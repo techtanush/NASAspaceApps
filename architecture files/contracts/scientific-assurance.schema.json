@@ -1,0 +1,451 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "audit_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "workspace_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "mode": {
+      "enum": [
+        "synthetic",
+        "replay",
+        "live"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "snapshot_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "mission_content_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "rover_content_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "dataset_policy_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "acquired_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "algorithm_lock_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "assurance_policy_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "critique_evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "uniqueItems": true
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "minItems": 1
+    },
+    "publication": {
+      "enum": [
+        "ALLOWED",
+        "LIMITED",
+        "BLOCKED"
+      ]
+    },
+    "blocking_issue_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "audit_id",
+    "workspace_id",
+    "run_id",
+    "mode",
+    "created_at",
+    "snapshot_sha256",
+    "mission_content_sha256",
+    "rover_content_sha256",
+    "dataset_policy_sha256",
+    "acquired_manifest_sha256",
+    "algorithm_lock_sha256",
+    "assurance_policy_sha256",
+    "critique_evidence_ids",
+    "claims",
+    "publication",
+    "blocking_issue_codes",
+    "limitations"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://analogforge.local/contracts/scientific-assurance.schema.json",
+  "title": "Scientific assurance artifact 1.0",
+  "description": "Immutable backend audit artifact; shape validation is necessary but cannot prove evidence or scientific correctness.",
+  "$defs": {
+    "Gate": {
+      "type": "object",
+      "properties": {
+        "gate_id": {
+          "type": "string",
+          "enum": [
+            "SC-01",
+            "SC-02",
+            "SC-03",
+            "SC-04",
+            "SC-05",
+            "SC-06",
+            "SC-07",
+            "SC-08",
+            "SC-09",
+            "SC-10",
+            "SC-11",
+            "SC-12",
+            "SC-13",
+            "SC-14",
+            "SC-15"
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "SATISFIED",
+            "UNSATISFIED",
+            "NOT_ASSESSED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "gate_id",
+        "outcome",
+        "reason",
+        "evidence_ids"
+      ],
+      "additionalProperties": false
+    },
+    "Claim": {
+      "type": "object",
+      "properties": {
+        "claim_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "claim_type": {
+          "enum": [
+            "QUALIFICATION",
+            "VERIFICATION",
+            "DISCOVERY",
+            "CONTEXT"
+          ]
+        },
+        "requirement_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidate_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uniqueItems": true
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disposition": {
+          "enum": [
+            "SUPPORTED",
+            "LIMITED",
+            "UNSUPPORTED",
+            "UNKNOWN",
+            "GAP",
+            "REJECTED"
+          ]
+        },
+        "qualification_status": {
+          "enum": [
+            "PASS",
+            "PARTIAL",
+            "FAIL",
+            "GAP",
+            "UNKNOWN",
+            null
+          ]
+        },
+        "verification_status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "INCONCLUSIVE",
+            null
+          ]
+        },
+        "validation_level": {
+          "enum": [
+            "S0",
+            "S1",
+            "S2",
+            "S3",
+            "S4"
+          ]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uniqueItems": true
+        },
+        "assumption_evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uniqueItems": true
+        },
+        "gates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Gate"
+          },
+          "minItems": 15,
+          "maxItems": 15
+        },
+        "permitted_statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "claim_id",
+        "claim_type",
+        "requirement_id",
+        "candidate_ids",
+        "scope",
+        "disposition",
+        "qualification_status",
+        "verification_status",
+        "validation_level",
+        "evidence_ids",
+        "assumption_evidence_ids",
+        "gates",
+        "permitted_statement",
+        "limitations"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "disposition": {
+                "const": "SUPPORTED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "evidence_ids": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "claim_type": {
+                "const": "QUALIFICATION"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "requirement_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "qualification_status": {
+                "enum": [
+                  "PASS",
+                  "PARTIAL",
+                  "FAIL",
+                  "GAP",
+                  "UNKNOWN"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "claim_type": {
+                "const": "VERIFICATION"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "verification_status": {
+                "enum": [
+                  "PASS",
+                  "FAIL",
+                  "INCONCLUSIVE"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "disposition": {
+                "enum": [
+                  "LIMITED",
+                  "UNSUPPORTED",
+                  "UNKNOWN",
+                  "GAP",
+                  "REJECTED"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "limitations": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "publication": {
+            "const": "BLOCKED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blocking_issue_codes": {
+            "minItems": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "blocking_issue_codes": {
+            "maxItems": 0
+          },
+          "claims": {
+            "items": {
+              "properties": {
+                "disposition": {
+                  "not": {
+                    "const": "REJECTED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "publication": {
+            "const": "LIMITED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "limitations": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

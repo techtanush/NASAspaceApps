@@ -158,3 +158,7 @@ Additional fixture assertions: a one-expansion budget gives INCONCLUSIVE/SEARCH_
 Analytic tests include flat-route energy with known units, uphill/downhill asymmetry, no downhill energy credit, auxiliary power during dwell, conservative reserve threshold equality, invalid efficiency rejection, a contour route on a steep plane rejected by full surface slope, nodata supercover, diagonal corner blocking, sample snapping beyond tolerance, exposure-band boundaries, unique-edge double counting, return closure, and independent rejection of falsified solver totals.
 
 Live-data acceptance is outcome-neutral: analyze actual downloaded terrain, run a real proposed route, preserve the computed outcome, and produce a real replan only if supported. It is acceptable for the actual candidate to remain unqualified. The polished failure/replan story must use the visibly synthetic regression fixture or an honestly recorded real run, as specified in [29-SCIENTIFIC-VALIDATION.md](29-SCIENTIFIC-VALIDATION.md).
+
+## Assured experiment claims
+
+Independent verifier outputs must satisfy SC-11 and the other applicable gates in [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md). Audit exact frozen route/constraint/input/policy hashes; do not certify from search counters. Preserve calibrated versus assumed energy, all attempts, bounded-search uncertainty and source support. Physical rover performance remains outside modeled verification.

@@ -27,3 +27,7 @@ Do not accept a handoff with "tests should pass" or an unspecified branch tip. R
 ## Final reporting
 
 Own `team handoffs/tanush/` checkpoint reports and final integration report. Reference other producer reports rather than rewriting their observed results. Declare explicit `platform_ready`, `scientific_modules_integrated`, `frontend_integrated`, `offline_e2e_passed`, `real_data_gates`, `live_model_gate` and `remaining_blockers`. Successful local source merges do not imply all those fields are true.
+
+## C1 scientific assurance seam
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

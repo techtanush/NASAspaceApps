@@ -1,0 +1,278 @@
+{
+  "schema_version": "1.0",
+  "scope": "NOT_DECLARED",
+  "tested_commit_sha": null,
+  "accepted_main_sha": null,
+  "created_at": null,
+  "locks": {
+    "schema_sha256": null,
+    "science_port_sha256": null,
+    "assurance_policy_sha256": null,
+    "algorithm_lock_sha256": null,
+    "dataset_policy_sha256": null,
+    "acquired_manifest_sha256": null
+  },
+  "integrity_tests": [
+    {
+      "test_id": "SCI-01",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-02",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-03",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-04",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-05",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-06",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-07",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-08",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-09",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-10",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-11",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-12",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-13",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-14",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-15",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-16",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-17",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    },
+    {
+      "test_id": "SCI-18",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": []
+    }
+  ],
+  "validation_levels": {
+    "S0": {
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    "S1": {
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    "S2": {
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    "S3": {
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    "S4": {
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    "S5": {
+      "status": "NOT_IMPLEMENTED",
+      "evidence": []
+    }
+  },
+  "source_paths": {
+    "Earth": {
+      "status": "NOT_RUN",
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": []
+    },
+    "Moon": {
+      "status": "NOT_RUN",
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": []
+    },
+    "Mars": {
+      "status": "NOT_RUN",
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": []
+    }
+  },
+  "controls": {
+    "status": "NOT_RUN",
+    "manifest_sha256": null,
+    "tuning_ids": [],
+    "held_out_ids": [],
+    "positive_control_evidence": [],
+    "negative_control_evidence": [],
+    "mission_sensitivity_evidence": [],
+    "ancestry_or_selection_limitations": []
+  },
+  "published_examples": {
+    "supported_positive": [],
+    "supported_negative": [],
+    "limited_unknown": [],
+    "rejected_claim_audits": [],
+    "ui_export_comparisons": []
+  },
+  "live_model": {
+    "status": "NOT_RUN",
+    "receipts": []
+  },
+  "blockers": [],
+  "limitations": [],
+  "permitted_release_claims": [],
+  "prohibited_or_unproven_claims": [],
+  "ready_for_declared_scope": false,
+  "status_vocabulary": [
+    "NOT_RUN",
+    "PASSED",
+    "FAILED",
+    "BLOCKED_EXTERNAL",
+    "SKIPPED",
+    "NOT_IMPLEMENTED"
+  ],
+  "note": "Template only. Replace with actual observed evidence for the exact tested commit. No planning fixture or skipped gate counts as passed."
+}

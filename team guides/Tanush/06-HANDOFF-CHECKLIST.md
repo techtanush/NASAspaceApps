@@ -19,3 +19,7 @@ Use a checkpoint directory under `team handoffs/tanush/`. Copy the common handof
 - [ ] Final accepted main SHA and report match the tested candidate; no forced update or publication.
 
 The handoff should tell each teammate exactly which main checkpoint to merge and which port/client version changed. Do not claim that a clean Git merge means the product works; attach the combined test evidence.
+
+## Scientific credibility handoff
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

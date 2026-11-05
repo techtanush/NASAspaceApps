@@ -6,7 +6,7 @@ Build reusable screens against real contracts, then connect actual durable resul
 
 Confirm own branch/worktree. Read architecture00/02/05/07/16–19/26/28 and shared ownership/service/runtime files. Scaffold only owned frontend files, root frontend package/lock and renderer package. Use current configured Codex; do not require an extra model or cloud service for frontend creation.
 
-Generate client/types from accepted architecture OpenAPI C0, then from Tanush's exported F0 implementation schema. Resolve/bundle relative schema refs rather than hand-copying partial interfaces. Provide `typecheck`, `test`, `build`, `generate:client`, `dev`, `dev:mock`, `test:e2e` scripts with locked versions. A generated client diff signals contract drift; do not edit generated fields manually.
+Generate client/types from accepted architecture OpenAPI C1, then from Tanush's exported F0 implementation schema. Resolve/bundle relative schema refs rather than hand-copying partial interfaces. Provide `typecheck`, `test`, `build`, `generate:client`, `dev`, `dev:mock`, `test:e2e` scripts with locked versions. A generated client diff signals contract drift; do not edit generated fields manually.
 
 Set up an explicit MSW/mock-development switch with prominent MOCK/SYNTHETIC preview badge and network isolation. Fixtures cover all five qualification states, three verification outcomes, pending critic review, no rover, blocked source, revision409, empty candidates, cancellation and event reconnect. They are development fixtures, not fake backend persistence.
 
@@ -53,3 +53,7 @@ Run both visible mock-preview component suite and separately real backend/scienc
 ## U-A6 Final handoff
 
 Deliver U1 exact tested SHA/base/schema hash, package lock, browser/renderer commands/results, real integration evidence, assets/licenses and blockers. Keep only owned paths. Request shared changes through exact contract-change file; do not rewrite Tanush's schema or Ayan's scientific outputs. Tanush integrates the tested commit and reruns combined gates before main advances.
+
+## Mandatory scientific implementation checkpoint
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

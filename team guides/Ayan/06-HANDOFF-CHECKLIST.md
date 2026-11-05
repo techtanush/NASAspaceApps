@@ -19,3 +19,7 @@ Create checkpoint report under `team handoffs/ayan/` using the shared template. 
 - [ ] Exact tested commit, commands/counts, tolerances, source/algorithm hashes and blockers included.
 
 Deliver S0 as soon as the pure facade/regression works, then S1 for complete scientific source/discovery/portfolio behavior. Do not wait for a perfect final app before exposing your actual integration shapes.
+
+## Scientific credibility handoff
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

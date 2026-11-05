@@ -27,3 +27,7 @@ Explain physical limitations in concise field-specific text: unresolved clearanc
 S0: analytic math/graph, typed facade and tests, expected result arithmetic, dependency requests and tested SHA. S1: actual supported source adapters/discovery/portfolio/display, source lock/asset report, validation controls, performance/resource data and blockers. Report corrected decoders/scale changes that invalidate earlier derivations.
 
 If a port is incompatible, submit an exact change request in your handoff directory with before/after fields and affected tests; Tanush owns shared schema/lock changes. Keep working on independent science while it is resolved. Do not make unreviewed edits in platform paths or silently ship an adapter the registrar cannot consume.
+
+## C1 scientific assurance seam
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

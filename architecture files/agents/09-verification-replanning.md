@@ -90,3 +90,7 @@ Handoff to Director: outcome/result/diagnosis IDs, next repair and remaining-bud
 - Missing energy calibration yields DATA/INCONCLUSIVE for energy-dependent test.
 - New candidate respects all original constraints and replan budget.
 - All outcomes remain modeled results, never real rover execution claims.
+
+## Scientific credibility enforcement
+
+[Architecture33](../33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) binds this role. Supply only registered evidence and permitted scoped proposals; backend SC gates decide public conclusions. Preserve uncertainty, support, mode and critic restrictions. This role cannot waive inadequate evidence, rewrite accepted thresholds, self-certify independent verification or claim physical readiness from modeled results.

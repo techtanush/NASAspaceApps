@@ -71,3 +71,7 @@ The final handoff must distinguish implemented software, exercised synthetic beh
 ## Dependency map
 
 Steps1→2→3→4 form the deterministic foundation. Step5 consumes2–4. Step6 can proceed after3 in parallel with interface work. Step7 requires2–4 and stable tool contracts. Step8 requires5–7, and9 hardens all layers. Step10 validates the entire result. Parallelize independent modules only after freezing shared types; one owner reconciles contracts and runs integration checks.
+
+## Scientific credibility work in every milestone
+
+Build C1 assurance/adequacy types and passport pointer at foundation; source/scale/uncertainty evidence with science; backend gate compiler before results; independent verification and critic enforcement before final claims; UI/export propagation before acceptance. Execute [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) and the [shared SCI matrix](../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md) alongside existing milestones. Disclaimers without enforcement are incomplete work.

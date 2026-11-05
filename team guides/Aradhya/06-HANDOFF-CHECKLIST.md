@@ -19,3 +19,7 @@ Use the common handoff template under `team handoffs/aradhya/<checkpoint>/`. U0 
 - [ ] Exact SHA, commands/results, seed/profile details, required backend gaps and external blockers included.
 
 The integrator should be able to run your interface and renderer from a clean checkout, identify their actual mode, reproduce tests and connect to the accepted backend without reverse engineering hidden local settings.
+
+## Scientific credibility handoff
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

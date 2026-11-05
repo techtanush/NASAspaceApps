@@ -63,3 +63,7 @@ Migration order: extensions and identity; mission/rover revisions; runs/jobs/eve
 ## Acceptance
 
 Cross-workspace reads and writes fail; an expired worker cannot commit; a duplicate command returns the original result; source hash changes invalidate derived caches; a crash between blob move and DB commit leaves only a recoverable orphan; backup restoration recovers both rows and all referenced blobs.
+
+## Scientific assurance persistence
+
+Include non-null passports.assurance_evidence_id referencing evidence in the initial passport migration; enforce same workspace/run/mode and presence in document_json.evidence_ids at application commit, with composite foreign keys/constraints where supported. Reports are immutable content-addressed DERIVED artifacts using existing tables, not mutable flags. Atomically commit audited conclusions, audit reference, passport manifest and event under current lease/revision fencing. A rejected proposal retains diagnostic evidence but creates no final passport. Preserve old reports on recomputation. See [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md).

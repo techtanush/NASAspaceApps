@@ -73,3 +73,7 @@ Tanush exposes authenticated asynchronous export endpoints/storage/header behavi
 Tanush publishes operation input/output models and ports. Ayan's facade is checked against them with synthetic example calls; Aradhya's renderer is checked with a complete immutable fixture. Each branch tests both happy and rejection/missing-data paths without pretending the fake collaborator is implemented. At integration replace collaborator doubles with real modules and rerun the same case.
 
 When an exact field is missing, record a contract change rather than inventing a private cross-branch convention. Public statuses/units/ID/null behavior must agree with architecture05/07. Proposed private envelope names above become real typed models at F0; they do not override public wire contracts.
+
+## C1 assurance and claim boundary
+
+Architecture33 and the [assurance schema](../architecture%20files/contracts/scientific-assurance.schema.json) define the shared artifact. Ayan returns observable-policy/adequacy/uncertainty/independent-verifier evidence through ScienceService drafts; Tanush resolves UUIDs, enforces SC gates and compiles permitted statements. The final passport has required assurance_evidence_id; its DERIVED record resolves by existing evidence/artifact endpoints. Tanush passes the resolved immutable report through PassportExportBundle to Aradhya. The renderer/browser never computes or upgrades scientific disposition. No new service process is required.

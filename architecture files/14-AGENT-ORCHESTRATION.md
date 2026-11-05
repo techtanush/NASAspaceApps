@@ -157,3 +157,7 @@ Append run events with increasing integer `seq` per run. SSE publishes committed
 - Exhaust search/replan budgets: preserve INCONCLUSIVE and SEARCH_LIMIT; never claim all possible Earth routes failed.
 - Reconnect SSE after event N: receive committed events N+1 onward and no hidden reasoning content.
 - Change 18° rover limit or mission exposure during replanning: immutable hash mismatch blocks commit and UI offers a new revision/run.
+
+## Scientific enforcement cannot be delegated to agent agreement
+
+All ten roles are bound by [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md). They may propose tools, registered evidence and scoped statements; deterministic backend assurance owns gate decisions and publication. Critic issues need linked repair/downgrade, and final Evidence/Passport output is compiled only from audited claims. A unanimous council cannot waive a scientific defect.

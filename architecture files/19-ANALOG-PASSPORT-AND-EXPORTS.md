@@ -181,3 +181,7 @@ Receipt summaries exclude secrets, headers and private reasoning. Input JSON inc
 | PASS-010 | Tampered, missing or unauthorized evidence cannot be represented as fully integrity-verified. |
 | PASS-011 | Malicious text/links cannot execute HTML/JavaScript or spreadsheet formulas; secrets never enter export files. |
 | PASS-012 | Refreshing/downloading an immutable published export yields the same published bytes/digest for that rendition. |
+
+## Required assurance section and publication check
+
+Include required assurance_evidence_id in the passport and manifest, plus resolved audited claims/gates in PassportExportBundle. Display exact permitted conclusions, mode/validation level, critical limitations and audit reference in HTML/JSON; flattened CSV preserves per-row status/scope/limitations and assurance reference. A blocked audit cannot issue a final passport. ALLOWED may describe a supported FAIL; LIMITED describes honest unresolved/nominal scope. Renderer never upgrades the decision. Apply [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) and shared SCI presentation/export tests.

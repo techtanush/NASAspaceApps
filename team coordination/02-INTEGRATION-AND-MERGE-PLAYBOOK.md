@@ -8,7 +8,7 @@ Tanush is the integrator. Ayan and Aradhya deliver tested owned modules; they do
 | --- | --- | --- |
 | F0 Platform foundation | Tanush | Locks/native imports, domain/OpenAPI, ports, healthy DB/API/worker, local commands, safe mode/identity/artifact context. |
 | S0 Scientific core | Ayan | Pure analytic terrain/comparison/energy/graph fixtures, typed facade, independent verifier, deterministic expected arithmetic. |
-| U0 Functional interface shell | Aradhya | Generated C0/F0 client, accessible navigation/forms/matrix, visible mock preview, snapshot/SSE/error handling scaffolding. |
+| U0 Functional interface shell | Aradhya | Generated C1/F0 client, accessible navigation/forms/matrix, visible mock preview, snapshot/SSE/error handling scaffolding. |
 | I1 First combined slice | Tanush with all modules | Actual API persists mission/rover, invokes Ayan facade, serves Aradhya UI, produces first real synthetic evidence. |
 | S1 Sources and full modeled science | Ayan | Earth/Mars/Moon source paths, honest optional-layer states, discovery controls, portfolio, raster-route verification. |
 | U1 Complete experience/export | Aradhya | Test lab/history/critic/review/portfolio/passport, pure renderer, responsive/browser/negative-state tests. |
@@ -86,3 +86,7 @@ Final RC requires:
 Classify a conflict before resolving: shared contract (Tanush decides with both consumer changes), scientific meaning (Ayan proposes evidence-supported correction), UI rendering/client (Aradhya reconciles with exported contract), dependency/native runtime (Tanush resolves lock with Ayan import tests). Never keep both conflicting enum definitions or fix a test by weakening the accepted requirement.
 
 Resolve on the integration candidate or producer branch according to ownership, record the fix, rerun affected and combined tests, then submit a new tested SHA. Never `reset --hard`, force-push or delete someone else's work to get a green merge. No deployment or external publication happens automatically after a local merge.
+
+## Scientific acceptance before advancing main
+
+Run [shared scientific gate06](06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md) on the exact integrated candidate. Verify no missing audit, unsupported positive claim, hidden essential unknown, unresolved material critic issue or UI/export contradiction. Collect observed results in the [scientific report](templates/scientific-validation-report.template.json). Separate owned branch code readiness, offline product acceptance and actual real-data/live-model validation; unrun source gates do not satisfy full scientific release acceptance.

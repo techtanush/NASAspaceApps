@@ -224,3 +224,7 @@ Use component tests for real branch logic and a browser journey for cross-screen
 | FE-014 | Workspace change clears/isolates queries and stream; unauthorized artifact detail is never reused from another workspace. |
 
 Implementation is ready when these pass with a real API adapter, plus the product scenarios in `28-DEMO-SCENARIOS-AND-ACCEPTANCE.md`. Mock transport fixtures are useful for isolated tests but do not fulfill live integration acceptance.
+
+## Scientific claim presentation
+
+Implement an assurance/evidence view using the required passport assurance_evidence_id and resolved JSON artifact. Display exact audited scope, mode, validation level, support, uncertainty/proxy limits, essential unknowns and issue restrictions. Missing audit stays incomplete; no client-derived PASS/confidence/coverage or hidden required row. See [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) and Aradhya's personal07 guide.

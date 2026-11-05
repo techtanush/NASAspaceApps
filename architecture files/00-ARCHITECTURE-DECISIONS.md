@@ -48,3 +48,7 @@ ARES-1: 42 kg, maximum safe slope 18 degrees, clearance 0.20 m, wheel diameter 0
 ## Documentation responsibilities
 
 Each document must include concrete behavior, implementation boundaries, input/output references, failure handling, and acceptance criteria. Each external dataset/service claim must cite an official source or explicitly be a proposed design choice. External credentials are setup dependencies, not values to invent or collect into these files. Exact software patches, data granules, checksums, and available model identifiers are resolved during preflight and recorded in a lock manifest.
+
+## Binding scientific claim policy
+
+Apply [33 scientific credibility and claim gates](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) to every scientific result and final passport. Deterministic backend audits enforce SC-01–SC-15, immutable evidence and exact claim scope. The C1 passport contract requires assurance_evidence_id. Scientific limitations cannot be waived by model prose or user review; truthful negative/unknown reports are legitimate outcomes.

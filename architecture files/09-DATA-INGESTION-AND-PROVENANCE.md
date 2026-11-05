@@ -98,3 +98,7 @@ In replay mode all necessary bytes and recorded agent operations must already ex
 Automated fixtures must demonstrate interrupted download recovery, duplicate fetch idempotency, HTML-login rejection, archive traversal rejection, checksum mismatch quarantine, missing label rejection, body mismatch, nodata halo propagation, cross-tile seam handling, categorical resampling, and mode contamination rejection. A provenance traversal from any displayed number must reach source bytes or an explicitly synthetic generator.
 
 A human opening an exported passport must be able to identify the source product, measured quantity, support scale, derivation, assumptions, and why a dimension is unknown without access to private agent reasoning. Passing download tests alone does not validate science; see [29-SCIENTIFIC-VALIDATION.md](29-SCIENTIFIC-VALIDATION.md).
+
+## Source admissibility for claims
+
+Register actual decoded asset/quality/body/frame/unit/support/time/lineage receipts before a source can support a claim. Catalog hits and product names alone cannot pass SC-02–SC-06. Include common ancestry for SC-10. Invalid assets cannot be cited in a positive conclusion; preserve safe failure evidence and downgrade dependent findings. See [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md).

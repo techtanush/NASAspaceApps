@@ -9,3 +9,5 @@ Follow [scope](01-SCOPE-AND-FILE-OWNERSHIP.md), [build sequence](02-IMPLEMENTATI
 Start with pure analytic rasters and the small graph regression while Tanush publishes F0. This work needs no API key, browser or database. Deliver a computed S0 checkpoint early; then connect real sources and complete the full scientific operation set. Do not wait until the end to reveal that your return format differs from the shared port.
 
 References: [architecture](../../architecture%20files/README.md), [team rules](../../team%20coordination/README.md), [service boundary](../../team%20coordination/03-SERVICE-BOUNDARIES.md), [ownership](../../team%20coordination/contracts/ownership.json). Record reports/dependency/change requests in `team handoffs/ayan/`.
+
+Before implementing scientific results, read the mandatory [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md). It assigns your concrete backend/science/presentation responsibilities and shared adversarial merge tests under contract C1.

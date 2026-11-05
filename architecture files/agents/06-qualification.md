@@ -77,3 +77,7 @@ Handoff to Critic includes matrix revision, comparison receipt IDs, evidence bun
 - Changing a quantitative threshold in a proposed row is rejected by contract hash/predicate checks.
 - A modeled route FAIL narrows test-use claims without erasing the independently valid site measurements.
 - Public qualification contains traceable row decisions and no universal similarity percentage.
+
+## Scientific credibility enforcement
+
+[Architecture33](../33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) binds this role. Supply only registered evidence and permitted scoped proposals; backend SC gates decide public conclusions. Preserve uncertainty, support, mode and critic restrictions. This role cannot waive inadequate evidence, rewrite accepted thresholds, self-certify independent verification or claim physical readiness from modeled results.

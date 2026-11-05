@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "change_id": "C1-scientific-assurance",
+  "previous_baseline": "C0-planning-snapshot",
+  "new_baseline": "C1-scientific-assurance",
+  "authorization": "User requested explicit backend and all branch/general architecture requirements for scientific credibility.",
+  "stage": "Planning only; no application implementation or persisted application data exists.",
+  "public_contract_change": "AnalogPassport now requires assurance_evidence_id. Existing evidence/artifact endpoints resolve the audit. No new endpoint or scientific status enum.",
+  "new_artifact_contract": "scientific-assurance.schema.json and SC-01 through SC-15 registry; claim compiler and publication semantics in architecture33.",
+  "compatibility": "Required passport field changes its shape. Regenerate all models/client/fixtures from C1; do not silently accept missing audits as successful.",
+  "migration": "Include assurance pointer/FK and application semantic checks in first passport migration. If implementation appears before applying C1, add an explicit migration and preserve historical records as unaudited.",
+  "consumers": [
+    "Tanush platform/domain/ports/audit/compiler",
+    "Ayan science adequacy/verification receipts",
+    "Aradhya generated client/UI/renderer bundle"
+  ],
+  "validation": [
+    "blueprint schemas/examples/references",
+    "team guide integrity/baseline",
+    "all worktree branch copies"
+  ],
+  "implementation_validation_status": "NOT_IMPLEMENTED"
+}

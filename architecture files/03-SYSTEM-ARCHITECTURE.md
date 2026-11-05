@@ -56,3 +56,7 @@ Sites/static hosting may serve the frontend only. The Python/GDAL worker needs a
 ## Acceptance
 
 Kill the API during a run, reconnect, and recover state/events. Kill a worker mid-analysis and let its lease expire; a replacement must complete without publishing duplicate results. Disable OpenAI and run deterministic unit verification. Run the synthetic scenario with external networking disabled. Verify no browser network request carries a provider secret.
+
+## Scientific assurance boundary
+
+Insert application.assurance between scientific receipts and public result commit, and recheck the final frozen manifest before passport publication. It uses existing domain/evidence/artifact infrastructure and Ayan's ScienceService results; no separate microservice or duplicate science engine. See [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md).

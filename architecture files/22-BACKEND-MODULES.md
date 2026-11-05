@@ -44,3 +44,7 @@ Pydantic model fields follow 05 and domain.schema.json. Explicitly serialize UTC
 ## Acceptance
 
 Each row above has one happy-path contract test and a meaningful failure test. Science can run without API/model imports. A backend router test substitutes a fake queue and proves no CPU analysis occurs inside the request. A malicious model proposal cannot directly set PASS, reference another workspace's evidence, select an unapproved source host, alter a threshold, or execute arbitrary code.
+
+## Mandatory scientific assurance service
+
+Implement application.assurance.audit(snapshot, proposed_claims, registered_receipts), deterministic SC gate evaluators and claim compiler before public scientific commits. Consume Ayan's scientific adequacy/uncertainty/verifier evidence rather than duplicating algorithms. Audit again before passport publication; persist immutable DERIVED scientific-assurance/1.0 artifact and enforce required assurance_evidence_id. Verify all frozen hashes and no unresolved claim contradictions. Same-workspace/mode and lease/revision fencing apply. Synchronous invalid claims yield SCIENTIFIC_CLAIM_REJECTED; limited/negative honest findings remain publishable. Full field, pipeline, hash and failure specification: [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md).

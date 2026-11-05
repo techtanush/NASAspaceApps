@@ -1995,6 +1995,11 @@
           "items": {
             "type": "string"
           }
+        },
+        "assurance_evidence_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Required DERIVED scientific-assurance evidence; also in evidence_ids and frozen manifest."
         }
       },
       "required": [
@@ -2017,7 +2022,8 @@
         "evidence_ids",
         "manifest_sha256",
         "limitations",
-        "next_steps"
+        "next_steps",
+        "assurance_evidence_id"
       ],
       "additionalProperties": false
     },

@@ -34,3 +34,7 @@ Before claiming completion, check every PR row in02 and the traceability CSV. Ve
 ## External prerequisites
 
 Consult20/21 for OPENAI_API_KEY, explicit OPENAI_MODEL and Earthdata access where required. Account creation, access authorization, funded API limits and scientifically adequate source coverage cannot be guaranteed by architecture text. If those are absent, finish the implementation with honest blocked live capabilities and state the precise remaining setup. Do not fabricate keys, downloaded products, research facts or successful demonstrations to satisfy the word "complete".
+
+## Binding scientific credibility task
+
+Implement [33 scientific credibility and claim gates](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md), the C1 passport assurance pointer and [shared SCI acceptance matrix](../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Backend gates must constrain actual results, not just prompts. Preserve source/support/uncertainty/proxy/mode limits, critic resolution and independently verified experiments. Deliver observed scientific-validation-report.json; never label skipped source/live/physical checks passed.

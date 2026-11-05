@@ -49,3 +49,7 @@ In live mode, use real approved source products and live role calls; missing dep
 ## Role-specific completion
 
 Finish when the role's required deliverable is schema-valid, evidence-linked and internally consistent, or when a bounded blocker is recorded. Backend policy validates and commits your proposal. You cannot override a rejected commit, erase a failed attempt, or reclassify a scientific outcome to create a more compelling demonstration.
+
+## Mandatory scientific claim boundary
+
+Follow [33 scientific credibility](../33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md). Cite only registered evidence. Propose scoped claims; deterministic backend assurance decides statuses/publication. No mode/validation-level promotion, unsupported physical readiness, hidden failed/unknown requirement, invented uncertainty, waived material critic issue or altered frozen criteria. Missing evidence stays explicit. User acceptance of assumptions does not certify a physical result.

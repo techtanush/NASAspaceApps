@@ -4,7 +4,7 @@ This schedule coordinates dependency handoffs, not fixed estimates of what an AI
 
 | Time from start | Tanush | Ayan | Aradhya | Shared gate |
 | --- | --- | --- | --- | --- |
-|0–2h| Lock environment, domain/ports/API, local DB/worker foundation | Analytic terrain and graph fixture scaffold, dependency requests | Frontend tooling, C0 client, visible mock preview, workbench skeleton | Confirm ownership, branches/profile, exact F0 seam fields. |
+|0–2h| Lock environment, domain/ports/API, local DB/worker foundation | Analytic terrain and graph fixture scaffold, dependency requests | Frontend tooling, C1 client, visible mock preview, workbench skeleton | Confirm ownership, branches/profile, exact F0 seam fields. |
 |2–6h| Draft/accept/rover/run records, idempotency/artifacts/events | Terrain/CRS/masks/energy, graph solver and verifier | Mission/rover/fingerprint forms, qualification/evidence components | F0 tested commit; producers import accepted checkpoint. |
 |6–10h| Tool registrar and scripted-role worker, synthetic persistence | Typed scientific facade with computed FAIL/repair/PASS and limits | Snapshot/actions/SSE/mock negative states, test-lab skeleton | S0/U0 checkpoints; build imports, no fake science. |
 |10–14h| Integrate actual science and frontend; fix cross-boundary gaps | Support real facade registration/telemetry, not DB rewrite | Replace mocks with real API for one path, preserve preview mode separately | I1 browser flow persists real synthetic evidence and attempts. |

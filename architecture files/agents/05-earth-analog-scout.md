@@ -73,3 +73,7 @@ Handoff to Qualification: exact candidate and analysis revision IDs, target prof
 - The shortlist states the search catalog/extent and bounded optimality limits.
 - A failed candidate/zone/route attempt is not silently repeated.
 - Portfolio coverage does not split an indivisible continuous-route benchmark across sites.
+
+## Scientific credibility enforcement
+
+[Architecture33](../33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) binds this role. Supply only registered evidence and permitted scoped proposals; backend SC gates decide public conclusions. Preserve uncertainty, support, mode and critic restrictions. This role cannot waive inadequate evidence, rewrite accepted thresholds, self-certify independent verification or claim physical readiness from modeled results.

@@ -78,3 +78,7 @@ Handoff to Director includes accepted contract ID/hash only after API acceptance
 - Changing the mission after acceptance produces a new draft/hash and cannot alter an old run.
 - Joint route requirements remain joint in portfolio eligibility.
 - One complete contract can be evaluated by deterministic predicates without asking a model to interpret success at runtime.
+
+## Scientific credibility enforcement
+
+[Architecture33](../33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) binds this role. Supply only registered evidence and permitted scoped proposals; backend SC gates decide public conclusions. Preserve uncertainty, support, mode and critic restrictions. This role cannot waive inadequate evidence, rewrite accepted thresholds, self-certify independent verification or claim physical readiness from modeled results.

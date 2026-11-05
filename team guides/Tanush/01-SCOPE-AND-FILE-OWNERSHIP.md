@@ -34,3 +34,7 @@ Do not rewrite frontend components, scientific leaf packages, source decoders or
 ## Definition of your completed responsibility
 
 Your branch individually is ready when F0/platform/agent tests pass, stable interfaces are delivered, no unsafe bypasses exist and your implementation has honest missing-module behavior. The **team product** is complete only after actual Ayan/Aradhya modules merge and full integrated gates pass. State those two statuses separately in the handoff.
+
+## Scientific responsibilities in owned files
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

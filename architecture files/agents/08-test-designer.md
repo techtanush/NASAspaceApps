@@ -73,3 +73,7 @@ Maximum 6 model requests, 8 tools, one schema correction. Route CPU search is bo
 - Recovery mask removes a real modeled segment and preserves mission constraints.
 - Test design cannot change exposure or battery reserve without a new accepted run.
 - Route found proceeds to independent deterministic verification before any PASS claim.
+
+## Scientific credibility enforcement
+
+[Architecture33](../33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) binds this role. Supply only registered evidence and permitted scoped proposals; backend SC gates decide public conclusions. Preserve uncertainty, support, mode and critic restrictions. This role cannot waive inadequate evidence, rewrite accepted thresholds, self-certify independent verification or claim physical readiness from modeled results.

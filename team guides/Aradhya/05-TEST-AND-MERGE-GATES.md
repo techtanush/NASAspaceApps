@@ -51,3 +51,7 @@ Document profile URL/mock flag/fixture seed for each browser test. Do not treat 
 ## Ready to merge
 
 Owned-path diff only, no secrets/bulk assets/runtime output, no test failures/client drift/unsupported state claims, reproducible mock and actual-API commands, test counts/screenshots where useful, asset provenance and known blockers. Submit exact tested commit SHA and base schema/main checkpoint. Tanush tests the final combined merge candidate; no hosting/publication happens automatically.
+
+## Mandatory credibility tests
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

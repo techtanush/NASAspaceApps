@@ -77,6 +77,23 @@ def fixture_hash(value) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+def assurance_shape_issues(value, gate_ids: set[str]) -> list[str]:
+    """Planning-fixture consistency, not the future application's scientific audit."""
+    issues = []
+    seen_claims = set()
+    for claim in value.get('claims', []):
+        if claim['claim_id'] in seen_claims:
+            issues.append('duplicate claim ID')
+        seen_claims.add(claim['claim_id'])
+        ids = [gate['gate_id'] for gate in claim['gates']]
+        if len(ids) != len(set(ids)) or set(ids) != gate_ids:
+            issues.append('each registered gate must occur exactly once')
+        for gate in claim['gates']:
+            if gate['gate_id'] in {'SC-01', 'SC-07', 'SC-12', 'SC-14', 'SC-15'} and gate['outcome'] == 'NOT_APPLICABLE':
+                issues.append('an ALL gate cannot be disabled')
+    return issues
+
+
 def main() -> int:
     for path in ROOT.rglob('*.json'):
         try:
@@ -143,6 +160,50 @@ def main() -> int:
         for error in errors:
             fail(f'{filename} {list(error.path)}: {error.message}')
         CHECKS['schema_validated_examples'] += 1
+
+    assurance_path = ROOT / 'contracts/scientific-assurance.schema.json'
+    assurance = load(assurance_path)
+    Draft202012Validator.check_schema(assurance)
+    walk_refs(assurance, assurance_path)
+    gate_registry = load(ROOT / 'contracts/scientific-gates.json')
+    expected_gates = {f'SC-{i:02d}' for i in range(1, 16)}
+    if (set(gate_registry['required_gate_ids']) != expected_gates
+            or len(gate_registry['required_gate_ids']) != 15
+            or {gate['gate_id'] for gate in gate_registry['gates']} != expected_gates
+            or len(gate_registry['gates']) != 15):
+        fail('Scientific gate registry must define each SC-01 through SC-15 once')
+    CHECKS['scientific_gate_definitions'] = len(gate_registry['gates'])
+    audit_validator = Draft202012Validator(assurance, format_checker=FormatChecker())
+    audit_cases = ['assurance-supported-negative.json', 'assurance-supported-positive.json',
+                   'assurance-limited-unknown.json', 'assurance-blocked-claim.json']
+    for filename in audit_cases:
+        value = load(ROOT / 'examples' / filename)
+        for error in audit_validator.iter_errors(value):
+            fail(f'{filename} {list(error.path)}: {error.message}')
+        for issue in assurance_shape_issues(value, expected_gates):
+            fail(f'{filename}: {issue}')
+        CHECKS['assurance_validated_examples'] += 1
+    import copy
+    valid = load(ROOT / 'examples/assurance-supported-negative.json')
+    missing = copy.deepcopy(valid)
+    missing['claims'][0]['gates'].pop()
+    duplicate = copy.deepcopy(valid)
+    duplicate['claims'][0]['gates'][-1] = copy.deepcopy(duplicate['claims'][0]['gates'][0])
+    disabled = copy.deepcopy(valid)
+    disabled['claims'][0]['gates'][0]['outcome'] = 'NOT_APPLICABLE'
+    unknown_id = copy.deepcopy(valid)
+    unknown_id['claims'][0]['gates'][0]['gate_id'] = 'SC-99'
+    empty_blocked = copy.deepcopy(valid)
+    empty_blocked['publication'] = 'BLOCKED'
+    rejected_published = copy.deepcopy(valid)
+    rejected_published['claims'][0]['disposition'] = 'REJECTED'
+    for mutation in [missing, duplicate, disabled, unknown_id, empty_blocked, rejected_published]:
+        if audit_validator.is_valid(mutation) and not assurance_shape_issues(mutation, expected_gates):
+            fail('Malformed assurance planning fixture was accepted')
+        CHECKS['assurance_invalid_fixture_rejections'] += 1
+    passport = domain['$defs']['AnalogPassport']
+    if 'assurance_evidence_id' not in passport['required']:
+        fail('C1 passport must require assurance_evidence_id')
 
     for filename, meta in [
         ('mission-contract.json', {'schema_version', 'id', 'mission_id', 'workspace_id',

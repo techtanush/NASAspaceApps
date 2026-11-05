@@ -49,5 +49,15 @@
   "reproduction_steps": [],
   "consumer_handoff": [],
   "ignored_data_not_committed": true,
-  "secrets_not_committed": true
+  "secrets_not_committed": true,
+  "scientific_credibility": {
+    "contract_baseline": "C1-scientific-assurance",
+    "implemented_gate_ids": [],
+    "assigned_sci_test_results": [],
+    "policy_hashes": [],
+    "audit_evidence_ids": [],
+    "validation_report_path": null,
+    "unproven_claims": [],
+    "status": "NOT_RUN"
+  }
 }

@@ -71,3 +71,7 @@ Retain events for at least 30 days. If cursor predates retained data, return HTT
 ## Acceptance
 
 Contract tests cover every operation, each action/state combination, revision conflict, duplicate request, cross-workspace object, and SSE replay. A frontend reload must reconstruct the exact current scientific state without relying on prior local events.
+
+## Scientific assurance retrieval and failures
+
+The C1 AnalogPassport response includes required assurance_evidence_id; clients resolve it through existing GET /evidence/{id} then authorized GET /artifacts/{sha256}. Artifact validates against [the assurance schema](contracts/scientific-assurance.schema.json). No extra endpoint or new qualification enum is introduced. Synchronous invalid claim/publication returns422 SCIENTIFIC_CLAIM_REJECTED with safe gate issues; async jobs record rejection in receipts/events after their original202. No passport.created event occurs for a blocked audit. See [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md).

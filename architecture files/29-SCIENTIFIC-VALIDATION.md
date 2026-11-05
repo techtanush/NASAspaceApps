@@ -145,3 +145,7 @@ Every displayed quantity in the resulting passport must resolve through its evid
 The release report separates PASSED, FAILED, SKIPPED, and NOT_IMPLEMENTED checks. It lists tested source products rather than claiming all products in an instrument archive work. It reports model assumptions, calibration status, unsupported physical dimensions, bounded discovery extent, search approximation, and unverified operational access.
 
 Release-blocking scientific defects include body/CRS confusion, radius/height or scaling errors, use of nodata as terrain, manufactured source IDs or measurements, source-scale clearance PASS, relaxed mission constraints inside replanning, search-budget exhaustion called infeasibility, and unsupported full-mission success. Correct UNKNOWN/GAP/INCONCLUSIVE results are expected product behavior, not defects to conceal.
+
+## Executable assurance and release evidence
+
+Enforce these validation boundaries using [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md), immutable assurance artifacts and [shared SCI tests](../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Control split membership, thresholds and tolerances are locked before tuning; preserve related-source dependence and finite-search limits. Complete [the scientific report](../team%20coordination/templates/scientific-validation-report.template.json) with observed checks for the exact tested SHA. S0–S4 labels require corresponding executed evidence; baseline cannot self-award S5.

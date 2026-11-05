@@ -25,3 +25,7 @@ Your renderer implements the F0 pure port under `rendering/passport/`. Accept fr
 ## Requests and blockers
 
 Use `team handoffs/aradhya/` for schema/dependency requests and reproducible defects. Include field path, expected semantic/unit/state, actual behavior, effect on user flow, test case and proposed nonbreaking fix. Continue component/renderer work against visible fixtures while a backend dependency is pending. Do not silently ship a screen whose button has no real eventual action.
+
+## C1 scientific assurance seam
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

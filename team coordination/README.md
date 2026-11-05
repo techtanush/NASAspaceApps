@@ -39,6 +39,8 @@ The [48 hour schedule](05-48-HOUR-EXECUTION-SCHEDULE.md) is a suggested order of
 
 ## Local transfer between computers
 
+The primary shared repository is [techtanush/NASAspaceApps](https://github.com/techtanush/NASAspaceApps). Clone it and check out the branch assigned to your person. On a separate computer the clone root is your working checkout; use its `team guides/<Name>/` instructions. The nested named worktrees above describe the original integrator computer and are not committed duplicate directories. Push your work to your assigned branch; Tanush follows the merge playbook before advancing main. GitHub version control does not change the local runtime scope.
+
 `analogforge-team.bundle` at the repository root is an offline Git transfer artifact created after the shared baseline/branches. It contains committed history and all branches; it excludes ignored data and secrets. Copy the bundle using the team's chosen transfer method. No network account is required to create or clone it.
 
 On a teammate's computer, use the bundle's actual path and a new empty destination:
@@ -65,3 +67,7 @@ To transfer a completed feature back, create a new bundle from the contributor c
 - [Changed-path ownership checker](scripts/check_branch_ownership.py)
 
 No subagents were used to prepare these team assignments. Runtime Agent Council roles are part of the future product, a separate concept from coding-agent delegation during this setup task.
+
+## Scientific credibility is a shared merge gate
+
+Follow [06 scientific credibility and release gate](06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). The [C1 change record](contracts/C1-SCIENTIFIC-ASSURANCE-CHANGE.json) adds immutable claim audits and the required passport pointer before app implementation. All three personal guides include concrete implementation obligations beyond their agent prompts. Use the [scientific validation template](templates/scientific-validation-report.template.json) to record observed evidence; its unfilled fields are not completed validation.

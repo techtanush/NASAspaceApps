@@ -4,7 +4,7 @@ Implement pure numerical correctness first, then source realism, then optimizati
 
 ## S-A0 Establish contracts and offline fixtures
 
-Confirm Ayan branch/worktree. Read architecture00/05/08–13/26/29 and shared03. Use current public schemas C0 until accepted F0 ports arrive. Create your owned `science` package and operation-specific value types; avoid importing nonexistent platform internals. If F0 is pending, use a local test fixture implementing the **documented port**, not a second production interface.
+Confirm Ayan branch/worktree. Read architecture00/05/08–13/26/29 and shared03. Use current public schemas C1 until accepted F0 ports arrive. Create your owned `science` package and operation-specific value types; avoid importing nonexistent platform internals. If F0 is pending, use a local test fixture implementing the **documented port**, not a second production interface.
 
 Generate small flat/inclined/bumpy/nodata rasters with explicit metric CRS/body/units and deterministic seeds. Copy the canonical graph/constraints fixture semantics, keeping its mock resource provider test-only. Include machine expected values and source labels. No fixture generated from a formula is NASA data.
 
@@ -57,3 +57,7 @@ Run known-control recovery, negative control, mission sensitivity, scale/proxy c
 ## S-A6 Final handoff
 
 Run own05, port tests with real platform registrar and actual display consumer. Commit only owned code/config/tests/reports, no downloaded bulk data or secrets. Produce S1 report with exact tested/base SHA, operations supported, source metadata/checksums available, numeric tolerances, examples, dependencies and blockers. Continue until all owned operations and tested failure paths are complete; distinguish software completion from unperformed real-data/field validation.
+
+## Mandatory scientific implementation checkpoint
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

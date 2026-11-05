@@ -6,7 +6,7 @@ Implement the tests below and record actual results. Commands describe the futur
 
 - Python3.12/native science imports work inside the built worker image, not only on your laptop.
 - Fresh Postgres/PostGIS migration succeeds; API/worker readiness and capabilities are accurate.
-- Public domain shapes/units/statuses match C0; OpenAPI/client-generation input is stable; port models serialize real fixture requests/results.
+- Public domain shapes/units/statuses match C1; OpenAPI/client-generation input is stable; port models serialize real fixture requests/results.
 - Local mode binds safely; isolated profile ports/volumes/CORS point to the right worktree.
 - Synthetic seed is idempotent/offline. Missing external keys do not break offline startup or pretend live is available.
 
@@ -53,3 +53,7 @@ At integration run the complete Python suite plus Aradhya's frontend checks/brow
 ## Merge report
 
 Record exact tested source SHA, accepted main/base SHA, runtime/profile/build lock, schema/port hashes, commands/exit codes/counts, observed live/source probes and blockers. `ready_to_merge` requires no unexplained failing tests, unauthorized files, runtime secrets, fake fixtures or unresolved contract mismatch. Record platform readiness separately from integrated product acceptance. Final main only advances to the tested integration candidate; no deployment follows automatically.
+
+## Mandatory credibility tests
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

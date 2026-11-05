@@ -171,3 +171,7 @@ A result with a slope histogram can support terrain-distribution comparison at i
 - Provider refusal, partial stream and malformed function arguments are visible typed failures; no parser falls back to prose-based decisions.
 - Logs and SSE contain approved summaries and receipts, with no credentials or hidden reasoning.
 - Contract tests cover all tool argument/result variants and each role payload. Science correctness tests remain in the deterministic tools, not prompt string assertions.
+
+## Assurance after tools
+
+Existing scientific tools return typed adequacy, lineage, uncertainty and independent-verification receipts through the common port. Run deterministic application.assurance after registration and before result publication; it is not an LLM self-certification tool. Use stable SC gate IDs in safe receipts and reject unsupported claims with SCIENTIFIC_CLAIM_REJECTED. See [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md).

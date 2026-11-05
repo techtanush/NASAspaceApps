@@ -24,17 +24,17 @@ Generated clients are regenerated from Tanush's accepted exported OpenAPI. Aradh
 
 ## Initial authority and F0 freeze
 
-The existing architecture schema/OpenAPI is contract C0. Before integration, Tanush publishes foundation checkpoint F0 containing:
+The existing architecture schema/OpenAPI is contract C1. Before integration, Tanush publishes foundation checkpoint F0 containing:
 
 1. Installed/locked Python dependencies and real Postgres/worker/API boot commands.
-2. Pydantic/domain types and existing public status enums/units matching C0.
+2. Pydantic/domain types and existing public status enums/units matching C1.
 3. `ports/science.py` and `ports/passport_renderer.py` implementing the call boundaries in03.
-4. Exported OpenAPI and a deterministic export command; public shape diff must match C0 or have an approved change record.
+4. Exported OpenAPI and a deterministic export command; public shape diff must match C1 or have an approved change record.
 5. Structured errors, mode guard, workspace/job/run context, artifact I/O ports and cancellation token interface.
 6. Stable scenario IDs and safe capabilities response so frontend run creation does not guess IDs.
 7. Foundation test report and exact commit SHA. This is a real commit once implemented; do not invent a SHA in a template.
 
-Ayan and Aradhya can build pure modules, fixtures and interface components against C0 while F0 is prepared. They import F0 when available and replace temporary **test doubles** with the accepted ports. A missing port is a dependency to report, not permission to create a competing production API.
+Ayan and Aradhya can build pure modules, fixtures and interface components against C1 while F0 is prepared. They import F0 when available and replace temporary **test doubles** with the accepted ports. A missing port is a dependency to report, not permission to create a competing production API.
 
 ## Change process
 
@@ -51,3 +51,7 @@ First deliver a terrain-first vertical slice; then complete remaining full-scope
 Own branch, own worktree, own runtime profile. Commit only owned files plus an explicitly approved shared patch. Merge accepted main checkpoints into feature branches; use merge commits rather than rewriting branches while teammates depend on them. Do not rebase/force-update another person's branch, reset worktrees, auto-resolve conflicts by choosing one entire side, or let an agent edit the root main checkout to fix its branch tests.
 
 The ownership checker is an aid, not a security boundary. It checks changed paths against this registry; it cannot certify scientific behavior. A special shared patch must still be reviewed/tested even when its author is the owner.
+
+## Accepted C1 scientific credibility revision
+
+[C1 change record](contracts/C1-SCIENTIFIC-ASSURANCE-CHANGE.json) supersedes the original planning C0 shape. It requires the passport assurance pointer, typed audit/adequacy handoffs and deterministic publication checks from architecture33. Tanush owns shared schema/ports/compiler; Ayan supplies scientific policy/evidence; Aradhya consumes and displays the resolved audit. This user-authorized planning update is synchronized to all three worktrees; future shared changes still follow this file's change process.

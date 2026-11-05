@@ -1,6 +1,6 @@
 # Architecture file index
 
-Every file below belongs to the implementation blueprint. Generated validation reports describe blueprint integrity, not application completion.
+Every file below belongs to the implementation blueprint. Validation reports describe planning integrity, not application or scientific completion.
 
 | File | Purpose |
 | --- | --- |
@@ -37,7 +37,9 @@ Every file below belongs to the implementation blueprint. Generated validation r
 | [30-REQUIREMENTS-TRACEABILITY.md](30-REQUIREMENTS-TRACEABILITY.md) | Requirements traceability and completion evidence |
 | [31-SOURCE-REGISTER.md](31-SOURCE-REGISTER.md) | Source register and verification boundaries |
 | [32-CODING-AGENT-EXECUTION-PROMPT.md](32-CODING-AGENT-EXECUTION-PROMPT.md) | Coding agent execution prompt |
-| [BLUEPRINT-VALIDATION.json](BLUEPRINT-VALIDATION.json) | Machine readable supporting artifact |
+| [33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) | Scientific credibility and enforceable claim gates |
+| [BLUEPRINT-VALIDATION.json](BLUEPRINT-VALIDATION.json) | Supporting blueprint artifact |
+| [FILE-INDEX.md](FILE-INDEX.md) | Architecture file index |
 | [README.md](README.md) | AnalogForge implementation blueprint |
 | [agents/01-mission-director.md](agents/01-mission-director.md) | Role 01 — Mission Director |
 | [agents/02-requirements.md](agents/02-requirements.md) | Role 02 — Requirements Agent |
@@ -50,25 +52,30 @@ Every file below belongs to the implementation blueprint. Generated validation r
 | [agents/09-verification-replanning.md](agents/09-verification-replanning.md) | Role 09 — Verification and Replanning |
 | [agents/10-evidence-passport.md](agents/10-evidence-passport.md) | Role 10 — Evidence and Analog Passport |
 | [contracts/domain.schema.json](contracts/domain.schema.json) | Typed JSON Schema contract |
-| [contracts/error-codes.json](contracts/error-codes.json) | Machine readable supporting artifact |
-| [contracts/openapi.yaml](contracts/openapi.yaml) | OpenAPI3.1 HTTP specification |
-| [contracts/requirements-traceability.csv](contracts/requirements-traceability.csv) | Product requirement implementation and validation ledger |
-| [contracts/validate_blueprint.py](contracts/validate_blueprint.py) | Blueprint artifact validation utility |
-| [examples/.env.example](examples/.env.example) | Example input, configuration or synthetic regression fixture |
-| [examples/constraints-artifact.json](examples/constraints-artifact.json) | Example input, configuration or synthetic regression fixture |
-| [examples/dataset-lock.template.json](examples/dataset-lock.template.json) | Example input, configuration or synthetic regression fixture |
-| [examples/mission-contract.json](examples/mission-contract.json) | Example input, configuration or synthetic regression fixture |
-| [examples/qualification-unknown.json](examples/qualification-unknown.json) | Example input, configuration or synthetic regression fixture |
-| [examples/request-create-run.json](examples/request-create-run.json) | Example input, configuration or synthetic regression fixture |
-| [examples/request-prove-it.json](examples/request-prove-it.json) | Example input, configuration or synthetic regression fixture |
-| [examples/rover-import.json](examples/rover-import.json) | Example input, configuration or synthetic regression fixture |
-| [examples/rover-profile.json](examples/rover-profile.json) | Example input, configuration or synthetic regression fixture |
-| [examples/run-event.json](examples/run-event.json) | Example input, configuration or synthetic regression fixture |
-| [examples/scenario-manifest.json](examples/scenario-manifest.json) | Example input, configuration or synthetic regression fixture |
-| [examples/synthetic-route-graph.json](examples/synthetic-route-graph.json) | Example input, configuration or synthetic regression fixture |
+| [contracts/error-codes.json](contracts/error-codes.json) | Supporting blueprint artifact |
+| [contracts/openapi.yaml](contracts/openapi.yaml) | Supporting blueprint artifact |
+| [contracts/requirements-traceability.csv](contracts/requirements-traceability.csv) | Supporting blueprint artifact |
+| [contracts/scientific-assurance.schema.json](contracts/scientific-assurance.schema.json) | Typed JSON Schema contract |
+| [contracts/scientific-gates.json](contracts/scientific-gates.json) | Supporting blueprint artifact |
+| [contracts/validate_blueprint.py](contracts/validate_blueprint.py) | Supporting blueprint artifact |
+| [examples/.env.example](examples/.env.example) | Supporting blueprint artifact |
+| [examples/assurance-blocked-claim.json](examples/assurance-blocked-claim.json) | Supporting blueprint artifact |
+| [examples/assurance-limited-unknown.json](examples/assurance-limited-unknown.json) | Supporting blueprint artifact |
+| [examples/assurance-supported-negative.json](examples/assurance-supported-negative.json) | Supporting blueprint artifact |
+| [examples/constraints-artifact.json](examples/constraints-artifact.json) | Supporting blueprint artifact |
+| [examples/dataset-lock.template.json](examples/dataset-lock.template.json) | Supporting blueprint artifact |
+| [examples/mission-contract.json](examples/mission-contract.json) | Supporting blueprint artifact |
+| [examples/qualification-unknown.json](examples/qualification-unknown.json) | Supporting blueprint artifact |
+| [examples/request-create-run.json](examples/request-create-run.json) | Supporting blueprint artifact |
+| [examples/request-prove-it.json](examples/request-prove-it.json) | Supporting blueprint artifact |
+| [examples/rover-import.json](examples/rover-import.json) | Supporting blueprint artifact |
+| [examples/rover-profile.json](examples/rover-profile.json) | Supporting blueprint artifact |
+| [examples/run-event.json](examples/run-event.json) | Supporting blueprint artifact |
+| [examples/scenario-manifest.json](examples/scenario-manifest.json) | Supporting blueprint artifact |
+| [examples/synthetic-route-graph.json](examples/synthetic-route-graph.json) | Supporting blueprint artifact |
 | [prompts/COMMON-SYSTEM-POLICY.md](prompts/COMMON-SYSTEM-POLICY.md) | Common system policy for all AnalogForge roles |
-| [references/AnalogForge_Final_Research_Build_Brief.docx](references/AnalogForge_Final_Research_Build_Brief.docx) | Retained original source or source integrity metadata |
-| [references/docx-text-extract.txt](references/docx-text-extract.txt) | Retained original source or source integrity metadata |
-| [references/original-concept.txt](references/original-concept.txt) | Retained original source or source integrity metadata |
-| [references/source-manifest.json](references/source-manifest.json) | Retained original source or source integrity metadata |
-| [FILE-INDEX.md](FILE-INDEX.md) | This generated file index |
+| [references/AnalogForge_Final_Research_Build_Brief.docx](references/AnalogForge_Final_Research_Build_Brief.docx) | Supporting blueprint artifact |
+| [references/docx-text-extract.txt](references/docx-text-extract.txt) | Supporting blueprint artifact |
+| [references/original-concept.txt](references/original-concept.txt) | Supporting blueprint artifact |
+| [references/source-manifest.json](references/source-manifest.json) | Supporting blueprint artifact |
+| [examples/assurance-supported-positive.json](examples/assurance-supported-positive.json) | Synthetic supported-positive assurance fixture |

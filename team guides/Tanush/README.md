@@ -9,3 +9,5 @@ Your first deliverable is F0: a runnable backend foundation, stable typed ports/
 Do not implement a second terrain/route engine while waiting for Ayan. Do not build a competing frontend while waiting for Aradhya. Use explicit typed test doubles in platform tests, label incomplete capability, and replace them at integration. Only you advance main, using isolated tested merge candidates.
 
 The full architecture remains at [architecture README](../../architecture%20files/README.md). Team collaboration rules are at [coordination README](../../team%20coordination/README.md). Exact ownership rules are in [ownership registry](../../team%20coordination/contracts/ownership.json). Report status in `team handoffs/tanush/`, not by editing the other people's files.
+
+Before implementing scientific results, read the mandatory [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md). It assigns your concrete backend/science/presentation responsibilities and shared adversarial merge tests under contract C1.

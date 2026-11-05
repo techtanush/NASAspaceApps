@@ -12,7 +12,7 @@ Scaffold Python package, dependencies/uv lock, Postgres/PostGIS Compose service,
 
 Create `ports/science.py`, `ports/passport_renderer.py`, artifact/mode/cancellation/source-policy interfaces as described in shared03. Include operation-specific input/result models, typed collaborator test doubles and contract tests. Provide `make bootstrap`, `dev`, `migrate`, `test`, `generate-client`, `build`, `seed-synthetic`, `preflight` commands; frontend build target may delegate to Aradhya's later package instead of generating her files.
 
-F0 exit: clean checkout starts DB/API/worker, settings invalidity is clear, modes and scenario IDs visible, dependencies locked, ports importable and schema export matches accepted C0. Commit and submit exact F0 SHA for integration into main. Do not wait for all roles/science/UI before sharing this foundation.
+F0 exit: clean checkout starts DB/API/worker, settings invalidity is clear, modes and scenario IDs visible, dependencies locked, ports importable and schema export matches accepted C1. Commit and submit exact F0 SHA for integration into main. Do not wait for all roles/science/UI before sharing this foundation.
 
 ## T2 Durable domain and evidence
 
@@ -57,3 +57,7 @@ Complete local security, workspace isolation, quotas, source allowlists, logs/re
 ## T7 Deliver exact evidence
 
 Run own05 plus combined gates. Update58-row traceability with code/test references, gate report and actual command results. Produce clean build/run instructions, tested commit/merge refs and demo mode declaration. The final report distinguishes your code, integrated software, synthetic arithmetic, actual downloaded sources, actual model calls and unresolved physical/source requirements. Continue fixing ordinary failures; ask humans only for real missing choices/credentials, never for routine reversible fixes.
+
+## Mandatory scientific implementation checkpoint
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

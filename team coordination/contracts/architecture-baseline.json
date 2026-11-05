@@ -1,11 +1,12 @@
 {
   "schema_version": "1.0",
-  "baseline": "C0-planning-snapshot",
+  "baseline": "C1-scientific-assurance",
+  "note": "User-authorized C1 planning snapshot. See C1-SCIENTIFIC-ASSURANCE-CHANGE.json. Future shared revisions require a recorded change and baseline update by Tanush.",
   "files": [
     {
       "path": "architecture files/00-ARCHITECTURE-DECISIONS.md",
-      "bytes": 7247,
-      "sha256": "6d9d9a11fe3fc86a21665524d97236ef3ba464fa85c83851c29804694069900f"
+      "bytes": 7708,
+      "sha256": "c67848ddcb62ed7d31023bf3b10fe01806aa92b48d45802ffe3ffe4de1b51bde"
     },
     {
       "path": "architecture files/01-VISION-CONTEXT-AND-SCOPE.md",
@@ -19,8 +20,8 @@
     },
     {
       "path": "architecture files/03-SYSTEM-ARCHITECTURE.md",
-      "bytes": 5260,
-      "sha256": "9bf4023895701a5bceea6ecf94dc95cabb80b0ea1af6eb7ca4ce499a936c500b"
+      "bytes": 5647,
+      "sha256": "034d18d51c715b3f5bf1c633b934f3770c3b723231830cda483a0f6f80a76ffb"
     },
     {
       "path": "architecture files/04-REPOSITORY-AND-DEPENDENCIES.md",
@@ -29,18 +30,18 @@
     },
     {
       "path": "architecture files/05-DOMAIN-MODEL-AND-CONTRACTS.md",
-      "bytes": 9758,
-      "sha256": "ab50c443187e0621517de934f6f3cb589cdbd9e8895d5a17e764e237bc94667f"
+      "bytes": 10387,
+      "sha256": "9e0a382fa1a4163c1c44e1e7dbe7f4c07ce7e3fa70b22a763dcf95f74e677cbc"
     },
     {
       "path": "architecture files/06-DATABASE-AND-STORAGE.md",
-      "bytes": 7352,
-      "sha256": "9b644a015590ee166e76b8897801e7ceceef177fe5119e761bc4952bd07de623"
+      "bytes": 8046,
+      "sha256": "187be53c48dbff716519ed7b12efe4c69c745d377a54f0a63e1f86bcff4fbc56"
     },
     {
       "path": "architecture files/07-HTTP-API-AND-EVENTS.md",
-      "bytes": 10660,
-      "sha256": "c9efea7db18cd890bc43fd9ba59703e05c2dd88d6603e776e27daafd412e6f99"
+      "bytes": 11311,
+      "sha256": "62ae65d26fbf8c6c8fe7e1b6d3e2f8bb5cb55f781b2c8e6cd34738e2f7ef101e"
     },
     {
       "path": "architecture files/08-DATASET-CATALOG.md",
@@ -49,8 +50,8 @@
     },
     {
       "path": "architecture files/09-DATA-INGESTION-AND-PROVENANCE.md",
-      "bytes": 13279,
-      "sha256": "a8aeb03cbc9ae50003c44c5840c2dbdf0c898de4b47599f4a32b81b7c43e6c24"
+      "bytes": 13714,
+      "sha256": "c3e1334c76b38ca79c6dac956ce67f060d03a38ffac7d000eef868237b8f2010"
     },
     {
       "path": "architecture files/10-TERRAIN-AND-PLANETARY-COMPARISON.md",
@@ -59,13 +60,13 @@
     },
     {
       "path": "architecture files/11-QUALIFICATION-AND-UNCERTAINTY.md",
-      "bytes": 12197,
-      "sha256": "f0ae4c440788772fedbedc9014a06333bd8a1b667f75390cb0b73c2c0076252a"
+      "bytes": 12734,
+      "sha256": "c3f002ef16a4a233d420668452ae2debd5e3984a78a15e58829b9aac272733ea"
     },
     {
       "path": "architecture files/12-ROUTE-ENERGY-AND-VERIFICATION.md",
-      "bytes": 20585,
-      "sha256": "cf8aa8556fc8d3238e0a07acf03fcc497fcc7852a9278c3d3dc6810ee2f64ad3"
+      "bytes": 21013,
+      "sha256": "80ade0e90cdcbd1c8eddb6dc852061618812f143083055eae4d1010fcfc1a662"
     },
     {
       "path": "architecture files/13-COMPOSITE-ANALOG-PORTFOLIOS.md",
@@ -74,13 +75,13 @@
     },
     {
       "path": "architecture files/14-AGENT-ORCHESTRATION.md",
-      "bytes": 20688,
-      "sha256": "a62da28c62ef696555541f0436e8d4a9b1980a7628df923f7835370f8576e24a"
+      "bytes": 21141,
+      "sha256": "58877c22afd936e1e4362a32567ef285702a7464aa8b4131148b950228b48351"
     },
     {
       "path": "architecture files/15-TOOL-REGISTRY-AND-PROMPT-CONTRACT.md",
-      "bytes": 26135,
-      "sha256": "826d09fa41950c44d333ebf6c4dcab413a2cca8790fd4534af678ba7072f9a76"
+      "bytes": 26585,
+      "sha256": "4fed8990922416dbab874a9f315e24c1ca46ed9f3fbd3dde4203bd0feda72a9a"
     },
     {
       "path": "architecture files/16-USER-JOURNEYS-AND-SCREENS.md",
@@ -89,8 +90,8 @@
     },
     {
       "path": "architecture files/17-FRONTEND-COMPONENTS-AND-STATE.md",
-      "bytes": 19902,
-      "sha256": "0d03c5339afd998c67a93d75401377a33b123e854aead4fbdb967a715671f5e3"
+      "bytes": 20369,
+      "sha256": "c091f5f8f8390516edec7ecd677a8b0fd9b320d447e8cb28dca1daa8a0aa8ff9"
     },
     {
       "path": "architecture files/18-MAPS-LAYERS-AND-VISUAL-DESIGN.md",
@@ -99,8 +100,8 @@
     },
     {
       "path": "architecture files/19-ANALOG-PASSPORT-AND-EXPORTS.md",
-      "bytes": 19636,
-      "sha256": "85c4bacc483a1e84bb00e0f59e18e5462c0ee942c46ac36c0ef7507381c66bac"
+      "bytes": 20290,
+      "sha256": "ef548e53989a5f826d14299faae820e49d6861a11293ab4266ff8c4c6a0eecaa"
     },
     {
       "path": "architecture files/20-CREDENTIALS-AND-EXTERNAL-SERVICES.md",
@@ -114,8 +115,8 @@
     },
     {
       "path": "architecture files/22-BACKEND-MODULES.md",
-      "bytes": 6362,
-      "sha256": "95d71c0e5feb0e5de050bed1186ac42dd4a19ef1ca156d9f6f237c55c42680a6"
+      "bytes": 7163,
+      "sha256": "96df8fb44e111a6f30f2eaff8c7413eef51446498a54504a652b638734ffde3a"
     },
     {
       "path": "architecture files/23-JOBS-AND-RECOVERY.md",
@@ -134,28 +135,28 @@
     },
     {
       "path": "architecture files/26-TEST-STRATEGY.md",
-      "bytes": 7839,
-      "sha256": "e9daec277defe2c05607fcb7252f288f497b53bf850b41c229e2cd685ba90eab"
+      "bytes": 8506,
+      "sha256": "3378d0bf5abd3467b0d22b1e36c6c844daf2be07e1ac0619d4eddee405761253"
     },
     {
       "path": "architecture files/27-IMPLEMENTATION-PLAYBOOK.md",
-      "bytes": 8948,
-      "sha256": "c009748a8aa93abfd67984b0db9ce88fd54ba5b4cf978325c4fcb403f19c2f3d"
+      "bytes": 9507,
+      "sha256": "e1eb9fdc627ca1c227ce4137691920ae5fee053a3c344feca342fda8a4f59897"
     },
     {
       "path": "architecture files/28-DEMO-SCENARIOS-AND-ACCEPTANCE.md",
-      "bytes": 19687,
-      "sha256": "b46780221c91e8cc8bbc0015446afab44ccca6eb0c294a86715dfa8cd5c5ffe6"
+      "bytes": 20185,
+      "sha256": "2f98324f879d56f78cf168adaeadfea4fc50344b228f408a47ae9d55fc4d5693"
     },
     {
       "path": "architecture files/29-SCIENTIFIC-VALIDATION.md",
-      "bytes": 17191,
-      "sha256": "59b414101676b99a151816236093fcc46952c381463fe9f4097a6ec4798ae178"
+      "bytes": 17839,
+      "sha256": "2b9cdff80882cde8ef13eb0c992a065337ef1b1909f4f5a153818f347bf9a9e8"
     },
     {
       "path": "architecture files/30-REQUIREMENTS-TRACEABILITY.md",
-      "bytes": 4326,
-      "sha256": "4ac19f6efa1584944840e8fc2c29277097b8bfb452ff5957eb051854ff0a9476"
+      "bytes": 4856,
+      "sha256": "7814e870e4e52d68002986679e0798022334894ed5e4b7250dd77629787473b5"
     },
     {
       "path": "architecture files/31-SOURCE-REGISTER.md",
@@ -164,83 +165,88 @@
     },
     {
       "path": "architecture files/32-CODING-AGENT-EXECUTION-PROMPT.md",
-      "bytes": 5843,
-      "sha256": "46b6c231bdef84ebfffecf8af36a58f1a0821e7dcda8032e506af63c8f1a3331"
+      "bytes": 6409,
+      "sha256": "3a6c3106778383d698fd2f1fab4804d7905837419fd437a6a75b64d47be946fe"
+    },
+    {
+      "path": "architecture files/33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md",
+      "bytes": 18564,
+      "sha256": "e38b4f07fb8717cbc8486429650b0bff86b7396cdf7c7bf3c6c4010e4a640f17"
     },
     {
       "path": "architecture files/BLUEPRINT-VALIDATION.json",
-      "bytes": 626,
-      "sha256": "134ce5fc440a6d9c2d638e8e4d9ea1ed5d901f9fc3efd01e7031e9db798e8f23"
+      "bytes": 751,
+      "sha256": "cffef20eea57ac3b58bd2c3fd4a6ffd98ba9dbf7063b0fb2414214145b7b0281"
     },
     {
       "path": "architecture files/FILE-INDEX.md",
-      "bytes": 8053,
-      "sha256": "67f334ca074376a974015a3b7ca9f11542465722ef3f35386f03990bf9ed8856"
+      "bytes": 8413,
+      "sha256": "b0ba992cc0ecba8ddf6f48dfe641b7a02fcd3f3a79e8a1bf1eb39935c7a9a7e7"
     },
     {
       "path": "architecture files/README.md",
-      "bytes": 8357,
-      "sha256": "a5a4e338d740c63087f7dbf13b62a9987743632f6b8b00f23be7932a775adabc"
+      "bytes": 9197,
+      "sha256": "650c28071a037ca164ee1a19acf8fe6c30c97df20ee1958c87f7c28c9f205bea"
     },
     {
       "path": "architecture files/agents/01-mission-director.md",
-      "bytes": 7021,
-      "sha256": "945ed8924c37d418e5bd840e1bb7438025965c8bea7f7105598eaa7b49926091"
+      "bytes": 7474,
+      "sha256": "af06e50001beefb76ef19a08d5fdb86ee6d7b1b4c32b6910a64143275081254a"
     },
     {
       "path": "architecture files/agents/02-requirements.md",
-      "bytes": 10210,
-      "sha256": "d7e23c8d00bb033d39d78e18c60ec1e2dad0a7f13960b5c56421798b94abd5ec"
+      "bytes": 10663,
+      "sha256": "a3ccb3800bf19cd94c5ed28e41008174b6cd042b2ba1edae73ebdff45d8564a8"
     },
     {
       "path": "architecture files/agents/03-rover-systems.md",
-      "bytes": 7115,
-      "sha256": "b4cf3a3f2f26a20285ac78733248388110c398100f0868aaeff7b2ee95ef6dbd"
+      "bytes": 7568,
+      "sha256": "2a404d217baf3f79c5d633adc9648845a7a4ea8d33b3ffe2bbdf65448aedcc27"
     },
     {
       "path": "architecture files/agents/04-planetary-target.md",
-      "bytes": 6914,
-      "sha256": "031ea612f0d9609a07779ab83737cf037200daddb9677968fbe00e60c07641ce"
+      "bytes": 7367,
+      "sha256": "3831305c54ccd0a0f4bc22c9cfa7f6caf3e0e257e050d4582362e50de101c70c"
     },
     {
       "path": "architecture files/agents/05-earth-analog-scout.md",
-      "bytes": 7285,
-      "sha256": "b0afa832964c7c4b4feaab5e57f9054aa14b552ea2547457b4a5063d349e00ca"
+      "bytes": 7738,
+      "sha256": "31d959d9e9f4bbc49d10a95c0800cbd217cdd592578b3459d540a9f5c3ade385"
     },
     {
       "path": "architecture files/agents/06-qualification.md",
-      "bytes": 7833,
-      "sha256": "9a84e31a3d63352c23df23a4a7ece14b25fd757dce927cb20c9318d893b2bfe8"
+      "bytes": 8286,
+      "sha256": "87c9b0debc237d6a1ae2470489258c054054108dd19bc2254ed53a6a24a2e903"
     },
     {
       "path": "architecture files/agents/07-scientific-critic.md",
-      "bytes": 9159,
-      "sha256": "2aedf2022658a1b804b8604948d006e16b8811d53d13bc692a5e77fce6fb5972"
+      "bytes": 9612,
+      "sha256": "da5cee943927d572b02af88aa00e4fec6fb6d547cbf6cfdbf7109c1c25908c9a"
     },
     {
       "path": "architecture files/agents/08-test-designer.md",
-      "bytes": 7421,
-      "sha256": "2e9f0c8c7f4f5a366e007e996d2a61e18f2ddee9d7ae47aefeb93be7cafe696e"
+      "bytes": 7874,
+      "sha256": "8159f05f5e59c5fda3982cda77b9c4a131b07d56d29c7859ee647f37d92faeb9"
     },
     {
       "path": "architecture files/agents/09-verification-replanning.md",
-      "bytes": 8828,
-      "sha256": "4247513034a1ed4777f90ece3c03ba8362023e917552283441a6a28f59c1e313"
+      "bytes": 9281,
+      "sha256": "82f3c32c8f95cbee4b32703b8d39fd336d6bf001793f26df2122411365521f97"
     },
     {
       "path": "architecture files/agents/10-evidence-passport.md",
-      "bytes": 8824,
-      "sha256": "328a7ed1c5730ab47eb944bfd16a0f85d08fe610f330d9ce3b102c7591d78dca"
+      "bytes": 9277,
+      "sha256": "5c8c77ab7c331267494f4702459ca2f260caf35c2570b2ff0fdc783c10ee5cc6"
     },
     {
       "path": "architecture files/contracts/domain.schema.json",
-      "bytes": 58773,
-      "sha256": "68676e111acf2764c70c5b9b97508ec971b91d4bc7dbf1c565ea938a394dfc13"
+      "bytes": 59025,
+      "sha256": "cd051f476020752eca804d65ee2bb693c39109523a2d3bd69f49f3e923c6ecdf"
     },
     {
       "path": "architecture files/contracts/error-codes.json",
-      "bytes": 2643,
-      "sha256": "9828e7a847f61a017f6d212386fdfb93bd70230c0cc8d2088373ddc68f99ea37"
+      "bytes": 2750,
+      "sha256": "46629281a6f62acc8a57721ee28140e9841bbbcd171f5ae5d8d5649603ba6dc1"
     },
     {
       "path": "architecture files/contracts/openapi.yaml",
@@ -253,14 +259,44 @@
       "sha256": "582b7db38e8183cc2cd70291cb7c98d4df0dab9319c2f74ffaf0ded2c75a8bdb"
     },
     {
+      "path": "architecture files/contracts/scientific-assurance.schema.json",
+      "bytes": 9485,
+      "sha256": "f88986b65b31ac8fbd2e6ad0fa05b31792a1b065786983789d174dec2008fa65"
+    },
+    {
+      "path": "architecture files/contracts/scientific-gates.json",
+      "bytes": 4452,
+      "sha256": "a8db66d44553bbb767b4bd5dce99480edab9867a917c68f94d7d35685435ae8d"
+    },
+    {
       "path": "architecture files/contracts/validate_blueprint.py",
-      "bytes": 10638,
-      "sha256": "7b837b8557e8e330a4ca590d1357e7b1ffbd1c29c357ce3420a980a5b7f92327"
+      "bytes": 14021,
+      "sha256": "3386441b04a810a1cdd2bd06564ea62448cae53fbb36bc9c7421c48babc2110a"
     },
     {
       "path": "architecture files/examples/.env.example",
       "bytes": 771,
       "sha256": "59b3c29ba3ebcb1c295cfb0777e43fa35aaca5e6184b70423bfc71593ec6801f"
+    },
+    {
+      "path": "architecture files/examples/assurance-blocked-claim.json",
+      "bytes": 6260,
+      "sha256": "630927a2ec6a45ba3975681368be514d5a076503498ff132a6c84ab50552dda2"
+    },
+    {
+      "path": "architecture files/examples/assurance-limited-unknown.json",
+      "bytes": 6189,
+      "sha256": "95192a06c8a76ff108484e329d0a601efc21de4601f4d4b9b86935387e50a793"
+    },
+    {
+      "path": "architecture files/examples/assurance-supported-negative.json",
+      "bytes": 6175,
+      "sha256": "7163a9c26e59b2b0a7060af723c607ef295869a634386929adc9c38fc0c10c5b"
+    },
+    {
+      "path": "architecture files/examples/assurance-supported-positive.json",
+      "bytes": 6235,
+      "sha256": "42672e0e357549f7aca8a9cabb5f5a9486a3914ac2814b45014be56c82d486a4"
     },
     {
       "path": "architecture files/examples/constraints-artifact.json",
@@ -319,8 +355,8 @@
     },
     {
       "path": "architecture files/prompts/COMMON-SYSTEM-POLICY.md",
-      "bytes": 6921,
-      "sha256": "251a4216cbf268d76b3baf2a5638b22e481b7a8c6c64a2abc8b9a5c99d1477ad"
+      "bytes": 7445,
+      "sha256": "f521c607abb61e4a8018e2cfc554be37bebeb90a412012dcc35dd7ae431fac36"
     },
     {
       "path": "architecture files/references/AnalogForge_Final_Research_Build_Brief.docx",
@@ -342,6 +378,5 @@
       "bytes": 986,
       "sha256": "a3cce0fa4304ad7b08e70cda41adfb593fc538a8642728505d5b1e7b9a34943a"
     }
-  ],
-  "note": "Immutable starting architecture. Approved shared revisions require a recorded change and an updated baseline by Tanush."
+  ]
 }

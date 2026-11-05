@@ -23,7 +23,7 @@ def main() -> int:
     required = ['README.md', 'CODING-AGENT-PROMPT.md', '01-SCOPE-AND-FILE-OWNERSHIP.md',
                 '02-IMPLEMENTATION-PLAN.md', '03-ARCHITECTURE-READING-MAP.md',
                 '04-SERVICE-INTERFACES-AND-HANDOFFS.md', '05-TEST-AND-MERGE-GATES.md',
-                '06-HANDOFF-CHECKLIST.md', 'STATUS-TEMPLATE.json']
+                '06-HANDOFF-CHECKLIST.md', '07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md', 'STATUS-TEMPLATE.json']
     registry = json.loads((root / 'team coordination/contracts/ownership.json').read_text())
     for person, spec in registry['people'].items():
         for name in required:

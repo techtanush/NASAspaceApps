@@ -23,7 +23,7 @@ Read the First rows before substantive implementation, then specialist rows as t
 | [21-CONFIGURATION-AND-PREFLIGHT.md](../../architecture%20files/21-CONFIGURATION-AND-PREFLIGHT.md) | Before real backend | Correct profile/scenario/mode/source-policy settings. | Runtime |
 | [24-SECURITY-IDENTITY-AND-DATA-POLICY.md](../../architecture%20files/24-SECURITY-IDENTITY-AND-DATA-POLICY.md) | Before renderer/API completion | Escaping/CSRF/workspace/source link/output safety. | Security |
 | [26-TEST-STRATEGY.md](../../architecture%20files/26-TEST-STRATEGY.md) | First and final | Meaningful component/renderer/browser/real-API tests and release gates. | Tests |
-| [27-IMPLEMENTATION-PLAYBOOK.md](../../architecture%20files/27-IMPLEMENTATION-PLAYBOOK.md) | Context | Build UI early against C0, then integrate actual F0/S0. | Coordination |
+| [27-IMPLEMENTATION-PLAYBOOK.md](../../architecture%20files/27-IMPLEMENTATION-PLAYBOOK.md) | Context | Build UI early against C1, then integrate actual F0/S0. | Coordination |
 | [28-DEMO-SCENARIOS-AND-ACCEPTANCE.md](../../architecture%20files/28-DEMO-SCENARIOS-AND-ACCEPTANCE.md) | First and final | Full positive/negative/no-rover/unknown/replan/portfolio scenarios. | Acceptance |
 | [30-REQUIREMENTS-TRACEABILITY.md](../../architecture%20files/30-REQUIREMENTS-TRACEABILITY.md) | At handoff | Map UI behavior to actual requirement IDs and observed test results. | Report |
 
@@ -41,3 +41,7 @@ These describe the product’s Agent Council, not permission to spawn additional
 - [08-test-designer](../../architecture%20files/agents/08-test-designer.md)
 - [09-verification-replanning](../../architecture%20files/agents/09-verification-replanning.md)
 - [10-evidence-passport](../../architecture%20files/agents/10-evidence-passport.md)
+
+## Required scientific credibility reading
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

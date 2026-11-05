@@ -181,3 +181,7 @@ A 90-second presentation can use a labeled replay of a prior live run while pres
 For each acceptance run save: scenario manifest/version, environment/data lock manifest, contract/rover digests, tool versions, run ID/mode, event excerpt, evidence/attempt IDs, qualification/critic result, final passport ID/digest, export checksums, assertion report and key screenshots. Sanitize secrets and private account details. Include expected failures as passing acceptance observations only when the test explicitly intended them.
 
 Release report labels outcomes **implemented and verified**, **implemented but not yet live-verified**, **blocked by named dependency**, or **future extension**. The full application is complete only when all in-scope requirements are implemented and their required verification is recorded. Do not confuse honest scientific uncertainty in a completed investigation with missing software functionality.
+
+## Credibility demonstration
+
+Include a supported negative report, a visible inadequate-data UNKNOWN, a material critic downgrade and one independently checked computation. Distinguish computed synthetic fail/replan from actual source analysis; do not force real terrain to pass. Show exact audited scope, mode, source support and unrun gates. Follow [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) and shared SCI acceptance; architecture or source metadata alone is not scientific validation.

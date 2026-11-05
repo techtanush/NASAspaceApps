@@ -31,3 +31,7 @@ An optional-layer adapter's honest no-coverage result can satisfy its software f
 ## Handoff ledger
 
 For every final claimed feature include PR IDs, module paths, unit/integration/e2e test names, runtime mode, dataset/model probe evidence where applicable, and remaining limitations. Attach the release verification report and source/build locks. Completion claims must remain consistent with passport language and the actual reports.
+
+## Scientific assurance acceptance overlay
+
+Keep the existing58 PR IDs. Cross-cutting scientific integrity is additionally tracked as SC-01–SC-15 gate IDs and SCI-01–SCI-18 test IDs; these are not new PRs. Every implemented science-facing requirement links applicable gates, owned test paths and actual audit/release receipts. Follow [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) and [the shared matrix](../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Unimplemented/unrun entries remain explicit.

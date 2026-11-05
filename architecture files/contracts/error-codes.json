@@ -120,6 +120,11 @@
       "code": "MODEL_OUTPUT_INVALID",
       "http_status": 503,
       "retryable": false
+    },
+    {
+      "code": "SCIENTIFIC_CLAIM_REJECTED",
+      "http_status": 422,
+      "retryable": false
     }
   ],
   "note": "Tool/science outcomes map to these HTTP codes only at synchronous request boundaries. In asynchronous runs they appear in receipts/reports without changing already accepted HTTP202 responses."

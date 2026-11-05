@@ -81,3 +81,7 @@ Final handoff to Director/policy: passport manifest/revision, export artifact ID
 - Coarse terrain calculations never produce hardware-safe, flight-ready or actually-autonomous claims.
 - JSON and printable tables show the same values/statuses/units from one manifest.
 - Report generation never sends mail, posts publicly, or starts real equipment.
+
+## Scientific credibility enforcement
+
+[Architecture33](../33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) binds this role. Supply only registered evidence and permitted scoped proposals; backend SC gates decide public conclusions. Preserve uncertainty, support, mode and critic restrictions. This role cannot waive inadequate evidence, rewrite accepted thresholds, self-certify independent verification or claim physical readiness from modeled results.

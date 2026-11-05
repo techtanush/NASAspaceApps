@@ -34,3 +34,7 @@ Tanush supplies immutable accepted inputs/evidence/attempts/manifest and validat
 ## Not your scope
 
 Do not implement a competing FastAPI backend or hidden client-side qualification engine. Do not force success by hiding negative rows, scripts or labels. Do not buy/publish hosting or send communications. Do not change public API/mission/rover scientific semantics or hardcode live model/source results. A mock preview is useful development infrastructure, not a live product integration.
+
+## Scientific responsibilities in owned files
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

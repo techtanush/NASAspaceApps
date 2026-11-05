@@ -111,3 +111,7 @@ All recomputation creates new qualification revisions. The accepted mission and 
 Test all five statuses independently and threshold equality boundaries. Test missing data versus physical gap, permitted versus forbidden proxy, direct versus coarse-scale slope, nominal versus conservative energy, preliminary availability versus verified continuity, and explicit versus unknown rover capabilities. A fabricated citation, unresolved evidence ID, incompatible mode, or unsupported clearance PASS must be rejected by policy even when proposed by an agent.
 
 Mandatory acceptance: the same target with terrain and thermal mission contracts produces different evidence requests and different qualification coverage when supported data differ. Missing thermal data must produce UNKNOWN rather than an unchanged terrain-driven recommendation disguised as a thermal result. Scientific evaluation cases are detailed in [29](29-SCIENTIFIC-VALIDATION.md).
+
+## Enforcement and audit
+
+Implement these decision rules through the deterministic SC gates and structured claims in [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md). Persist observable-specific policy hashes, actual evidence and uncertainty/proxy/support limitations; never use a generic credibility score to replace them. A robust pass and a disclosed nominal-model result have different permitted wording. The backend audits before result commit and final export; negative/unknown findings remain first-class publishable outcomes.

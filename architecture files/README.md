@@ -79,3 +79,7 @@ This validates the blueprint artifacts. Application tests, live accounts, exact 
 ## Decisions that must survive implementation
 
 PASS, PARTIAL, FAIL, GAP and UNKNOWN remain distinct. Verification adds INCONCLUSIVE for missing information or bounded search. Coarse planetary data provides regional context; Earth terrain-model feasibility does not certify wheel-scale clearance or physical navigation. Replanning preserves accepted requirements. The initial PROVE IT click authorizes test design and execution within accepted assumptions; new material input changes require review/new revisions. All modes and uncertainty remain visible in the final passport.
+
+## Mandatory C1 scientific credibility controls
+
+Read [33 scientific credibility and claim gates](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md). It defines the backend audit/compiler, source/scale/coverage/uncertainty/critic/verification/publication checks and required passport assurance pointer. Machine contracts: [assurance schema](contracts/scientific-assurance.schema.json), [SC gate registry](contracts/scientific-gates.json). Examples: [supported negative](examples/assurance-supported-negative.json), [limited unknown](examples/assurance-limited-unknown.json), [blocked claim](examples/assurance-blocked-claim.json). These are visibly synthetic shape/semantics fixtures, not executed scientific validation. All branches follow [shared credibility acceptance](../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md).

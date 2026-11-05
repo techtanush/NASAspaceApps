@@ -36,3 +36,7 @@ Do not call a natural Earth site a complete Mars/Moon simulation. MOLA gives reg
 ## Not your work
 
 Do not scaffold another backend/frontend/database or implement Agent Council conversations. Do not edit global locks/migrations/contracts to fit your private representation. Do not add hardware/simulator/ROS dependencies excluded from the architecture. Leave UI/API/export authentication and model keys to the respective owners. Your dependency reports should make integration easy rather than leaving undocumented dictionaries for someone else to reverse engineer.
+
+## Scientific responsibilities in owned files
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.

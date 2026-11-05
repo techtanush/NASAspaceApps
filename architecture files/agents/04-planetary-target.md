@@ -72,3 +72,7 @@ Handoff includes profile/evidence/spec IDs, supported dimensions, unresolved dim
 - A metadata-only receipt cannot be cited as completed slope computation.
 - Every numeric profile field resolves to a deterministic measurement and effective scale.
 - Profile reproducibility uses pinned source checksums and algorithm/config versions.
+
+## Scientific credibility enforcement
+
+[Architecture33](../33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) binds this role. Supply only registered evidence and permitted scoped proposals; backend SC gates decide public conclusions. Preserve uncertainty, support, mode and critic restrictions. This role cannot waive inadequate evidence, rewrite accepted thresholds, self-certify independent verification or claim physical readiness from modeled results.

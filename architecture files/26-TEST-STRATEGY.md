@@ -59,3 +59,7 @@ Required software gate pass criteria: no unexplained test failures, schema/clien
 ## Completion report
 
 Produce `verification-report.json` with source commit/build lock, test suite counts, timestamps, modes exercised, real source/AI probes performed, gate outcomes and remaining blockers. List unsupported physical claims explicitly. A coding agent must not say "everything works" when it only compiled the frontend or exercised synthetic data.
+
+## Mandatory scientific integrity matrix
+
+The [shared SCI-01–SCI-18 gate](../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md) supplements G0–G7 and must pass for combined local integrity/UI/export acceptance. It catches source/scale/coverage/uncertainty/mode/solver/critic/claim defects, and verifies truthful negative publication. Record actual S0–S4 evidence with [the scientific report template](../team%20coordination/templates/scientific-validation-report.template.json). Offline integrity tests cannot establish G4 real-data or G6 live-agent readiness. [33](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) defines backend gate semantics.

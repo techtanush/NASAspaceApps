@@ -51,3 +51,7 @@ Provide a documented opt-in source validation command under `scripts/science/` a
 ## Ready to merge
 
 No failing/unrun mandatory pure tests, unexplained tolerance changes, fake NASA labels, unsupported PASS, out-of-scope file changes, secret/raw-data commits or incompatible port. Source-dependent gates may be BLOCKED_EXTERNAL only with precise remediation and honest limited capabilities; they cannot be marked verified. Record tested SHA/base/locks, numeric outcomes, runtime/resource measurements, supported operations, actual source probes and remaining limitations. Tanush runs the combined app gate before main advances.
+
+## Mandatory credibility tests
+
+Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.
