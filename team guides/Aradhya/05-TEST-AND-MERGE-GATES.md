@@ -1,57 +1,55 @@
-# Aradhya browser renderer and merge gates
+# Aradhya — tests and merge gates
 
-Demonstrate working user flows and truthful data, not only a successful frontend compilation. Keep mock-preview tests separate from real backend/science integration. An empty UI, hidden failed row or hardcoded second pass cannot satisfy acceptance.
+A gate passes only when its tests **execute and assert**. Skips, xfails, deselects and "no tests found" are failures. Catalog ids: architecture 39 §1.
 
-## Tooling and contracts
-
-TypeScript strict checking, generated-client freshness, frontend test suite and production build pass from committed pnpm lock. No duplicate scientific enums or manual edits to generated client. Actual request bodies, null behavior, errors, state/action guards and selection restoration match accepted OpenAPI. Report schema hash/base SHA.
-
-## Component and interaction suite
-
-Test draft autosave saving/saved/failure/conflict and reload; manual/import rover round trip and exact field errors; Mission Fingerprint proposed defaults and explicit acceptance; no-rover mode; all five qualification statuses and confidence text; pending versus unknown; evidence drawer actual references; critic/review/blocked actions; all three verification outcomes; immutable attempt history; portfolio residual/co-location; passport/export error and polling.
-
-Inputs preserve user text on failed validation. A review cannot hide a scientific blocker. A first PROVE_IT button cannot display a computed route before backend artifact commit. Candidate selection and status changes require server acknowledgment. Missing provider/source capabilities show exact remediation without asking for a secret in a browser form.
-
-## Event and recovery tests
-
-Repeated seq is deduplicated, missing seq triggers authoritative snapshot,410 cursor expiry resyncs, disconnect/reconnect does not duplicate a user command, terminal event closes stream, component unmount removes listeners. Reload restores selected_candidate_id/selected_portfolio_id and current attempts/qualification versions. No optimistic green qualification or fake private reasoning timeline.
-
-## Maps and responsive accessibility
-
-At1440px,900px and390px verify readable layout with no required row/action hidden or clipped. Keyboard focus order, form labels, status text/icons, dialog/drawer focus management and route/table alternatives work. No status is color-only. A WebGL failure leaves complete candidate/qualification/route information and actions.
-
-Earth images use supplied corners/legend/units/attribution/transparency. Planetary target displays body-specific planar affine/CRS, not Earth map labels/tiles. Bad/missing manifest produces a visible unavailable layer, not guessed projection. Route is labeled modeled terrain feasibility; imagery smoothing cannot alter route or create claimed measurement detail.
-
-## Renderer security and integrity
-
-Pure renderer runs without DB/model/network. Positive, limited, failed, inconclusive, no-rover and composite fixtures preserve exact accepted inputs/evidence/attempts/unknowns. HTML escapes script/tag payloads, is self-contained and prints readably. CSV text formula injection is escaped while actual typed numeric values retain meaning. JSON contains scientific frozen snapshot, not DOM-derived summaries. No credential/signed URL/internal path/private reasoning in exports. Separate byte hash and manifest hash match their intended content.
-
-## Real combined journey
-
-With actual F0/platform and Ayan science installed, explicitly disable mock handlers and run: draft→preparation→accept→rover→run→candidate/matrix/critic→PROVE_IT→computed fail→real replan→verified result→passport/download→reload. Assert actual backend job/evidence/receipt IDs and unchanged contract/rover hashes. The graph regression values are expected synthetic test outputs, not mocked successful API responses.
-
-Also exercise no-rover block, unknown clearance, missing geology/thermal, negative control, search INCONCLUSIVE, review, portfolio co-location, cancellation/reconnect and stale revision. Test at least one actual Moon and Mars body-specific response path. If live source/model is blocked, report it separately from the completed offline browser journey.
-
-## Commands to supply and run
-
-From `analogforge/`, implement root frontend scripts that delegate to `apps/web`:
+## 1. Commands (from `analogforge/`; omit `rtk` if not installed)
 
 ```bash
-rtk pnpm install --frozen-lockfile
-rtk pnpm run generate:client
-rtk pnpm run typecheck
-rtk pnpm run test
-rtk pnpm run build
-rtk pnpm run test:e2e
-rtk proxy uv run pytest tests/unit/passport_renderer
+python3 "../architecture files/contracts/kit/materialize.py" --verify                      # KIT-01
+uv run pytest tests/contracts/kit -q                                                       # KIT-02
+uv run pytest tests/unit/passport_renderer tests/contracts/ui -q --strict-markers          # UIX-08, UIX-09 + fixtures
+uv run ruff check src/analogforge/rendering/passport tests/unit/passport_renderer tests/contracts/ui scripts/ui scripts/build_mock_exports.py
+uv run mypy src/analogforge/rendering/passport                                             # strict
+pnpm install --frozen-lockfile
+pnpm run generate:client && git diff --exit-code apps/web/src/generated                    # UIX-02
+pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run test:contracts && pnpm run build   # UIX-01/03/04/05/06/10
+pnpm run test:e2e:mock                                                                      # journeys J01..J13 in mock mode
+pnpm run a11y                                                                               # UIX-07
+python3 scripts/ui/forbidden_scan.py --json out/forbidden.json && python3 scripts/ui/mutation_check.py --json out/mutations.json
+python3 "../team coordination/scripts/check_branch_ownership.py" --person aradhya --repo ..   # PASS
 ```
 
-Document profile URL/mock flag/fixture seed for each browser test. Do not treat a missing script, skipped entire suite, unavailable browser or hidden mock server as a passing run. Use provided preview/browser tools when available; report actual verification limits otherwise and continue static/renderer checks.
+`scripts/ui/forbidden_scan.py` additionally fails the gate if the JUnit/Playwright JSON report contains any skipped/fixme test among the journeys or UIX suites.
 
-## Ready to merge
+## 2. Required test files (names are part of the gate)
 
-Owned-path diff only, no secrets/bulk assets/runtime output, no test failures/client drift/unsupported state claims, reproducible mock and actual-API commands, test counts/screenshots where useful, asset provenance and known blockers. Submit exact tested commit SHA and base schema/main checkpoint. Tanush tests the final combined merge candidate; no hosting/publication happens automatically.
+| File | Catalog | Must assert |
+| --- | --- | --- |
+| `apps/web/src/test/typecheck+build` (via scripts) | UIX-01 | strict TS clean, lint clean, production build succeeds |
+| `apps/web/src/test/client-freshness` (script) | UIX-02 | regenerate from the bundled spec ⇒ no diff |
+| `apps/web/src/test/msw-validate.test.ts` | UIX-03 | every mock response body for every operation/script validates against the bundled OpenAPI (ajv 2020-12) |
+| `apps/web/src/test/testids.test.ts` + Playwright assertions | UIX-04 | every id of `ui-testids.json` occurs in `src` and is asserted by ≥ 1 Playwright test; required `data-*` attributes present on rendered elements |
+| `apps/web/src/features/**/*.test.tsx` | UIX-05 | FE-001…FE-014 (architecture 17 §10) and UX-001…UX-012 (16 §7): immutability of accepted inputs, null⇒Unknown (never 0), distinct GAP/UNKNOWN/PENDING/FAIL, no optimistic science, same-key retry, revision-conflict flow, invalid import never persists, no color-only status, mode badge persistence, route playback only over committed data, three distinct result view models, recoverable error states, workspace isolation of caches |
+| `apps/web/src/api/runStream.test.ts` | UIX-06 | duplicate ignored, gap ⇒ resync, 410 ⇒ resync, backoff schedule, heartbeat not an event, terminal close, unmount cleanup, run switch isolation |
+| `apps/web/src/maps/affine.test.ts` | SCN-17 consumer | four corners + interior point round-trip ≤ 0.5 px for north-up and rotated transforms; Earth corner order NW,NE,SE,SW; layer registry rejects body/CRS mismatches |
+| `analogforge/tests/unit/passport_renderer/test_determinism.py` | UIX-08 | same bundle ⇒ identical bytes for all 9 fixtures × 3 formats |
+| `…/test_html.py` | UIX-08/09 | headline logic (4 cases), every requirement row/attempt/GAP/UNKNOWN present, mode text, manifest digest, assurance statements, no `<script`, no external `src=`/`href=`/`url(`, draft banner, `Unknown` for nulls |
+| `…/test_escaping.py` | UIX-08 | hostile strings never become executable HTML; CSV formula prefixes neutralized; JSON round-trips originals |
+| `…/test_csv.py` | UIX-08 | exact `CSV_COLUMNS`, one row per candidate×requirement, metric mapping of `08` §7, empty (never 0) when absent, delimiter ` | `, rectangular |
+| `…/test_json.py` | UIX-08 | structure of architecture 35 §4; `sha256(rfc8785(canonical_manifest)) == manifest_sha256` using `analogforge.ports.hashing` **and** an independent `rfc8785` call |
+| `…/test_errors.py` | UIX-08 | each `RendererError` code for its crafted inconsistent bundle; BLOCKED audit; digest mismatch; draft never raises |
+| `…/test_purity.py` | UIX-09 | subprocess import shows none of `socket, http.client, urllib.request, requests, httpx, sqlalchemy, psycopg, openai, fastapi`; no file writes; no env reads |
+| `tests/contracts/ui/test_openapi_fixtures.py` | UIX-03 | mock fixtures (exported to JSON by the web test) validate with Python `jsonschema` too |
+| `tests/contracts/ui/test_bundle_fixtures.py` | UIX-08 | all bundle fixtures validate as `PassportExportBundle`; `contracts/algorithm-ids.json` equals `analogforge.ports.catalog.ALGORITHM_IDS` |
+| `tests/e2e/journeys/J01…J13*.spec.ts` | UIX-04/05/07/10/11 | the click scripts of architecture 39 §3, exactly, in mock mode (mock banner present) |
+| `tests/e2e/a11y.spec.ts` | UIX-07 | axe: 0 critical/serious on S01–S12 at 1440/900/390; keyboard path; 200 % zoom; reduced motion |
+| `tests/e2e/webgl-fallback.spec.ts` | UIX-11 | with WebGL disabled the candidate list, matrix, route table and exports still work |
+| `tests/e2e/prod-build-guard.test` | UIX-10 | build with `VITE_API_MOCK=1 NODE_ENV=production` fails; real build has no `msw` in the bundle |
 
-## Mandatory credibility tests
+## 3. Frozen thresholds
 
-Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.
+Journey step timeouts: preparation 60 s, run to `AWAITING_REVIEW` 180 s (mock: ≤ 10 s), PROVE IT sequence 240 s (mock ≤ 15 s). axe: 0 critical/serious. Affine tolerance 0.5 px. Renderer: byte-identical across 3 repeated renders in separate processes (`PYTHONHASHSEED` 1/2/3).
+
+## 4. Merge readiness
+
+`STATUS.json.ready_to_merge = true` only if: every UIX row `PASSED`; J01–J13 pass in mock mode with **0 skipped**; kit verify and ownership `PASS`; all linters/typecheck clean; forbidden/mutation checks clean; the self-audit complete. Real-backend execution of the journeys is **not possible in your environment** and is listed `BLOCKED_ENVIRONMENT` for `MRG-03` only (it belongs to the merging agent); your specs must already contain the real-mode assertions (guarded by `isMock()`).

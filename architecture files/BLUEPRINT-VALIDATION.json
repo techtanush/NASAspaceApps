@@ -2,7 +2,7 @@
   "blueprint_validation_only": true,
   "status": "PASS",
   "checks": {
-    "json_files": 21,
+    "json_files": 52,
     "domain_definitions": 29,
     "schema_references": 410,
     "api_component_schemas": 57,
@@ -14,8 +14,8 @@
     "example_hashes": 2,
     "source_hashes": 3,
     "traceable_product_requirements": 58,
-    "local_document_links": 230,
-    "json_document_examples": 12,
+    "local_document_links": 302,
+    "json_document_examples": 14,
     "synthetic_graph_attempts": 2
   },
   "errors": [],

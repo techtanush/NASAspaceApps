@@ -1,33 +1,37 @@
-# Tanush interfaces and handoffs
+# Tanush — interfaces and handoffs
 
-Read shared03 as the binding seam. You are the only producer of common domain/API/port changes and the only committer of durable scientific state.
+All seams are frozen kit types ([35](../../architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md)). There are no mid-build hand-offs; the merging agent connects the three branches.
 
-## What Ayan needs from you
+## You consume (load via `importlib`; never import at module top level)
 
-Provide F0 domain types, ScienceService request/context/result models, safe artifact read/scratch interfaces, mode guard, cancellation/deadline/progress API and source credential access policy. Give expected operation names and example typed requests; avoid giving him DB IDs with no authorized resolver/materialized input. Include installed science packages and exact worker native-library versions.
+| Entry point | Provider | How you use it |
+| --- | --- | --- |
+| `analogforge.science.facade:create_science_service` | Ayan | Build `ScienceRequest`s from frozen records; run `execute` in a CPU subprocess with a `ScienceContext` you implement (`scratch_dir`, `read_artifact`, `local_dataset_root`, `check_cancelled`, `report_progress`, `http_client`); register the result with the registrar |
+| `analogforge.rendering.passport:create_passport_renderer` | Aradhya | Assemble a `PassportExportBundle` + `ProvidedAsset`s; call `render` per format; store bytes; serve |
+| `analogforge.science.fixtures.practice:generate_all`, `…mock_nasa_drop:generate`, `analogforge.science.datasets.inspect:draft_manifest` | Ayan | Called by the dataset CLI |
 
-Your wrapper calls his facade, registers result-local artifacts/evidence keys atomically and resolves public candidate/profile/test/measurement IDs. His module must never need a SQL session to calculate a slope. If his output suggests PASS with incompatible/missing evidence, policy rejects/marks UNKNOWN rather than trusting the label.
+If an entry point is absent, preflight reports `SCIENCE_FACADE_MISSING` / `RENDERER_MISSING` and run creation for scenarios that need it fails with a named `503`; **no fallback object is constructed in `src/`**.
 
-Handoff F0 includes exported contract hashes, source policy identity/version, ports signature hash, safe settings, run profiles, test commands and commit SHA. Future modifications follow a concrete contract-change record. Ayan returns operation coverage, computed fixtures, source validation, numeric tests and typed limitations.
+## You provide
 
-## What Aradhya needs from you
+| Artifact | Consumer | Contract |
+| --- | --- | --- |
+| A server whose responses validate against `contracts/openapi.bundled.json` | Aradhya's client, MSW fixtures, e2e | PLT-02 |
+| `GET /capabilities` scenario list per architecture 40 §10, `GET /configuration/scenarios/{id}` | Aradhya's UI | scenario/lock ids are never guessed by the UI |
+| SSE `RunEvent`s and durable operation/receipt/critique/review/display-layer reads | Aradhya | architecture 07 |
+| `PassportExportBundle` + assets | Aradhya's renderer | architecture 35 §4 (assembly guarantees) |
+| `ScienceContext` implementation | Ayan's facade | per `ports.science.ScienceContext` |
+| `config/scenarios.yaml` | Ayan (reads scenario source selectors via requests only) | architecture 35 §7 |
+| Dataset CLI and lock files | operators | architecture 36 |
 
-Provide stable OpenAPI export, capabilities/scenario IDs, draft read/save/preparation endpoints, immutable input retrieval, selection pointers, operations/receipts/critiques/reviews, display manifests, TestResult retrieval and SSE semantics. Provide a seed command and deterministic synthetic data she can drive through the real API. Explain actual pending/export202 behavior and local base URL/CORS profile.
+## Doubles you write (tests only)
 
-She generates client types and owns browser code; do not send undocumented JSON snippets as a substitute for API changes. Use the same schema/error cases in platform contract tests and frontend MSW fixtures. On integration assert MSW is off and server job/receipt IDs exist.
+`tests/support/fake_science.py` returns **kit-valid** `ScienceComputationResult`s for the storylines of architecture 40 §6, built through the kit models with real artifact bytes on scratch (so the registrar's hashing is truly exercised). `fake_renderer.py` returns deterministic bytes per format. `fake_openai_server.py` serves a local Responses-API-shaped endpoint (strict tool calls, refusal, malformed, timeout modes). The merging agent replaces the first two with the real entry points and reruns the same tests.
 
-For renderer provide a complete PassportExportBundle plus validated image bytes. Her renderer returns bytes, MIME, safe filename/hash and version; you authorize/store/serve it. File digest and manifest digest are distinct.
+## Defects you find elsewhere
 
-## What you receive and how to accept it
+`STATUS.json.defects_in_other_areas` with a reproduction; never edit another owner's files. Kit blockers: `CHANGE-REQUEST-<n>.json` + local workaround.
 
-Ayan: exact SHA, scientific facade implementation, graph/analytic expected outputs, package requests, source/policy/asset notes, supported/unavailable operations and test report. Accept only if its calculations work without API/model/DB and outputs carry scale/lineage. Aradhya: exact SHA, real/mock startup commands, generated-client schema hash, UI/renderer tests and assets. Accept only if scientific states are server-owned and missing/error/unknown modes are preserved.
+## Dependencies
 
-Do not accept a handoff with "tests should pass" or an unspecified branch tip. Run producer tests plus actual cross-boundary contract cases in an integration candidate. File conflicts, semantic conflicts and missing interfaces have distinct owners. Return a short exact defect/reproduction to the person; this document itself does not authorize sending external messages through tools.
-
-## Final reporting
-
-Own `team handoffs/tanush/` checkpoint reports and final integration report. Reference other producer reports rather than rewriting their observed results. Declare explicit `platform_ready`, `scientific_modules_integrated`, `frontend_integrated`, `offline_e2e_passed`, `real_data_gates`, `live_model_gate` and `remaining_blockers`. Successful local source merges do not imply all those fields are true.
-
-## C1 scientific assurance seam
-
-Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.
+Platform-only packages go in `extra-tanush`. You own `uv.lock`; regenerate it only from the committed `pyproject.toml`. Because the merged `pyproject.toml` will also contain Ayan's and Aradhya's extras, your `uv.lock` is **re-locked by the merging agent** — do not hand-edit it to anticipate them.

@@ -1,42 +1,36 @@
-# Ayan scope and file ownership
+# Ayan — scope and file ownership
 
-Your implementation must operate as a reusable scientific library plus approved source adapters. It must not require a running web API, model call, browser session or SQL database to calculate terrain or verify a route.
+Your code is a **pure scientific library plus approved source adapters**. It must run with no web API, database, model, browser or network (in `synthetic`/`replay`). Everything crosses the boundary as typed kit models.
 
-## Owned production paths
+## Owned paths (longest-prefix registry, `team coordination/contracts/ownership.json`)
 
-- `analogforge/src/analogforge/science/`: typed facade, normalized scientific metadata, raster/planetary transforms, features, comparison, qualification math, compatibility math, routing, energy, verification, diagnosis, portfolio and analytic fixtures.
-- `adapters/earthdata/`, `pds/`, `emit/`, `diviner/`, `user_survey/`, `source_http/`: metadata selection/download/decoding/quality and approved source HTTP behavior.
-- `rendering/tiles/`: prepared scientific display images/legend/affine/CRS and mask overlays; images are derived presentation artifacts, not replacements for analytical arrays.
-- `config/datasets.yaml`, `algorithms.yaml`, `candidates.yaml`: versioned source/feature/rule/search/candidate definitions. Do not introduce a hidden mission-default override here.
-- Scientific suites under `tests/unit/science/`, `tests/property/science/`, `tests/integration/science/`, `tests/replay/science/`, `tests/fixtures/science/` and `scripts/science/`.
+* `analogforge/src/analogforge/science/**` — facade, geometry, raster, features, comparison, qualification, compatibility, routing, energy, portfolio, display, datasets, fixtures, audit, provenance (layout in `08` §2).
+* `analogforge/src/analogforge/adapters/{earthdata,pds,emit,diviner,user_survey,source_http}/**`
+* `analogforge/src/analogforge/rendering/tiles/**`
+* `analogforge/config/{datasets,algorithms,candidates}.yaml`
+* `analogforge/tests/{unit,property,integration,replay}/science/**`, `tests/contracts/science/**`, `tests/fixtures/science/**`
+* `analogforge/scripts/science/**`
+* `team guides/Ayan/**`, `team handoffs/ayan/**`
+* Your own list `extra-ayan` in `analogforge/pyproject.toml` (science-only dependencies). Install with `uv pip install -e ".[dev,extra-ayan]"`; never commit `uv.lock`.
 
-The longest-prefix registry governs exact path ownership. You own leaf initializers inside your packages; shared root package/adapters/rendering initializers, Python lock, application wrappers, settings, migrations and public domain/API schemas are Tanush's. Never change them without a recorded owner handoff. Add a small dependency request to your own handoff directory when a required decoder package is missing.
+## Not yours (report, never edit)
 
-## Functional deliverables
+The kit (`ports/`, kit tests/fixtures/contracts), Tanush's platform (`api`, `db`, `jobs`, `application`, `agents`, `tools`, `main.py`, `cli.py`, `config/scenarios.yaml`, `config/presets/`, compose/Make/migrations/lock), Aradhya's frontend and `rendering/passport/`, original architecture files, other people's guides/handoffs.
 
-1. Source registry and real locked source selections, with source-policy versus acquired-asset manifest distinction.
-2. Correct Earth/Mars/Moon metadata/frame/scale/mask handling and comparable target/candidate features.
-3. Bounded coarse-to-fine candidate discovery and controls, with documented exclusions and novelty scope.
-4. Deterministic qualification/confidence/compatibility proposals using exact accepted requirements and evidence.
-5. Frozen benchmark assembly, tasks, traversability graph, route search, exposure/diversity, energy and independent verification.
-6. Supported failure diagnosis and legal repair suggestions; numerical module does not autonomously rewrite the mission or dispatch another role.
-7. Portfolio coverage with co-location and honest gaps/unknowns, plus display-layer drafts.
-8. Analytic/property/replay/actual-source tests and reproducible scientific reports.
+## What you deliver (summary; exact files in `08` §2)
 
-## Persistence and orchestration boundary
+1. `science.facade:create_science_service` returning a `ScienceService` whose `supported_operations()` is all fifteen `ScienceOperation`s and whose `execute()` is correct, deterministic, cancellable and honest (`BLOCKED`/`LIMITED` instead of guessing).
+2. Dataset slot support: `INGEST_LOCAL_DATASET` with every check of architecture 36 §4; `science.datasets.inspect:draft_manifest`; format support for GeoTIFF/COG, HGT(+zip), PDS3/PDS4 through GDAL, NetCDF, ASCII grid.
+3. Generators: `science.fixtures.practice:generate_all` (all datasets of architecture 40 §3) and `science.fixtures.mock_nasa_drop:generate` (architecture 39 §5), plus in-memory fixture loaders so `SourceSelector(kind="SYNTHETIC_FIXTURE")` and `LOCAL_DATASET` give identical rasters.
+4. The route engine: constraints design (`auto-waypoints-v1`), graph (raster + abstract), resource-constrained search with certificates, **independent verifier**, diagnosis (ANALOG vs ROVER rule), telemetry.
+5. Qualification/compatibility/portfolio math, display-layer images and manifests, audit evidence (`AUDIT_EVIDENCE`).
+6. Live adapters (`earthdata`, `pds`, `emit`, `diviner`, `user_survey`, `source_http`): discovery/fetch/decode/mask/normalize, safe redirects/checksums, honest `NO_COVERAGE`/`AUTH_REQUIRED`/`UNSUPPORTED` states — validated against **format-faithful synthetic files and mocked HTTP transport**. They are never claimed validated against real servers.
+7. Tests for every catalog row `SCN-01…SCN-21`, perturbation tests, and a filled `STATUS.json`.
 
-Your facade returns computed proposals and content-addressed artifact/evidence drafts. Tanush allocates persisted UUIDs, resolves local keys, creates receipts and commits run/qualification/result state. You must not write DB rows, advance a run, construct fake receipt IDs or call the product's model. Supply enough typed data and lineage that the registrar can persist without guessing.
+## Hard boundaries
 
-Your comparisons are scientifically deterministic; Tanush's policy validates the proposal against the run/evidence scope. A computation may be successful while its requirement result is FAIL/UNKNOWN. Keep execution status and scientific status distinct.
-
-## Unsupported claims
-
-Do not call a natural Earth site a complete Mars/Moon simulation. MOLA gives regional context, not wheel-scale stress. NASADEM cannot establish20cm clearance, actual autonomous navigation, traction or sample chemistry. Earth mineral evidence plus a MOLA-only target cannot prove mineral equivalence. A protected-download error is not evidence that terrain is unsuitable. A bounded/approximate search failure is not global infeasibility.
-
-## Not your work
-
-Do not scaffold another backend/frontend/database or implement Agent Council conversations. Do not edit global locks/migrations/contracts to fit your private representation. Do not add hardware/simulator/ROS dependencies excluded from the architecture. Leave UI/API/export authentication and model keys to the respective owners. Your dependency reports should make integration easy rather than leaving undocumented dictionaries for someone else to reverse engineer.
-
-## Scientific responsibilities in owned files
-
-Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.
+* No imports of `fastapi`, `sqlalchemy`, `psycopg`, `openai`, `analogforge.api|db|jobs|application|agents|tools|rendering.passport` anywhere under your paths (tested, SCN-19).
+* No `os.environ`/`os.getenv` in science code; credentials arrive only through `context.http_client()` supplied by the platform. (The adapter modules receive an injected client; they never read the environment.)
+* No network access in `synthetic`/`replay`; `context.http_client()` is `None` there and `source_policy.allow_network` is `False`.
+* Write files only under `context.scratch_dir()`; never under `data/incoming/`; never outside the repo scratch.
+* Never convert unknown to zero; never interpolate categorical ids; never upsample to claim resolution; never use Earth CRS for Moon/Mars.

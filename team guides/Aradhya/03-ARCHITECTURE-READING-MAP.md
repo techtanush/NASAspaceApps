@@ -4,6 +4,10 @@ Read the First rows before substantive implementation, then specialist rows as t
 
 | Architecture | When | How to use it | Gate |
 | --- | --- | --- | --- |
+| [34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md](../../architecture%20files/34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md) | First (mandatory) | Completion tiers, errata E-01…E-18 (note E-01 frontend path, E-09 preliminary rows), forbidden behaviors | All |
+| [35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md](../../architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md) | First (mandatory) | Kit, bundled OpenAPI, renderer seam, §5b UI-readable artifacts, test-id contract | All |
+| [39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md](../../architecture%20files/39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md) | First (mandatory) | Your UIX rows and journeys J1–J13 (the exact click scripts) | All gates |
+| [40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md](../../architecture%20files/40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md) | First (mandatory) | Storylines, truth tables, scenario catalog the mock must replay | UIX-03/05 |
 | [00-ARCHITECTURE-DECISIONS.md](../../architecture%20files/00-ARCHITECTURE-DECISIONS.md) | First | Never duplicate statuses, mislabel modes or let UI alter scientific truth. | All UX |
 | [01-VISION-CONTEXT-AND-SCOPE.md](../../architecture%20files/01-VISION-CONTEXT-AND-SCOPE.md) | First | Core user question and truthful scope of modeled test outcomes. | Product story |
 | [02-PRODUCT-REQUIREMENTS.md](../../architecture%20files/02-PRODUCT-REQUIREMENTS.md) | First | All user-facing functional requirements and negative states. | Full UI |

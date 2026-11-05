@@ -1,0 +1,164 @@
+{
+  "schema_version": "1.0",
+  "audit_id": "70000000-0000-4000-8000-000000000040",
+  "workspace_id": "70000000-0000-4000-8000-000000000011",
+  "run_id": "70000000-0000-4000-8000-000000000012",
+  "mode": "synthetic",
+  "created_at": "2026-11-04T12:00:00Z",
+  "snapshot_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "mission_content_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "rover_content_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+  "dataset_policy_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+  "acquired_manifest_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+  "algorithm_lock_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+  "assurance_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+  "critique_evidence_ids": [],
+  "claims": [
+    {
+      "claim_id": "graph-attempt-2-exposure",
+      "claim_type": "VERIFICATION",
+      "requirement_id": "REQ-EXPOSURE",
+      "candidate_ids": [],
+      "scope": "Canonical synthetic graph; fixed mock edge energies; no physical rover inference.",
+      "disposition": "SUPPORTED",
+      "qualification_status": null,
+      "verification_status": "PASS",
+      "validation_level": "S1",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000001"
+      ],
+      "assumption_evidence_ids": [],
+      "gates": [
+        {
+          "gate_id": "SC-01",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-02",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-03",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "Abstract synthetic graph has no body-specific raster or physical coordinate frame.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-04",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "Abstract graph provides explicit edges; no claim about raster spatial resolution.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-05",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "No masked raster/AOI is used in this abstract graph regression.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-06",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "No time-varying measured source is used.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-07",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-08",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-09",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-10",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "No independent source corroboration is claimed.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-11",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-12",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-13",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "No candidate discovery or held-out real-source validation is claimed.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-14",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-15",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        }
+      ],
+      "permitted_statement": "In the canonical synthetic graph, the repaired route supplies 150 m unique slope exposure and passes the fixed graph constraints: 340 m traversal and 34 Wh mock consumption.",
+      "limitations": [
+        "Synthetic graph regression only; does not validate any NASA product, physical terrain or calibrated rover energy."
+      ]
+    }
+  ],
+  "publication": "ALLOWED",
+  "blocking_issue_codes": [],
+  "limitations": [
+    "Blueprint fixture only: UUIDs and hash strings are synthetic test identifiers, not executed application evidence."
+  ]
+}

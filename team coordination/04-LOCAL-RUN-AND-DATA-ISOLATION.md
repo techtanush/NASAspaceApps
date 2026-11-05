@@ -1,6 +1,6 @@
 # Local runtime and data isolation
 
-Different Git worktrees isolate source files, not ports, Docker project names, database contents, caches, credentials or process IDs. Configure those separately. Tanush implements the profile selection in Compose/Make; each agent then runs only its own profile.
+Different Git clones/worktrees isolate source files, not ports, Docker project names, database contents, caches, credentials or process IDs. Configure those separately. Tanush implements the profile selection in Compose/Make; each agent then runs only its own profile. Ayan and Aradhya may not have Tanush's Makefile on their branch: they run the underlying commands directly (`uv run pytest …`, `pnpm …`) and need no database unless they choose to test against the real API.
 
 ## Profile allocation
 
@@ -42,3 +42,7 @@ Aradhya's Playwright config reads the selected profile URL and uses disposable f
 ## Acceptance
 
 Launch two profiles simultaneously; source edits, database writes, worker claims, exports and cancellation in one do not affect the other. Shut down one project and verify the other stays healthy. Confirm each profile's capabilities/base URL/mode/source lock is visible and agrees with its test report. No runtime files appear in changed-path Git reports.
+
+## Merging agent profile
+
+The merging agent uses profile `integration` (8000/5173/5432, project `af-integration`) on a clean clone. It starts and stops only its own Compose project and never touches another profile. A database is mandatory for the merge ([38](../architecture%20files/38-RUNTIME-KEYS-AND-LOCAL-SETUP.md) §4.1).

@@ -52,3 +52,7 @@ Each document must include concrete behavior, implementation boundaries, input/o
 ## Binding scientific claim policy
 
 Apply [33 scientific credibility and claim gates](33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md) to every scientific result and final passport. Deterministic backend audits enforce SC-01–SC-15, immutable evidence and exact claim scope. The C1 passport contract requires assurance_evidence_id. Scientific limitations cannot be waived by model prose or user review; truthful negative/unknown reports are legitimate outcomes.
+
+## Precedence of the one-shot layer
+
+[34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md](34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md) records binding errata (E-01…E-18) and completion tiers, and [35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md](35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md) defines the frozen kit. Where a numbered document conflicts with them, they win. The decisions in this register otherwise stand.

@@ -1,63 +1,39 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "person": "Ayan",
   "branch": "ayan/science-data-verification",
-  "checkpoint": null,
+  "template_note": "Copy to team handoffs/ayan/STATUS.json. Replace every null with an observed value or leave null with a reason. Never invent results.",
+  "base_main_sha": null,
   "tested_commit_sha": null,
-  "accepted_main_sha": null,
-  "contract_sha256": null,
-  "ports_version": null,
-  "runtime_profile": "ayan",
-  "ready_to_merge": false,
-  "owned_features": [],
-  "changed_owned_paths": [],
-  "shared_change_requests": [],
-  "commands": [
-    {
-      "command": null,
-      "working_directory": null,
-      "exit_code": null,
-      "tests_passed": null,
-      "tests_failed": null,
-      "notes": "Replace with actual observed result; remove example if unrun."
-    }
-  ],
-  "validation_modes": {
-    "synthetic": {
-      "status": "NOT_RUN",
-      "evidence": []
-    },
-    "source_replay": {
-      "status": "NOT_RUN",
-      "evidence": []
-    },
-    "actual_source_downloads": {
-      "status": "NOT_RUN",
-      "evidence": []
-    },
-    "live_model": {
-      "status": "NOT_RUN",
-      "evidence": []
-    },
-    "real_backend_browser": {
-      "status": "NOT_RUN",
-      "evidence": []
-    }
+  "kit_version": null,
+  "kit_verify": {"status": "NOT_RUN", "command": "python3 \"architecture files/contracts/kit/materialize.py\" --verify", "exit_code": null},
+  "environment": {"python": null, "uv": null, "gdal": null, "gdal_drivers_present": [], "rasterio": null, "notes": []},
+  "ownership_check": {"status": "NOT_RUN", "exit_code": null},
+  "catalog": {
+    "KIT-01": {"status": "NOT_RUN", "command": null, "exit_code": null, "tests_passed": null, "tests_failed": null, "tests_skipped": null, "output_file": null},
+    "KIT-02": {"status": "NOT_RUN", "command": null, "exit_code": null, "tests_passed": null, "tests_failed": null, "tests_skipped": null, "output_file": null},
+    "SCN-01": {"status": "NOT_RUN"}, "SCN-02": {"status": "NOT_RUN"}, "SCN-03": {"status": "NOT_RUN"}, "SCN-04": {"status": "NOT_RUN"},
+    "SCN-05": {"status": "NOT_RUN"}, "SCN-06": {"status": "NOT_RUN"}, "SCN-07": {"status": "NOT_RUN"}, "SCN-08": {"status": "NOT_RUN"},
+    "SCN-09": {"status": "NOT_RUN"}, "SCN-10": {"status": "NOT_RUN"}, "SCN-11": {"status": "NOT_RUN"}, "SCN-12": {"status": "NOT_RUN"},
+    "SCN-13": {"status": "NOT_RUN"}, "SCN-14": {"status": "NOT_RUN"}, "SCN-15": {"status": "NOT_RUN"}, "SCN-16": {"status": "NOT_RUN"},
+    "SCN-17": {"status": "NOT_RUN"}, "SCN-18": {"status": "NOT_RUN"}, "SCN-19": {"status": "NOT_RUN"}, "SCN-20": {"status": "NOT_RUN"},
+    "SCN-21": {"status": "NOT_RUN"}
   },
+  "status_values": ["PASSED", "FAILED", "BLOCKED_ENVIRONMENT", "BLOCKED_EXTERNAL", "NOT_IMPLEMENTED", "NOT_RUN"],
+  "sci_tests": {"SCI-01": "NOT_RUN", "SCI-02": "NOT_RUN", "SCI-03": "NOT_RUN", "SCI-04": "NOT_RUN", "SCI-05": "NOT_RUN", "SCI-06": "NOT_RUN", "SCI-07": "NOT_RUN", "SCI-08": "NOT_RUN", "SCI-09": "NOT_RUN", "SCI-10": "NOT_RUN", "SCI-14": "NOT_RUN", "SCI-17": "NOT_RUN"},
+  "operations_supported": [],
+  "self_audit": {"forbidden_scan": {"status": "NOT_RUN", "findings": 0}, "mutation_check": {"status": "NOT_RUN", "mutants": 16, "killed": null}, "perturbations": {}, "adversarial_reviewers": [], "final_truth_checks": {}},
+  "lint": {"ruff": {"status": "NOT_RUN", "exit_code": null}, "mypy": {"status": "NOT_RUN", "exit_code": null}},
+  "performance_ms": {},
+  "contradictions_found": [],
+  "defects_in_other_areas": [],
+  "change_requests": [],
   "external_blockers": [],
   "known_limitations": [],
-  "reproduction_steps": [],
-  "consumer_handoff": [],
-  "ignored_data_not_committed": true,
-  "secrets_not_committed": true,
-  "scientific_credibility": {
-    "contract_baseline": "C1-scientific-assurance",
-    "implemented_gate_ids": [],
-    "assigned_sci_test_results": [],
-    "policy_hashes": [],
-    "audit_evidence_ids": [],
-    "validation_report_path": null,
-    "unproven_claims": [],
-    "status": "NOT_RUN"
-  }
+  "decisions": "see team handoffs/ayan/DECISIONS.md",
+  "ready_to_merge": false,
+  "ready_to_merge_rule": "true only if every required catalog row is PASSED, kit_verify and ownership_check PASS, lint clean, self_audit complete, no hidden skips; BLOCKED_EXTERNAL allowed only for rows that require real network/credentials and have an offline PASSED equivalent",
+  "pushed_sha": null,
+  "secrets_not_committed": null,
+  "data_not_committed": null
 }

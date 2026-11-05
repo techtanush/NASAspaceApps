@@ -1,57 +1,61 @@
-# Ayan scientific testing and merge gates
+# Ayan — tests and merge gates
 
-Your merge evidence must establish numerical correctness and honest scope, not just produce attractive terrain maps. Separate pure synthetic tests, verified-source replay, actual source access and physical performance. No real-data gate passes from a registry entry alone.
+A gate passes only when its tests **execute and assert**. Skips, xfails, deselects and "no tests collected" are failures. Catalog ids are in architecture 39 §1.
 
-## Numerical fixture tests
-
-- Flat metric plane: slope/relief/detrended roughness0 at valid interior cells.
--10°/20° plane: correct angle within declared tolerance, detrended roughness near0; contour-heading traversal still rejects surface20° for18° cap.
-- Known bump/noise: distinguish terrain roughness from overall tilt; test support-window sensitivity and units.
-- Nodata/water/channel/diagonal: derivatives/masks propagate and no illegal supercover/corner crossing occurs.
-- Planetary scaling: apply integer scale/offset/radius interpretation exactly once; fail unresolved frame/vertical units rather than defaulting Earth.
-- Longitude seam/polar grids: body-aware transforms, normalized positive-east API input, preserved native metadata, correct actual scale.
-- Comparison: aggregate to a valid common support; no higher confidence/clearance claim from upsampling.
-- Requirement boundaries: angle-band inclusion, distance threshold equality, units, mandatory/optional/gap/unknown and co-location parameters.
-
-Use independent expected values and mathematical properties, not snapshots copied from the function under test. Record tolerances and why they are appropriate. Quantities must be finite; null stays unavailable. Test that related NASADEM/SRTM agreement does not claim independent observations.
-
-## Route and energy tests
-
-Canonical graph120m/26Wh/0m exposure must fail EXPOSURE_SHORTFALL; repaired340m/34Wh/150m exposure must pass with W1/W2/return and unchanged contract. The mock edge energies are test-only. Oscillating across the same steep edge cannot multiply unique terrain exposure. Each traversal still costs time/energy.
-
-Test true production Earth energy formula: J→Wh conversion, rolling+uphill terms, idle during drive/dwell, incremental task cost, no downhill credit, conservative uncertainty/reserve, invalid efficiency and missing model. Negative reserve is not clamped. Earth test uses Earth gravity, not Mars gravity.
-
-Test waypoint tolerance/snapping/tasks/return, maximum surface slope, forbidden/unknown intersections, class thresholds, length/time/edge limits, exact and approximate search termination, cancellation. Force one-expansion/label/time cap and require INCONCLUSIVE/SEARCH_LIMIT. Exact finite-model infeasibility is permitted only with complete lossless search/proof for that declared domain. Independently verify a corrupted route and falsified solver totals; the verifier must reject them.
-
-## Source and qualification tests
-
-For NASADEM/SRTM/MOLA/LOLA use actual small permitted source/replay fixtures where available and verify checksum, shape, label/CRS, units, nodata/quality and derived support. Test EDL auth failure, HTML login response, bad archive member/size/redirect, source checksum mismatch, unsupported frame/format and no coverage. Those are input/dependency states, not terrain FAIL.
-
-EMIT tests categorical mineral handling, geolocation/quality mask and valid retrieval fractions. Diviner tests actual variable/time-support/Kelvin semantics. Missing target mineral or compatible Earth thermal evidence remains UNKNOWN even if an attractive Earth layer exists. Physical clearance/traction/autonomy remain UNKNOWN without suitable evidence.
-
-Discovery tests known controls, obvious non-analog negative control, beyond-reference candidate origin, mission sensitivity, finite search extent and stopping. Portfolio tests minimum site-count/coverage tradeoff, residual gaps/unknowns and co-location; no joining a continuous route across sites or invented logistics cost.
-
-## Port and integration tests
-
-Pure math imports without FastAPI/SQLAlchemy/OpenAI. Facade accepts F0 port models and returns all artifact/evidence drafts with resolvable local keys, input hashes/units/body/scale. Cancellation/deadline tested. Live mode rejects mock resource provider; offline mode makes no external calls. Registrar integration persists actual UUIDs and route telemetry without altering computed values. Display consumer renders image/manifest correctly and preserves mask/source scale.
-
-## Required commands
-
-From `analogforge/`, after environment/bootstrap:
+## 1. Commands (from `analogforge/`; omit `rtk` if not installed)
 
 ```bash
-rtk proxy uv run pytest tests/unit/science tests/property/science tests/integration/science
-rtk proxy uv run pytest tests/replay/science
-rtk proxy uv run ruff check src/analogforge/science src/analogforge/adapters/earthdata src/analogforge/adapters/pds
-rtk proxy uv run mypy src/analogforge/science
+python3 "../architecture files/contracts/kit/materialize.py" --verify                        # KIT-01
+uv run pytest tests/contracts/kit -q                                                          # KIT-02 (19+)
+uv run pytest tests/unit/science tests/property/science tests/integration/science tests/contracts/science -q --strict-markers \
+    -p no:randomly --timeout=600                                                              # SCN-01..SCN-21 offline
+uv run pytest tests/replay/science -q                                                         # recorded/format-faithful fixtures
+uv run ruff check src/analogforge/science src/analogforge/adapters/earthdata src/analogforge/adapters/pds \
+    src/analogforge/adapters/emit src/analogforge/adapters/diviner src/analogforge/adapters/user_survey \
+    src/analogforge/adapters/source_http src/analogforge/rendering/tiles tests/unit/science tests/property/science
+uv run mypy src/analogforge/science                                                           # strict
+python3 scripts/science/run_oracles.py --json out/oracles.json                                # prints every oracle and exit code
+python3 "../team coordination/scripts/check_branch_ownership.py" --person ayan --repo ..      # PASS
 ```
 
-Provide a documented opt-in source validation command under `scripts/science/` and report actual selected files/checksums. External access tests never run implicitly in every offline CI invocation. Run complete science suites after scientific input/algorithm changes; avoid unrelated installation or repeated unchanged full-world downloads.
+`uv run pytest … -q` must report **0 skipped, 0 xfailed, 0 deselected** for SCN tests; a final `scripts/science/run_oracles.py` run asserts the same by parsing the junit XML (`--junitxml out/science-junit.xml`) and failing if any `skipped` element exists in SCN tests.
 
-## Ready to merge
+## 2. Required test files (names are part of the gate)
 
-No failing/unrun mandatory pure tests, unexplained tolerance changes, fake NASA labels, unsupported PASS, out-of-scope file changes, secret/raw-data commits or incompatible port. Source-dependent gates may be BLOCKED_EXTERNAL only with precise remediation and honest limited capabilities; they cannot be marked verified. Record tested SHA/base/locks, numeric outcomes, runtime/resource measurements, supported operations, actual source probes and remaining limitations. Tanush runs the combined app gate before main advances.
+| File (under `tests/…/science/`) | Catalog | Must assert |
+| --- | --- | --- |
+| `unit/test_geometry.py` | SCN-01, SCN-14 | GEO-01…GEO-10 oracles; polar wedge AOI; longitude 359.9/0.1 wrap; planetary radius→height once; scale applied once; no Earth CRS for planets |
+| `unit/test_features.py` | SCN-01 | flat/inclined (10°,20°)/bump/anisotropic/rotated/nodata-halo oracles with stated tolerances |
+| `unit/test_energy.py` | SCN-02 | `ENERGY_ORACLE_FLAT_1000M` ≤ 1e-8 Wh; doubling mass/distance/speed relations; no downhill credit; dwell/task accounting; invalid efficiency; missing model ⇒ unknown; Earth gravity only |
+| `unit/test_graph_oracle.py` | SCN-03 | every `catalog.GRAPH_EXPECTED` entry **through the real search and verifier**, brute-force oracle equality, lexicographic tie-break, mock provider rejected in `live` |
+| `unit/test_verifier_independence.py` | SCN-04 | falsified solver totals, diagonal-corner/nodata traversal, stale hash, repeated-edge gaming, missing return, unreachable/too-far-snapped waypoint, non-adjacent step, mutated route |
+| `unit/test_search_limits.py` | SCN-05 | one expansion ⇒ `BUDGET_EXHAUSTED`; lossy pruning never `EXHAUSTIVE_INFEASIBLE`; certificate lossless; cancellation within 1 s |
+| `integration/test_practice_windows.py` | SCN-06 | independent checker: every property of 40 §4 |
+| `integration/test_screening.py` | SCN-07 | 40 §4.1 exactly |
+| `integration/test_truth_table.py` | SCN-08 | 40 §5 incl. oracle rule for the context row |
+| `integration/test_storylines.py` | SCN-09 | S-RASTER-1 (3 attempts), S-GRAPH-1, S-ROVER-LITE, S-NO-ENERGY, S-SMALL-BATTERY at science level, through `facade.execute` only |
+| `integration/test_perturbations.py` | SCN-10 | PERT-01…PERT-09 each flips as specified |
+| `integration/test_dataset_validation.py` | SCN-11 | one failing fixture per `check_id`; `usable_for_quantitative_claims` rules; PASS for each good fixture |
+| `integration/test_mock_nasa_drop.py` | SCN-12 | 5 good datasets validate and run end-to-end; 4 bad datasets fail with exactly the named check |
+| `integration/test_parity.py` | SCN-13 | fixture-id source ≡ LOCAL_DATASET source (identical metrics/evidence parameters) |
+| `integration/test_optional_layers.py` | SCN-15 | absent/partial mineral & thermal ⇒ specified reasons; categorical ids never interpolated |
+| `integration/test_portfolio.py` | SCN-16 | architecture 13 §6 fixtures 1–7; input-order stability |
+| `integration/test_display_layers.py` | SCN-17 | corners order, affine round-trip, legend, transparency, attribution |
+| `replay/test_adapters.py` | SCN-18 | decoders and failure modes with mocked HTTP (HTML login, bad archive, checksum, redirect auth leak, 429 Retry-After, truncation disclosure) |
+| `unit/test_import_hygiene.py` | SCN-19 | subprocess import of `analogforge.science.facade` loads none of `fastapi, sqlalchemy, psycopg, openai`; AST scan finds no `os.environ`/`getenv`; no network in synthetic (monkeypatched `socket`) |
+| `integration/test_determinism.py` | SCN-20 | two executions produce identical payload JSON and artifact SHA-256 (excluding elapsed fields) |
+| `integration/test_cancellation.py` | SCN-21 | search/screening/analysis honor cancel and deadline within 1 s |
+| `contracts/test_port_conformance.py` | all | every operation returns a kit-valid `ScienceComputationResult`; `registrar_stub` accepts it and rejects crafted bad results (hash mismatch, dangling key, path escape) |
+| `property/test_properties.py` | — | (hypothesis) non-negative distance/energy; no invalid-cell traversal; monotone reserve with added work; no duplicate exposure credit; deterministic hashes |
 
-## Mandatory credibility tests
+## 3. Tolerances (frozen; do not loosen)
 
-Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.
+Slope interior of planar facets ≤ 1e-6°; energy oracle ≤ 1e-8 Wh; histogram area fractions of the practice targets ±0.03 of design; analytic roughness of a pure plane ≤ 1e-9 m; affine round-trip ≤ 0.5 pixel; reserve percent ≤ 1e-9; W1 vs independent implementation ≤ 1e-9°.
+
+## 4. Performance budgets (offline, 4 CPU cores)
+
+`INGEST_LOCAL_DATASET` ≤ 5 s per practice dataset; `CHARACTERIZE_TARGET` ≤ 5 s; `SCREEN_CANDIDATES` ≤ 20 s; `ANALYZE_CANDIDATE` ≤ 5 s per window; `COMPARE_REQUIREMENT` ≤ 1 s; `DESIGN_BENCHMARK` ≤ 2 s; `SEARCH_ROUTE` ≤ 10 s (practice grid, default budgets); `VERIFY_ROUTE` ≤ 3 s; `OPTIMIZE_PORTFOLIO` ≤ 1 s; `BUILD_DISPLAY_LAYERS` ≤ 5 s. A test asserts each budget (`pytest.mark.slow` is allowed only for the full-suite timing test, which still runs by default).
+
+## 5. Merge readiness
+
+`STATUS.json.ready_to_merge = true` only if: every SCN row `PASSED`; kit verify and ownership `PASS`; ruff and mypy clean; no forbidden pattern (`09`); the self-audit complete; no hidden skip. External-network gates (`SCN-18` against real servers) are **not run** and must be listed as `BLOCKED_EXTERNAL` (the mocked-transport rows still must `PASS`).

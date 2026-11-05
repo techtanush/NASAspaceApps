@@ -79,3 +79,13 @@ Every file below belongs to the implementation blueprint. Validation reports des
 | [references/original-concept.txt](references/original-concept.txt) | Supporting blueprint artifact |
 | [references/source-manifest.json](references/source-manifest.json) | Supporting blueprint artifact |
 | [examples/assurance-supported-positive.json](examples/assurance-supported-positive.json) | Synthetic supported-positive assurance fixture |
+| [34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md](34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md) | One-shot build profile, completion tiers and errata |
+| [35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md](35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md) | Frozen contract kit and cross-branch seams |
+| [36-DATASET-PLUG-IN-AND-NASA-SLOT.md](36-DATASET-PLUG-IN-AND-NASA-SLOT.md) | Dataset plug-in and the NASA data slot |
+| [37-HACKATHON-DAY-RUNBOOK.md](37-HACKATHON-DAY-RUNBOOK.md) | Hackathon-day runbook |
+| [38-RUNTIME-KEYS-AND-LOCAL-SETUP.md](38-RUNTIME-KEYS-AND-LOCAL-SETUP.md) | Runtime, API keys and local setup |
+| [39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md](39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md) | Acceptance catalog, purity tests and browser journeys |
+| [40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md](40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md) | Practice scenarios and fixture specifications |
+| [contracts/kit/materialize.py](contracts/kit/materialize.py) | Kit materialize/verify tool (stdlib only) |
+| [contracts/kit/kit-manifest.json](contracts/kit/kit-manifest.json) | SHA-256 manifest of every frozen kit file |
+| [contracts/kit/tools/build_kit.py](contracts/kit/tools/build_kit.py) | Kit regeneration tool (contract-change process only) |

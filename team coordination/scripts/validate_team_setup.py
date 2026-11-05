@@ -23,16 +23,19 @@ def main() -> int:
     required = ['README.md', 'CODING-AGENT-PROMPT.md', '01-SCOPE-AND-FILE-OWNERSHIP.md',
                 '02-IMPLEMENTATION-PLAN.md', '03-ARCHITECTURE-READING-MAP.md',
                 '04-SERVICE-INTERFACES-AND-HANDOFFS.md', '05-TEST-AND-MERGE-GATES.md',
-                '06-HANDOFF-CHECKLIST.md', '07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md', 'STATUS-TEMPLATE.json']
+                '06-HANDOFF-CHECKLIST.md', '07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md',
+                '08-MODULE-SPECIFICATION.md', '09-SELF-AUDIT-AND-LOOPHOLE-CHECKLIST.md', 'STATUS-TEMPLATE.json']
     registry = json.loads((root / 'team coordination/contracts/ownership.json').read_text())
     for person, spec in registry['people'].items():
+        if person == 'merging':
+            continue
         for name in required:
             if not (root / 'team guides' / spec['name'] / name).is_file():
                 errors.append(f'Missing {spec["name"]}/{name}')
         prompt = (root / 'team guides' / spec['name'] / 'CODING-AGENT-PROMPT.md').read_text()
         if spec['branch'] not in prompt:
             errors.append(f'Missing expected branch in {person} prompt')
-    checks['personal_required_files'] = len(required) * len(registry['people'])
+    checks['personal_required_files'] = len(required) * 3
 
     docs = [root / 'README.md']
     for directory in ['team guides', 'team coordination']:
@@ -93,6 +96,8 @@ def main() -> int:
             common = (common_raw if common_raw.is_absolute() else root / common_raw).resolve()
             git_report['worktrees'] = []
             for key, spec in registry['people'].items():
+                if key == 'merging':
+                    continue
                 checkout = root / spec['worktree']
                 branch = git(checkout, 'branch', '--show-current')
                 actual_root = Path(git(checkout, 'rev-parse', '--show-toplevel')).resolve()

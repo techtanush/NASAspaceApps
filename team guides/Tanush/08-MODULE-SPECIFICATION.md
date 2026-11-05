@@ -1,0 +1,109 @@
+# Tanush — module specification
+
+File-by-file contract for the platform branch. Types come from the kit (`analogforge.ports.*`); behaviors come from architecture 03, 05–07, 14, 15, 19–25, 33, 35, 40. Where this file is more specific, it wins for your branch. You call Ayan's science only through the `ScienceService` entry point and Aradhya's renderer only through the `PassportRenderer` entry point; **you test against doubles that live under `tests/` only**.
+
+## 1. Global rules
+
+* Wire models are the kit's `domain_models`; do not redeclare them. Add semantic validators in `domain/validators.py` and wrap persistence in `db/`.
+* Every mutation: `Idempotency-Key` + `expected_revision` + workspace scope + one DB transaction (command, job, event together). Every scientific result: registrar-validated, fenced by lease token + run revision.
+* No scientific number is computed in the platform. Policy compares/validates; science computes. A platform function that turns raw rasters/routes into a metric is a defect.
+* `AUTH_MODE=local` binds `127.0.0.1` only (startup error otherwise); one seeded workspace/user/OWNER. OIDC mode is implemented and tested with a fake issuer but is not exercised by the journeys.
+* Logs/SSE/exports/errors never contain secrets, DSNs, signed URLs, hidden reasoning, raw prompts with secrets.
+* Test doubles: `tests/support/fake_science.py` (kit-valid canned results reproducing the storylines of architecture 40 §6, **constructed through the kit models**, never importable from `src/`), `tests/support/fake_openai_server.py`, `tests/support/fake_renderer.py`.
+
+## 2. File manifest (every file must exist and be implemented)
+
+```text
+src/analogforge/{main.py,settings.py,cli.py,py.typed}
+api/{__init__,dependencies,errors,sse,security}.py   api/routers/{health,capabilities,missions,rovers,runs,jobs,reads,evidence,passports,artifacts,configuration,auth}.py
+domain/{__init__,validators,state_machine,policy,confidence,budgets,hashing_utils,ids}.py
+db/{__init__,base,models,repositories,unit_of_work,rls,events,idempotency,leases}.py
+services/api/{Dockerfile,alembic.ini,migrations/versions/0001..0007_*.py,migrations/env.py}
+jobs/{__init__,queue,worker,reaper,subprocess_runner,context}.py   jobs/handlers/{prepare_fingerprint,advance_run,export_passport}.py
+application/{missions,rovers,runs,scheduler,registrar,evidence,qualification,compatibility,verification,portfolios,discovery,assurance,passports,exports,datasets,capabilities,preflight,seed}.py
+agents/runtime/{provider,openai_provider,scripted_provider,invocation,budget,sanitize}.py
+agents/roles/{mission_director,requirements,rover_systems,planetary_target,earth_scout,qualification,scientific_critic,test_designer,verification_replanning,evidence_passport}.py
+agents/schemas/{task,submission,payloads}.py   agents/prompts/{COMMON_POLICY.md,<role>.md x10,bundle.py}
+tools/{__init__,registry,receipts,science_tools,platform_tools,allowlist}.py
+adapters/{openai/{client,probe}.py,storage/cas.py,identity/{local,oidc}.py}
+config/{scenarios.yaml,presets/missions/*.json,presets/rovers/*.json}      (presets byte-identical to kit fixtures)
+compose.yaml  Makefile  README.md  scripts/{bootstrap.sh,preflight.sh,seed_synthetic.sh,validate_docs.sh,lock_sources.sh}  ops/{proxy,backup,restore,runbooks}/
+tests/{unit,integration}/platform/**  tests/contracts/platform/**  tests/support/{fake_science,fake_openai_server,fake_renderer}.py
+```
+
+## 3. Settings, config, preflight, CLI
+
+* `settings.py`: every variable of `.env.example` as a typed field; validators: local-mode loopback bind, `ALLOWED_ORIGINS` exact origins, `JOB_HEARTBEAT_SECONDS < JOB_LEASE_SECONDS/3`, OIDC set complete, test-hook variables rejected unless `ANALOGFORGE_TEST_HOOKS=1` **and** `AUTH_MODE=local` **and** the hook-specific condition; `effective_config_sha256` = canonical hash of non-secret effective settings + parsed `scenarios.yaml` + parsed `algorithms.yaml` hash (from Ayan's file; parse it as an opaque mapping if its models are unavailable — preflight reports the hash).
+* `config/scenarios.yaml` per architecture 35 §7 for the five scenario ids of `catalog.ALL_SCENARIOS`; `live-hackathon-v1` has `status: AWAITING_DATASETS`, `allowed_modes: []` until `scenario bind`.
+* `application/preflight.py`: stages `RUNTIME, STORAGE, IDENTITY, MODEL, METADATA, DOWNLOAD, SCIENCE, SCENARIO, LOCK, DATASETS` (architecture 38 §5). `SCIENCE` loads the **real entry point**, runs the tiny probe through it and reports the facade's `supported_operations()`; absence ⇒ gate failure `SCIENCE_FACADE_MISSING` (never a fallback).
+* `cli.py` commands (all exit non-zero on failure, print machine-readable JSON with `--json`): `serve`, `worker`, `migrate [--check]`, `db up|down|status`, `seed-synthetic` (idempotent, offline: workspace, presets), `preflight`, `datasets list|scaffold|validate|lock|generate-practice|generate-mock-nasa-drop`, `scenario bind|show`, `export-openapi --out`, `science-check`, `assurance-selftest`. `datasets validate` runs `INGEST_LOCAL_DATASET` via the entry point in a `LocalScienceContext`-like CLI context and prints each check; `lock`/`bind` per architecture 36 §3 including `MODE_MISMATCH` for synthetic data into `live-hackathon-v1`.
+* `Makefile`: `bootstrap dev migrate seed-synthetic preflight test test-live generate-client build check backup restore-check down` (each documented; `test-live` skips with a printed reason without credentials and reports `BLOCKED_EXTERNAL`).
+
+## 4. Domain validators (`domain/validators.py`)
+
+`validate_rover_input` (positive mass/energy/speed, `0 < max_slope_deg < 90`, reserve 0–100, unknown units, duplicate sensors, `energy_model` bounds, clearance vs obstacle distinct), `validate_mission_content` (unique requirement ids, operator/bounds rules of architecture 05, `minimum ≤ maximum` support, slope band within 0–90 and ordered, exposure `lower` is a distance, co-location ids, `NOT_NATURALLY_REPRODUCIBLE` only for gap observables, `evidence_scope` vs scale consistency, hard conflict detection: band upper > rover max slope ⇒ **warning issue `ROVER_LIMIT_CONFLICT`**, never silent relaxation), `validate_run_inputs` (accepted mission, same workspace, mode vs scenario `allowed_modes`, body vs scenario body, rover optional, dataset lock exists and matches scenario, live ⇒ key+model present). Each validator returns structured violations with field paths.
+
+## 5. State machine, scheduler, actions
+
+`domain/state_machine.py` encodes the transition table of architecture 14 as **data** (`TRANSITIONS[state] -> {next_state: guard}`) plus `allowed_actions(snapshot) -> frozenset[str]`. `application/scheduler.py` is code (never model-driven) and executes this sequence (architecture 35 §3.2) inside the worker, one durable step per job (`advance_run`), checkpointing after each:
+
+| State | Step (operations in order) | Next |
+| --- | --- | --- |
+| `DRAFT`→`VALIDATING` | `validate_run_inputs`; live preflight; budget reservation; for `LOCAL_DATASET` sources: lock tamper check + `INGEST_LOCAL_DATASET` per bound dataset | `CHARACTERIZING` |
+| `CHARACTERIZING` | `RESOLVE_COVERAGE`, `CHARACTERIZE_TARGET`, `BUILD_DISPLAY_LAYERS(TARGET)`; Requirements role (`validate_accepted_contract`); Rover role (if rover); Target role | `DISCOVERING` (or `BLOCKED` on `NO_COVERAGE` of a mandatory target dimension) |
+| `DISCOVERING` | `SCREEN_CANDIDATES`; `ANALYZE_CANDIDATE` for each shortlist window and each `NOMINATE_CANDIDATE`; display layers; Scout role | `QUALIFYING` (or `BUILDING_PASSPORT` if no supported candidate) |
+| `QUALIFYING` | `COMPARE_REQUIREMENT` for every requirement × candidate (route-dependent rows with no verification are computed as PRELIMINARY by the operation itself); `ASSESS_COMPATIBILITY` (rover present); Qualification role proposal | `CRITIQUING` |
+| `CRITIQUING` | mechanical bundle review (`scale`, `provenance`, `modes`, `units`, `crs`, `coverage`, `proxies`, `contract_integrity`) + `AUDIT_EVIDENCE`; Critic role; ≤ 2 repair rounds (`catalog.BUDGETS`); open BLOCKING issues exclude affected claims from positive statements | `AWAITING_REVIEW` (rover present) or `BUILDING_PASSPORT` (qualification-only) |
+| `AWAITING_REVIEW` | pause; user actions `SELECT_CANDIDATE`, `NOMINATE_CANDIDATE`, `BUILD_PORTFOLIO`, `SELECT_PORTFOLIO`, `APPROVE_EVIDENCE`, `REJECT_EVIDENCE`, `PROVE_IT`, `CANCEL`; worker releases its lease | `DESIGNING_TEST` on `PROVE_IT` |
+| `DESIGNING_TEST` | `DESIGN_BENCHMARK` → register CONSTRAINTS + immutable `VerificationTest` → `SEARCH_ROUTE` → register ROUTE | `VERIFYING` |
+| `VERIFYING` | `VERIFY_ROUTE` (route found) or build `TestResult` from the search payload (E-08); final `COMPARE_REQUIREMENT` for route-dependent rows (rule of architecture 40 §5) and final `ASSESS_COMPATIBILITY` | `BUILDING_PASSPORT` (PASS) or `DIAGNOSING` |
+| `DIAGNOSING` | `DIAGNOSE_RESULT`; Verification role proposal validated against `permitted_repairs` and remaining budgets | `REPLANNING` or `BUILDING_PASSPORT` |
+| `REPLANNING` | apply the repair: new strategy on the same candidate (≤ 2 per candidate) or the next candidate by the picker of architecture 40 §4 (≤ 1); **mission and rover hashes must be unchanged** (assert) | `DESIGNING_TEST` |
+| `BUILDING_PASSPORT` | final `AUDIT_EVIDENCE` + application assurance; passport assembly; export rendering job | `COMPLETED` |
+
+`APPROVE_EVIDENCE`/`REJECT_EVIDENCE` only resolve a pending `ASSUMPTION`/`PROXY`/`MATERIAL_TEST_CHANGE` review; an `EVIDENCE_READY` review needs no approval. `PROVE_IT` requires: a rover, a selected-or-given candidate with analysis evidence, no pending blocking review, state `AWAITING_REVIEW`, revision match; else `409 ROVER_REQUIRED`/`INVALID_TRANSITION`/`REVISION_CONFLICT`. Cancellation (`CANCEL`) is legal in every non-terminal state and idempotent in terminal ones. A run never goes backward on contract/rover change (new run). Replan counters (`replans_total ≤ 3`, route repairs ≤ 2, candidate switches ≤ 1, attempts per candidate ≤ 3) persist and survive restart.
+
+**Attempt bookkeeping:** each `VerificationTest` row carries `attempt_number`, `parent_test_id`, `strategy`, `search_status`, `diagnosis_json`, `changed_elements` (strings like `strategy: WAYPOINT_RETURN -> EXPOSURE_COVERAGE`, `candidate: Practice grid-r0c1 -> Practice grid-r0c0`). `TestResult` for no-route outcomes follows E-08; `failure_category` for `EXHAUSTIVE_INFEASIBLE` comes from `DIAGNOSE_RESULT`.
+
+## 6. Registrar (`application/registrar.py`)
+
+Implements exactly architecture 35 §3.3 (all eight steps, all rejection rules) with these additions: it recomputes `input_sha256` with `ports.hashing.canonical_sha256(request)`; it enforces the media-type allow-list; it rejects `ArtifactDraft`s whose scratch path is a symlink or outside the scratch dir; it quarantines (not deletes) rejected bytes; every rejection creates a diagnostic `ToolReceipt(status=FAILED, error_code=MODEL_OUTPUT_INVALID or SOURCE_CONTENT_INVALID)` and an event, and **no** domain row. Evidence and receipts are append-only; the DAG is checked acyclic.
+
+**Discoverability rules (architecture 35 §5b):** attach the screening evidence and each analysis evidence to the shortlisted `EarthAnalogCandidate.evidence_ids`; the `characterize-target` evidence to the target profile; `verify-route` + `route-telemetry` evidences to `TestResult.evidence_ids`; each qualification row's `compare-requirement` evidence to `QualificationDimension.evidence_ids`; route/constraints artifact hashes to `VerificationTest`. Verify with a contract test that the UI-readable artifacts of a completed run are reachable by walking only public endpoints.
+
+## 7. Persistence
+
+Tables, constraints and indexes exactly as architecture 06 (all of them, including `idempotency_requests`, `audit_events`, `preparation_jobs`, `agent_invocations`, `tool_receipts`, `evidence_edges`, `export_artifacts`), plus the attempt columns of §5, `scenario_bindings` (scenario→dataset ids at run creation), `dataset_locks` (id, sha, file path; the file is authoritative). Migrations `0001` extensions+identity, `0002` missions/rovers/revisions/acceptances, `0003` runs/jobs/events/idempotency, `0004` storage/evidence/edges, `0005` candidates/qualifications/critiques/reviews, `0006` tests/results/portfolios/passports/exports (**passports.assurance_evidence_id NOT NULL with composite FK**), `0007` immutability triggers + RLS policies + indexes. Immutable tables deny `UPDATE/DELETE` to the application role. Composite workspace FKs prevent cross-workspace joins. `alembic upgrade head` works on empty and seeded previous schema; `alembic downgrade` is documented as unsupported for deployed data.
+
+## 8. Jobs and worker
+
+Claim query of architecture 23 verbatim; lease 120 s, heartbeat 20 s, reaper every 30 s; fenced publication; CPU work in a child process per `ScienceRequest` with wall/memory budget, cancellation token and 5 s terminate escalation; `WORKER_CPU_CONCURRENCY ≤ 2` subprocesses. Job kinds: `PREPARE_FINGERPRINT`, `ADVANCE_RUN`, `EXPORT_PASSPORT`. A job never holds a DB transaction across model/CPU/network work. SIGTERM stops claiming and requeues by lease expiry.
+
+## 9. Agents
+
+* **Providers:** `OpenAIProvider` (Responses API, `store=false` where supported, strict function schemas generated from pydantic with `additionalProperties:false` and all properties required, serial tool calls, `call_id`-correlated outputs, typed errors for refusal/incomplete/malformed) and `ScriptedProvider` (synthetic/replay, no network objects constructed). The scripted provider derives each role's `RoleSubmission` from the **tool receipts that exist** and the server-issued `allowed_actions`; it never emits a number or verdict; it injects the seeded scale defect of architecture 40 §7 only in `synthetic-mars-mobility-v1`.
+* **Roles:** ten role modules implement task kinds, tool allowlists, payload schemas and limits of `architecture files/agents/01…10`. Allowlists (enforced in `tools/allowlist.py`, tested for every unlisted call): director `{get_run_snapshot, inspect_contract, get_evidence, optimize_portfolio, submit_role_result}`; requirements (preparation) `{validate_mission_draft, submit_role_result}`, (run) `{get_run_snapshot, inspect_contract, get_evidence, submit_role_result}`; rover_systems `{get_run_snapshot, inspect_contract, validate_rover_profile, assess_rover_compatibility, get_evidence, submit_role_result}`; planetary_target `{get_run_snapshot, inspect_contract, resolve_dataset_coverage, fetch_dataset, characterize_target, compare_evidence, get_evidence, submit_role_result}`; earth_scout `{get_run_snapshot, inspect_contract, resolve_dataset_coverage, fetch_dataset, screen_earth_candidates, analyze_earth_candidate, compare_evidence, optimize_portfolio, get_evidence, submit_role_result}`; qualification `{get_run_snapshot, inspect_contract, compare_requirement, compare_evidence, get_evidence, optimize_portfolio, submit_role_result}`; scientific_critic `{get_run_snapshot, inspect_contract, get_evidence, review_evidence_bundle, compare_evidence, compare_requirement, resolve_dataset_coverage, submit_role_result}`; test_designer `{get_run_snapshot, inspect_contract, get_evidence, assess_rover_compatibility, design_test, search_route, submit_role_result}`; verification_replanning `{get_run_snapshot, inspect_contract, get_evidence, assess_rover_compatibility, verify_route, diagnose_verification, search_route, submit_role_result}`; evidence_passport `{get_run_snapshot, inspect_contract, get_evidence, review_evidence_bundle, build_passport_manifest, submit_role_result}`.
+* **Tools:** the 21 tools of `catalog.TOOL_NAMES` with strict schemas; tool → operation: `resolve_dataset_coverage→RESOLVE_COVERAGE`, `fetch_dataset→FETCH_SOURCE` (adapter `local_dataset`⇒`INGEST_LOCAL_DATASET`), `characterize_target`, `screen_earth_candidates→SCREEN_CANDIDATES`, `analyze_earth_candidate→ANALYZE_CANDIDATE`, `compare_requirement→COMPARE_REQUIREMENT`, `assess_rover_compatibility→ASSESS_COMPATIBILITY`, `design_test→DESIGN_BENCHMARK`, `search_route→SEARCH_ROUTE`, `verify_route→VERIFY_ROUTE`, `diagnose_verification→DIAGNOSE_RESULT`, `optimize_portfolio→OPTIMIZE_PORTFOLIO`; platform-only: `get_run_snapshot, inspect_contract, validate_mission_draft, validate_rover_profile, review_evidence_bundle, get_evidence, compare_evidence, build_passport_manifest, submit_role_result`. Checks in order: strict schema → invocation active → allowlist → workspace → revision/mode → contract hash → budgets/cancel → tool constraints → execute → output schema → receipt/evidence → sanitized envelope.
+* **Policy (`domain/policy.py`)** rejects (typed, no commit): evidence ids not resolvable/authorized/mode-compatible; tool receipt not terminal-success; status or confidence stronger than the deterministic comparison's; contract/rover hash mismatch; threshold/limit change; unlisted `next_action`; stale revision; routes/verdicts not from the verifier; a repair outside `permitted_repairs`. Prompt-injection text in source metadata is data (a test proves it never reaches privileged instructions or expands tools).
+* **Budgets:** `catalog.BUDGETS` enforced and persisted transactionally (model/tool counts including retries, dispatches, repair rounds, replans, active seconds); preparation cap 4.
+* **Live provider capability probe** (`adapters/openai/probe.py`): one strict function call + one structured result with the configured model; typed failure codes `MODEL_KEY_MISSING|MODEL_NAME_MISSING|MODEL_CAPABILITY_FAILED`.
+
+## 10. Assurance and passport (`application/assurance.py`, `passports.py`)
+
+* `audit(snapshot, claims, receipts)`: build one claim per (requirement × assessed candidate) plus one `VERIFICATION` claim per attempt plus `DISCOVERY` claims for the screening result; fill SC-01, SC-12, SC-14, SC-15 yourself (frozen hashes, critic resolution, mode/validation-level consistency, claim↔table↔export consistency) and take SC-02…SC-11/SC-13 from the science evidence (`AUDIT_EVIDENCE` + `adequacy`); missing gate ⇒ `NOT_ASSESSED` ⇒ dependent positive claim `REJECTED`. Validation level per claim: S1 for synthetic analytic results, S2 for decoded real source, S3 for real common-scale comparison, S4 for an independently verified modeled route on real data; replay keeps the original level but mode `replay`.
+* Dispositions: `SUPPORTED` (evidence present, gates satisfied), `LIMITED` (nominal/proxy/unquantified-uncertainty restriction), `UNKNOWN`, `GAP`, `UNSUPPORTED`, `REJECTED` (inconsistent/invalid claim). **Publication:** `BLOCKED` iff any included claim is `REJECTED` or an integrity gate (SC-01/02/09/14/15) is `UNSATISFIED`; `LIMITED` iff any claim is `LIMITED/UNKNOWN/GAP/UNSUPPORTED`; else `ALLOWED`. All practice scenarios publish `LIMITED`; `ALLOWED` is exercised by a minimal single-FAIL-claim platform test and the kit's blueprint negative fixture.
+* `permitted_statement` strings are produced from templates keyed by (claim type, status, scope), never free text; `qualified_uses`, `partial_uses`, `unsupported_uses`, `unknowns` of the `AnalogPassport` are compiled only from audited claims (qualified use = "modeled terrain-feasibility test of <requirement labels> on <candidate name> under the accepted assumptions", only when the verification claim is SUPPORTED PASS **and** all mandatory route rows FINAL PASS).
+* Assembly order (acyclic): freeze snapshot → run final audit → persist assurance evidence (DERIVED, `algorithm_id=scientific-assurance`, `algorithm_version=1.0`, artifact validates against the assurance schema) → build manifest (architecture 19 §3 sections + assurance pointer) → `manifest_sha256` via `ports.hashing` over the manifest **excluding** its own digest and signatures → persist canonical manifest bytes artifact → `AnalogPassport` row (`assurance_evidence_id` in `evidence_ids`) → `PassportExportBundle` → render. A stale snapshot, changed asset/algorithm/policy hash, lost lease or cancellation aborts publication; the rejected proposal keeps a diagnostic audit only.
+* `SCIENTIFIC_CLAIM_REJECTED` (422 with SC issue codes) for synchronous violations; asynchronous rejection appears in receipts/events and **no** `passport.created` event.
+
+## 11. Exports
+
+`EXPORT_PASSPORT` job loads the renderer via its entry point, builds `ProvidedAsset`s (validated PNGs rendered by the science display layers/route images), calls `render` for each format, re-hashes `content`, stores the blob, writes `export_artifacts` (unique passport+format+renderer_version). `GET /passports/{id}/exports/{format}` → `202` + `Retry-After` while pending, then `200` with `Content-Type`, `Content-Disposition: attachment; filename=<renderer filename>`, `ETag: "<sha>"`, `X-Artifact-SHA256`, `X-Content-Type-Options: nosniff`; bytes identical on every download; authorization per passport/workspace.
+
+## 12. API
+
+Implement all 43 operations of `contracts/openapi.bundled.json` with the exact paths, operationIds, bodies, status codes and error envelope. `GET /capabilities` lists scenarios per architecture 40 §10 (`live-hackathon-v1` present with `allowed_modes: []` until bound) and `worker_healthy` from the heartbeat. SSE per architecture 07. `/auth/*` per architecture 24 (local-mode session cookie; CSRF only when cookie sessions are used). The OpenAPI document the app serves at `/openapi.json` must pass PLT-02 against the kit's bundled spec.
+
+## 13. Acceptance numbers
+
+43 operations; 10 roles; 21 tools; 15 science operations invoked by the stages above; migrations 0001–0007; budgets of `catalog.BUDGETS`; journey J1 completes through the **real API** with `fake_science` replaced by the real facade at merge; replans 1 route repair + 1 candidate switch in S-RASTER-1; every practice scenario publishes `LIMITED`; `PLT-01…PLT-21` pass.

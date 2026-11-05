@@ -1,13 +1,29 @@
-# Aradhya interface maps and passport branch
+# Aradhya — interface, maps and passport renderer
 
-Your branch is `aradhya/frontend-experience`. Your local checkout is `Aradhya/`. Give Codex the [coding agent prompt](CODING-AGENT-PROMPT.md) and implement the interface, generated client and pure passport renderer under that checkout's `analogforge/`.
+**Branch:** `aradhya/frontend-experience` · **Agent:** Claude Code or Codex · **Result:** the React workbench (all screens, maps, SSE, accessible, mock-previewable) and the pure passport renderer (`analogforge.rendering.passport:create_passport_renderer`).
 
-Your job is a working mission-test workbench, not a presentation with hardcoded scientific results. Tanush supplies the real API/Agent Council/persistence; Ayan supplies scientific evidence, route outputs and display layers. The frontend must make their distinctions and limitations understandable.
+You make the product legible and truthful: a mission-test workbench, not a chat window. Every scientific state comes from the server; you display it with its scale, limits and unknowns, and you never compute science. Tanush's API and Ayan's science are not available to you during the build — you develop against the **bundled OpenAPI**, a faithful **stateful mock backend** (visibly bannered), and typed renderer fixtures. The merging agent runs your journeys against the real backend.
 
-Follow [scope](01-SCOPE-AND-FILE-OWNERSHIP.md), [implementation sequence](02-IMPLEMENTATION-PLAN.md), [architecture map](03-ARCHITECTURE-READING-MAP.md), [interfaces](04-SERVICE-INTERFACES-AND-HANDOFFS.md), [tests/merge gates](05-TEST-AND-MERGE-GATES.md) and [handoff checklist](06-HANDOFF-CHECKLIST.md).
+## How to run this branch in one session
 
-Start against the supplied C1 OpenAPI with a **visibly mocked development preview** while F0 is prepared. Deliver U0 early. Once the real backend is available, disable mocks explicitly and connect the same components/client to persisted data. Never silently return mock PASS when a real request fails.
+1. Clone the repo, check out `aradhya/frontend-experience`.
+2. Open Claude Code or Codex and paste **only** [CODING-AGENT-PROMPT.md](CODING-AGENT-PROMPT.md).
+3. Leave it running; it follows [COMMON-BUILDER-PROTOCOL](../COMMON-BUILDER-PROTOCOL.md), builds to your [definition of done](06-HANDOFF-CHECKLIST.md), self-audits, pushes and prints a summary.
 
-References: [architecture](../../architecture%20files/README.md), [team rules](../../team%20coordination/README.md), [service boundary](../../team%20coordination/03-SERVICE-BOUNDARIES.md), [ownership](../../team%20coordination/contracts/ownership.json). Reports and requests go under `team handoffs/aradhya/`.
+## Files in this guide
 
-Before implementing scientific results, read the mandatory [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md). It assigns your concrete backend/science/presentation responsibilities and shared adversarial merge tests under contract C1.
+| File | Purpose |
+| --- | --- |
+| [CODING-AGENT-PROMPT.md](CODING-AGENT-PROMPT.md) | The single prompt |
+| [01-SCOPE-AND-FILE-OWNERSHIP.md](01-SCOPE-AND-FILE-OWNERSHIP.md) | What you own and must not touch |
+| [02-IMPLEMENTATION-PLAN.md](02-IMPLEMENTATION-PLAN.md) | Phases with exit gates |
+| [03-ARCHITECTURE-READING-MAP.md](03-ARCHITECTURE-READING-MAP.md) | What to read, when |
+| [04-SERVICE-INTERFACES-AND-HANDOFFS.md](04-SERVICE-INTERFACES-AND-HANDOFFS.md) | Your seams |
+| [05-TEST-AND-MERGE-GATES.md](05-TEST-AND-MERGE-GATES.md) | Exact commands, tests, thresholds |
+| [06-HANDOFF-CHECKLIST.md](06-HANDOFF-CHECKLIST.md) | Definition of done |
+| [07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) | Truthful presentation requirements |
+| [08-MODULE-SPECIFICATION.md](08-MODULE-SPECIFICATION.md) | **File-by-file specification** |
+| [09-SELF-AUDIT-AND-LOOPHOLE-CHECKLIST.md](09-SELF-AUDIT-AND-LOOPHOLE-CHECKLIST.md) | Adversarial self-review and mutation checks |
+| [STATUS-TEMPLATE.json](STATUS-TEMPLATE.json) | Report you fill |
+
+Authoritative context: [architecture 34](../../architecture%20files/34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md), [35](../../architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md), [39](../../architecture%20files/39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md), [40](../../architecture%20files/40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md), [16](../../architecture%20files/16-USER-JOURNEYS-AND-SCREENS.md)–[19](../../architecture%20files/19-ANALOG-PASSPORT-AND-EXPORTS.md).

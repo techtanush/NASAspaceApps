@@ -1,25 +1,22 @@
-# Ayan handoff checklist
+# Ayan — definition of done (checklist)
 
-Create checkpoint report under `team handoffs/ayan/` using the shared template. The integrator should be able to reproduce your results without understanding every implementation detail.
+Tick only with observed evidence recorded in `STATUS.json`.
 
-- [ ] Correct branch/worktree/profile and accepted F0/base SHA recorded.
-- [ ] Only owned science/source/display/config/test paths changed; dependency/contract requests are separate.
-- [ ] Typed facade and all supported operation examples match accepted port version.
-- [ ] Analytic expected values, masks/body/CRS/scale handling and property tests pass.
-- [ ] Graph FAIL→repair→PASS arithmetic is computed with unchanged accepted thresholds.
-- [ ] Production energy tested separately; mock energy cannot enter live mode.
-- [ ] Independent verifier rejects falsified solver totals and unsafe/unknown traversal.
-- [ ] Search limits/approximation create INCONCLUSIVE rather than false infeasibility.
-- [ ] Scientific evidence/artifacts have complete draft lineage, hashes, quantity kinds and limitations.
-- [ ] Earth/Mars/Moon actual source validation listed separately from synthetic/replay tests.
-- [ ] Optional-layer/no-coverage/error states and physical unknowns remain honest.
-- [ ] Discovery controls, mission sensitivity, bounded novelty scope and portfolios/co-location tested.
-- [ ] Display manifests/images/route telemetry can be consumed by the actual platform/UI.
-- [ ] No secrets, bulk data, hidden models, SQL/FastAPI dependencies in pure math or unapproved lock edits.
-- [ ] Exact tested commit, commands/counts, tolerances, source/algorithm hashes and blockers included.
+- [ ] Correct branch/clone; kit materialized and `--verify` PASS at start and end; `tests/contracts/kit` green.
+- [ ] Only owned paths changed (ownership checker PASS); `extra-ayan` is the only `pyproject.toml` edit; no `uv.lock`.
+- [ ] `create_science_service()` returns a `ScienceService` supporting all 15 operations; each has happy-path, `BLOCKED`/`LIMITED` and cancellation tests; every result validates as `ScienceComputationResult`.
+- [ ] `tests/support/registrar_stub.py` enforces the platform registration rules and your results pass it; crafted bad results are rejected.
+- [ ] Canonical graph: every `GRAPH_EXPECTED` entry reproduced by the real search + independent verifier; falsified totals rejected.
+- [ ] Energy oracle within 1e-8 Wh; analytic geometry oracles GEO-01…10 pass.
+- [ ] Practice generators produce all five practice datasets and the nine mock-drop datasets, byte-deterministic, **and** the independent checker confirms every window property of architecture 40 §4.
+- [ ] Screening, truth table, five storylines and nine perturbations pass through `facade.execute` only.
+- [ ] Dataset validation implements every check of architecture 36 §4 with a failing fixture each; `draft_manifest` works; parity (fixture ≡ local dataset) holds.
+- [ ] Optional layers (mineral/thermal) honest: UNKNOWN with the specified reasons; categorical ids never interpolated.
+- [ ] Display layers: correct corners/affine/legend/transparency/attribution.
+- [ ] Live adapters implemented and tested with mocked HTTP + format-faithful files; none contacts a real server; none reads the environment.
+- [ ] Import hygiene: no `fastapi/sqlalchemy/psycopg/openai`/platform imports; no `os.environ`; no network in synthetic.
+- [ ] Determinism: two executions give identical bytes; budgets in `05` §4 met.
+- [ ] No `NotImplementedError`/`TODO`/`FIXME`/`HACK`; no hard-coded practice outcomes; no weakened/skipped tests; mutation checks demonstrate tests can fail.
+- [ ] `STATUS.json` complete and truthful; contradictions and cross-area defects listed; committed; pushed to `origin ayan/science-data-verification`.
 
-Deliver S0 as soon as the pure facade/regression works, then S1 for complete scientific source/discovery/portfolio behavior. Do not wait for a perfect final app before exposing your actual integration shapes.
-
-## Scientific credibility handoff
-
-Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.
+Deliver as early as each phase gate allows by pushing at every gate — but the **branch is only mergeable at the end**.

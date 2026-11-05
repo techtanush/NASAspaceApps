@@ -1,25 +1,39 @@
-# AnalogForge local team workspace
+# AnalogForge — NASA Space Apps 2026 team repository
 
-This repository contains the complete AnalogForge architecture and the work assignments for Tanush, Ayan and Aradhya. The application has not been implemented yet. Three local Git branches and isolated working copies let the three people build the same application without sharing an editable checkout.
+**Challenge:** *Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars.*
+**Product:** AnalogForge, a mission-conditioned Earth-analog qualification and test-design workbench: Mission Fingerprint → planetary target characterization → Earth candidate discovery → requirement-by-requirement qualification (PASS / PARTIAL / FAIL / GAP / UNKNOWN) → **PROVE IT** (deterministic, independently verified route/energy/exposure experiment with diagnosis and bounded replanning) → Analog Passport (HTML/JSON/CSV). *A place can look like Mars and still be useless for the test; AnalogForge checks the test, not the resemblance.*
 
-| Person | Branch | Responsibility | Start here |
+The application is **not implemented yet**: this repository contains the complete specification, a frozen contract kit, and one-shot build guides for three parallel coding agents plus a merging guide. Everything except the NASA-provided dataset is built and rehearsed on synthetic practice data; the dataset plugs into a prepared slot at the hackathon.
+
+## Branches and who runs them
+
+| Branch | Person | Start here | Result |
 | --- | --- | --- | --- |
-| Tanush | `tanush/platform-agents-integration` | Backend, persistence, jobs, Agent Council, API contracts, final integration | [Tanush guide](team%20guides/Tanush/README.md) |
-| Ayan | `ayan/science-data-verification` | Dataset adapters, planetary/Earth terrain, qualification algorithms, routes, energy, verification, portfolios | [Ayan guide](team%20guides/Ayan/README.md) |
-| Aradhya | `aradhya/frontend-experience` | Web interface, maps, generated API client, evidence/test interactions, passport renderer and browser validation | [Aradhya guide](team%20guides/Aradhya/README.md) |
+| `tanush/platform-agents-integration` | Tanush | [team guides/Tanush/README.md](team%20guides/Tanush/README.md) | Backend, persistence, jobs, Agent Council, policy/assurance, API, config/compose, passport assembly |
+| `ayan/science-data-verification` | Ayan | [team guides/Ayan/README.md](team%20guides/Ayan/README.md) | Scientific library behind the `ScienceService` port, dataset slot, route verifier, generators |
+| `aradhya/frontend-experience` | Aradhya | [team guides/Aradhya/README.md](team%20guides/Aradhya/README.md) | React workbench, maps, mock backend, pure passport renderer, browser journeys |
+| `merging-branch` | merging agent | `merging guide/README.md` on that branch | Purity checks, wiring, combined tests, release candidate |
+| `main` | — | this README | Shared specification and guides |
 
-The root checkout stays on `main`. Directories `Tanush/`, `Ayan/` and `Aradhya/` are local Git worktrees on the named branches. Each contains the full architecture and all team guides. Work on application code inside **your own worktree's `analogforge/` directory**. Your personal directory is an actual checkout, not a second independent copy of the project to paste into main.
+Each person clones their branch and pastes **one prompt** (`team guides/<Name>/CODING-AGENT-PROMPT.md`) into Claude Code or Codex. The agent runs unattended (with subagents as needed) until its definition of done, then pushes with a filled `STATUS.json`. When all three are ready, the merging agent (one prompt) fuses them.
 
-On another computer, clone [techtanush/NASAspaceApps](https://github.com/techtanush/NASAspaceApps), then select your branch from the table. For example, Ayan can start directly with:
+## Read order
+
+1. [architecture files/README.md](architecture%20files/README.md) — product and science specification (documents 00–33).
+2. [34 One-shot build profile and errata](architecture%20files/34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md) (overrides 00–33 where they conflict) and [35 Frozen contract kit and seams](architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md).
+3. [36 Dataset plug-in](architecture%20files/36-DATASET-PLUG-IN-AND-NASA-SLOT.md), [37 Hackathon-day runbook](architecture%20files/37-HACKATHON-DAY-RUNBOOK.md), [38 Keys and local setup](architecture%20files/38-RUNTIME-KEYS-AND-LOCAL-SETUP.md), [39 Acceptance catalog](architecture%20files/39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md), [40 Practice scenarios](architecture%20files/40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md).
+4. [team coordination/README.md](team%20coordination/README.md) and [team guides/COMMON-BUILDER-PROTOCOL.md](team%20guides/COMMON-BUILDER-PROTOCOL.md).
+
+## Keys needed (summary; details in [38](architecture%20files/38-RUNTIME-KEYS-AND-LOCAL-SETUP.md))
+
+None to build or run synthetic mode. For `live` mode: an OpenAI API key and an explicit model id (`OPENAI_API_KEY`, `OPENAI_MODEL`). Earthdata token only for optional network downloads. No NASA API key, map key or sponsor credentials.
+
+## Validation
 
 ```bash
-rtk proxy git clone --branch ayan/science-data-verification https://github.com/techtanush/NASAspaceApps.git
+python3 "architecture files/contracts/validate_blueprint.py"          # specification integrity (needs jsonschema, referencing)
+python3 "team coordination/scripts/validate_team_setup.py"            # guide/baseline integrity
+python3 "architecture files/contracts/kit/materialize.py" --verify    # after materializing into analogforge/
 ```
 
-Tanush and Aradhya use their respective branch names. Open the cloned repository root and follow `team guides/<YourName>/README.md`; the nested person worktrees described above are specific to this original computer. A clone of your branch is already an isolated checkout. The local transfer bundle remains an offline alternative described in [team coordination](team%20coordination/README.md). Copying just a worktree folder is not a portable repository transfer.
-
-Read [architecture](architecture%20files/README.md) for product/science authority and [team coordination](team%20coordination/README.md) for ownership, interfaces, foundation handoff, merge order and acceptance. Each coding agent starts with its person's `CODING-AGENT-PROMPT.md`, not the unrestricted whole-app prompt alone.
-
-GitHub stores the shared architecture and three implementation branches; the app will still run locally. All branches start from the same committed C1 specification with their individual scope, implementation plan and merge gates under `team guides/`. This repository currently contains planning artifacts and validators. App implementation, live credentials and deployment remain future work.
-
-Scientific credibility is now a binding C1 implementation/merge requirement: [architecture33](architecture%20files/33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md), [shared release gate](team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md) and each person's07 guide specify backend enforcement, scientific evidence and truthful UI/exports. Planning validation does not establish implemented scientific capability.
+These validate planning artifacts only; they certify no application behavior, real data, live model access or physical rover performance.

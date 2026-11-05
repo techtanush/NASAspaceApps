@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "change_id": "C2-one-shot-kit",
+  "previous_baseline": "C1-scientific-assurance",
+  "new_baseline": "C2-one-shot-kit",
+  "authorization": "User requested branch-specific one-shot build guides, a merging branch/guide, and a pre-hackathon build that lacks only the NASA dataset.",
+  "stage": "Planning only; no application implementation exists yet.",
+  "public_contract_change": "None. The 43 OpenAPI operations, domain schema and assurance schema are unchanged. The kit adds typed cross-branch ports, a bundled OpenAPI and shared fixtures derived from them.",
+  "added_artifacts": [
+    "architecture files/34..40",
+    "architecture files/contracts/kit/** (ports: science, science_payloads, passport_renderer, datasets, domain_models, assurance_models, hashing, catalog, common; bundled OpenAPI; ui-testids; fixtures; self-tests)",
+    "merging guide/** (merging-branch only)"
+  ],
+  "errata": "E-01..E-18 in architecture 34",
+  "compatibility": "Backward compatible with C1. Entry points and the dataset manifest are new; the personal guides' ban on subagents is superseded (E-14).",
+  "migration": "None.",
+  "consumers": ["Tanush", "Ayan", "Aradhya", "merging agent"],
+  "validation": ["architecture/validate_blueprint.py", "team coordination/scripts/validate_team_setup.py", "kit self-tests (19)"],
+  "implementation_validation_status": "NOT_IMPLEMENTED"
+}

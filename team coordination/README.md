@@ -1,73 +1,46 @@
-# Three person build coordination
+# Three-person parallel build coordination
 
-This is the division of one application across three branches. Tanush owns the platform and its final assembly, Ayan owns scientific computation, and Aradhya owns the user experience. Existing architecture files remain the product/scientific specification. These team files define ownership, dependency order and delivery boundaries without changing scientific requirements.
+One application, three branches, three coding agents working **in parallel, each from one prompt**, then one **merging agent** fuses them. This folder defines ownership, the shared frozen contract kit, runtime isolation and how the pieces meet. The product and science live in `architecture files/`; read [34](../architecture%20files/34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md) and [35](../architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md) first.
 
-## Local working copies
+## What the project is
 
-The repository root is the integration checkout on `main`. The sibling directories below it are isolated worktrees:
+AnalogForge — NASA Space Apps Challenge 2026, *Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars*. A mission-conditioned qualification workbench: Mission Fingerprint → target characterization → Earth candidate discovery → requirement-by-requirement qualification (PASS/PARTIAL/FAIL/GAP/UNKNOWN) → **PROVE IT** (deterministic, independently verified route/energy/exposure experiment with diagnosis and bounded replanning) → Analog Passport (HTML/JSON/CSV). Everything is built and rehearsed on synthetic practice data now; the single missing piece is the NASA dataset, which plugs into a prepared slot at the hackathon ([36](../architecture%20files/36-DATASET-PLUG-IN-AND-NASA-SLOT.md), [37](../architecture%20files/37-HACKATHON-DAY-RUNBOOK.md)).
 
-```text
-NASA space apps/                     main, integration checkout
-  architecture files/               original full blueprint
-  team coordination/                shared collaboration contracts
-  team guides/{Tanush,Ayan,Aradhya}/  personal instructions
-  Tanush/                           tanush/platform-agents-integration
-    architecture files/             complete Git snapshot
-    team guides/Tanush/              Tanush instructions
-    analogforge/                    future application code
-  Ayan/                             ayan/science-data-verification
-    architecture files/
-    team guides/Ayan/
-    analogforge/
-  Aradhya/                          aradhya/frontend-experience
-    architecture files/
-    team guides/Aradhya/
-    analogforge/
-```
+## Who does what
 
-Do not edit the root application while an agent is implementing in a person worktree. Do not launch three coding agents in one editable checkout. A branch name alone does not isolate filesystem writes; the worktrees do. Shared Git objects/refs are expected; files and runtime state must stay separate.
+| Person | Branch | Start here | Builds |
+| --- | --- | --- | --- |
+| Tanush | `tanush/platform-agents-integration` | [team guides/Tanush/README.md](../team%20guides/Tanush/README.md) | FastAPI backend, PostgreSQL/PostGIS persistence, durable jobs/leases/events, Agent Council (10 roles), tool registrar, policy + scientific assurance, passport assembly/export service, config/compose/Make/CLI, dataset CLI |
+| Ayan | `ayan/science-data-verification` | [team guides/Ayan/README.md](../team%20guides/Ayan/README.md) | The `ScienceService` facade: ingestion, terrain/qualification/compatibility math, route search + independent verifier, portfolio, display layers, practice-data generators, live source adapters |
+| Aradhya | `aradhya/frontend-experience` | [team guides/Aradhya/README.md](../team%20guides/Aradhya/README.md) | React workbench, generated client, MapLibre + planetary panel, accessible UI, SSE controller, pure passport renderer, Playwright suites |
+| Merging agent | `merging-branch` | `merging guide/README.md` on that branch | Purity checks of each branch, wiring, combined tests, browser clicks, release candidate |
 
-## Start sequence
+## The one-shot workflow
 
-1. Each person opens their named worktree, reads its own guide and gives the coding agent its `CODING-AGENT-PROMPT.md`.
-2. Everyone reads the [ownership/freeze rules](01-OWNERSHIP-AND-CONTRACT-FREEZE.md), [service boundaries](03-SERVICE-BOUNDARIES.md) and [runtime isolation](04-LOCAL-RUN-AND-DATA-ISOLATION.md).
-3. Tanush ships the small F0 foundation first. Ayan starts pure science fixtures; Aradhya starts frontend against the supplied OpenAPI/MSW fixtures. Neither needs to wait idle for the API.
-4. Tanush integrates F0 into main. Ayan and Aradhya merge that accepted main checkpoint into their own branches. They do not overwrite their current code with a downloaded directory.
-5. Integrate the scientific tool layer and interface early, then iterate with the [merge playbook](02-INTEGRATION-AND-MERGE-PLAYBOOK.md). Final merge readiness requires all applicable per-person and combined tests.
+1. **Each person clones their branch** (or uses a worktree), opens a coding agent (Claude Code or Codex) and pastes **only** `team guides/<Name>/CODING-AGENT-PROMPT.md`. The agent runs unattended until its guide's *definition of done* is met, using subagents inside its owned paths as it sees fit.
+2. The agent's **first command** materializes the frozen contract kit; its **last commands** are the self-audit, the gate suite and `kit --verify`. It commits and pushes its branch with a filled `STATUS.json`.
+3. When all three report `ready_to_merge`, the merging agent (one prompt: `merging guide/MERGING-AGENT-PROMPT.md`) verifies each branch, merges in the fixed order, wires seams, runs combined suites and browser journeys, and produces the release candidate.
+4. At the hackathon, only the dataset is added ([37](../architecture%20files/37-HACKATHON-DAY-RUNBOOK.md)).
 
-The [48 hour schedule](05-48-HOUR-EXECUTION-SCHEDULE.md) is a suggested order of checkpoints. It is not permission to fabricate a PASS or describe incomplete live dependencies as completed.
+## Documents
 
-## Local transfer between computers
+| File | Content |
+| --- | --- |
+| [01 Ownership and contract freeze](01-OWNERSHIP-AND-CONTRACT-FREEZE.md) | Who may edit which path; the kit; shared files |
+| [02 Integration and merge playbook](02-INTEGRATION-AND-MERGE-PLAYBOOK.md) | Checkpoints and the summary of the merge procedure |
+| [03 Service boundaries](03-SERVICE-BOUNDARIES.md) | Platform/science/renderer/frontend seams in brief |
+| [04 Local run and data isolation](04-LOCAL-RUN-AND-DATA-ISOLATION.md) | Profiles, ports, databases, credentials |
+| [05 Parallel one-shot execution plan](05-PARALLEL-ONE-SHOT-EXECUTION-PLAN.md) | Internal phase gates each agent follows; no human hand-offs mid-build |
+| [06 Scientific credibility and release gate](06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md) | SC gates, SCI-01…SCI-18 |
+| `contracts/ownership.json` | Machine-readable ownership + kit rules |
+| `scripts/check_branch_ownership.py` | Changed-path checker (kit-aware) |
+| `scripts/validate_team_setup.py` | Guide/baseline integrity validator |
+| `scripts/refresh_baseline.py` | Rewrites `architecture-baseline.json` after a recorded architecture change |
+| `templates/` | Handoff, contract-change and scientific-validation templates |
 
-The primary shared repository is [techtanush/NASAspaceApps](https://github.com/techtanush/NASAspaceApps). Clone it and check out the branch assigned to your person. On a separate computer the clone root is your working checkout; use its `team guides/<Name>/` instructions. The nested named worktrees above describe the original integrator computer and are not committed duplicate directories. Push your work to your assigned branch; Tanush follows the merge playbook before advancing main. GitHub version control does not change the local runtime scope.
+## Rules that never bend
 
-`analogforge-team.bundle` at the repository root is an offline Git transfer artifact created after the shared baseline/branches. It contains committed history and all branches; it excludes ignored data and secrets. Copy the bundle using the team's chosen transfer method. No network account is required to create or clone it.
-
-On a teammate's computer, use the bundle's actual path and a new empty destination:
-
-```bash
-rtk proxy git clone "/path/to/analogforge-team.bundle" "analogforge-team"
-```
-
-Inside that clone, Ayan selects `ayan/science-data-verification` and Aradhya selects `aradhya/frontend-experience`. A clone normally creates remote-tracking branches from the bundle; `rtk git branch -a` confirms the actual state. If the local branch is absent, create it tracking its matching `origin/...` branch. The resulting origin points to a **bundle file**, not a writable GitHub repository. Do not tell an agent to push changes there.
-
-To transfer a completed feature back, create a new bundle from the contributor clone containing that feature branch. Tanush fetches it into an import reference and follows the exact merge process in02. The original planning bundle is a baseline snapshot; it does not automatically update when later work is committed. Do not transfer `.env` or raw downloaded datasets through Git bundles.
-
-## Documents and tools
-
-- [Ownership and contract freeze](01-OWNERSHIP-AND-CONTRACT-FREEZE.md)
-- [Integration and merge playbook](02-INTEGRATION-AND-MERGE-PLAYBOOK.md)
-- [Service boundaries](03-SERVICE-BOUNDARIES.md)
-- [Runtime isolation](04-LOCAL-RUN-AND-DATA-ISOLATION.md)
-- [Schedule](05-48-HOUR-EXECUTION-SCHEDULE.md)
-- [Ownership registry](contracts/ownership.json)
-- [Handoff template](templates/handoff-report.json)
-- [Contract change template](templates/contract-change-request.json)
-- [Setup validator](scripts/validate_team_setup.py)
-- [Changed-path ownership checker](scripts/check_branch_ownership.py)
-
-No subagents were used to prepare these team assignments. Runtime Agent Council roles are part of the future product, a separate concept from coding-agent delegation during this setup task.
-
-## Scientific credibility is a shared merge gate
-
-Follow [06 scientific credibility and release gate](06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). The [C1 change record](contracts/C1-SCIENTIFIC-ASSURANCE-CHANGE.json) adds immutable claim audits and the required passport pointer before app implementation. All three personal guides include concrete implementation obligations beyond their agent prompts. Use the [scientific validation template](templates/scientific-validation-report.template.json) to record observed evidence; its unfilled fields are not completed validation.
+* Own paths only; kit files byte-identical; no force-push; no history rewriting; no secrets committed.
+* A gate that was not executed is not passed. A test is never weakened, skipped or special-cased to turn a gate green.
+* Truthful negative results are valid outcomes. Synthetic data is never labeled NASA; live never silently falls back.
+* If something blocks you: implement everything that is independent, record the exact blocker in `STATUS.json`, and finish. Do not stop at the first obstacle and do not invent a workaround that changes a contract.

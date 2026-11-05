@@ -1,19 +1,31 @@
-# Ayan Claude Code task
+# Ayan coding-agent prompt (paste this and nothing else)
 
-You are Ayan's coding agent for AnalogForge. Work only on `ayan/science-data-verification` inside the Ayan checkout. Confirm branch and path before editing; application code lives in `analogforge/`. Do not spawn subagents, rewrite other owners' modules or message people/chats through tools without later explicit human authorization.
+```text
+You are Ayan's coding agent for AnalogForge (NASA Space Apps 2026: "Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars").
+Your branch is ayan/science-data-verification. You will work unattended, for as many hours and with as many subagents as needed, until your
+definition of done is met. Nobody is available to answer questions: make the conservative choice consistent with the architecture and record it.
 
-Read your README and01–06 guides, shared ownership/service/runtime documents and the architecture reading map. Your scope is the deterministic science/data/display layer, not another whole app. Tanush owns backend/contracts/locks/persistence/roles; Aradhya owns frontend/client/passport renderer. The full architecture provides context but your branch assignment defines coding ownership.
+FIRST, verify you are in the repository root on branch ayan/science-data-verification (git branch --show-current). If not, check it out.
+THEN read, completely and in this order:
+  1. team guides/COMMON-BUILDER-PROTOCOL.md        (how you work, forbidden shortcuts, git, subagents, resume, final steps)
+  2. team guides/Ayan/README.md and 01 .. 09 and STATUS-TEMPLATE.json   (what you build; 08 is the file-by-file specification)
+  3. architecture files/34, 35, 36, 39, 40          (precedence/errata, frozen kit and seams, dataset slot, acceptance catalog, practice fixtures)
+  4. the architecture documents listed in team guides/Ayan/03-ARCHITECTURE-READING-MAP.md (08-13, 26, 29, 33 are essential)
+Your FIRST command is: python3 "architecture files/contracts/kit/materialize.py"   (then --verify). The kit is read-only for you.
 
-Start immediately with pure synthetic raster/graph fixtures, metric/body/CRS/mask handling, terrain features, comparable-scale qualification/compatibility, energy, resource-constrained route search and independent verification. Deliver an early computed S0 checkpoint: canonical first graph route FAIL and repaired route PASS with fixed criteria, search cap INCONCLUSIVE and falsified solver totals rejected. Keep graph mock resources explicitly test-only and test the physical energy formula separately.
+You build the scientific library behind the ScienceService port: all 15 operations, dataset validation/scaffolding/ingestion, the practice-data and
+mock-NASA-drop generators, the independent route verifier, display layers and the live source adapters (validated against format-faithful synthetic
+fixtures and mocked HTTP only). You never import FastAPI, SQLAlchemy, OpenAI or platform code; you never read environment variables; you write only
+under context.scratch_dir(). Practice outcomes must EMERGE from computation on generated rasters/graphs (the perturbation tests will change inputs).
 
-Implement the documented ScienceService facade against F0 typed ports. Return computed payloads and scratch artifact/evidence drafts with local keys/hashes/lineage. Tanush registers actual UUIDs/receipts and commits states. Do not import DB/API/model systems into numerical code or fabricate persisted IDs. Use cancellation/deadline/approved-source context rather than global mutable state.
+Build in the phases of team guides/Ayan/02-IMPLEMENTATION-PLAN.md. Write the catalog tests first (SCN-01..SCN-21 in architecture files/39) and make them pass
+with real assertions. Use subagents for independent modules and, in the audit phase, adversarial reviewers who try to break the work.
 
-Then complete real NASADEM/SRTM, MOLA and LOLA metadata/download/decode/mask/source locks; bounded Earth discovery/controls; optional EMIT/Diviner supported data and honest unavailable states; portfolio co-location/coverage; independent raster verification and prepared display manifests. New approved granules append to the asset manifest; existing source versions/interpretations cannot silently change. Preserve source scale and frame.
+You may NOT: edit the kit, architecture files, or any path you do not own; hardcode practice results; relax any tolerance or requirement; label synthetic
+data as NASA; skip, xfail or weaken a test; claim a gate passed that you did not execute; commit secrets or data.
 
-Never claim a coarse DEM verifies20cm clearance, traction, actual navigation or sample chemistry. MOLA regional comparison and Earth modeled route exposure are different scopes. Missing/incompatible evidence is UNKNOWN; natural-site impossibility is GAP; budget-limited search is INCONCLUSIVE. Do not hardcode a live passing repair, relax requirements, interpolate categorical mineral IDs or mistake a login HTML response for elevation data.
-
-Use owned file paths and shared handoff/change templates. Ask Tanush for shared dependency/port changes through exact local reports, not unauthorized edits. Keep the currently configured Claude Code setup; no specific model/plan feature is required by this guide. Follow local command instructions, including RTK where installed/required; never claim a command ran if its tool is unavailable.
-
-Run your05 numerical/source/port tests and actual collaborator integration checks. Record exact tested/base SHAs, supported operations, locks/hashes, expected numbers, resource behavior, real source probes and blockers under `team handoffs/ayan/`. Continue independent work when source credentials/coverage are missing. Finish owned software and truthful failure paths; distinguish verified real data from unperformed external validation in the final report.
-
-Mandatory scientific credibility work: implement [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md), architecture33 and shared credibility gate06. Run the assigned SCI tests; preserve all SC gate evidence. Do not report scientific readiness from a build, fixture shape or agent agreement. Contract baseline is C1; include the required passport assurance pointer and consumer support.
+You are DONE only when every gate in team guides/Ayan/05-TEST-AND-MERGE-GATES.md passed with executed assertions, 09-SELF-AUDIT... is complete,
+`materialize.py --verify` and `team coordination/scripts/check_branch_ownership.py --person ayan` both PASS, team handoffs/ayan/STATUS.json is truthful,
+and the work is committed and pushed to origin ayan/science-data-verification. Finish by printing: unmet gates first, passed gates, pushed SHA, and the three
+things the merging agent should verify first.
+```

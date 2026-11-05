@@ -1,57 +1,70 @@
-# File ownership and interface freeze
+# File ownership and the contract freeze
 
-Build one `analogforge/` application per checkout. The final merge combines complementary modules. It must not combine three separately scaffolded whole apps, three databases, three sets of statuses or three implementations of the same scientific calculation.
+There is **one** application under `analogforge/`. The final merge combines three complementary sets of modules plus a byte-identical shared kit. It never combines three separately scaffolded apps, three databases, three status enums or three implementations of the same calculation.
 
-## Ownership
+## 1. The frozen contract kit (read-only for all)
 
-| Owner | Owned production paths relative to repository root |
-| --- | --- |
-| Tanush | `analogforge/src/analogforge/{api,domain,db,jobs,application,agents,tools,ports}/`; main/settings/CLI/package root; `adapters/{openai,storage,identity}/`; backend Docker/migrations; Compose/Make/Python dependency files; `config/scenarios.yaml`; implementation contracts; integration/operations. |
-| Ayan | `analogforge/src/analogforge/science/`; `adapters/{earthdata,pds,emit,diviner,user_survey,source_http}/`; `rendering/tiles/`; `config/{datasets,algorithms,candidates}.yaml`; scientific tests/fixtures/preflight helpers. |
-| Aradhya | `analogforge/apps/web/`; root frontend package/lock/workspace files; `src/analogforge/rendering/passport/`; renderer tests; browser end-to-end/accessibility tests. |
+`architecture files/contracts/kit/` holds the exact files that every branch materializes into `analogforge/` as its first action ([35](../architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md)):
 
-The machine-readable longest-prefix registry in `contracts/ownership.json` resolves exact paths. A longer specific rule overrides a broader prefix; unknown paths are not automatically free to edit. The common package root `src/analogforge/__init__.py`, `adapters/__init__.py`, `rendering/__init__.py` belongs to Tanush. Science/passport-owned package initializers belong to their respective owners. Use leaf modules rather than editing a shared barrel file for every new export.
+```bash
+python3 "architecture files/contracts/kit/materialize.py"            # first command of every session
+python3 "architecture files/contracts/kit/materialize.py" --verify   # last command; must print "PASS"
+```
 
-Application-service wrappers belong to Tanush; scientific algorithms belong to Ayan. For example Tanush's `application/verification` loads records, authorizes and persists; Ayan's `science/routing` computes and independently checks the route. Aradhya's `rendering/passport` turns an already assembled snapshot into escaped HTML/CSV/JSON; Tanush's `application/passports` assembles/authorizes/freezes that snapshot. No duplicate policy/calculation should be hidden in either wrapper or browser.
+Kit files are owned by nobody. Editing one is a failed gate. The only editable region is the owner's own `extra-<name>` list in `pyproject.toml`. If the kit blocks you, record a contract-change request and continue with a compatible local workaround.
 
-## Shared files
+## 2. Master layout and owners
 
-Tanush is the single writer for `pyproject.toml`, `uv.lock`, Compose, backend migrations, global Make targets and published Python/domain/API contracts. Aradhya is the single writer for frontend package files, pnpm lock and generated TypeScript client. Ayan requests scientific packages by recording a dependency request in his handoff directory; he does not independently rewrite the shared Python lock. Tanush's initial dependency set includes the architecture's native-science packages so Ayan can begin immediately.
+```text
+analogforge/
+  README.md Makefile compose.yaml  services/api/  ops/  scripts/{bootstrap,preflight,seed_synthetic,validate_docs,lock_sources}  uv.lock   Tanush
+  .env.example .gitignore pyproject.toml  contracts/ (generated kit files)  src/analogforge/{__init__,ports/**}             kit (nobody)
+  config/scenarios.yaml  config/presets/**                                                                                   Tanush
+  config/{datasets,algorithms,candidates}.yaml  scripts/science/**                                                           Ayan
+  package.json pnpm-lock.yaml pnpm-workspace.yaml  apps/web/**                                                               Aradhya
+  src/analogforge/{main.py,settings.py,cli.py,api,domain,db,jobs,application,agents,tools}/                                  Tanush
+  src/analogforge/adapters/{openai,storage,identity}/                                                                        Tanush
+  src/analogforge/science/**  (facade, geometry, raster, features, comparison, qualification, compatibility, routing,
+                               energy, portfolio, display, datasets, fixtures, provenance)                                   Ayan
+  src/analogforge/adapters/{earthdata,pds,emit,diviner,user_survey,source_http}/  src/analogforge/rendering/tiles/           Ayan
+  src/analogforge/rendering/passport/**                                                                                      Aradhya
+  tests/contracts/kit/**  tests/fixtures/kit/**                                                                              kit (nobody)
+  tests/{unit,integration}/platform/**  tests/contracts/platform/**  tests/support/**                                         Tanush
+  tests/{unit,property,integration,replay}/science/**  tests/contracts/science/**  tests/fixtures/science/**                  Ayan
+  tests/unit/passport_renderer/**  tests/contracts/ui/**  tests/e2e/**                                                       Aradhya
+  data/                                                                                                                      git-ignored runtime
+team guides/<Person>/**  team handoffs/<person>/**                                                                           that person
+architecture files/**  team coordination/**  README.md  .gitignore                                                           Tanush (changes follow the recorded change process)
+merging guide/**  team handoffs/merging/**                                                                                   merging agent
+```
 
-Original `architecture files/` documents/contracts remain read-only for Ayan and Aradhya. Tanush may reconcile them through a recorded contract-change decision with affected tests/consumers, not casual edits to make an implementation easier. Each person can maintain only their own `team handoffs/<person>/` and `team guides/<Person>/` files. Common coordination rules and root README/ignore belong to Tanush.
+Machine-readable form: `contracts/ownership.json` (longest matching prefix; unknown paths are unowned and may not be edited; kit files may be committed unchanged by anyone). The checker `scripts/check_branch_ownership.py --person <name>` implements it, including kit awareness.
 
-Generated clients are regenerated from Tanush's accepted exported OpenAPI. Aradhya checks in generated files under her frontend path. Tanush does not edit them by hand. Database migrations are created only on Tanush's branch, preventing competing migration heads.
+Application-service wrappers belong to Tanush; algorithms to Ayan; presentation to Aradhya. Tanush's `application/verification` loads records, authorizes and persists; Ayan's `science/routing` computes and independently checks. Tanush's `application/passports` assembles/freezes the bundle; Aradhya's `rendering/passport` turns it into bytes. No policy or calculation is duplicated in a wrapper or in the browser.
 
-## Initial authority and F0 freeze
+## 3. Shared files and single writers
 
-The existing architecture schema/OpenAPI is contract C1. Before integration, Tanush publishes foundation checkpoint F0 containing:
+| File | Single writer | Notes |
+| --- | --- | --- |
+| `pyproject.toml` | kit; extras per person | Add only to your own `extra-<name>` list; no other edit |
+| `uv.lock` | Tanush | Ayan/Aradhya install with `uv pip install -e ".[dev,extra-<name>]"` and never commit a lock |
+| `compose.yaml`, `Makefile`, `services/api/migrations/**` | Tanush | Migrations only on his branch (no competing heads) |
+| `package.json`, `pnpm-lock.yaml`, `apps/web/src/generated/**` | Aradhya | Generated client regenerates from the kit's bundled OpenAPI |
+| `config/*.yaml` | per the master layout | Cross-branch keys fixed in [35](../architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md) §7 |
+| `architecture files/**` originals | read-only for Ayan/Aradhya | Tanush edits only through the recorded change process |
 
-1. Installed/locked Python dependencies and real Postgres/worker/API boot commands.
-2. Pydantic/domain types and existing public status enums/units matching C1.
-3. `ports/science.py` and `ports/passport_renderer.py` implementing the call boundaries in03.
-4. Exported OpenAPI and a deterministic export command; public shape diff must match C1 or have an approved change record.
-5. Structured errors, mode guard, workspace/job/run context, artifact I/O ports and cancellation token interface.
-6. Stable scenario IDs and safe capabilities response so frontend run creation does not guess IDs.
-7. Foundation test report and exact commit SHA. This is a real commit once implemented; do not invent a SHA in a template.
+## 4. Contract change process (should be rare)
 
-Ayan and Aradhya can build pure modules, fixtures and interface components against C1 while F0 is prepared. They import F0 when available and replace temporary **test doubles** with the accepted ports. A missing port is a dependency to report, not permission to create a competing production API.
+`templates/contract-change-request.json` → your `team handoffs/<person>/CHANGE-REQUEST-<n>.json`. Keep working with a compatible workaround. The **merging agent** applies an accepted change to the kit via `kit/tools/build_kit.py`, updates all consumers and re-runs every gate. Additive private helpers inside owned modules need no process; any public field, enum, nullability, unit, status meaning, port signature or dependency lock does.
 
-## Change process
+## 5. Branch discipline
 
-Use `templates/contract-change-request.json`. Record current contract hash/version, exact before/after fields, reason, consumers affected, compatibility, tests and required migration. Ayan or Aradhya proposes from their own handoff directory. Tanush implements the approved shared change, commits it, integrates it into main and identifies the checkpoint. Consumers merge that main commit, regenerate/retest, then continue. Human coordination is through the team's chosen conversation; this guide does not authorize sending messages from tools automatically.
+Own branch, own clone, own runtime profile. Commit only owned files plus exact kit files. Never rebase/force-push/reset another person's branch; never resolve a conflict by taking one whole side; never edit another owner's files to make your tests pass (report the missing interface). The ownership checker is an aid, not a security boundary.
 
-An additive private helper in an owned module needs no contract-change process. A public response field, enum, nullability, unit, source/verification meaning, protocol signature or dependency lock does. No one silently changes PASS semantics, loosens rover limits, invents a model ID or substitutes a different data product.
+## 6. Completion versus build order
 
-## Completion versus build order
+Within each branch the build order is: kit → pure/deterministic core → typed port implementation → integration points → full scope → hardening → self-audit. Optional scientific sources keep tested no-coverage states. A feature is not complete because its tab exists or a mock response has the right colors.
 
-First deliver a terrain-first vertical slice; then complete remaining full-scope features. Hosted OIDC/deployment readiness is a later phase because this work is local, but do not replace workspace isolation and safe local binding with an unrestricted public server. Optional scientific source absence must have tested UNKNOWN/no-coverage behavior. A feature is not complete merely because its tab exists or a mock response has the right colors.
+## 7. Accepted revisions
 
-## Branch discipline
-
-Own branch, own worktree, own runtime profile. Commit only owned files plus an explicitly approved shared patch. Merge accepted main checkpoints into feature branches; use merge commits rather than rewriting branches while teammates depend on them. Do not rebase/force-update another person's branch, reset worktrees, auto-resolve conflicts by choosing one entire side, or let an agent edit the root main checkout to fix its branch tests.
-
-The ownership checker is an aid, not a security boundary. It checks changed paths against this registry; it cannot certify scientific behavior. A special shared patch must still be reviewed/tested even when its author is the owner.
-
-## Accepted C1 scientific credibility revision
-
-[C1 change record](contracts/C1-SCIENTIFIC-ASSURANCE-CHANGE.json) supersedes the original planning C0 shape. It requires the passport assurance pointer, typed audit/adequacy handoffs and deterministic publication checks from architecture33. Tanush owns shared schema/ports/compiler; Ayan supplies scientific policy/evidence; Aradhya consumes and displays the resolved audit. This user-authorized planning update is synchronized to all three worktrees; future shared changes still follow this file's change process.
+C1 (scientific assurance, passport `assurance_evidence_id`) — [record](contracts/C1-SCIENTIFIC-ASSURANCE-CHANGE.json). C2 (one-shot layer: kit, entry points, dataset slot, errata) — [record](contracts/C2-ONE-SHOT-KIT-CHANGE.json). Baseline hashes: `contracts/architecture-baseline.json`.

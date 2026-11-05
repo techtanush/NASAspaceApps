@@ -4,6 +4,12 @@ Read the First rows before substantive implementation, then specialist rows as t
 
 | Architecture | When | How to use it | Gate |
 | --- | --- | --- | --- |
+| [34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md](../../architecture%20files/34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md) | First (mandatory) | Completion tiers, errata E-01…E-18, forbidden behaviors; overrides 00–33 | All |
+| [35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md](../../architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md) | First (mandatory) | Kit, entry points, registrar rules, stage→operation table, config keys | All |
+| [36-DATASET-PLUG-IN-AND-NASA-SLOT.md](../../architecture%20files/36-DATASET-PLUG-IN-AND-NASA-SLOT.md) | First (mandatory) | Dataset CLI, lock file, binding rules | PLT-17 |
+| [38-RUNTIME-KEYS-AND-LOCAL-SETUP.md](../../architecture%20files/38-RUNTIME-KEYS-AND-LOCAL-SETUP.md) | First (mandatory) | Keys, DB bootstrap ladder, preflight stages | PLT-16/17 |
+| [39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md](../../architecture%20files/39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md) | First (mandatory) | Your PLT rows; journeys you must support | All gates |
+| [40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md](../../architecture%20files/40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md) | First (mandatory) | Scenarios, storylines, seeded defect, picker rule | PLT-10, PLT-20 |
 | [00-ARCHITECTURE-DECISIONS.md](../../architecture%20files/00-ARCHITECTURE-DECISIONS.md) | First | Binding stack/status/mode/immutability decisions; preserve these in settings/policy. | All gates |
 | [01-VISION-CONTEXT-AND-SCOPE.md](../../architecture%20files/01-VISION-CONTEXT-AND-SCOPE.md) | First | Understand why qualification, compatibility and actual verification are separate. | Product scope |
 | [02-PRODUCT-REQUIREMENTS.md](../../architecture%20files/02-PRODUCT-REQUIREMENTS.md) | First | Trace platform/API/agents obligations and the complete58-requirement product ledger. | Final RC |

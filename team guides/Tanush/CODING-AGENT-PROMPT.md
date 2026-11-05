@@ -1,19 +1,34 @@
-# Tanush coding agent task
+# Tanush coding-agent prompt (paste this and nothing else)
 
-You are implementing Tanush's part of AnalogForge on `tanush/platform-agents-integration`. Confirm your working directory is the Tanush checkout before changing files. Build under `analogforge/`. Work as one coding agent; do not spawn subagents or message other chats/people through tools unless the human later explicitly authorizes it.
+```text
+You are Tanush's coding agent for AnalogForge (NASA Space Apps 2026: "Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars").
+Your branch is tanush/platform-agents-integration. You will work unattended, for as many hours and with as many subagents as needed, until your
+definition of done is met. Nobody is available to answer questions: make the conservative choice consistent with the architecture and record it.
 
-Read your README and01–06 guides, shared coordination01–04, and the architecture reading map. Original architecture defines the full product; your guide narrows your coding ownership to backend/platform/agents/integration. The architecture's whole-app prompt is context, not permission to overwrite Ayan's science or Aradhya's frontend/renderer.
+FIRST, verify you are in the repository root on branch tanush/platform-agents-integration (git branch --show-current). If not, check it out.
+THEN read, completely and in this order:
+  1. team guides/COMMON-BUILDER-PROTOCOL.md        (how you work, forbidden shortcuts, git, subagents, resume, final steps)
+  2. team guides/Tanush/README.md and 01 .. 09 and STATUS-TEMPLATE.json   (what you build; 08 is the file-by-file specification)
+  3. architecture files/34, 35, 36, 38, 39, 40      (precedence/errata, frozen kit and seams, dataset slot, keys/setup, acceptance catalog, practice scenarios)
+  4. the architecture documents listed in team guides/Tanush/03-ARCHITECTURE-READING-MAP.md (03, 05-07, 14, 15, 19-26, 33 are essential)
+Your FIRST command is: python3 "architecture files/contracts/kit/materialize.py"   (then --verify). The kit is read-only for you; you own uv.lock.
 
-Deliver F0 first: locked Python/native environment, Postgres/API/worker boot, shared domain/OpenAPI, ScienceService/passport ports, scenario IDs, mode/identity/artifact/cancellation context and reproducible commands. Produce a tested commit for main so teammates can merge it. They may work independently on pure modules/fixtures while you do this.
+You build the platform: FastAPI API (all 43 operations of the kit's bundled OpenAPI), PostgreSQL/PostGIS persistence and migrations, durable worker with
+leases/fencing/cancellation, the registrar that validates and persists science results, the ten-role Agent Council (scripted provider for synthetic/replay,
+OpenAI Responses provider for live), the 21-tool registry, policy, scientific assurance (SC-01..15) and passport assembly/export, CLI, preflight, Compose/Make.
+You call science ONLY through the entry point analogforge.science.facade:create_science_service and the renderer ONLY through
+analogforge.rendering.passport:create_passport_renderer; you test against typed doubles under tests/support/ (never importable from src/). You compute no
+scientific number yourself. Synthetic runs need no keys and no network. Live mode never falls back silently.
 
-Continue implementing durable mission drafts/preparation/acceptance, rover revisions, immutable runs, idempotency/revision guards, artifacts/evidence/lineage, leases/fencing/cancellation, committed events and SSE, all required read/action endpoints, ten strict Agent Council roles, one server model adapter, registered tools, policy commits and passport/export services. Call Ayan's scientific facade and Aradhya's pure renderer through shared typed interfaces. Do not duplicate their implementations. Missing modules are explicit dependencies, with test doubles restricted to tests.
+Build in the phases of team guides/Tanush/02-IMPLEMENTATION-PLAN.md. Write the catalog tests first (PLT-01..PLT-21 in architecture files/39) with real
+assertions. Use subagents for independent modules and, in the audit phase, adversarial reviewers who try to break the work.
 
-Preserve scientific honesty: no model-created measurements, no fake NASA fixtures, no silent live→synthetic fallback, no threshold relaxation to force a pass, no coarse terrain claim of physical clearance/navigation. Missing information is UNKNOWN; natural-site physical impossibility is GAP; bounded route search can be INCONCLUSIVE. A completed investigation can have a failed or limited recommendation.
+You may NOT: edit the kit, architecture files (except by the recorded change process, which you do not use in this build), or any path you do not own;
+hardcode practice results; relax any requirement, limit or tolerance; label synthetic data as NASA; skip, xfail or weaken a test; claim a gate passed that
+you did not execute; commit secrets or data. If PostgreSQL/PostGIS is unavailable, try every option in architecture files/38 section 4.1 before marking DB rows blocked.
 
-Use only owned files per the registry. You own common contracts/locks/migrations; coordinate changes through actual versioned requests and consumer checks. Preserve other work and secrets. Existing coding-assistant configuration stays as the user configured it. Product API key/model/source access follows architecture20/21; never search unrelated projects for keys or invent account access.
-
-Follow your implementation plan to completion and run your test gate. Then integrate exact tested teammate checkpoints on isolated integration candidate branches/worktrees, execute the actual combined app/science/UI tests, and advance main only to a passing tested candidate. Do not deploy, create GitHub resources, send messages or operate hardware as part of this local task.
-
-Maintain `team handoffs/tanush/implementation-status.md` and per-checkpoint report JSON using the common template. Include exact SHAs, baseline, schema/port hashes, commands/results, actual live/source tests and blockers. Continue useful independent work if credentials are absent. End only when your owned responsibilities and applicable integration gates are complete, or a precise external dependency truly prevents remaining work; never report unrun live gates as passed.
-
-Mandatory scientific credibility work: implement [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md), architecture33 and shared credibility gate06. Run the assigned SCI tests; preserve all SC gate evidence. Do not report scientific readiness from a build, fixture shape or agent agreement. Contract baseline is C1; include the required passport assurance pointer and consumer support.
+You are DONE only when every gate in team guides/Tanush/05-TEST-AND-MERGE-GATES.md passed with executed assertions, 09-SELF-AUDIT... is complete,
+`materialize.py --verify` and `team coordination/scripts/check_branch_ownership.py --person tanush` both PASS, team handoffs/tanush/STATUS.json is truthful,
+and the work is committed and pushed to origin tanush/platform-agents-integration. Finish by printing: unmet gates first, passed gates, pushed SHA, and the
+three things the merging agent should verify first.
+```

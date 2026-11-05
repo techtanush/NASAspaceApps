@@ -1,12 +1,12 @@
 {
-  "schema_version": "1.0",
-  "selection": "longest matching path; file rules require exact match; no match is unowned",
+  "schema_version": "1.1",
+  "selection": "longest matching path; file rules require exact match; no match is unowned. A path that is a frozen kit file (see kit) may be committed unchanged by anyone.",
   "people": {
     "tanush": {
       "name": "Tanush",
       "branch": "tanush/platform-agents-integration",
       "worktree": "Tanush",
-      "coding_agent": "Current configured Codex/coding agent",
+      "coding_agent": "Claude Code or Codex",
       "profile": "tanush",
       "checkpoints": [
         "F0",
@@ -19,7 +19,7 @@
       "name": "Ayan",
       "branch": "ayan/science-data-verification",
       "worktree": "Ayan",
-      "coding_agent": "Claude Code",
+      "coding_agent": "Claude Code or Codex",
       "profile": "ayan",
       "checkpoints": [
         "S0",
@@ -30,11 +30,21 @@
       "name": "Aradhya",
       "branch": "aradhya/frontend-experience",
       "worktree": "Aradhya",
-      "coding_agent": "Codex",
+      "coding_agent": "Claude Code or Codex",
       "profile": "aradhya",
       "checkpoints": [
         "U0",
         "U1"
+      ]
+    },
+    "merging": {
+      "name": "Merging agent",
+      "branch": "merging-branch",
+      "worktree": "merging",
+      "coding_agent": "Claude Code or Codex",
+      "profile": "integration",
+      "checkpoints": [
+        "RC"
       ]
     }
   },
@@ -213,6 +223,62 @@
       "path": "analogforge/pnpm-workspace.yaml",
       "kind": "file",
       "owner": "aradhya"
+    },
+    {
+      "path": "analogforge/tests/contracts/science/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/tests/contracts/ui/",
+      "kind": "prefix",
+      "owner": "aradhya"
+    },
+    {
+      "path": "analogforge/src/analogforge/science/fixtures/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/src/analogforge/science/datasets/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "merging guide/",
+      "kind": "prefix",
+      "owner": "merging"
+    },
+    {
+      "path": "team handoffs/merging/",
+      "kind": "prefix",
+      "owner": "merging"
+    },
+    {
+      "path": "analogforge/uv.lock",
+      "kind": "file",
+      "owner": "tanush"
+    },
+    {
+      "path": "team guides/COMMON-BUILDER-PROTOCOL.md",
+      "kind": "file",
+      "owner": "tanush"
+    },
+    {
+      "path": "analogforge/scripts/ui/",
+      "kind": "prefix",
+      "owner": "aradhya"
+    },
+    {
+      "path": "analogforge/scripts/build_mock_exports.py",
+      "kind": "file",
+      "owner": "aradhya"
     }
-  ]
+  ],
+  "kit": {
+    "manifest": "architecture files/contracts/kit/kit-manifest.json",
+    "app_root": "analogforge/",
+    "rule": "Files listed in the kit manifest are owned by nobody and must be byte-identical to the kit, except pyproject.toml where each person may edit only their own extra-<name> list. analogforge/src/analogforge/ports/ accepts no files other than kit files.",
+    "uv_lock_owner": "tanush"
+  }
 }

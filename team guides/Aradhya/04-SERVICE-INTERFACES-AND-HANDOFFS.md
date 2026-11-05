@@ -1,31 +1,36 @@
-# Aradhya interfaces and handoffs
+# Aradhya — interfaces and handoffs
 
-Use the exact accepted API/domain contract. Shared03 fixes the frontend/platform/science-renderer seams. The interface's job is to present persisted evidence and request valid user actions, not infer hidden measurements.
+All seams are frozen kit artifacts ([35](../../architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md)). No mid-build hand-offs: you deliver a branch that works against the bundled OpenAPI, the mock backend and the renderer fixtures; the merging agent connects it to the real backend.
 
-## From Tanush
+## You consume
 
-Exported OpenAPI/contract version/hash, safe scenario/capability IDs, actual local profile URL, draft read/autosave/fingerprint/accept endpoints, rover/run creation/actions, snapshot selection/version/cursor, candidate/target/qualification/test/portfolio evidence reads, operations/receipts/critiques/reviews, display-layer manifests and async exports.
+| Artifact | How |
+| --- | --- |
+| `contracts/openapi.bundled.json` | Generate `apps/web/src/generated/schema.d.ts`; validate mock fixtures against it |
+| `contracts/ui-testids.json` | Implement every id; test coverage (UIX-04) |
+| `contracts/algorithm-ids.json` | Discover UI-readable artifacts by `algorithm_id` ([35 §5b](../../architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md)) |
+| `analogforge.ports.passport_renderer` (`PassportExportBundle`, `ProvidedAsset`, `RenderedExport`, `CSV_COLUMNS`, `RendererError`) | The renderer's input/output types |
+| `analogforge.ports.science_payloads` (artifact JSON shapes), `domain_models`, `assurance_models` | Typing the artifacts and the bundle fixtures |
+| `tests/fixtures/kit/**` | Missions/rovers/graph/blueprint fixtures for mock data and renderer bundles |
+| Server (at merge): `/api/v1/**`, SSE, `/artifacts/{sha}`, exports | Same specs, real mode |
 
-Generated client and MSW fixtures must agree with those shapes. Report missing input/read fields or nullability immediately using a concrete request/response and architecture requirement ID. Do not create a parallel production API or assume unlisted endpoints persist your changes. Safe capabilities show credential presence, never credentials.
+## You provide
 
-SSE data is a committed RunEvent with seq/mode/state/evidence references. Deduplicate by run_id+seq; refetch snapshot after gaps/expiry/reconnect; display server-confirmed scientific states. A pending event or animation does not grant a scientific verdict.
+| Entry point / artifact | Consumer | Contract |
+| --- | --- | --- |
+| `analogforge.rendering.passport:create_passport_renderer` → `PassportRenderer` | Tanush's export service | pure, deterministic; `render(bundle, assets, fmt)`; errors as `RendererError` |
+| `apps/web` build (`pnpm run build`) | Compose/Make wrapper (Tanush) | static assets; dev server on `WEB_PORT`; API proxied to `API_PORT` |
+| `tests/e2e/journeys/J01…J13` | merging agent | run with `E2E_TARGET=real`, `E2E_BASE_URL`, `E2E_API_URL`; mock-mode equivalents already green |
+| `scripts/ui/verify_exports.py` | merging agent | given a downloaded html/json/csv and the displayed digests, performs the digest/canonical-manifest/CSV-header/HTML-purity checks of journey J01 step 14 |
 
-## From Ayan through the platform
+## The export seam in detail
 
-Registered display-layer manifests and image/artifact URLs; metric names/units/support/classes; target body/frame; source valid fractions; route geometry/telemetry and exact violations; concise scientific captions. Only the platform supplies authorized artifact access and real persisted evidence IDs. Ask for missing affine/corners/legend rather than guessing from image aspect ratio or treating every coordinate pair as Earth.
+Tanush assembles the bundle and calls you; you never look anything up. The bundle guarantees (architecture 35 §4): references resolve, `manifest_sha256` matches `canonical_manifest_json`, attempts ordered and complete, assurance present for non-draft. You guarantee byte-determinism, escaping, completeness of rows/attempts/GAP/UNKNOWN, mode visibility, and that the file digest (`RenderedExport.sha256`) is **different from** the manifest digest. The frontend displays the **server's** `manifest_sha256` and `X-Artifact-SHA256`; it never hashes anything itself.
 
-Scientific values are read-only in the UI except clearly labeled user-owned input editing that creates accepted revisions. Keep unavailable physical clearance/sample chemistry/navigation proof visible. A colored thermal/mineral overlay is not automatically a validated match.
+## Defects you find elsewhere
 
-## To Tanush
+Record in `STATUS.json.defects_in_other_areas` with a reproduction (e.g. "the bundled spec lacks X"); never edit the kit or another owner's files. Kit blockers: `team handoffs/aradhya/CHANGE-REQUEST-<n>.json` plus a local workaround.
 
-Provide U0/U1 tested commits, frontend package scripts/lock, accepted schema hash/client generation instructions, mock-development switch and fixture cases, real API integration report, accessible UI assets and browser tests. Avoid modifying backend startup scripts: supply exact expected frontend commands and ports for Tanush's Compose/Make wrapper.
+## Dependencies
 
-Your renderer implements the F0 pure port under `rendering/passport/`. Accept frozen PassportExportBundle+provided validated image assets+format, return bytes/MIME/safe filename/file hash/renderer version. No SQL/model/network or current mutable run lookup. Supply independent fixture tests so Tanush can call it without a browser. Python dependency additions go through Tanush's lock owner.
-
-## Requests and blockers
-
-Use `team handoffs/aradhya/` for schema/dependency requests and reproducible defects. Include field path, expected semantic/unit/state, actual behavior, effect on user flow, test case and proposed nonbreaking fix. Continue component/renderer work against visible fixtures while a backend dependency is pending. Do not silently ship a screen whose button has no real eventual action.
-
-## C1 scientific assurance seam
-
-Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.
+JS dependencies in your `package.json`/lockfile (commit the lock). Python renderer dependencies only from the kit (`jinja2`, `markupsafe`, `pydantic`); extras via `extra-aradhya`. Never commit `uv.lock`.

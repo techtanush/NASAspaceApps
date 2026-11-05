@@ -4,6 +4,12 @@ Read the First rows before substantive implementation, then specialist rows as t
 
 | Architecture | When | How to use it | Gate |
 | --- | --- | --- | --- |
+| [34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md](../../architecture%20files/34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md) | First (mandatory) | Completion tiers, errata E-01…E-18, forbidden behaviors; overrides 00–33 | All |
+| [35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md](../../architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md) | First (mandatory) | The kit, entry points, registrar rules, which stage calls which operation | All |
+| [36-DATASET-PLUG-IN-AND-NASA-SLOT.md](../../architecture%20files/36-DATASET-PLUG-IN-AND-NASA-SLOT.md) | First (mandatory) | Manifest, validation checks, roles, window grid: you implement the validation | SCN-11/12/13 |
+| [39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md](../../architecture%20files/39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md) | First (mandatory) | Your SCN rows, the mock NASA drop spec | All gates |
+| [40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md](../../architecture%20files/40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md) | First (mandatory) | Practice data properties, truth tables, storylines, perturbations: your oracles | SCN-06…10 |
+| [38-RUNTIME-KEYS-AND-LOCAL-SETUP.md](../../architecture%20files/38-RUNTIME-KEYS-AND-LOCAL-SETUP.md) | Phase A0 | GDAL driver requirements, environment | A0 |
 | [00-ARCHITECTURE-DECISIONS.md](../../architecture%20files/00-ARCHITECTURE-DECISIONS.md) | First | Chosen stack, mode/status/scale/immutability; no private alternative meanings. | All science |
 | [01-VISION-CONTEXT-AND-SCOPE.md](../../architecture%20files/01-VISION-CONTEXT-AND-SCOPE.md) | First | Mission-conditioned usefulness, not planetary-likeness percentage. | Product goal |
 | [02-PRODUCT-REQUIREMENTS.md](../../architecture%20files/02-PRODUCT-REQUIREMENTS.md) | First | Scientific discovery/qualification/verification/composite requirements and acceptance. | S0/S1 |

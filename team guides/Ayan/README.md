@@ -1,13 +1,29 @@
-# Ayan scientific data and verification branch
+# Ayan — scientific data, computation and verification
 
-Your branch is `ayan/science-data-verification`. Your local checkout is `Ayan/`. Give Claude Code the [coding agent prompt](CODING-AGENT-PROMPT.md), then implement only your owned science/data paths inside that checkout's `analogforge/`.
+**Branch:** `ayan/science-data-verification` · **Agent:** Claude Code or Codex · **Result:** the `ScienceService` facade (`analogforge.science.facade:create_science_service`) and everything behind it.
 
-You own the part that makes AnalogForge scientifically meaningful: actual source decoding, body-aware terrain metrics, requirement comparisons, rover constraint assessment, route/energy computations, independent verification, bounded failure diagnosis and composite coverage. Tanush supplies the platform/tool registrar; Aradhya displays your typed outputs.
+You build the part that makes AnalogForge scientifically meaningful: dataset validation/ingestion, body-aware terrain metrics, requirement comparison, rover compatibility, route search with an **independent verifier**, energy, diagnosis, portfolio, display layers, practice-data generators and the live source adapters. No database, no web framework, no model call, no UI. Tanush's platform calls you through one port; Aradhya's UI shows your outputs.
 
-Follow [scope](01-SCOPE-AND-FILE-OWNERSHIP.md), [build sequence](02-IMPLEMENTATION-PLAN.md), [architecture reading map](03-ARCHITECTURE-READING-MAP.md), [interfaces](04-SERVICE-INTERFACES-AND-HANDOFFS.md), [tests/merge gates](05-TEST-AND-MERGE-GATES.md) and [handoff checklist](06-HANDOFF-CHECKLIST.md).
+## How to run this branch in one session
 
-Start with pure analytic rasters and the small graph regression while Tanush publishes F0. This work needs no API key, browser or database. Deliver a computed S0 checkpoint early; then connect real sources and complete the full scientific operation set. Do not wait until the end to reveal that your return format differs from the shared port.
+1. Clone the repo and check out your branch.
+2. Open your coding agent and paste **only** [CODING-AGENT-PROMPT.md](CODING-AGENT-PROMPT.md).
+3. Leave it running. It follows [COMMON-BUILDER-PROTOCOL](../COMMON-BUILDER-PROTOCOL.md), builds to your [definition of done](06-HANDOFF-CHECKLIST.md), self-audits, pushes, and prints a summary.
 
-References: [architecture](../../architecture%20files/README.md), [team rules](../../team%20coordination/README.md), [service boundary](../../team%20coordination/03-SERVICE-BOUNDARIES.md), [ownership](../../team%20coordination/contracts/ownership.json). Record reports/dependency/change requests in `team handoffs/ayan/`.
+## Files in this guide
 
-Before implementing scientific results, read the mandatory [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md). It assigns your concrete backend/science/presentation responsibilities and shared adversarial merge tests under contract C1.
+| File | Purpose |
+| --- | --- |
+| [CODING-AGENT-PROMPT.md](CODING-AGENT-PROMPT.md) | The single prompt |
+| [01-SCOPE-AND-FILE-OWNERSHIP.md](01-SCOPE-AND-FILE-OWNERSHIP.md) | Exactly what you own and must not touch |
+| [02-IMPLEMENTATION-PLAN.md](02-IMPLEMENTATION-PLAN.md) | Phases with exit gates |
+| [03-ARCHITECTURE-READING-MAP.md](03-ARCHITECTURE-READING-MAP.md) | What to read, when |
+| [04-SERVICE-INTERFACES-AND-HANDOFFS.md](04-SERVICE-INTERFACES-AND-HANDOFFS.md) | Your seams with Tanush and Aradhya |
+| [05-TEST-AND-MERGE-GATES.md](05-TEST-AND-MERGE-GATES.md) | Exact commands, tests, thresholds |
+| [06-HANDOFF-CHECKLIST.md](06-HANDOFF-CHECKLIST.md) | Definition of done |
+| [07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) | C1 gates you implement |
+| [08-MODULE-SPECIFICATION.md](08-MODULE-SPECIFICATION.md) | **File-by-file, operation-by-operation specification** |
+| [09-SELF-AUDIT-AND-LOOPHOLE-CHECKLIST.md](09-SELF-AUDIT-AND-LOOPHOLE-CHECKLIST.md) | Adversarial self-review and mutation checks |
+| [STATUS-TEMPLATE.json](STATUS-TEMPLATE.json) | Report you fill |
+
+Authoritative context: [architecture 34](../../architecture%20files/34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md), [35](../../architecture%20files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md), [36](../../architecture%20files/36-DATASET-PLUG-IN-AND-NASA-SLOT.md), [39](../../architecture%20files/39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md), [40](../../architecture%20files/40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md).

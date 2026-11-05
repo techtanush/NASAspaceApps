@@ -1,59 +1,55 @@
-# Tanush testing and merge gates
+# Tanush — tests and merge gates
 
-Implement the tests below and record actual results. Commands describe the future app once scaffolded. Run from your `analogforge/` directory, with the selected isolated profile. Missing targets/tests are unfinished work, not success.
+A gate passes only when its tests **execute and assert**. Skips, xfails, deselects and "no tests collected" are failures. Catalog ids: architecture 39 §1.
 
-## F0 foundation gate
-
-- Python3.12/native science imports work inside the built worker image, not only on your laptop.
-- Fresh Postgres/PostGIS migration succeeds; API/worker readiness and capabilities are accurate.
-- Public domain shapes/units/statuses match C1; OpenAPI/client-generation input is stable; port models serialize real fixture requests/results.
-- Local mode binds safely; isolated profile ports/volumes/CORS point to the right worktree.
-- Synthetic seed is idempotent/offline. Missing external keys do not break offline startup or pretend live is available.
-
-## Domain API and persistence tests
-
-Test mission draft save/reload/conflict, preparation lifecycle, proposed assumptions, explicit contract acceptance, rover import validation, optional rover and immutable input revisions. Verify public retrieval for every pointer in RunSnapshot, including target profile, selected candidates/portfolio, pending review, evidence and test results. New rover/threshold requires a new run.
-
-Test idempotent retry returns same business object; changed body with reused key409; stale expected_revision409; unauthorized workspace404/403 according to policy; HTTP202 queued work versus synchronous errors; proper422 validation; no hidden enum/string drift. An invalid/missing secret yields a safe actionable error without a raw token/DSN.
-
-Test blob atomicity and hash, orphan handling, lineage cycle rejection, local-key resolution, source-policy append-only acquisition, mode mismatch and missing referenced evidence. A label claiming a source exists cannot replace checksum/decoder validation.
-
-## Queue events and policy tests
-
-Two workers cannot own one lease. Expired worker publication is fenced. Crash after blob move/before DB commit resumes without duplicate result. Cancellation during a CPU tool prevents later success publication. Uncommitted output cannot appear as a committed SSE event. Cursor replay/expiry and snapshot after reconnect are consistent. Active-time and model/replan budgets survive process restart.
-
-Supply malicious role output: invented evidence ID, wrong workspace/mode, unsupported tool, untrusted prompt injection, nonfinite numeric quantity, hidden changed contract, stale revision, fabricated pass. Policy must reject it. Schema-valid prose cannot bypass evidence or override Ayan's independent verifier result. A model refusal/incomplete output is a typed failed/blocked invocation with bounded retry.
-
-## Agent gate
-
-Exercise all ten roles with scripted provider fixtures, actual registered tool receipts and explicit task kinds. Requirements preparation is not a fake run. The critic must create one exact material challenge and request evidence repair or leave UNKNOWN. PROVE_IT launches design+verification only after the accepted contract/rover context. Replanning preserves hashes, prior failures and caps. Budget exhaustion ends honestly without a forced PASS.
-
-With authorized configured credentials run a minimal actual provider capability/strict-call probe and one live role/tool journey. Preserve sanitized request/receipt/version evidence. If absent, `live_model_gate=BLOCKED_EXTERNAL`; offline agent tests can still pass.
-
-## Cross-branch gate
-
-Use Ayan's actual facade and Aradhya's actual UI/renderer. The baseline graph must compute120m/26Wh/0m exposure FAIL then340m/34Wh/150m exposure PASS, with fixed contract and actual persisted receipts. These are synthetic test energies, not calibrated live rover predictions. Reject test-only mock resource provider in live mode.
-
-Full browser path: create draft→fingerprint→accept→rover→run→target/candidates→critic/matrix→PROVE_IT→failed attempt→diagnose/replan→verified result→passport/export→reload. Also no-rover, invalid scale, missing optional data, negative candidate, search INCONCLUSIVE, cancellation and reconnect. Disabled MSW and actual database evidence must prove this is integration, not a browser-only fixture.
-
-## Command contract
-
-Provide and run these or documented equivalent exact targets:
+## 1. Commands (from `analogforge/`; omit `rtk` if not installed)
 
 ```bash
-rtk proxy uv run pytest tests/unit/platform tests/integration/platform tests/contracts/platform
-rtk proxy uv run ruff check src tests
-rtk proxy uv run mypy src/analogforge
-rtk proxy make check PROFILE=tanush
-rtk proxy make build PROFILE=tanush
+python3 "../architecture files/contracts/kit/materialize.py" --verify                              # KIT-01
+uv run pytest tests/contracts/kit -q                                                               # KIT-02
+uv run pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers \
+    -p no:randomly --junitxml out/platform-junit.xml                                                # PLT-01..PLT-21 (DB tests need TEST_DATABASE_URL)
+uv run ruff check src tests/unit/platform tests/integration/platform tests/contracts/platform tests/support
+uv run mypy src/analogforge --exclude 'src/analogforge/(ports|science|rendering/passport|adapters/(earthdata|pds|emit|diviner|user_survey|source_http))'
+uv run python -m analogforge.cli preflight --mode synthetic --scenario synthetic-mars-mobility-v1 --output out/preflight-synthetic.json --json
+uv run python -m analogforge.cli export-openapi --out out/openapi.exported.json
+python3 "../team coordination/scripts/check_branch_ownership.py" --person tanush --repo ..        # PASS
+make check PROFILE=tanush                                                                           # wraps the above; must exit 0
 ```
 
-At integration run the complete Python suite plus Aradhya's frontend checks/browser suite and Ayan's actual data tests. Global mypy/ruff failures in a producer module are coordinated fixes, not grounds to delete that module from checking. Do not keep expanding identical test runs after unchanged successful results; repeat when new changes/failures justify it.
+`DB` tests are marked `@pytest.mark.db`; with a database they **must run**. The only acceptable non-run is `BLOCKED_ENVIRONMENT` after trying every option of architecture 38 §4.1, recorded in `STATUS.json` with commands and errors. A junit parser step (`scripts/validate_docs.sh`) fails the gate if any PLT test is `skipped` while `TEST_DATABASE_URL` is set.
 
-## Merge report
+## 2. Required test files (names are part of the gate)
 
-Record exact tested source SHA, accepted main/base SHA, runtime/profile/build lock, schema/port hashes, commands/exit codes/counts, observed live/source probes and blockers. `ready_to_merge` requires no unexplained failing tests, unauthorized files, runtime secrets, fake fixtures or unresolved contract mismatch. Record platform readiness separately from integrated product acceptance. Final main only advances to the tested integration candidate; no deployment follows automatically.
+| File (under `tests/…/platform/`) | Catalog | Must assert |
+| --- | --- | --- |
+| `integration/test_migrations.py` | PLT-01 | empty DB → head; seeded previous schema → head; constraints/indexes exist; no auto-drop |
+| `contracts/test_openapi_conformance.py` | PLT-02 | 43 operationIds/paths/methods equal the bundled spec; **every** endpoint exercised with seeded data and every response (2xx and the documented 4xx) validated with jsonschema against the bundled operation's response schema; every kit request fixture validates against the request schema |
+| `integration/test_idempotency_revisions.py` | PLT-03 | same key+body ⇒ same response; changed body ⇒ 409 `IDEMPOTENCY_CONFLICT`; stale `expected_revision` ⇒ 409 `REVISION_CONFLICT` on every mutating endpoint (parametrized over all of them) |
+| `integration/test_workspace_isolation.py` | PLT-04 | cross-workspace id enumeration ⇒ 404 on every read; lists never leak; artifact access needs owning evidence/export |
+| `integration/test_jobs_leases.py` | PLT-05, PLT-06 | one lease owner; expired owner's publication fenced; crash after blob move before commit recovers; cancellation during CPU subprocess ⇒ `CANCELLED`, evidence kept, no later PASS |
+| `integration/test_sse.py` | PLT-07 | replay after cursor, `Last-Event-ID` precedence, 410 `EVENT_CURSOR_EXPIRED`, heartbeat comments don't advance cursor, terminal event |
+| `unit/test_registrar.py` | PLT-08 | every rejection rule of architecture 35 §3.3 (hash/size mismatch, scratch escape/symlink, dangling `local_key`, foreign-workspace/mode parent, `SYNTHETIC_` naming per mode, signed-URL `source_uri`, `input_sha256` mismatch, request/operation/mode mismatch) and a fully valid result registers atomically |
+| `unit/test_policy.py` | PLT-09 | fabricated/foreign evidence, changed threshold/limit, stale revision, unlisted tool, status/confidence inflation, repair outside `permitted_repairs`, prompt-injection text is data |
+| `integration/test_council_scripted.py` | PLT-10 | all ten roles via the scripted provider with strict schemas; seeded scale-defect loop ⇒ BLOCKING issue OPEN→RESOLVED, matrix revision 2 supersedes 1 |
+| `unit/test_budgets.py` | PLT-11 | every budget of `catalog.BUDGETS`, persisted across a simulated restart; preparation cap 4; replans 2+1; fourth attempt impossible |
+| `integration/test_assurance.py` | PLT-12 | SC-01…15 per claim, missing gate ⇒ `NOT_ASSESSED` ⇒ dependent positive claim `REJECTED`; BLOCKED/LIMITED/ALLOWED rules; atomic rollback; stale audit rejected; tampered artifact detected; SCI-01/04/06/07/09–18 platform parts |
+| `integration/test_passport_assembly.py` | PLT-13 | acyclic hashing; manifest re-canonicalized independently equals `manifest_sha256`; bundle invariants of `PassportExportBundle` |
+| `integration/test_exports.py` | PLT-14 | 202+`Retry-After` then 200; all headers; byte-stable re-download; per-workspace authorization |
+| `unit/test_entry_points.py` | PLT-15 | missing/non-conforming facade/renderer ⇒ named failure, no fallback; `analogforge.main` imports without science/renderer packages |
+| `integration/test_live_gates.py` | PLT-16, PLT-18 | `live` without key/model ⇒ 503 `PROVIDER_AUTH_FAILED` with `details.dependency`, no run created, no scripted fallback; `live` rejects the mock graph provider; synthetic/replay open no sockets (socket monkeypatch) |
+| `integration/test_dataset_cli.py` | PLT-17 | scaffold/validate/lock/bind/generate commands (through doubles); tamper after lock ⇒ `SOURCE_CHECKSUM_MISMATCH` block; synthetic dataset into `live-hackathon-v1` ⇒ `MODE_MISMATCH`; `live-hackathon-v1` unbound ⇒ `allowed_modes: []` |
+| `unit/test_secrets.py` | PLT-19 | scan of logs, SSE payloads, exports, errors, OpenAPI and `git ls-files` for key/token/DSN patterns |
+| `integration/test_seed_and_capabilities.py` | PLT-20 | `seed-synthetic` idempotent/offline; capabilities list per architecture 40 §10; presets byte-identical to kit fixtures |
+| `integration/test_live_rehearsal.py` | PLT-21 | with test hooks: live role loop against `fake_openai_server` incl. refusal/malformed/timeout; harness provider rejected without hooks |
+| `integration/test_journey_api.py` | (J1 API-level) | create→fingerprint→accept→run→select A→PROVE IT→3 attempts (1 FAIL ROUTE, 2 FAIL ANALOG, 3 PASS on B)→passport LIMITED→3 exports; hashes unchanged across attempts; replans 1+1; uses `fake_science`; asserts persisted receipts/evidence for every step |
+| `integration/test_recovery.py` | — | kill API mid-run ⇒ snapshot+events recover; kill worker mid-search ⇒ replacement completes without duplicates |
+| `integration/test_rls.py` | PLT-04 | RLS enabled in hosted mode under a non-superuser role blocks cross-workspace SQL |
 
-## Mandatory credibility tests
+## 3. Frozen thresholds
 
-Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.
+Lease 120 s / heartbeat 20 s / reaper 30 s; event visible ≤ 2 s locally; cancellation acknowledged ≤ 2 s and CPU child terminated ≤ 5 s; health < 100 ms; ordinary reads p95 < 500 ms (measured and recorded, not claimed); `MAX_RUN_MODEL_CALLS=40`, `MAX_RUN_SECONDS=900`, replans 3, preparation 4.
+
+## 4. Merge readiness
+
+`STATUS.json.ready_to_merge = true` only if: every PLT row `PASSED` (or DB rows `BLOCKED_ENVIRONMENT` with the proof required above and the merging agent notified in `external_blockers`); kit verify and ownership `PASS`; ruff/mypy clean; forbidden-pattern and mutation checks (`09`) clean; the self-audit complete; no hidden skip. Live-OpenAI against the real service is **not run** and is listed `BLOCKED_EXTERNAL`; the fake-server rehearsal (PLT-21) must `PASS`.

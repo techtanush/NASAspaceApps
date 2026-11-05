@@ -4,6 +4,10 @@ This folder is the complete build specification for AnalogForge: a mission-condi
 
 Start with the reading order below. Keep the shared contracts authoritative while implementing specialist modules; do not read one UI file and invent the remaining backend. The goal is a coherent full application, with truthful handling of unavailable data and external setup.
 
+## One-shot build layer (read first when building)
+
+[34 One-shot build profile, completion tiers and errata](34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md) is binding and **overrides 00–33 where they conflict**. It defines the pre-hackathon target (everything except NASA data), the errata, and what "done" means. [35 Frozen contract kit and cross-branch seams](35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md) defines the byte-identical code every branch shares (`contracts/kit/`), the entry points, and how the three branches plug together. [36 Dataset plug-in](36-DATASET-PLUG-IN-AND-NASA-SLOT.md), [37 Hackathon-day runbook](37-HACKATHON-DAY-RUNBOOK.md), [38 Runtime, keys and local setup](38-RUNTIME-KEYS-AND-LOCAL-SETUP.md), [39 Acceptance catalog and purity tests](39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md) and [40 Practice scenarios and fixture specifications](40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md) complete it. Branch builders start at `team guides/<Name>/README.md`; the merging agent starts at `merging guide/README.md` on branch `merging-branch`.
+
 ## Start here
 
 1. [Architecture decisions and precedence](00-ARCHITECTURE-DECISIONS.md): binding technical choices, invariants and source conflicts.

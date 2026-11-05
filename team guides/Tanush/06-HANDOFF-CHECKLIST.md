@@ -1,25 +1,23 @@
-# Tanush handoff checklist
+# Tanush — definition of done (checklist)
 
-Use a checkpoint directory under `team handoffs/tanush/`. Copy the common handoff template, fill actual values and include a readable report. Null/unrun is valid when explained; invented success/SHAs are not.
+Tick only with observed evidence recorded in `STATUS.json`.
 
-- [ ] Correct branch/worktree/profile recorded; no code written into the root integration checkout by accident.
-- [ ] F0 contract/ports/dependencies/OpenAPI delivered early with tested commit SHA.
-- [ ] Ayan/Aradhya can consume foundation without importing private implementation details.
-- [ ] Migrations, idempotency/revision guards, storage/lineage, queue/fencing/cancellation and SSE tests pass.
-- [ ] All role task kinds/tools/results are strict, scoped and bounded; no numeric truth comes from prose.
-- [ ] Unknown/gap/fail/inconclusive/blocked distinctions are preserved.
-- [ ] Exact API/schema/config version and all approved changes are documented.
-- [ ] Contributor checkpoints are reviewed and tested on isolated combined candidate commits.
-- [ ] Real Ayan facade and Aradhya UI/renderer replace collaborator doubles in integrated tests.
-- [ ] Original failed test and unchanged mission/rover hashes survive replan/export.
-- [ ] Setup/run/check/build commands work from a clean checkout and each runtime profile is isolated.
-- [ ] Secrets/data/caches absent from tracked diff; raw provider reasoning absent from output.
-- [ ]58 product requirements have code/test/evidence status in the final ledger.
-- [ ] Actual downloaded data/live AI gates are distinguished from synthetic tests and missing external setup.
-- [ ] Final accepted main SHA and report match the tested candidate; no forced update or publication.
+- [ ] Correct branch/clone; kit materialized and `--verify` PASS at start and end; `tests/contracts/kit` green; `uv.lock` committed and consistent with `pyproject.toml`.
+- [ ] Only owned paths changed; `extra-tanush` is the only `pyproject.toml` edit; ownership checker PASS.
+- [ ] PostgreSQL/PostGIS obtained (method recorded) and all `db` tests executed — or `BLOCKED_ENVIRONMENT` with every attempted command/error.
+- [ ] All 43 operations implemented; PLT-02 validates real responses against the bundled OpenAPI.
+- [ ] Missions/rovers/runs/drafts/idempotency/revisions/workspace isolation/jobs/leases/fencing/cancellation/events/SSE pass their tests.
+- [ ] Registrar enforces every rule of architecture 35 §3.3 and rejects crafted bad results atomically.
+- [ ] State machine is data-driven; scheduler sequence of `08` §5 implemented; replan limits (2+1, 3 total) persisted; mission/rover hashes asserted unchanged on every replan.
+- [ ] Ten roles, 21 tools with allowlists, strict schemas, scripted provider (seeded scale defect loop works), OpenAI provider + probe + fake server rehearsal.
+- [ ] Policy rejects fabricated evidence, status/confidence inflation, threshold changes, stale revisions, unlisted tools/repairs; budgets enforced and persisted.
+- [ ] Assurance SC-01…15, claim compiler, publication rules, acyclic hashing, `manifest_sha256` independently reproduced; `assurance_evidence_id` enforced by DB + app.
+- [ ] Exports: 202→200, headers, byte stability, authorization; renderer loaded only via entry point.
+- [ ] Dataset CLI (scaffold/validate/lock/bind/generate-*), lock tamper detection, `MODE_MISMATCH`, scenario availability rules.
+- [ ] Preflight (10 stages) truthful offline and for `live` (names exactly what is missing); capabilities correct; no key needed for synthetic.
+- [ ] Journey J1 API-level test passes with `fake_science` and asserts persisted receipts.
+- [ ] No platform code computes a scientific metric; no science/renderer import at top level; no secrets/signed URLs anywhere; test hooks inert by default.
+- [ ] No `NotImplementedError`/`TODO`/`FIXME`/`HACK`; no hard-coded storyline outcomes in `src/`; no weakened/skipped tests; mutation checks demonstrate tests can fail.
+- [ ] `STATUS.json` complete and truthful; contradictions and cross-area defects listed; committed (with `uv.lock`); pushed to `origin tanush/platform-agents-integration`.
 
-The handoff should tell each teammate exactly which main checkpoint to merge and which port/client version changed. Do not claim that a clean Git merge means the product works; attach the combined test evidence.
-
-## Scientific credibility handoff
-
-Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.
+Push at every phase gate, but the branch is only mergeable at the end.

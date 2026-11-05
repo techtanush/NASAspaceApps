@@ -1,21 +1,34 @@
-# Aradhya Codex task
+# Aradhya coding-agent prompt (paste this and nothing else)
 
-You are Aradhya's coding agent for AnalogForge on `aradhya/frontend-experience`. Confirm you are in the Aradhya checkout before editing. Application code lives in `analogforge/`. Work as one coding agent; do not spawn subagents, edit another owner’s files or message other chats/people through tools unless later explicitly authorized.
+```text
+You are Aradhya's coding agent for AnalogForge (NASA Space Apps 2026: "Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars").
+Your branch is aradhya/frontend-experience. You will work unattended, for as many hours and with as many subagents as needed, until your
+definition of done is met. Nobody is available to answer questions: make the conservative choice consistent with the architecture and record it.
 
-Read your README and01–06 guides, shared ownership/service/runtime rules and architecture reading map. Build the complete user-facing workbench and pure passport renderer within your owned paths. Tanush owns backend/API/contracts/roles/persistence; Ayan owns science/source/tiles. The original whole-app architecture is context, not permission to scaffold a competing backend or overwrite their modules.
+FIRST, verify you are in the repository root on branch aradhya/frontend-experience (git branch --show-current). If not, check it out.
+THEN read, completely and in this order:
+  1. team guides/COMMON-BUILDER-PROTOCOL.md        (how you work, forbidden shortcuts, git, subagents, resume, final steps)
+  2. team guides/Aradhya/README.md and 01 .. 09 and STATUS-TEMPLATE.json   (what you build; 08 is the file-by-file specification)
+  3. architecture files/34, 35, 39, 40              (precedence/errata, frozen kit and seams incl. section 5b UI-readable artifacts, acceptance catalog, practice storylines)
+  4. the architecture documents listed in team guides/Aradhya/03-ARCHITECTURE-READING-MAP.md (16-19 and 07 are essential)
+Your FIRST command is: python3 "architecture files/contracts/kit/materialize.py"   (then --verify). The kit is read-only for you.
 
-Start with React19/TypeScript/Vite, generated client from accepted C1/F0 OpenAPI, locked frontend tooling and a prominently labeled MSW/mock preview. Deliver an early U0 checkpoint with forms, navigation, matrix/evidence and negative states. Never silently substitute mock results for failed production requests.
+You build (a) the React 19 + TypeScript workbench in analogforge/apps/web: all screens S01-S12, Earth map (MapLibre, offline basemap) and a separate body-aware
+planetary panel, generated API client from the kit's contracts/openapi.bundled.json, TanStack Query state, SSE controller with dedup/resync, accessible UI,
+every data-testid of contracts/ui-testids.json; (b) a stateful MSW mock backend (visible MOCK PREVIEW banner, impossible in production builds) that replays the
+practice storylines and serves REAL renderer output as mock exports; (c) the pure Python passport renderer analogforge.rendering.passport
+(html/json/csv) implementing the kit's PassportRenderer port; (d) Playwright journeys J01-J13 of architecture files/39 section 3 that run in mock mode now and
+against the real backend at merge time (same specs). You compute NO scientific value; you display server data and the artifacts of architecture 35 section 5b.
 
-Complete mission draft autosave, Moon/Mars target selection, manual/JSON rover and no-rover flow, preparation/fingerprint/explicit acceptance, run/candidate/qualification/evidence, agent operations/critic/review, compatibility, PROVE_IT/test lab/attempt history/replan, portfolios, passport and downloads. Use generated types/statuses and server-confirmed actions/revisions/idempotency. SSE consumes committed events with dedup/resync/reload recovery; private reasoning is not a UI feed.
+Build in the phases of team guides/Aradhya/02-IMPLEMENTATION-PLAN.md. Write the catalog tests first (UIX-01..UIX-11) with real assertions. Use subagents for
+independent screens/modules and, in the audit phase, adversarial reviewers who try to break the work.
 
-Use Ayan's registered display manifests/images/telemetry; Earth mapping and body-specific planetary panel have separate CRS handling. No browser terrain/energy/qualification calculation or fake similarity score. Keep scale, unknown clearance, unsupported mineral/thermal and physical gaps visible even after a modeled terrain PASS.
+You may NOT: edit the kit or any path you do not own; add a scientific enum by hand; compute qualification/energy/slope/exposure in the browser; hide a failed,
+unknown or gap row; hardcode a green result; leave a control without real behavior; skip, xfail or weaken a test; claim a gate passed that you did not execute;
+commit secrets or generated build output.
 
-Implement `rendering/passport` as a pure renderer of Tanush's frozen bundle and supplied validated images. Return escaped printable self-contained HTML, frozen scientific JSON and safe CSV, with MIME/filename/file hash/version. No SQL, model calls, source fetch or mutation. Preserve all attempts and distinguish manifest digest from exported-file digest.
-
-Merge accepted foundation/main checkpoints, disable mocks explicitly for real integration and connect the actual backend/science early. Missing endpoints/fields/dependencies go into exact handoff/change requests; do not invent a parallel wire contract or alter shared locks/migrations/science. Keep configured Codex tools/model as the user has them; no additional plan feature is assumed.
-
-Run your05 component/type/build/renderer/browser/accessibility/real-API gates. Test success, failure, unknown/gap, inconclusive, blocked/review, cancellation/reconnect, no-rover, scale limits, both bodies and portfolio co-location. Assert real backend receipts/persistence in integrated tests. A hardcoded green dashboard is not completion.
-
-Maintain `team handoffs/aradhya/implementation-status.md` and checkpoint reports with exact tested/base SHA, contract hash, commands/results, mock-versus-real evidence, assets and blockers. Continue independent interface/renderer work when a backend dependency is pending. Finish the owned functional product and honest limitations; do not deploy, buy hosting, send messages or claim unperformed live source/model gates passed.
-
-Mandatory scientific credibility work: implement [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md), architecture33 and shared credibility gate06. Run the assigned SCI tests; preserve all SC gate evidence. Do not report scientific readiness from a build, fixture shape or agent agreement. Contract baseline is C1; include the required passport assurance pointer and consumer support.
+You are DONE only when every gate in team guides/Aradhya/05-TEST-AND-MERGE-GATES.md passed with executed assertions, 09-SELF-AUDIT... is complete,
+`materialize.py --verify` and `team coordination/scripts/check_branch_ownership.py --person aradhya` both PASS, team handoffs/aradhya/STATUS.json is truthful,
+and the work is committed and pushed to origin aradhya/frontend-experience. Finish by printing: unmet gates first, passed gates, pushed SHA, and the three
+things the merging agent should verify first.
+```
