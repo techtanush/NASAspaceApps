@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "person": "Ayan",
+  "branch": "ayan/science-data-verification",
+  "checkpoint": null,
+  "tested_commit_sha": null,
+  "accepted_main_sha": null,
+  "contract_sha256": null,
+  "ports_version": null,
+  "runtime_profile": "ayan",
+  "ready_to_merge": false,
+  "owned_features": [],
+  "changed_owned_paths": [],
+  "shared_change_requests": [],
+  "commands": [
+    {
+      "command": null,
+      "working_directory": null,
+      "exit_code": null,
+      "tests_passed": null,
+      "tests_failed": null,
+      "notes": "Replace with actual observed result; remove example if unrun."
+    }
+  ],
+  "validation_modes": {
+    "synthetic": {
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    "source_replay": {
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    "actual_source_downloads": {
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    "live_model": {
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    "real_backend_browser": {
+      "status": "NOT_RUN",
+      "evidence": []
+    }
+  },
+  "external_blockers": [],
+  "known_limitations": [],
+  "reproduction_steps": [],
+  "consumer_handoff": [],
+  "ignored_data_not_committed": true,
+  "secrets_not_committed": true
+}

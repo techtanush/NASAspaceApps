@@ -1,0 +1,347 @@
+{
+  "schema_version": "1.0",
+  "baseline": "C0-planning-snapshot",
+  "files": [
+    {
+      "path": "architecture files/00-ARCHITECTURE-DECISIONS.md",
+      "bytes": 7247,
+      "sha256": "6d9d9a11fe3fc86a21665524d97236ef3ba464fa85c83851c29804694069900f"
+    },
+    {
+      "path": "architecture files/01-VISION-CONTEXT-AND-SCOPE.md",
+      "bytes": 5294,
+      "sha256": "8752b7e1ccb7a875c755d71e62ecb96414d0b2442e78ea80d707cd494611513a"
+    },
+    {
+      "path": "architecture files/02-PRODUCT-REQUIREMENTS.md",
+      "bytes": 20320,
+      "sha256": "9428942f468f6c3c507993ac70595f98cc84067fbdd693b9123644c23e992324"
+    },
+    {
+      "path": "architecture files/03-SYSTEM-ARCHITECTURE.md",
+      "bytes": 5260,
+      "sha256": "9bf4023895701a5bceea6ecf94dc95cabb80b0ea1af6eb7ca4ce499a936c500b"
+    },
+    {
+      "path": "architecture files/04-REPOSITORY-AND-DEPENDENCIES.md",
+      "bytes": 5161,
+      "sha256": "c4ada0858f9c97a56dc68493db51244070be401c159681024383e0659197ddee"
+    },
+    {
+      "path": "architecture files/05-DOMAIN-MODEL-AND-CONTRACTS.md",
+      "bytes": 9758,
+      "sha256": "ab50c443187e0621517de934f6f3cb589cdbd9e8895d5a17e764e237bc94667f"
+    },
+    {
+      "path": "architecture files/06-DATABASE-AND-STORAGE.md",
+      "bytes": 7352,
+      "sha256": "9b644a015590ee166e76b8897801e7ceceef177fe5119e761bc4952bd07de623"
+    },
+    {
+      "path": "architecture files/07-HTTP-API-AND-EVENTS.md",
+      "bytes": 10660,
+      "sha256": "c9efea7db18cd890bc43fd9ba59703e05c2dd88d6603e776e27daafd412e6f99"
+    },
+    {
+      "path": "architecture files/08-DATASET-CATALOG.md",
+      "bytes": 14578,
+      "sha256": "4af82259683a75d398711661dac06218ba47fc01c33bfa4c1eef15c9855e0ad1"
+    },
+    {
+      "path": "architecture files/09-DATA-INGESTION-AND-PROVENANCE.md",
+      "bytes": 13279,
+      "sha256": "a8aeb03cbc9ae50003c44c5840c2dbdf0c898de4b47599f4a32b81b7c43e6c24"
+    },
+    {
+      "path": "architecture files/10-TERRAIN-AND-PLANETARY-COMPARISON.md",
+      "bytes": 13631,
+      "sha256": "885d958e06dbfe2e821d9c84ba12b8ffb7293f868bf5ea2a36d2e63e3431f24c"
+    },
+    {
+      "path": "architecture files/11-QUALIFICATION-AND-UNCERTAINTY.md",
+      "bytes": 12197,
+      "sha256": "f0ae4c440788772fedbedc9014a06333bd8a1b667f75390cb0b73c2c0076252a"
+    },
+    {
+      "path": "architecture files/12-ROUTE-ENERGY-AND-VERIFICATION.md",
+      "bytes": 20585,
+      "sha256": "cf8aa8556fc8d3238e0a07acf03fcc497fcc7852a9278c3d3dc6810ee2f64ad3"
+    },
+    {
+      "path": "architecture files/13-COMPOSITE-ANALOG-PORTFOLIOS.md",
+      "bytes": 8110,
+      "sha256": "2430ea031149349d5ed93f50aa0c2cb6fca340f5af20ce0ed43c22335ee2f24b"
+    },
+    {
+      "path": "architecture files/14-AGENT-ORCHESTRATION.md",
+      "bytes": 20688,
+      "sha256": "a62da28c62ef696555541f0436e8d4a9b1980a7628df923f7835370f8576e24a"
+    },
+    {
+      "path": "architecture files/15-TOOL-REGISTRY-AND-PROMPT-CONTRACT.md",
+      "bytes": 26135,
+      "sha256": "826d09fa41950c44d333ebf6c4dcab413a2cca8790fd4534af678ba7072f9a76"
+    },
+    {
+      "path": "architecture files/16-USER-JOURNEYS-AND-SCREENS.md",
+      "bytes": 22989,
+      "sha256": "431b2de8e372e07c6906e28ed187504bf1e86ec293b5f3a17ba98cab9cf31320"
+    },
+    {
+      "path": "architecture files/17-FRONTEND-COMPONENTS-AND-STATE.md",
+      "bytes": 19902,
+      "sha256": "0d03c5339afd998c67a93d75401377a33b123e854aead4fbdb967a715671f5e3"
+    },
+    {
+      "path": "architecture files/18-MAPS-LAYERS-AND-VISUAL-DESIGN.md",
+      "bytes": 16378,
+      "sha256": "9b56cc41bf8837fd4433fbbb29d41eb0a163e2e50bec3ef3c3087578076b0550"
+    },
+    {
+      "path": "architecture files/19-ANALOG-PASSPORT-AND-EXPORTS.md",
+      "bytes": 19636,
+      "sha256": "85c4bacc483a1e84bb00e0f59e18e5462c0ee942c46ac36c0ef7507381c66bac"
+    },
+    {
+      "path": "architecture files/20-CREDENTIALS-AND-EXTERNAL-SERVICES.md",
+      "bytes": 6809,
+      "sha256": "de7b7b57f1b75e825c3b1713eb352592eb9b8e9811c1b4c61d3780e93419c410"
+    },
+    {
+      "path": "architecture files/21-CONFIGURATION-AND-PREFLIGHT.md",
+      "bytes": 7254,
+      "sha256": "c642b3d84973bb5146d00c6f795989be89e1691f3c0e1327e73e81310c2329dc"
+    },
+    {
+      "path": "architecture files/22-BACKEND-MODULES.md",
+      "bytes": 6362,
+      "sha256": "95d71c0e5feb0e5de050bed1186ac42dd4a19ef1ca156d9f6f237c55c42680a6"
+    },
+    {
+      "path": "architecture files/23-JOBS-AND-RECOVERY.md",
+      "bytes": 5752,
+      "sha256": "28c527bf6190172d77cde5c81acf87450df6ff04442a444fa26a0d0ddf9fdf05"
+    },
+    {
+      "path": "architecture files/24-SECURITY-IDENTITY-AND-DATA-POLICY.md",
+      "bytes": 5298,
+      "sha256": "fd5bc3cb04d41971c0b226d05ea89fe4929f3c0da09c7aab526a9569ee64ebac"
+    },
+    {
+      "path": "architecture files/25-DEPLOYMENT-OPERATIONS-AND-OBSERVABILITY.md",
+      "bytes": 5128,
+      "sha256": "40669e1f84f5aba143f85b9cb03e8d0d5750ee0d4508d5fecaf1cf40c1591be4"
+    },
+    {
+      "path": "architecture files/26-TEST-STRATEGY.md",
+      "bytes": 7839,
+      "sha256": "e9daec277defe2c05607fcb7252f288f497b53bf850b41c229e2cd685ba90eab"
+    },
+    {
+      "path": "architecture files/27-IMPLEMENTATION-PLAYBOOK.md",
+      "bytes": 8948,
+      "sha256": "c009748a8aa93abfd67984b0db9ce88fd54ba5b4cf978325c4fcb403f19c2f3d"
+    },
+    {
+      "path": "architecture files/28-DEMO-SCENARIOS-AND-ACCEPTANCE.md",
+      "bytes": 19687,
+      "sha256": "b46780221c91e8cc8bbc0015446afab44ccca6eb0c294a86715dfa8cd5c5ffe6"
+    },
+    {
+      "path": "architecture files/29-SCIENTIFIC-VALIDATION.md",
+      "bytes": 17191,
+      "sha256": "59b414101676b99a151816236093fcc46952c381463fe9f4097a6ec4798ae178"
+    },
+    {
+      "path": "architecture files/30-REQUIREMENTS-TRACEABILITY.md",
+      "bytes": 4326,
+      "sha256": "4ac19f6efa1584944840e8fc2c29277097b8bfb452ff5957eb051854ff0a9476"
+    },
+    {
+      "path": "architecture files/31-SOURCE-REGISTER.md",
+      "bytes": 6239,
+      "sha256": "fd88bf9ab980a020b1bcf438f62437769cdc0860c452e068e83dbbbb5430256d"
+    },
+    {
+      "path": "architecture files/32-CODING-AGENT-EXECUTION-PROMPT.md",
+      "bytes": 5843,
+      "sha256": "46b6c231bdef84ebfffecf8af36a58f1a0821e7dcda8032e506af63c8f1a3331"
+    },
+    {
+      "path": "architecture files/BLUEPRINT-VALIDATION.json",
+      "bytes": 626,
+      "sha256": "134ce5fc440a6d9c2d638e8e4d9ea1ed5d901f9fc3efd01e7031e9db798e8f23"
+    },
+    {
+      "path": "architecture files/FILE-INDEX.md",
+      "bytes": 8053,
+      "sha256": "67f334ca074376a974015a3b7ca9f11542465722ef3f35386f03990bf9ed8856"
+    },
+    {
+      "path": "architecture files/README.md",
+      "bytes": 8357,
+      "sha256": "a5a4e338d740c63087f7dbf13b62a9987743632f6b8b00f23be7932a775adabc"
+    },
+    {
+      "path": "architecture files/agents/01-mission-director.md",
+      "bytes": 7021,
+      "sha256": "945ed8924c37d418e5bd840e1bb7438025965c8bea7f7105598eaa7b49926091"
+    },
+    {
+      "path": "architecture files/agents/02-requirements.md",
+      "bytes": 10210,
+      "sha256": "d7e23c8d00bb033d39d78e18c60ec1e2dad0a7f13960b5c56421798b94abd5ec"
+    },
+    {
+      "path": "architecture files/agents/03-rover-systems.md",
+      "bytes": 7115,
+      "sha256": "b4cf3a3f2f26a20285ac78733248388110c398100f0868aaeff7b2ee95ef6dbd"
+    },
+    {
+      "path": "architecture files/agents/04-planetary-target.md",
+      "bytes": 6914,
+      "sha256": "031ea612f0d9609a07779ab83737cf037200daddb9677968fbe00e60c07641ce"
+    },
+    {
+      "path": "architecture files/agents/05-earth-analog-scout.md",
+      "bytes": 7285,
+      "sha256": "b0afa832964c7c4b4feaab5e57f9054aa14b552ea2547457b4a5063d349e00ca"
+    },
+    {
+      "path": "architecture files/agents/06-qualification.md",
+      "bytes": 7833,
+      "sha256": "9a84e31a3d63352c23df23a4a7ece14b25fd757dce927cb20c9318d893b2bfe8"
+    },
+    {
+      "path": "architecture files/agents/07-scientific-critic.md",
+      "bytes": 9159,
+      "sha256": "2aedf2022658a1b804b8604948d006e16b8811d53d13bc692a5e77fce6fb5972"
+    },
+    {
+      "path": "architecture files/agents/08-test-designer.md",
+      "bytes": 7421,
+      "sha256": "2e9f0c8c7f4f5a366e007e996d2a61e18f2ddee9d7ae47aefeb93be7cafe696e"
+    },
+    {
+      "path": "architecture files/agents/09-verification-replanning.md",
+      "bytes": 8828,
+      "sha256": "4247513034a1ed4777f90ece3c03ba8362023e917552283441a6a28f59c1e313"
+    },
+    {
+      "path": "architecture files/agents/10-evidence-passport.md",
+      "bytes": 8824,
+      "sha256": "328a7ed1c5730ab47eb944bfd16a0f85d08fe610f330d9ce3b102c7591d78dca"
+    },
+    {
+      "path": "architecture files/contracts/domain.schema.json",
+      "bytes": 58773,
+      "sha256": "68676e111acf2764c70c5b9b97508ec971b91d4bc7dbf1c565ea938a394dfc13"
+    },
+    {
+      "path": "architecture files/contracts/error-codes.json",
+      "bytes": 2643,
+      "sha256": "9828e7a847f61a017f6d212386fdfb93bd70230c0cc8d2088373ddc68f99ea37"
+    },
+    {
+      "path": "architecture files/contracts/openapi.yaml",
+      "bytes": 142775,
+      "sha256": "e1014ae2d49709bef9ac6d5508626c94945a156077e65ee7986f8464f691686c"
+    },
+    {
+      "path": "architecture files/contracts/requirements-traceability.csv",
+      "bytes": 13458,
+      "sha256": "582b7db38e8183cc2cd70291cb7c98d4df0dab9319c2f74ffaf0ded2c75a8bdb"
+    },
+    {
+      "path": "architecture files/contracts/validate_blueprint.py",
+      "bytes": 10638,
+      "sha256": "7b837b8557e8e330a4ca590d1357e7b1ffbd1c29c357ce3420a980a5b7f92327"
+    },
+    {
+      "path": "architecture files/examples/.env.example",
+      "bytes": 771,
+      "sha256": "59b3c29ba3ebcb1c295cfb0777e43fa35aaca5e6184b70423bfc71593ec6801f"
+    },
+    {
+      "path": "architecture files/examples/constraints-artifact.json",
+      "bytes": 1295,
+      "sha256": "b6828e9f30dde8595dae4f2745984c441ecc5551911befcbf012baa1550b8412"
+    },
+    {
+      "path": "architecture files/examples/dataset-lock.template.json",
+      "bytes": 1227,
+      "sha256": "4f0fc9b20edb28d4cc7b3aaab8d6a9c67577e92197b4ad387855176319c9290b"
+    },
+    {
+      "path": "architecture files/examples/mission-contract.json",
+      "bytes": 5164,
+      "sha256": "7ddb601560aaa3ce75293f466ffaff5de4154ae4c481111e927f29c768ba8e5f"
+    },
+    {
+      "path": "architecture files/examples/qualification-unknown.json",
+      "bytes": 735,
+      "sha256": "6bde43ed0969b9392ab45034f845fe7f4d0fd1b2637b907a5cc39db621fdebf3"
+    },
+    {
+      "path": "architecture files/examples/request-create-run.json",
+      "bytes": 252,
+      "sha256": "1b3b3d96fce0df5df47483f5eb11539f63e9935911ea1261e3922ab4f7d27e99"
+    },
+    {
+      "path": "architecture files/examples/request-prove-it.json",
+      "bytes": 137,
+      "sha256": "a3c86e59d3a7d96d4d2d81ca149aef8bd79fec5aaa9468b21857a773ecc77e50"
+    },
+    {
+      "path": "architecture files/examples/rover-import.json",
+      "bytes": 924,
+      "sha256": "368eed90c85fb1fbe7a91a2a90aeee168bf71d92851fd798140955bd3372ded7"
+    },
+    {
+      "path": "architecture files/examples/rover-profile.json",
+      "bytes": 1256,
+      "sha256": "448e6d8f76d1a81834f04be4f176969f1ce6a53c32c2ab25e4119b9247737d77"
+    },
+    {
+      "path": "architecture files/examples/run-event.json",
+      "bytes": 466,
+      "sha256": "ecadde8cff641320666e5f327eff29d83878f0ec97bedca8a8b2738e3397c197"
+    },
+    {
+      "path": "architecture files/examples/scenario-manifest.json",
+      "bytes": 469,
+      "sha256": "f62f4a581d1874cfddd548ca5c37ba7a8d337dfa6bfc593743cab77db4ce818d"
+    },
+    {
+      "path": "architecture files/examples/synthetic-route-graph.json",
+      "bytes": 1942,
+      "sha256": "ea6379931539157503fc1c1fb3190a9a73ac5ac6266784b5d8d37383721987b7"
+    },
+    {
+      "path": "architecture files/prompts/COMMON-SYSTEM-POLICY.md",
+      "bytes": 6921,
+      "sha256": "251a4216cbf268d76b3baf2a5638b22e481b7a8c6c64a2abc8b9a5c99d1477ad"
+    },
+    {
+      "path": "architecture files/references/AnalogForge_Final_Research_Build_Brief.docx",
+      "bytes": 58178,
+      "sha256": "8d68207277347c3b6c2614f1f07fd2146edbe4c18860ba15f589abff195bae01"
+    },
+    {
+      "path": "architecture files/references/docx-text-extract.txt",
+      "bytes": 39586,
+      "sha256": "8830920e0e6b352ad54d1170a5e3ed954fab71a53815b234024ecbe5b7921d1b"
+    },
+    {
+      "path": "architecture files/references/original-concept.txt",
+      "bytes": 35626,
+      "sha256": "368d71ca427bf280838698f39ca1f10b068213e1c9089bd9236c4970f0e43c51"
+    },
+    {
+      "path": "architecture files/references/source-manifest.json",
+      "bytes": 986,
+      "sha256": "a3cce0fa4304ad7b08e70cda41adfb593fc538a8642728505d5b1e7b9a34943a"
+    }
+  ],
+  "note": "Immutable starting architecture. Approved shared revisions require a recorded change and an updated baseline by Tanush."
+}

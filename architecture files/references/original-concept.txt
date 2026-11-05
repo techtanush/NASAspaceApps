@@ -1,0 +1,1959 @@
+# ANALOGFORGE
+## Mission-Conditioned Qualification of Earth Analogs for Moon & Mars Exploration
+
+**Final Research Brief + Hackathon Product Specification**
+
+**One-line idea:** Tell AnalogForge what you need to test on the Moon or Mars and what rover you have. It finds Earth locations that can actually support that test, explains exactly what each site can and cannot reproduce using NASA data, creates rover-specific pass/fail benchmarks, and uses an agentic AI team to design, verify, and re-plan the test.
+
+---
+
+## 1. Challenge
+
+NASA Space Apps 2026 challenge: **Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars.**
+
+NASA asks teams to use open Earth, Moon, and Mars data to identify and characterize terrestrial analogs for future bases/landing sites.
+
+Earth analogs already help mission teams test equipment and methods before flight; the gap is better discovery and characterization.
+
+### Plain-English challenge
+
+Before we send equipment or people to the Moon or Mars, where on Earth can we safely practice—and what exactly does that Earth location realistically simulate?
+
+---
+
+## 2. Core Problem / Insight
+
+The obvious solution is a similarity map.
+
+That will be crowded.
+
+The real insight is:
+
+> **There is no universally best Mars/Moon analog; there is a best analog for a specific experiment.**
+
+A volcanic field can be excellent for mobility/geology and poor for thermal testing.
+
+No Earth location naturally reproduces lunar gravity or vacuum.
+
+AnalogForge therefore asks:
+
+> **What can this site validly test for this mission, what can it not test, and how do we prove that?**
+
+---
+
+# 3. Final Product
+
+## AnalogForge
+
+### Pitch
+
+Tell AnalogForge what you need to test on the Moon or Mars.
+
+It finds the Earth location or locations that can actually support that test, proves what each can and cannot simulate using NASA data, and generates rover-specific benchmarks to verify the test.
+
+### Three Headline Features
+
+1. **Mission Fingerprint**  
+   Convert mission intent into measurable test requirements.
+
+2. **Analog Qualification + Analog Gaps**  
+   PASS / PARTIAL / FAIL / GAP by requirement.  
+   No fake “92% Mars” score.
+
+3. **PROVE IT**  
+   Generate a rover-specific field test and execute a deterministic terrain/route check. If the proposed site cannot actually exercise the requirement, reject it or re-plan.
+
+---
+
+# 4. Product Dashboard
+
+The dashboard should feel like a lightweight **planetary mission test-control environment**, not a chatbot with a map attached.
+
+## Screen 1 — Mission Setup
+
+The user defines:
+
+- Moon or Mars
+- target region
+- mission objective
+- what they need to test
+- equipment/platform type
+
+Example:
+
+> “We are developing a Mars rover that needs to autonomously cross steep rocky terrain and collect geological samples.”
+
+The user may also select a known Moon/Mars target directly on a map.
+
+---
+
+## Screen 2 — Rover Connection
+
+The user provides the rover's actual capabilities.
+
+For the hackathon MVP this should be simple.
+
+### Option A — Manual form
+
+Fields such as:
+
+- rover name
+- mass
+- maximum safe slope
+- ground clearance
+- wheel diameter
+- maximum obstacle height
+- battery capacity
+- minimum battery reserve
+- nominal speed
+- sensors
+- science instruments
+- mission capabilities
+
+### Option B — Upload `rover_profile.json`
+
+Example:
+
+```json
+{
+  "rover_name": "ARES-1",
+  "mass_kg": 42,
+  "max_slope_deg": 18,
+  "ground_clearance_m": 0.22,
+  "wheel_diameter_m": 0.30,
+  "battery_wh": 1800,
+  "min_reserve_pct": 20,
+  "max_speed_mps": 0.5,
+  "sensors": [
+    "stereo_camera",
+    "imu",
+    "lidar"
+  ],
+  "capabilities": [
+    "autonomous_navigation",
+    "geological_sampling"
+  ]
+}
+```
+
+We do **not** need CAD ingestion for the hackathon.
+
+The rover profile becomes an input to qualification and benchmark generation.
+
+---
+
+# 5. Mission Fingerprint
+
+AnalogForge should not immediately search Earth.
+
+First, it asks:
+
+> **What does this mission actually need reproduced?**
+
+The Mission Fingerprint transforms the mission objective into measurable test requirements.
+
+Example mission:
+
+> “Test autonomous Mars rover mobility and geological sampling.”
+
+Possible Mission Fingerprint:
+
+### Terrain requirements
+
+- slope distribution
+- terrain roughness
+- local relief
+- traversability
+
+### Science requirements
+
+- exposed geological/mineral features
+- sampling access
+
+### Operational requirements
+
+- route length
+- energy usage
+- navigation requirements
+
+### Environmental requirements
+
+- thermal regime
+- aridity
+- lighting, if relevant
+
+### Non-Earth-reproducible requirements
+
+- Mars gravity
+- lunar gravity
+- vacuum
+- radiation
+- true Martian atmospheric conditions
+- exact planetary regolith mechanics
+
+This is a key product principle:
+
+> **AnalogForge should never pretend that an Earth location reproduces a planetary condition that it physically cannot reproduce.**
+
+---
+
+# 6. Analog Qualification
+
+Instead of outputting:
+
+> “This location is 91% Mars.”
+
+AnalogForge outputs an evidence-backed qualification matrix.
+
+Example:
+
+## Candidate Earth Site A
+
+| Mission Requirement | Qualification |
+|---|---|
+| 8–18° slopes | PASS |
+| Rocky terrain | PASS |
+| Terrain roughness | PASS |
+| Exposed mineral context | PASS |
+| Extreme thermal environment | PARTIAL |
+| Low-light conditions | FAIL |
+| Mars gravity | GAP |
+| Mars atmosphere | GAP |
+
+### Qualified For
+
+- rover mobility testing
+- autonomous navigation
+- geological sampling procedures
+
+### Partially Qualified For
+
+- thermal operations
+
+### Not Qualified For
+
+- atmosphere-dependent testing
+- low-gravity mobility behavior
+- radiation testing
+
+This is significantly more scientifically useful than a generic similarity percentage.
+
+---
+
+# 7. Analog Gaps
+
+Analog Gaps are a first-class product feature.
+
+For every proposed Earth analog, AnalogForge explicitly states what the Earth site **cannot reproduce**.
+
+Example:
+
+## Analog Coverage
+
+### Reproducible on Earth
+
+- terrain
+- slope
+- roughness
+- geology
+- aridity
+- some thermal environments
+- logistics/isolation
+
+### Partially Reproducible
+
+- illumination
+- temperature cycle
+- dust characteristics
+
+### Not Naturally Reproducible
+
+- Mars gravity
+- lunar gravity
+- vacuum
+- radiation environment
+- planetary atmosphere
+- exact regolith mechanics
+
+Instead of hiding these weaknesses, AnalogForge highlights them.
+
+That gives engineers a more honest test plan.
+
+---
+
+# 8. Composite Analog Portfolio
+
+Sometimes one Earth site will not be sufficient.
+
+AnalogForge should be able to conclude:
+
+> **No single Earth location adequately covers this mission test.**
+
+It can then recommend a combination of sites.
+
+Example:
+
+## Mission Requirements
+
+- rough volcanic terrain
+- steep slopes
+- very cold conditions
+- low-light operations
+
+### Site A — Iceland
+
+- geology: strong
+- roughness: strong
+- slopes: strong
+- cold: moderate
+- low light: moderate
+
+### Site B — Antarctic region
+
+- geology: moderate
+- roughness: moderate
+- slopes: moderate
+- cold: excellent
+- low light: excellent
+
+AnalogForge might conclude:
+
+> **Recommended Test Portfolio: Site A + Site B**
+
+Site A handles:
+
+- mobility
+- terrain
+- geology
+
+Site B handles:
+
+- cold operations
+- low-light operations
+
+Remaining gaps:
+
+- gravity
+- vacuum
+- radiation
+
+These must be tested through simulation or specialized facilities.
+
+### Key idea
+
+> **Earth is not one Mars simulator. Earth is a distributed planetary test laboratory.**
+
+---
+
+# 9. Rover-Site Compatibility
+
+Once AnalogForge understands the rover, it compares rover capabilities against the actual Earth test environment.
+
+Example:
+
+| Metric | Rover Capability | Site/Test Requirement | Result |
+|---|---:|---:|---|
+| Maximum slope | 18° | 16° | PASS |
+| Ground clearance | 12 cm | 15 cm obstacle | FAIL |
+| Battery reserve | 20% minimum | predicted 17% | FAIL |
+| Route range | 3 km | 2.4 km | PASS |
+| Sensors | LiDAR + stereo | terrain navigation | PASS |
+
+The system can then say:
+
+> **The site is scientifically appropriate, but this rover is not yet ready for the proposed test.**
+
+That is a very important distinction.
+
+The system evaluates:
+
+1. whether the **site** is appropriate;
+2. whether the **rover** is capable of executing the required test.
+
+---
+
+# 10. Rover Qualification Benchmarks
+
+AnalogForge should generate concrete benchmarks customized to the rover.
+
+Example rover:
+
+- max safe slope: 18°
+- battery: 1.8 kWh
+- reserve requirement: 20%
+- max route: 3 km
+- sensors: stereo + IMU + LiDAR
+- objective: geological sampling
+
+AnalogForge might generate:
+
+## Benchmark 1 — Slope Mobility
+
+The rover must traverse:
+
+- 100 m at 8–12°
+- 200 m at 12–15°
+- 100 m at 15–18°
+
+PASS criteria:
+
+- no immobilization
+- never exceed 18°
+- no safety violation
+
+---
+
+## Benchmark 2 — Terrain Diversity
+
+The rover must cross at least:
+
+- 3 roughness classes
+- 2 relief classes
+- one high-complexity terrain segment
+
+PASS criteria:
+
+- reach all required sectors
+- preserve navigation accuracy
+
+---
+
+## Benchmark 3 — Energy
+
+Mission must finish with:
+
+> **>= 20% battery reserve**
+
+PASS criteria:
+
+- complete test route
+- complete science tasks
+- return to base
+- battery reserve above threshold
+
+---
+
+## Benchmark 4 — Science Access
+
+Rover must:
+
+- reach 2 geological targets
+- stop at each science waypoint
+- complete simulated sampling task
+- return safely
+
+---
+
+## Benchmark 5 — Recovery
+
+Inject one blocked path.
+
+Rover/test planner must:
+
+- detect blocked segment
+- generate alternate path
+- preserve science objective
+- remain within energy limits
+
+---
+
+# 11. PROVE IT
+
+This should be the main interactive feature.
+
+After AnalogForge qualifies a site, the user clicks:
+
+# PROVE IT
+
+AnalogForge then asks:
+
+> **Can this Earth location actually execute the experiment we claim it can support?**
+
+The system generates a lightweight test using the site's real terrain data.
+
+Example:
+
+### Required Test
+
+- travel 2.2 km
+- experience defined slope bands
+- cross multiple roughness classes
+- reach two geological targets
+- never exceed rover's 18° limit
+- return with 20% battery reserve
+
+The deterministic engine searches the terrain.
+
+---
+
+## Example Result
+
+### QUALIFICATION FAILED
+
+Reason:
+
+> Candidate Site A contains terrain that statistically matches the target profile, but there is no contiguous test route containing sufficient 12–18° slope exposure.
+
+This result is extremely valuable.
+
+It demonstrates:
+
+> **Similarity does not equal test usefulness.**
+
+AnalogForge then decides what to do next.
+
+Possible actions:
+
+- search another part of the same site;
+- alter the route;
+- investigate another candidate;
+- construct a composite analog portfolio;
+- revise the benchmark;
+- identify the requirement as impossible to reproduce.
+
+---
+
+# 12. Agent Council
+
+Agentic AI should be central to the project.
+
+However:
+
+> **Agents are operators—not the source of scientific truth.**
+
+NASA/open scientific data and deterministic calculations remain the evidence layer.
+
+One underlying AI model may perform several roles, but conceptually the system should expose a **Mission Council** of specialized agents.
+
+---
+
+## Agent 1 — Mission Director / Orchestrator
+
+Responsible for the overall goal.
+
+It decides:
+
+- what needs to happen next;
+- which agent should investigate;
+- whether evidence is sufficient;
+- whether the workflow should continue;
+- whether a result should be rejected.
+
+Example:
+
+> “Terrain evidence is sufficient, but geological evidence is weak. Send the target to the geological analysis tool before qualification.”
+
+---
+
+## Agent 2 — Requirements Agent
+
+Converts mission language into a structured Mission Test Contract.
+
+Input:
+
+> “Test autonomous rover navigation on steep rocky Mars terrain while collecting samples.”
+
+Output:
+
+- mobility requirement
+- terrain requirements
+- science requirements
+- rover constraints
+- environmental dimensions
+- success criteria
+
+---
+
+## Agent 3 — Rover Systems Agent
+
+Reads the rover profile.
+
+Determines:
+
+- hard limits
+- safety thresholds
+- battery constraints
+- mobility constraints
+- sensor capabilities
+- achievable mission objectives
+
+Then generates rover-specific benchmarks.
+
+---
+
+## Agent 4 — Planetary Target Agent
+
+Characterizes the Moon/Mars target region using approved scientific tools.
+
+It may request:
+
+- target elevation
+- slope
+- roughness
+- relief
+- thermal information
+- mineral context
+
+The agent itself does not calculate these values.
+
+It calls deterministic tools that do.
+
+---
+
+## Agent 5 — Earth Analog Scout
+
+Searches Earth candidate regions.
+
+Uses a two-stage approach:
+
+### Stage 1
+
+Coarse screening.
+
+### Stage 2
+
+Detailed investigation of top candidates.
+
+This avoids expensive full-resolution global processing.
+
+---
+
+## Agent 6 — Qualification Agent
+
+Builds the qualification matrix.
+
+For each requirement:
+
+- PASS
+- PARTIAL
+- FAIL
+- GAP
+
+Then determines what the Earth location can legitimately test.
+
+---
+
+## Agent 7 — Scientific Critic
+
+This is one of the most important agents.
+
+Its job is to attack the recommendation.
+
+Questions include:
+
+- Is this comparison scientifically valid?
+- Are spatial resolutions comparable?
+- Is this a direct measurement or a weak proxy?
+- Is evidence missing?
+- Did we overstate similarity?
+- Is there another candidate that could overturn the conclusion?
+- Are we trying to reproduce something Earth cannot actually reproduce?
+
+The critic can send the workflow backward.
+
+Example:
+
+> “Candidate A's terrain match is strong, but mineral evidence is unavailable. Qualification confidence is insufficient. Investigate Candidate B or retrieve another geological source.”
+
+---
+
+## Agent 8 — Test Designer
+
+Takes the qualified site and rover.
+
+Creates the smallest useful experiment that can verify the qualification.
+
+Outputs:
+
+- route objective
+- slope exposures
+- roughness exposures
+- science targets
+- energy constraints
+- success criteria
+
+---
+
+## Agent 9 — Verification & Replanning Agent
+
+Reads the output of the deterministic test engine.
+
+Possible outcomes:
+
+### PASS
+
+Qualification supported.
+
+### FAIL — route problem
+
+Generate another route.
+
+### FAIL — rover problem
+
+Modify test or flag design limitation.
+
+### FAIL — analog problem
+
+Reject site and return to Earth Analog Scout.
+
+### FAIL — requirement impossible
+
+Move requirement into Analog Gap.
+
+This agent creates the visible:
+
+> plan → test → inspect → diagnose → re-plan
+
+loop.
+
+---
+
+## Agent 10 — Evidence / Analog Passport Agent
+
+Produces the final report.
+
+Every claim must link back to:
+
+- NASA dataset
+- derived calculation
+- mission requirement
+- qualification decision
+- verification result
+
+The report should not be a generic LLM summary.
+
+It should be evidence-backed.
+
+---
+
+# 13. Agent Committee Behavior
+
+Do not create agents only because “multi-agent AI” sounds impressive.
+
+The important part is that they **disagree and verify**.
+
+Example:
+
+### Scout Agent
+
+> “Candidate Iceland-17 strongly matches the requested terrain.”
+
+### Qualification Agent
+
+> “Terrain PASS, geology PARTIAL, thermal FAIL.”
+
+### Scientific Critic
+
+> “The geology conclusion uses a weak proxy. Confidence too low.”
+
+### Mission Director
+
+> “Retrieve additional geological evidence.”
+
+### Data tool
+
+Processes another dataset.
+
+### Qualification Agent
+
+Updates result.
+
+### Test Designer
+
+Creates field benchmark.
+
+### Verification Agent
+
+Runs test.
+
+### Result
+
+FAIL.
+
+### Scientific Critic
+
+> “Failure indicates insufficient contiguous slope exposure, not rover limitation.”
+
+### Mission Director
+
+Reopens Earth search.
+
+That is agentic AI that visibly performs work.
+
+---
+
+# 14. Truth Layer
+
+The system needs clear separation between:
+
+## Agent Decisions
+
+Agents:
+
+- decide questions;
+- choose tools;
+- select investigations;
+- interpret evidence;
+- decide what to investigate next;
+- design tests;
+- diagnose failures.
+
+---
+
+## Deterministic Scientific Tools
+
+Code performs:
+
+- raster processing
+- slope calculation
+- terrain roughness
+- local relief
+- coordinate transforms
+- feature comparison
+- route search
+- coverage calculations
+- simple energy estimation
+
+---
+
+## Optimization
+
+Algorithms perform:
+
+- candidate ranking
+- composite-site selection
+- route optimization
+- minimal repair
+- test coverage optimization
+
+---
+
+## Verification
+
+Produces machine-readable:
+
+- PASS
+- PARTIAL
+- FAIL
+- GAP
+
+---
+
+## Human Approval
+
+Required for:
+
+- changing important assumptions;
+- real-world physical testing;
+- any future deployment to real hardware.
+
+### Non-negotiable rule
+
+> **NASA/open scientific data + deterministic calculations are the truth layer. Agents decide what to do next.**
+
+---
+
+# 15. NASA / Scientific Data
+
+The exact official challenge resource list should be checked once released/finalized, but the product is designed around authoritative open datasets.
+
+---
+
+## Earth
+
+### NASADEM / SRTM
+
+Used for:
+
+- elevation
+- slope
+- terrain roughness
+- local relief
+- route analysis
+- traversability
+
+This is one of the most important MVP datasets.
+
+---
+
+## Earth Stretch Layer
+
+### EMIT
+
+Potentially used for:
+
+- mineral identification
+- mineral band depth
+- uncertainty
+- geological context
+
+Approximate spatial resolution is around 60 meters, with limited coverage relative to global DEM products.
+
+This should be a stretch layer, not a dependency for the entire MVP.
+
+---
+
+# 16. Moon Data
+
+## LRO / LOLA
+
+Used for:
+
+- lunar elevation
+- slope
+- roughness
+- terrain context
+
+This allows AnalogForge to characterize the target lunar environment.
+
+---
+
+## Diviner
+
+Potential stretch dataset for:
+
+- surface temperature
+- thermal conditions
+- polar thermal characterization
+
+---
+
+# 17. Mars Data
+
+## MGS / MOLA
+
+Used for:
+
+- global Mars topography
+- elevation
+- slope
+- terrain characterization
+
+This is sufficient for the first Mars mobility demo.
+
+Future versions could add more detailed geology/mineral data.
+
+---
+
+# 18. Validation References
+
+## NASA Planetary Analog Explorer
+
+Known Earth analog sites can be used as sanity checks.
+
+The system should be capable of recognizing why known sites become useful **for the appropriate mission question**.
+
+Important:
+
+AnalogForge should not merely reproduce a list of famous analog sites.
+
+Known analogs are primarily a validation benchmark.
+
+The project should also attempt to identify less-obvious candidate regions.
+
+---
+
+# 19. Sponsor / Global Collaborator Usage
+
+2026 Global Collaborators include organizations such as:
+
+- Google
+- Microsoft
+- Meteomatics
+- GoDaddy
+
+These should be used **only when genuinely useful**.
+
+Possible roles:
+
+### Google / Microsoft
+
+- compute
+- AI inference
+- cloud services
+
+### GoDaddy
+
+- hosting/domain
+
+### Meteomatics
+
+Use only if their environmental/weather data genuinely contributes to a mission requirement.
+
+Do not add sponsor technologies simply to list sponsors.
+
+The project should remain fundamentally driven by NASA/open scientific data.
+
+---
+
+# 20. Dashboard Information Architecture
+
+The UI should not be a giant chat window.
+
+Recommended layout:
+
+## Top Navigation
+
+- Mission
+- Target
+- Analogs
+- Qualification
+- Test Lab
+- Passport
+
+---
+
+## Main View
+
+### Left Panel
+
+Mission + rover information.
+
+### Center
+
+Map / terrain view.
+
+### Right Panel
+
+Qualification + evidence.
+
+### Bottom
+
+Agent operations / evidence timeline.
+
+---
+
+# 21. Agent Operations Panel
+
+The panel should expose actions like:
+
+> Mission Director → requested terrain characterization
+
+> Planetary Target Agent → called MOLA elevation tool
+
+> Earth Scout → screened 18 candidate regions
+
+> Qualification Agent → candidate 4 terrain PASS
+
+> Scientific Critic → geology evidence insufficient
+
+> Scout → retrieved additional evidence
+
+> Test Designer → generated mobility benchmark
+
+> Verification Engine → FAIL
+
+> Replanning Agent → investigating alternate route
+
+Do not expose private chain-of-thought.
+
+Expose:
+
+- actions
+- tool calls
+- evidence
+- results
+- decisions
+- diffs
+- confidence
+
+---
+
+# 22. Analog Passport
+
+The final output should be visually memorable.
+
+# ANALOG PASSPORT
+
+### Mission
+
+Mars geological rover mobility test.
+
+### Rover
+
+ARES-1.
+
+### Earth Analog
+
+Candidate Site A.
+
+### Qualified Tests
+
+- terrain mobility
+- autonomous navigation
+- geological sampling
+
+### Partial Qualification
+
+- thermal environment
+
+### Analog Gaps
+
+- Mars gravity
+- Mars atmosphere
+- radiation
+
+### Rover Compatibility
+
+- slope: PASS
+- clearance: PASS
+- range: PASS
+- energy: PARTIAL
+
+### Verification
+
+**PASS after one re-plan**
+
+### NASA Evidence
+
+- Earth terrain dataset
+- Mars target terrain dataset
+- derived slope analysis
+- roughness analysis
+- route verification
+
+### Confidence
+
+Displayed by dimension rather than as one fake universal score.
+
+---
+
+# 23. Golden-Path Demo
+
+The demo should use **one scenario** exceptionally well.
+
+## Mission
+
+Future Mars rover mobility + geological sampling.
+
+## Rover Profile
+
+- max slope: 18°
+- battery: 1.8 kWh
+- reserve: 20%
+- stereo camera
+- IMU
+- LiDAR
+- geological sampling capability
+
+---
+
+## Demo Step 1 — Mission Request
+
+User says:
+
+> “I need to test this rover for a Mars mission involving steep rocky terrain and geological sampling.”
+
+---
+
+## Demo Step 2 — Rover Connected
+
+Load rover profile.
+
+AnalogForge recognizes:
+
+- max slope
+- power
+- sensors
+- mobility limits
+- science capability
+
+---
+
+## Demo Step 3 — Mission Fingerprint
+
+Agents determine:
+
+- slope requirements
+- roughness
+- local relief
+- geology
+- route range
+- science targets
+
+And mark:
+
+- Mars gravity → GAP
+- Mars atmosphere → GAP
+
+---
+
+## Demo Step 4 — Planetary Target Characterization
+
+Target Mars terrain is analyzed using NASA planetary data.
+
+---
+
+## Demo Step 5 — Earth Candidate Discovery
+
+Earth Analog Scout finds several candidates.
+
+Show perhaps:
+
+- Candidate A
+- Candidate B
+- Candidate C
+
+---
+
+## Demo Step 6 — Qualification
+
+Example:
+
+### Candidate A
+
+Terrain → PASS  
+Slope → PASS  
+Roughness → PASS  
+Geology → PASS  
+Thermal → PARTIAL  
+Gravity → GAP  
+Atmosphere → GAP
+
+AnalogForge says:
+
+> Qualified for rover mobility and sampling.
+
+---
+
+## Demo Step 7 — Rover Compatibility
+
+Check:
+
+- max slope
+- range
+- clearance
+- energy
+
+Everything appears good initially.
+
+---
+
+## Demo Step 8 — PROVE IT
+
+User clicks:
+
+# PROVE IT
+
+AnalogForge creates a test:
+
+- 2.4 km route
+- slope exposures
+- roughness exposure
+- two geological sample targets
+- return to starting location
+- minimum 20% battery
+
+---
+
+## Demo Step 9 — Failure
+
+The deterministic test engine runs.
+
+Example result:
+
+# TEST FAILED
+
+> Required 12–18° terrain exposure is insufficient across a continuous executable route.
+
+or:
+
+> Predicted return battery reserve: 13%.  
+> Required: 20%.
+
+---
+
+# 24. Failure Diagnosis
+
+The agent must determine **why** the test failed.
+
+Possible causes:
+
+### Route Problem
+
+A different path may work.
+
+### Rover Problem
+
+Rover specification cannot meet the mission.
+
+### Analog Problem
+
+Site cannot reproduce the required condition.
+
+### Data Problem
+
+Evidence is insufficient.
+
+### Requirement Problem
+
+Requirement cannot be naturally reproduced on Earth.
+
+The AI should not simply say:
+
+> “Test failed.”
+
+It should identify the failure category.
+
+---
+
+# 25. Replanning
+
+Example:
+
+> “Failure was caused by insufficient terrain exposure, not rover capability.”
+
+AnalogForge then:
+
+1. searches a different section of the site;
+2. runs route optimizer again;
+3. evaluates test;
+4. if still insufficient, reopens candidate search.
+
+It may conclude:
+
+> Candidate A cannot fully validate requirement R3.
+
+Then:
+
+> Investigating Candidate B.
+
+Or:
+
+> Adding Candidate B to the test portfolio.
+
+That is the strongest agentic moment in the demo.
+
+---
+
+# 26. Final Result
+
+After re-planning:
+
+# TEST PASSED
+
+Analog Passport appears.
+
+The judge sees:
+
+- what is being tested
+- where
+- why the location works
+- what it does not reproduce
+- what rover benchmarks were used
+- what failed
+- what the AI changed
+- what NASA data supports the conclusion
+
+---
+
+# 27. Judge Takeaway
+
+The single sentence judges should remember:
+
+> **A place can look like Mars and still be useless for the actual test. AnalogForge checks the test, not just the resemblance.**
+
+Alternative ending:
+
+> **We don't find the place that looks most like Mars. We find the place that can actually answer the question you need to test.**
+
+---
+
+# 28. 10-Second Explanation
+
+> NASA already tests future Moon and Mars missions here on Earth. AnalogForge figures out which Earth environment is actually good enough for the specific mission test you need to run.
+
+---
+
+# 29. 30-Second Explanation
+
+> NASA uses Earth environments to practice for the Moon and Mars, but one location might be excellent for rover mobility and poor for thermal testing. AnalogForge takes a mission and rover, uses real NASA Earth and planetary data to determine what conditions matter, finds candidate Earth sites, tells you exactly what each site can and cannot test, and generates a benchmark experiment to verify that the site is actually useful.
+
+---
+
+# 30. 90-Second Story
+
+1. NASA needs to test equipment before sending it to another world.
+2. Earth analogs already exist.
+3. But “Mars-like” is too vague.
+4. Different missions require different analog conditions.
+5. AnalogForge understands the mission and rover.
+6. Agents investigate NASA data.
+7. Candidate Earth sites are qualified requirement-by-requirement.
+8. Analog gaps are made explicit.
+9. AnalogForge designs a test.
+10. It actually checks whether the site can execute that test.
+11. If it fails, agents diagnose and re-plan.
+12. Final output is an evidence-backed Analog Passport.
+
+---
+
+# 31. 48-Hour MVP
+
+The hackathon project should **not** attempt the entire long-term vision.
+
+## P0 — Must Work
+
+- one Mars scenario
+- one rover profile
+- Mission Fingerprint
+- Mars terrain characterization
+- Earth candidate terrain data
+- qualification matrix
+- Earth analog map
+- Analog Gap
+- basic rover compatibility
+
+---
+
+## P1 — Winning Features
+
+- Agent Council operations
+- rover benchmark generator
+- PROVE IT
+- route/test engine
+- one real deterministic failure
+- AI diagnosis
+- one re-plan
+- Analog Passport
+
+---
+
+## P2 — Stretch
+
+- Composite Analog Portfolio
+- EMIT mineral layer
+- Diviner thermal layer
+- second Moon scenario
+- richer uncertainty
+- candidate novelty discovery
+
+---
+
+# 32. Explicit Cuts
+
+Do not build during the local hackathon:
+
+- ROS 2
+- F´
+- Isaac Sim
+- Isaac Lab
+- physical rover
+- CAD parser
+- rocket design
+- spacecraft engineering
+- full digital twin
+- reinforcement learning
+- full global high-resolution Earth processing
+- custom foundation model
+- 20 independent AI models
+
+These can become future expansion.
+
+---
+
+# 33. Why Agentic AI Is Necessary
+
+A judge may ask:
+
+> “Couldn't this just be a normal algorithm?”
+
+The answer:
+
+A static algorithm can rank predefined environmental features.
+
+But AnalogForge must handle **different mission questions**.
+
+For one rover mission, terrain roughness might matter most.
+
+For another mission, thermal exposure matters.
+
+For geological sampling, mineral context becomes critical.
+
+The agentic layer:
+
+1. understands the mission;
+2. identifies required evidence;
+3. selects the right scientific tools;
+4. executes analyses;
+5. inspects results;
+6. notices missing evidence;
+7. asks the critic to challenge conclusions;
+8. designs the verification experiment;
+9. reads test results;
+10. determines why failure occurred;
+11. re-plans.
+
+That open-ended scientific workflow is the reason agents matter.
+
+---
+
+# 34. Agentic AI Principle
+
+The AI should never say:
+
+> “I think this location is 89% similar.”
+
+Instead it should say:
+
+> “The mission requires terrain roughness evidence. I am invoking the terrain-analysis tool.”
+
+Then the tool produces the number.
+
+The agent decides **what question to ask next**.
+
+The deterministic engine produces **the answer**.
+
+---
+
+# 35. Validation
+
+This is critical for global-level credibility.
+
+## Validation Test 1 — Known Analog Recovery
+
+Use known NASA analog sites.
+
+For the appropriate mission objective, AnalogForge should recognize why those sites are useful.
+
+---
+
+## Validation Test 2 — Negative Control
+
+Use a clearly poor candidate.
+
+Example:
+
+A tropical low-relief environment should not qualify for a Mars rocky-mobility test because one isolated statistic happens to match.
+
+---
+
+## Validation Test 3 — Mission Sensitivity
+
+Use the same planetary target.
+
+Change the mission objective.
+
+Example:
+
+### Mission A
+
+Rover mobility.
+
+### Mission B
+
+Thermal operations.
+
+If AnalogForge returns exactly the same qualification/ranking, the system is probably not truly mission-conditioned.
+
+---
+
+## Validation Test 4 — PROVE IT
+
+A statistically promising site should sometimes fail actual benchmark execution.
+
+That proves the system is doing more than similarity matching.
+
+---
+
+# 36. Judging Criteria
+
+## Impact
+
+Turns NASA planetary and Earth data into actionable test decisions.
+
+---
+
+## Creativity
+
+The novelty is not “AI + NASA.”
+
+It is:
+
+- mission-conditioned analog qualification;
+- explicit analog gaps;
+- rover-specific benchmarks;
+- computational verification;
+- failure-driven re-planning.
+
+---
+
+## Validity
+
+Scientific credibility comes from:
+
+- deterministic calculations;
+- NASA/open scientific datasets;
+- provenance;
+- explicit limitations;
+- Scientific Critic agent;
+- verification.
+
+---
+
+## Relevance
+
+Directly addresses:
+
+- identify Earth analogs;
+- characterize Earth analogs;
+- explain where analogy succeeds/fails;
+- connect analogs to testing equipment and operations.
+
+---
+
+## Presentation
+
+The narrative is extremely visual:
+
+**mission**
+
+→ **site**
+
+→ **qualification**
+
+→ **PROVE IT**
+
+→ **FAIL**
+
+→ **agent re-plans**
+
+→ **PASS**
+
+→ **Analog Passport**
+
+---
+
+# 37. Conceptual Data Objects
+
+A coding agent should think in terms of these major objects.
+
+## MissionTestContract
+
+Contains:
+
+- target body
+- mission objective
+- required tests
+- scientific objectives
+- environmental requirements
+- success criteria
+
+---
+
+## RoverProfile
+
+Contains:
+
+- physical limits
+- energy
+- mobility
+- sensors
+- instruments
+- navigation capability
+
+---
+
+## PlanetaryTargetProfile
+
+Contains:
+
+- elevation
+- slope
+- roughness
+- geology/mineral context
+- thermal context
+- environmental dimensions
+
+---
+
+## EarthAnalogCandidate
+
+Contains:
+
+- coordinates
+- candidate region
+- available datasets
+- derived terrain/environment properties
+- accessibility metadata if later added
+
+---
+
+## QualificationDimension
+
+Contains:
+
+- requirement
+- evidence
+- status
+- confidence
+- direct measurement / proxy
+- limitations
+
+---
+
+## CompositePortfolio
+
+Contains:
+
+- selected sites
+- requirements covered by each
+- remaining gaps
+
+---
+
+## VerificationTest
+
+Contains:
+
+- route
+- required exposures
+- waypoints
+- science tasks
+- rover constraints
+- energy requirement
+- pass/fail rules
+
+---
+
+## TestResult
+
+Contains:
+
+- PASS/FAIL
+- telemetry
+- failure cause
+- violated constraints
+- suggested repair
+
+---
+
+## AgentAction
+
+Contains:
+
+- agent
+- action
+- tool
+- evidence
+- result
+- next decision
+
+---
+
+## AnalogPassport
+
+Contains final:
+
+- mission
+- rover
+- analog site
+- qualification
+- gaps
+- benchmark
+- test result
+- provenance
+- uncertainty
+
+---
+
+# 38. Product Philosophy
+
+AnalogForge should feel like:
+
+> **a miniature AI-native planetary mission test engineering environment**
+
+not:
+
+> a NASA-themed chatbot.
+
+The system should visually demonstrate that the AI:
+
+- plans;
+- investigates;
+- calls tools;
+- checks evidence;
+- gets challenged;
+- runs a test;
+- learns from failure;
+- re-plans.
+
+---
+
+# 39. Important Scientific Language
+
+Avoid phrases such as:
+
+> “Site X is exactly like Mars.”
+
+> “Site Y is 95% Mars.”
+
+> “This perfectly simulates lunar conditions.”
+
+Instead say:
+
+> “Qualified for this mission test.”
+
+> “Strong terrain analog.”
+
+> “Partial thermal analog.”
+
+> “This condition cannot be reproduced by site selection alone.”
+
+> “Additional simulation/facility testing required.”
+
+This language makes the product much more credible.
+
+---
+
+# 40. Non-Goals
+
+AnalogForge must **not** claim:
+
+- NASA does not already use terrestrial analogs.
+- NASA lacks planetary field-testing expertise.
+- AI replaces NASA scientists.
+- Earth can reproduce every planetary condition.
+- similarity score equals mission readiness.
+- generated tests are mission-certified.
+- a hackathon prototype can validate flight hardware.
+
+Instead:
+
+> AnalogForge helps make analog-selection reasoning explicit, mission-specific, evidence-backed, and computationally testable.
+
+---
+
+# 41. Long-Term Expansion
+
+After the hackathon, the concept could expand into:
+
+### More mission types
+
+- habitat operations
+- human EVA
+- communications
+- geological science
+- resource prospecting
+- thermal testing
+
+### More robot integration
+
+- ROS 2 profiles
+- URDF parsing
+- behavior trees
+- mission YAML
+- simulator integration
+
+### Physical testing
+
+Same high-level benchmark could eventually run on a small rover after explicit human approval.
+
+### More planetary datasets
+
+- CRISM
+- HiRISE
+- THEMIS
+- additional lunar datasets
+- radar products
+- higher-resolution local Earth products
+
+### Logistics
+
+Eventually include:
+
+- accessibility
+- cost
+- safety
+- protected land
+- travel constraints
+
+---
+
+# 42. Final Scope Lock
+
+## Build This
+
+AnalogForge is an **agentic, mission-conditioned Earth analog qualification tool**.
+
+It takes:
+
+**Moon/Mars mission objective**
+
++
+
+**rover profile**
+
+and uses NASA planetary and Earth data to:
+
+1. understand what the mission needs tested;
+2. characterize the target planetary environment;
+3. discover candidate Earth sites;
+4. qualify each site requirement-by-requirement;
+5. explicitly identify Analog Gaps;
+6. compare rover capabilities to test requirements;
+7. generate rover-specific pass/fail benchmarks;
+8. design a lightweight field test;
+9. execute a deterministic PROVE IT analysis;
+10. diagnose failures;
+11. re-plan when necessary;
+12. produce an evidence-backed Analog Passport.
+
+---
+
+# 43. Local Hackathon Success Definition
+
+We do **not** need ten scenarios.
+
+We need one excellent scenario.
+
+Success means:
+
+- real NASA terrain data;
+- real mission-specific qualification;
+- real rover constraints;
+- multiple collaborating agent roles;
+- one Scientific Critic loop;
+- one rover benchmark;
+- one actual computed failure;
+- one genuine agent re-plan;
+- one polished Analog Passport.
+
+If those pieces work together smoothly, the project will feel significantly more complete than a normal analog map.
+
+---
+
+# 44. Final One-Sentence Pitch
+
+> **AnalogForge uses agentic AI and real NASA Earth, Moon, and Mars data to determine which Earth environments can actually test a specific space mission, generate rover-specific benchmarks, prove the test works, and re-plan when it doesn't.**
+
+---
+
+# References
+
+- NASA Space Apps challenge:  
+  https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/
+
+- NASA Analog Missions:  
+  https://www.nasa.gov/analog-missions/
+
+- NASA Planetary Analog Explorer:  
+  https://science.nasa.gov/solar-system/analog-explorer/
+
+- LRO / LOLA:  
+  https://science.nasa.gov/mission/lro/lola/
+
+- MGS / MOLA:  
+  https://pds-geosciences.wustl.edu/missions/mgs/mola.html
+
+- NASADEM collections:  
+  https://cmr.earthdata.nasa.gov/search/site/collections/directory/LPCLOUD/gov.nasa.eosdis
+
+- EMIT Earthdata:  
+  https://search.earthdata.nasa.gov/search?fpj=GEMx%21EMIT
+
+- LRO Diviner data:  
+  https://data.nasa.gov/dataset/lro-dlre-5-global-cumulative-products-d137e
+
+- Space Apps 2026:  
+  https://www.spaceappschallenge.org/2026/

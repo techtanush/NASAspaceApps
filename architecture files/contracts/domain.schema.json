@@ -1,0 +1,2683 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:analogforge:domain:1.0",
+  "title": "AnalogForge domain contracts",
+  "description": "Blueprint wire contracts. Semantic invariants are defined in 05. AgentRoleResult payload is replaced with a role-specific strict schema before sending to a model.",
+  "$defs": {
+    "RuntimeMode": {
+      "type": "string",
+      "enum": [
+        "live",
+        "replay",
+        "synthetic"
+      ]
+    },
+    "QualificationStatus": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "PARTIAL",
+        "FAIL",
+        "GAP",
+        "UNKNOWN"
+      ]
+    },
+    "VerificationOutcome": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "INCONCLUSIVE"
+      ]
+    },
+    "FailureCategory": {
+      "type": "string",
+      "enum": [
+        "ROUTE",
+        "ROVER",
+        "ANALOG",
+        "DATA",
+        "REQUIREMENT",
+        "SEARCH_LIMIT",
+        "SYSTEM"
+      ]
+    },
+    "RunState": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "VALIDATING",
+        "CHARACTERIZING",
+        "DISCOVERING",
+        "QUALIFYING",
+        "CRITIQUING",
+        "AWAITING_REVIEW",
+        "DESIGNING_TEST",
+        "VERIFYING",
+        "DIAGNOSING",
+        "REPLANNING",
+        "BUILDING_PASSPORT",
+        "COMPLETED",
+        "BLOCKED",
+        "FAILED",
+        "CANCELLED"
+      ]
+    },
+    "Body": {
+      "type": "string",
+      "enum": [
+        "EARTH",
+        "MOON",
+        "MARS"
+      ]
+    },
+    "AreaOfInterest": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "$ref": "#/$defs/Body"
+        },
+        "bbox": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "longitude_convention": {
+          "type": "string",
+          "enum": [
+            "NEG180_180",
+            "ZERO_360"
+          ]
+        },
+        "latitude_type": {
+          "type": "string",
+          "enum": [
+            "PLANETOCENTRIC",
+            "PLANETOGRAPHIC",
+            "GEODETIC"
+          ]
+        },
+        "crs_wkt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "vertical_datum": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "body",
+        "bbox",
+        "longitude_convention",
+        "latitude_type",
+        "crs_wkt",
+        "vertical_datum"
+      ],
+      "additionalProperties": false
+    },
+    "Requirement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "dimension": {
+          "type": "string",
+          "enum": [
+            "TERRAIN",
+            "SCIENCE",
+            "OPERATIONS",
+            "THERMAL",
+            "ILLUMINATION",
+            "ARIDITY",
+            "GRAVITY",
+            "ATMOSPHERE",
+            "RADIATION",
+            "REGOLITH"
+          ]
+        },
+        "observable": {
+          "type": "string"
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "BETWEEN",
+            "GTE",
+            "LTE",
+            "EQUALS",
+            "PRESENT",
+            "NOT_NATURALLY_REPRODUCIBLE"
+          ]
+        },
+        "lower": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "upper": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unit": {
+          "type": "string"
+        },
+        "mandatory": {
+          "type": "boolean"
+        },
+        "weight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "evidence_scope": {
+          "type": "string",
+          "enum": [
+            "regional_context",
+            "terrain_model",
+            "field_validation"
+          ]
+        },
+        "minimum_support_scale_m": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "maximum_support_scale_m": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "USER",
+            "TARGET_DERIVED",
+            "PROPOSED_DEFAULT"
+          ]
+        },
+        "acceptance_note": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "slope_band_deg": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 90
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "exposure_counting": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "UNIQUE_UNDIRECTED_EDGE_DISTANCE",
+                    "TOTAL_TRAVERSED_DISTANCE"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "task_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "co_location_group": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "comparison_rule_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "temporal_support": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "slope_band_deg",
+            "exposure_counting",
+            "task_ids",
+            "co_location_group",
+            "comparison_rule_id",
+            "temporal_support"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "dimension",
+        "observable",
+        "operator",
+        "lower",
+        "upper",
+        "unit",
+        "mandatory",
+        "weight",
+        "evidence_scope",
+        "minimum_support_scale_m",
+        "maximum_support_scale_m",
+        "origin",
+        "acceptance_note",
+        "parameters"
+      ],
+      "additionalProperties": false
+    },
+    "MissionTestContract": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mission_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "accepted_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "content_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "objective": {
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/AreaOfInterest"
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Requirement"
+          },
+          "minItems": 1
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "forbidden_actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "mission_id",
+        "workspace_id",
+        "revision",
+        "created_at",
+        "accepted_at",
+        "content_sha256",
+        "name",
+        "objective",
+        "target",
+        "requirements",
+        "assumptions",
+        "forbidden_actions"
+      ],
+      "additionalProperties": false
+    },
+    "EnergyModel": {
+      "type": "object",
+      "properties": {
+        "model_id": {
+          "type": "string"
+        },
+        "rolling_coefficient": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "drive_efficiency": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "idle_power_w": {
+          "type": "number",
+          "minimum": 0
+        },
+        "science_task_wh": {
+          "type": "number",
+          "minimum": 0
+        },
+        "roughness_multiplier": {
+          "type": "number",
+          "minimum": 1
+        },
+        "uncertainty_fraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "calibration_status": {
+          "type": "string",
+          "enum": [
+            "ASSUMED",
+            "CALIBRATED"
+          ]
+        },
+        "calibration_evidence_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "model_id",
+        "rolling_coefficient",
+        "drive_efficiency",
+        "idle_power_w",
+        "science_task_wh",
+        "roughness_multiplier",
+        "uncertainty_fraction",
+        "calibration_status",
+        "calibration_evidence_id"
+      ],
+      "additionalProperties": false
+    },
+    "RoverProfile": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "rover_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "content_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "mass_kg": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_slope_deg": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 90
+        },
+        "ground_clearance_m": {
+          "type": "number",
+          "minimum": 0
+        },
+        "wheel_diameter_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_obstacle_height_m": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "battery_wh": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "min_reserve_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "nominal_speed_mps": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_route_m": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sensors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "energy_model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EnergyModel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "rover_id",
+        "workspace_id",
+        "revision",
+        "created_at",
+        "content_sha256",
+        "name",
+        "mass_kg",
+        "max_slope_deg",
+        "ground_clearance_m",
+        "wheel_diameter_m",
+        "max_obstacle_height_m",
+        "battery_wh",
+        "min_reserve_pct",
+        "nominal_speed_mps",
+        "max_route_m",
+        "sensors",
+        "capabilities",
+        "energy_model",
+        "assumptions"
+      ],
+      "additionalProperties": false
+    },
+    "MeasuredMetric": {
+      "type": "object",
+      "properties": {
+        "metric_id": {
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unit": {
+          "type": "string"
+        },
+        "support_scale_m": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quantity_kind": {
+          "type": "string",
+          "enum": [
+            "MEASURED",
+            "DERIVED",
+            "PROXY",
+            "ASSUMED"
+          ]
+        },
+        "method_id": {
+          "type": "string"
+        },
+        "valid_fraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "uncertainty_note": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "metric_id",
+        "value",
+        "unit",
+        "support_scale_m",
+        "quantity_kind",
+        "method_id",
+        "valid_fraction",
+        "uncertainty_note"
+      ],
+      "additionalProperties": false
+    },
+    "EvidenceRecord": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "SOURCE",
+            "DERIVED",
+            "COMPARISON",
+            "VERIFICATION",
+            "CRITIQUE",
+            "ASSUMPTION",
+            "REPLAY"
+          ]
+        },
+        "artifact_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "artifact_media_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dataset_product_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dataset_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "granule_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "license_note": {
+          "type": "string"
+        },
+        "body": {
+          "$ref": "#/$defs/Body"
+        },
+        "aoi": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AreaOfInterest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "input_evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "parameters_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "algorithm_id": {
+          "type": "string"
+        },
+        "algorithm_version": {
+          "type": "string"
+        },
+        "native_resolution_m": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "comparison_scale_m": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MeasuredMetric"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "kind",
+        "artifact_sha256",
+        "artifact_media_type",
+        "source_uri",
+        "dataset_product_id",
+        "dataset_version",
+        "granule_id",
+        "license_note",
+        "body",
+        "aoi",
+        "input_evidence_ids",
+        "parameters_sha256",
+        "algorithm_id",
+        "algorithm_version",
+        "native_resolution_m",
+        "comparison_scale_m",
+        "metrics",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "PlanetaryTargetProfile": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "target": {
+          "$ref": "#/$defs/AreaOfInterest"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MeasuredMetric"
+          }
+        },
+        "unavailable_dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "target",
+        "evidence_ids",
+        "metrics",
+        "unavailable_dimensions"
+      ],
+      "additionalProperties": false
+    },
+    "EarthAnalogCandidate": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "aoi": {
+          "$ref": "#/$defs/AreaOfInterest"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "KNOWN_CONTROL",
+            "DISCOVERED",
+            "USER_SUPPLIED",
+            "SYNTHETIC_CONTROL"
+          ]
+        },
+        "discovery_method": {
+          "type": "string"
+        },
+        "novelty_status": {
+          "type": "string",
+          "enum": [
+            "NOT_ASSESSED",
+            "NOT_IN_REFERENCE_LIST",
+            "KNOWN_ANALOG"
+          ]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MeasuredMetric"
+          }
+        },
+        "accessibility_status": {
+          "type": "string",
+          "enum": [
+            "NOT_ASSESSED",
+            "DOCUMENTED"
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "name",
+        "aoi",
+        "origin",
+        "discovery_method",
+        "novelty_status",
+        "evidence_ids",
+        "metrics",
+        "accessibility_status",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "QualificationDimension": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "candidate_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "requirement_id": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/QualificationStatus"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "rule_id": {
+          "type": "string"
+        },
+        "rule_version": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "string",
+          "enum": [
+            "HIGH",
+            "MEDIUM",
+            "LOW",
+            "UNASSESSED"
+          ]
+        },
+        "comparison_scale_m": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "explanation": {
+          "type": "string"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "critic_status": {
+          "type": "string",
+          "enum": [
+            "UNREVIEWED",
+            "ACCEPTED",
+            "CHALLENGED",
+            "RESOLVED"
+          ]
+        },
+        "critique_evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "candidate_id",
+        "requirement_id",
+        "status",
+        "evidence_ids",
+        "rule_id",
+        "rule_version",
+        "confidence",
+        "comparison_scale_m",
+        "explanation",
+        "limitations",
+        "critic_status",
+        "critique_evidence_ids"
+      ],
+      "additionalProperties": false
+    },
+    "CompositePortfolio": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "candidate_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "requirement_assignments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "requirement_id": {
+                "type": "string"
+              },
+              "candidate_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "coverage": {
+                "type": "string",
+                "enum": [
+                  "FULL",
+                  "PARTIAL",
+                  "NONE",
+                  "UNKNOWN",
+                  "GAP"
+                ]
+              }
+            },
+            "required": [
+              "requirement_id",
+              "candidate_ids",
+              "coverage"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "objective_value": {
+          "type": "number"
+        },
+        "algorithm_id": {
+          "type": "string"
+        },
+        "residual_requirement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "candidate_ids",
+        "requirement_assignments",
+        "objective_value",
+        "algorithm_id",
+        "residual_requirement_ids",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "VerificationTest": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "candidate_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mission_revision_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "rover_revision_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "test_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "requirement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "route_artifact_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "waypoints_artifact_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "constraints_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "required_exposures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "requirement_id": {
+                "type": "string"
+              },
+              "metric_id": {
+                "type": "string"
+              },
+              "lower": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "upper": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "minimum_distance_m": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "requirement_id",
+              "metric_id",
+              "lower",
+              "upper",
+              "minimum_distance_m"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "solver_config": {
+          "type": "object",
+          "properties": {
+            "max_expansions": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max_seconds": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max_labels_per_node": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "seed": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "max_expansions",
+            "max_seconds",
+            "max_labels_per_node",
+            "seed"
+          ],
+          "additionalProperties": false
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "candidate_id",
+        "mission_revision_id",
+        "rover_revision_id",
+        "test_revision",
+        "requirement_ids",
+        "route_artifact_sha256",
+        "waypoints_artifact_sha256",
+        "constraints_sha256",
+        "required_exposures",
+        "solver_config",
+        "assumptions"
+      ],
+      "additionalProperties": false
+    },
+    "TestResult": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "test_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "outcome": {
+          "$ref": "#/$defs/VerificationOutcome"
+        },
+        "failure_category": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FailureCategory"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "search_status": {
+          "type": "string",
+          "enum": [
+            "FOUND",
+            "EXHAUSTIVE_INFEASIBLE",
+            "BUDGET_EXHAUSTED",
+            "NOT_RUN",
+            "ERROR"
+          ]
+        },
+        "verified_route_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MeasuredMetric"
+          }
+        },
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "requirement_id": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "evidence_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "required": [
+              "requirement_id",
+              "code",
+              "message",
+              "evidence_ids"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "verifier_version": {
+          "type": "string"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "test_id",
+        "outcome",
+        "failure_category",
+        "search_status",
+        "verified_route_sha256",
+        "metrics",
+        "violations",
+        "evidence_ids",
+        "verifier_version",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "AgentAction": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "agent_role": {
+          "type": "string"
+        },
+        "invocation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "action_type": {
+          "type": "string",
+          "enum": [
+            "REQUEST_TOOL",
+            "TOOL_RESULT",
+            "PROPOSAL",
+            "DECISION",
+            "ERROR"
+          ]
+        },
+        "tool_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tool_receipt_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "QUEUED",
+            "RUNNING",
+            "SUCCEEDED",
+            "FAILED",
+            "BLOCKED"
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "agent_role",
+        "invocation_id",
+        "action_type",
+        "tool_name",
+        "tool_receipt_id",
+        "summary",
+        "evidence_ids",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "ToolReceipt": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "invocation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "tool_name": {
+          "type": "string"
+        },
+        "tool_version": {
+          "type": "string"
+        },
+        "input_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "output_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "SUCCEEDED",
+            "FAILED",
+            "BLOCKED"
+          ]
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "elapsed_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cache_hit": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "invocation_id",
+        "tool_name",
+        "tool_version",
+        "input_sha256",
+        "output_sha256",
+        "evidence_ids",
+        "status",
+        "error_code",
+        "elapsed_ms",
+        "cache_hit"
+      ],
+      "additionalProperties": false
+    },
+    "AgentRoleResult": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "invocation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "role": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "SUCCEEDED",
+            "BLOCKED",
+            "FAILED"
+          ]
+        },
+        "proposed_next_state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunState"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "receipt_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "summary": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "object"
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "invocation_id",
+        "role",
+        "status",
+        "proposed_next_state",
+        "evidence_ids",
+        "receipt_ids",
+        "summary",
+        "payload",
+        "error_code"
+      ],
+      "additionalProperties": false
+    },
+    "AnalogPassport": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "mission_revision_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "rover_revision_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidate_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "portfolio_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "qualification_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "test_result_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "qualified_uses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "partial_uses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unsupported_uses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "manifest_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "mission_revision_id",
+        "rover_revision_id",
+        "candidate_ids",
+        "portfolio_id",
+        "qualification_ids",
+        "test_result_ids",
+        "qualified_uses",
+        "partial_uses",
+        "unsupported_uses",
+        "unknowns",
+        "evidence_ids",
+        "manifest_sha256",
+        "limitations",
+        "next_steps"
+      ],
+      "additionalProperties": false
+    },
+    "RunEvent": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "event_type": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/$defs/RunState"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "object"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "seq",
+        "created_at",
+        "event_type",
+        "state",
+        "summary",
+        "payload",
+        "evidence_ids"
+      ],
+      "additionalProperties": false
+    },
+    "RunSnapshot": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "state": {
+          "$ref": "#/$defs/RunState"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "last_event_seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mission_revision_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "rover_revision_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target_profile_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidate_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "qualification_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "test_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "test_result_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "portfolio_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "passport_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pending_review": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReviewRequest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "config_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "selected_candidate_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selected_portfolio_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scenario_config_id": {
+          "type": "string"
+        },
+        "dataset_lock_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "state",
+        "revision",
+        "last_event_seq",
+        "mission_revision_id",
+        "rover_revision_id",
+        "target_profile_id",
+        "candidate_ids",
+        "qualification_ids",
+        "test_ids",
+        "test_result_ids",
+        "portfolio_ids",
+        "passport_id",
+        "pending_review",
+        "blocked_dependencies",
+        "config_sha256",
+        "selected_candidate_id",
+        "selected_portfolio_id",
+        "scenario_config_id",
+        "dataset_lock_id"
+      ],
+      "additionalProperties": false
+    },
+    "ErrorEnvelope": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "request_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "details": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "request_id",
+            "retryable",
+            "details"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "ReviewRequest": {
+      "type": "object",
+      "properties": {
+        "review_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "EVIDENCE_READY",
+            "ASSUMPTION",
+            "PROXY",
+            "MATERIAL_TEST_CHANGE"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "proposal_artifact_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blocked_requirement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allowed_actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "PENDING",
+            "APPROVED",
+            "REJECTED",
+            "SUPERSEDED"
+          ]
+        }
+      },
+      "required": [
+        "review_id",
+        "kind",
+        "summary",
+        "evidence_ids",
+        "proposal_artifact_sha256",
+        "blocked_requirement_ids",
+        "allowed_actions",
+        "created_at",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "CritiqueIssue": {
+      "type": "object",
+      "properties": {
+        "issue_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "requirement_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "target_evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "reason_code": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "INFO",
+            "WARNING",
+            "BLOCKING"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "OPEN",
+            "RESOLVED",
+            "ACCEPTED_LIMITATION",
+            "REJECTED"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "repair_request": {
+          "type": "string"
+        },
+        "resolution_evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "required": [
+        "issue_id",
+        "run_id",
+        "candidate_id",
+        "requirement_id",
+        "target_evidence_ids",
+        "reason_code",
+        "severity",
+        "status",
+        "summary",
+        "repair_request",
+        "resolution_evidence_ids"
+      ],
+      "additionalProperties": false
+    },
+    "DisplayLayerManifest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "workspace_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "mode": {
+          "$ref": "#/$defs/RuntimeMode"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target_profile_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "body": {
+          "$ref": "#/$defs/Body"
+        },
+        "layer_kind": {
+          "type": "string",
+          "enum": [
+            "ELEVATION",
+            "SLOPE",
+            "ROUGHNESS",
+            "QUALIFICATION",
+            "THERMAL",
+            "MINERAL"
+          ]
+        },
+        "rendering": {
+          "type": "string",
+          "enum": [
+            "EARTH_WEBMERCATOR_IMAGE",
+            "PLANETARY_PLANAR_IMAGE"
+          ]
+        },
+        "image_artifact_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "display_crs_wkt": {
+          "type": "string"
+        },
+        "pixel_to_world": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 6,
+          "maxItems": 6
+        },
+        "width_px": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height_px": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "earth_corners": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "legend": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "lower": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "upper": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "color": {
+                "type": "string",
+                "pattern": "^#[a-fA-F0-9]{6}$"
+              }
+            },
+            "required": [
+              "label",
+              "lower",
+              "upper",
+              "color"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "unit": {
+          "type": "string"
+        },
+        "support_scale_m": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "nodata_transparent": {
+          "const": true
+        },
+        "attribution": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "candidate_id",
+        "target_profile_id",
+        "body",
+        "layer_kind",
+        "rendering",
+        "image_artifact_sha256",
+        "display_crs_wkt",
+        "pixel_to_world",
+        "width_px",
+        "height_px",
+        "earth_corners",
+        "legend",
+        "unit",
+        "support_scale_m",
+        "source_evidence_ids",
+        "nodata_transparent",
+        "attribution",
+        "limitations"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

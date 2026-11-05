@@ -1,0 +1,14 @@
+{
+  "id": "synthetic-mars-mobility-v1",
+  "mode": "synthetic",
+  "mission_contract_file": "mission-contract.json",
+  "rover_profile_file": "rover-profile.json",
+  "graph_file": "synthetic-route-graph.json",
+  "source_policy": "synthetic-only-no-network",
+  "expected_first_outcome": "FAIL",
+  "expected_repaired_outcome": "PASS",
+  "real_nasa_evidence": false,
+  "limitations": [
+    "This is the small deterministic regression, not a live source-data scenario."
+  ]
+}

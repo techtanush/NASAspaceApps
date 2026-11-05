@@ -1,0 +1,26 @@
+{
+  "authority": "reference material; see 00 for decisions",
+  "sources": [
+    {
+      "file": "AnalogForge_Final_Research_Build_Brief.docx",
+      "original_path": "/Users/tanushchokshi/Downloads/AnalogForge_Final_Research_Build_Brief.docx",
+      "bytes": 58178,
+      "sha256": "8d68207277347c3b6c2614f1f07fd2146edbe4c18860ba15f589abff195bae01",
+      "role": "original source"
+    },
+    {
+      "file": "original-concept.txt",
+      "original_path": "/Users/tanushchokshi/.codex/attachments/a05ae441-e618-413a-ac37-7496784de743/Pasted text.txt",
+      "bytes": 35626,
+      "sha256": "368d71ca427bf280838698f39ca1f10b068213e1c9089bd9236c4970f0e43c51",
+      "role": "original source"
+    },
+    {
+      "file": "docx-text-extract.txt",
+      "original_path": "/tmp/analogforge_docx_extracted.txt",
+      "bytes": 39586,
+      "sha256": "8830920e0e6b352ad54d1170a5e3ed954fab71a53815b234024ecbe5b7921d1b",
+      "role": "derived ordered paragraph/table-cell extraction"
+    }
+  ]
+}

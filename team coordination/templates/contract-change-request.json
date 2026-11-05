@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "request_id": null,
+  "requester": null,
+  "status": "PROPOSED",
+  "owner": "tanush",
+  "current_contract_sha256": null,
+  "affected_fields_or_paths": [],
+  "before": null,
+  "after": null,
+  "reason": null,
+  "scientific_meaning_changes": false,
+  "compatibility": "UNASSESSED",
+  "affected_consumers": [],
+  "required_migration": null,
+  "required_tests": [],
+  "accepted_checkpoint_sha": null
+}

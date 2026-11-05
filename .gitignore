@@ -1,0 +1,22 @@
+# Local branch checkouts are managed worktrees, never nested repository content.
+/Tanush/
+/Ayan/
+/Aradhya/
+/*.bundle
+/.local-team/
+.DS_Store
+**/__pycache__/
+**/*.pyc
+**/.venv/
+**/node_modules/
+**/.env
+**/.env.*
+!**/.env.example
+analogforge/data/
+analogforge/.runtime/
+analogforge/.cache/
+analogforge/apps/web/dist/
+analogforge/playwright-report/
+analogforge/test-results/
+analogforge/.coverage
+analogforge/htmlcov/

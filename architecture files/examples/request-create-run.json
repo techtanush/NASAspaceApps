@@ -1,0 +1,7 @@
+{
+  "mission_revision_id": "00000000-0000-4000-8000-000000000002",
+  "rover_revision_id": "00000000-0000-4000-8000-000000000004",
+  "mode": "synthetic",
+  "dataset_lock_id": "synthetic-policy-v1",
+  "scenario_config_id": "synthetic-mars-mobility-v1"
+}

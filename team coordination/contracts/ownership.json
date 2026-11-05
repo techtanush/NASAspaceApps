@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0",
+  "selection": "longest matching path; file rules require exact match; no match is unowned",
+  "people": {
+    "tanush": {
+      "name": "Tanush",
+      "branch": "tanush/platform-agents-integration",
+      "worktree": "Tanush",
+      "coding_agent": "Current configured Codex/coding agent",
+      "profile": "tanush",
+      "checkpoints": [
+        "F0",
+        "I1",
+        "P1",
+        "RC"
+      ]
+    },
+    "ayan": {
+      "name": "Ayan",
+      "branch": "ayan/science-data-verification",
+      "worktree": "Ayan",
+      "coding_agent": "Claude Code",
+      "profile": "ayan",
+      "checkpoints": [
+        "S0",
+        "S1"
+      ]
+    },
+    "aradhya": {
+      "name": "Aradhya",
+      "branch": "aradhya/frontend-experience",
+      "worktree": "Aradhya",
+      "coding_agent": "Codex",
+      "profile": "aradhya",
+      "checkpoints": [
+        "U0",
+        "U1"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "path": "analogforge/",
+      "kind": "prefix",
+      "owner": "tanush"
+    },
+    {
+      "path": "architecture files/",
+      "kind": "prefix",
+      "owner": "tanush"
+    },
+    {
+      "path": "team coordination/",
+      "kind": "prefix",
+      "owner": "tanush"
+    },
+    {
+      "path": "README.md",
+      "kind": "file",
+      "owner": "tanush"
+    },
+    {
+      "path": ".gitignore",
+      "kind": "file",
+      "owner": "tanush"
+    },
+    {
+      "path": "team guides/Tanush/",
+      "kind": "prefix",
+      "owner": "tanush"
+    },
+    {
+      "path": "team handoffs/tanush/",
+      "kind": "prefix",
+      "owner": "tanush"
+    },
+    {
+      "path": "team guides/Ayan/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "team handoffs/ayan/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "team guides/Aradhya/",
+      "kind": "prefix",
+      "owner": "aradhya"
+    },
+    {
+      "path": "team handoffs/aradhya/",
+      "kind": "prefix",
+      "owner": "aradhya"
+    },
+    {
+      "path": "analogforge/src/analogforge/science/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/src/analogforge/adapters/earthdata/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/src/analogforge/adapters/pds/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/src/analogforge/adapters/emit/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/src/analogforge/adapters/diviner/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/src/analogforge/adapters/user_survey/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/src/analogforge/adapters/source_http/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/src/analogforge/rendering/tiles/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/tests/unit/science/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/tests/property/science/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/tests/integration/science/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/tests/replay/science/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/tests/fixtures/science/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/scripts/science/",
+      "kind": "prefix",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/config/datasets.yaml",
+      "kind": "file",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/config/algorithms.yaml",
+      "kind": "file",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/config/candidates.yaml",
+      "kind": "file",
+      "owner": "ayan"
+    },
+    {
+      "path": "analogforge/apps/web/",
+      "kind": "prefix",
+      "owner": "aradhya"
+    },
+    {
+      "path": "analogforge/src/analogforge/rendering/passport/",
+      "kind": "prefix",
+      "owner": "aradhya"
+    },
+    {
+      "path": "analogforge/tests/unit/passport_renderer/",
+      "kind": "prefix",
+      "owner": "aradhya"
+    },
+    {
+      "path": "analogforge/tests/e2e/",
+      "kind": "prefix",
+      "owner": "aradhya"
+    },
+    {
+      "path": "analogforge/package.json",
+      "kind": "file",
+      "owner": "aradhya"
+    },
+    {
+      "path": "analogforge/pnpm-lock.yaml",
+      "kind": "file",
+      "owner": "aradhya"
+    },
+    {
+      "path": "analogforge/pnpm-workspace.yaml",
+      "kind": "file",
+      "owner": "aradhya"
+    }
+  ]
+}

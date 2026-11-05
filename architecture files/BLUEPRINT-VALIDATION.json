@@ -1,0 +1,25 @@
+{
+  "blueprint_validation_only": true,
+  "status": "PASS",
+  "checks": {
+    "json_files": 15,
+    "domain_definitions": 29,
+    "schema_references": 408,
+    "api_component_schemas": 57,
+    "api_operations": 43,
+    "schema_validated_examples": 7,
+    "example_hashes": 2,
+    "source_hashes": 3,
+    "traceable_product_requirements": 58,
+    "local_document_links": 168,
+    "json_document_examples": 12,
+    "synthetic_graph_attempts": 2
+  },
+  "errors": [],
+  "not_validated": [
+    "future application behavior",
+    "real source granules",
+    "live AI account/model capability",
+    "physical rover performance"
+  ]
+}

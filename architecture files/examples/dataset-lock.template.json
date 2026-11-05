@@ -1,0 +1,45 @@
+{
+  "status": "UNRESOLVED_TEMPLATE_NOT_LIVE_EVIDENCE",
+  "policy_id": "replace-after-preflight",
+  "policy_sha256": null,
+  "allowed_search_extent": null,
+  "products": [
+    {
+      "adapter_id": "earth_nasadem_hgt_v001",
+      "provider_product_id": null,
+      "version": null,
+      "metadata_verified": false,
+      "access_verified": false
+    },
+    {
+      "adapter_id": "mars_mola_megdr",
+      "provider_product_id": null,
+      "version": null,
+      "metadata_verified": false,
+      "access_verified": false
+    },
+    {
+      "adapter_id": "moon_lola_gdr",
+      "provider_product_id": null,
+      "version": null,
+      "metadata_verified": false,
+      "access_verified": false
+    },
+    {
+      "adapter_id": "earth_emit_l2bmin_v001",
+      "provider_product_id": null,
+      "version": null,
+      "metadata_verified": false,
+      "access_verified": false
+    },
+    {
+      "adapter_id": "moon_diviner_derived",
+      "provider_product_id": null,
+      "version": null,
+      "metadata_verified": false,
+      "access_verified": false
+    }
+  ],
+  "seed_assets": [],
+  "acquired_asset_manifest_rule": "Append approved granules immutably; each derivation pins exact hashes; passport pins final manifest."
+}
