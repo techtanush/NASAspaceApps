@@ -20,7 +20,7 @@ Practice outcomes must **emerge from computation on the generated rasters/graph*
 | dataset_id | body / role | content |
 | --- | --- | --- |
 | `practice-mars-target-v1` | MARS / `TARGET_TERRAIN` | 128×128, 480 m posting, planetary equirectangular CRS on the Mars-2000 sphere (WKT in manifest), `ELEVATION` m, vertical ref `SYNTHETIC_MARS_REFERENCE_SPHERE_3396190M`, AOI `[137,-5,138,-4]`. Alternating-sign planar strips so area fractions of surface slope are **0.40 at 3°, 0.30 at 7°, 0.20 at 14°, 0.10 at 22°** (each ±0.03 after transition smearing; independent oracle: strip widths in cells / 128). |
-| `practice-moon-target-v1` | MOON / `TARGET_TERRAIN` | 160×160, 1000 m posting, **south-polar stereographic** CRS on the Moon-2000 sphere, quantity `RADIUS`, units `m`, stored as `int16` with `scale_factor=0.5`, `offset=1737400`, `scale_already_applied=false`, `reference_radius_m=1737400` (exercises radius→height and "apply scale once"). AOI is the wedge `[-10,-89.5,10,-87.5]` (exercises polar geometry and longitude wrap). Area fractions of slope: **0.50 at 2°, 0.30 at 6°, 0.15 at 13°, 0.05 at 20°** (±0.03). |
+| `practice-moon-target-v1` | MOON / `TARGET_TERRAIN` | 160×160, **960 m** posting (= 16 Earth cells, so the common support divides the Earth grid exactly), **south-polar stereographic** CRS on the Moon-2000 sphere, quantity `RADIUS`, units `m`, stored as `int16` with `scale_factor=0.5`, `offset=1737400`, `scale_already_applied=false`, `reference_radius_m=1737400` (exercises radius→height and "apply scale once"). AOI is the wedge `[-10,-89.5,10,-87.5]` (exercises polar geometry and longitude wrap). Area fractions of slope over the AOI wedge: **0.50 at 2°, 0.30 at 6°, 0.15 at 13°, 0.05 at 20°** (±0.03). Recipe: rings of constant radial slope about the pole; ring area ∝ r², so with the wedge spanning r ≈ 15.2–75.8 km the boundaries fall at r ≈ 54.7, 68.1 and 74.0 km. |
 | `practice-moon-thermal-v1` | MOON / `LUNAR_THERMAL` | same polar grid, `TEMPERATURE_K` kelvin, minimum 88 K inside a cold-trap disc, 160–250 K elsewhere. **Not bound** in the default Moon scenario; bound only by a perturbation test. |
 | `practice-earth-grid-v1` | EARTH / `EARTH_TERRAIN` | the 192×192 grid of §4 (elevation GeoTIFF + `…-water.tif` listed with `role: MASK`). |
 | `practice-earth-minerals-v1` | EARTH / `EARTH_MINERAL` | categorical `uint8` class ids 1–4 (dictionary in `manifest.notes`), 60 m grid, valid only over windows `grid-r0c0` (valid fraction 0.60 within the window) and `grid-r2c2` (0.85); nodata `0`. **Used in `local-dataset-practice-v1` only.** Class ids are categorical: no interpolation, nearest/area-fraction only. |
@@ -33,7 +33,7 @@ Geometry is free; the **properties** below are binding and are verified by an in
 
 | Window (`catalog.*`) | Role in the story | Properties |
 | --- | --- | --- |
-| `grid-r0c0` (`WINDOW_B_CORRIDOR`) | Feasible corridor — route PASS expected | `f_band ∈ [0.07, 0.15]`. A **connected** ramp of slope **15° ± 0.5°** (interior), ≥ 8 cells wide, runs ≥ 40 cells; everything else ≤ 6°. All cells slope ≤ 18° (corridor is inside the safe component). The `auto-waypoints-v1` start and tasks lie in the largest safe component; the start-reachable component contains ≥ 400 m of band-edge length. |
+| `grid-r0c0` (`WINDOW_B_CORRIDOR`) | Feasible corridor — route PASS expected | `f_band ∈ [0.07, 0.15]`. A **connected** ramp of slope **15° ± 0.5°** (interior), ≥ 8 cells wide, runs ≥ 40 cells; everything else ≤ 6°. All cells slope ≤ 18° (corridor is inside the safe component). The `auto-waypoints-v1` start and tasks lie in the largest safe component; the start-reachable component contains ≥ 400 m of band-edge length. **Binding first-attempt property:** the rule places `W1`/`W2` on non-band cells within 2 cells of the corridor and on the same side as `S`, so the minimum-distance `WAYPOINT_RETURN` loop (found by an independent 8-neighbour Dijkstra in the checker) has unique band exposure **< 100 m** (attempt 1 genuinely FAILs `EXPOSURE_SHORTFALL`), while a closed route with ≥ 100 m unique band exposure within `max_distance_m` exists. |
 | `grid-r0c1` (`WINDOW_A_MESA`) | Statistically promising, **untestable** (island) | `f_band ∈ [0.25, 0.60]` over valid land. The band area is a 15° ± 0.5° plateau/island fully enclosed by a **water moat ≥ 4 cells wide**; mainland slope ≤ 6°; the start-reachable component (land, valid, slope ≤ 18°) contains **zero** band cells. Mainland area > island area, so the largest safe component is the mainland. |
 | `grid-r0c2` (`WINDOW_C_FLAT`) | Negative control | `f_band = 0`; max slope ≤ 3°. |
 | `grid-r1c0` (`WINDOW_ROLLING_1`) | filler | `f_band ∈ [0.02, 0.04]` |
@@ -41,9 +41,9 @@ Geometry is free; the **properties** below are binding and are verified by an in
 | `grid-r1c2` (`WINDOW_NODATA_STRIPE`) | excluded `INSUFFICIENT_VALID_DATA` | valid fraction **0.50–0.60** (a wide N–S nodata band); `min_valid_fraction` policy is 0.80 |
 | `grid-r2c0` (`WINDOW_ROLLING_2`) | filler | `f_band ∈ [0.01, 0.03]` |
 | `grid-r2c1` (`WINDOW_GENTLE`) | ranked 6th, not detailed | `f_band ≤ 0.01` |
-| `grid-r2c2` (`WINDOW_KNOWN_REFERENCE`) | `KNOWN_ANALOG` reference | `f_band ∈ [0.06, 0.10]` as **scattered small 15° patches** (each connected band patch ≤ 6 cells); the start component's total band-edge length is **< 100 m**, so an exposure route there is infeasible; listed in `practice-reference-set-v1` |
+| `grid-r2c2` (`WINDOW_KNOWN_REFERENCE`) | `KNOWN_ANALOG` reference | `f_band ∈ [0.06, 0.10]` as a small 15° plateau **enclosed by a water moat ≥ 4 cells wide** (like `A`, smaller); the start-reachable component contains **zero** band cells, so an exposure route there is infeasible; listed in `practice-reference-set-v1` |
 
-**Replan candidate picker (normative):** when a diagnosis recommends `NEW_CANDIDATE`, the platform chooses among already-analyzed candidates not yet attempted, ordered by (1) `ConnectedZone.band_area_m2` of the zone with `contains_start=true` for the requirement's band, descending; (2) screening rank ascending; (3) `window_id`. Properties above guarantee `B` outranks `KNOWN` (B's start-zone band area is more than 10× KNOWN's) regardless of the relative screening order of `A`, `B`, `KNOWN`.
+**Replan candidate picker (normative):** when a diagnosis recommends `NEW_CANDIDATE`, the platform considers already-analyzed candidates not yet attempted whose mandatory availability rows (`R-SLOPE-AVAILABILITY`) are **not FAIL** (eligibility), ordered by (1) `ConnectedZone.band_area_m2` of the zone with `contains_start=true` for the requirement's band, descending; (2) screening rank ascending; (3) `window_id`. Properties above guarantee `B` (start-zone band area > 0, and larger than any `ROLLING_*`) is chosen: `KNOWN` is eligible but has start-zone band area 0, and `ROLLING_*`/`C` fail availability. This holds regardless of the relative screening order of `A`, `B`, `KNOWN`.
 
 ### 4.1 Screening result (`SCREEN_CANDIDATES`, 9 windows, `max_detailed=6`)
 
@@ -70,7 +70,7 @@ Ranking key (ascending): `deficit = max(0, 0.05 − f_band)`; then Wasserstein-1
 | `R-CLEARANCE` (field_validation, 0.02 m support) | UNKNOWN `SCALE_UNSUPPORTED` | same | same | same | same |
 | `R-GRAVITY`, `R-ATMOSPHERE` | GAP `PHYSICAL_GAP` | same | same | same | same |
 
-"Per oracle" means: the test computes the binned Wasserstein-1 distance (bin centres from edges `[0,2,5,8,12,15,18,25,35,90]`) with an independent implementation and asserts `status == PASS ⇔ w1 ≤ 6.0`, `measured_unit == "deg"`, and `comparison_scale_m == 480`.
+"Per oracle" means: the test computes the binned Wasserstein-1 distance (bin centres from edges `[0,2,5,8,12,15,18,25,35,90]`) with an independent implementation and asserts `status == PASS ⇔ w1 ≤ 6.0`, `measured_unit == "deg"`, and `comparison_scale_m == 480` (Mars scenario) or `960` (Moon scenario).
 
 After PROVE IT (§6): A → `R-EXPOSURE` FAIL `ROUTE_FAILED` (FINAL), `R-TASKS` PASS, `R-RESERVE` PASS. Platform rule: the `verification` summary supplied to `COMPARE_REQUIREMENT` for candidate X is the **last attempt on X that produced a verified route** for the tasks/reserve rows and the **last attempt on X** for the exposure row; a no-route attempt turns only the rows named in `DIAGNOSE_RESULT.violated_constraint_ids` into FAIL and leaves the rest as they were. Each row cites the attempt it came from and states in `limitations` that a coupled (`co_location_group`) claim is unsupported when any member row failed. B → `R-EXPOSURE`, `R-TASKS`, `R-RESERVE` PASS `ROUTE_VERIFIED` (FINAL). Confidence values come from the rubric in 11 and are never `HIGH` for `terrain_model` rows with unquantified uncertainty (maximum `MEDIUM`).
 
@@ -108,7 +108,7 @@ Attempt 1 `WAYPOINT_RETURN` FOUND → verify FAIL `EXPOSURE_SHORTFALL` (ROUTE). 
 Attempt 1 FAIL (exposure). Attempt 2 route FOUND; verification: exposure/tasks PASS, energy **not evaluable** ⇒ `INCONCLUSIVE` / `DATA` with issue `ENERGY_UNCALIBRATED`; permitted `[DATA_REPAIR]`; stop `DATA_BLOCKED`. No zero-consumption assumption anywhere.
 
 ### S-SMALL-BATTERY: `PRACTICE-SMALL-BATTERY` (30 Wh) on **B**
-`WAYPOINT_RETURN` search → `EXHAUSTIVE_INFEASIBLE` by lossless energy bound (usable 24 Wh); diagnosis `ROVER` (feasible with battery unbounded), violated constraint `C-ENERGY-RESERVE`; permitted `[NEW_CONTRACT_REQUIRED]`.
+`WAYPOINT_RETURN` search → `EXHAUSTIVE_INFEASIBLE` by lossless energy bound (usable 24 Wh; derivable from the waypoint rule: `W1` lies ≥ 0.15·3840 m = 576 m from `S`, so any closed loop is ≥ 1152 m, whose idle energy alone is ≥ 22.4 Wh nominal, exceeding 24 Wh with the 25 % margin); diagnosis `ROVER` (feasible with battery unbounded), violated constraint `C-ENERGY-RESERVE`; permitted `[NEW_CONTRACT_REQUIRED]`.
 
 ### S-SEARCH-LIMIT
 Test hook (only when `ANALOGFORGE_TEST_HOOKS=1` **and** mode `synthetic`): operator limit `search_max_expansions=1` → `BUDGET_EXHAUSTED` / `INCONCLUSIVE` / `SEARCH_LIMIT`; UI `empty-state[data-reason=SEARCH_LIMIT]`; passport states "bounded search; not proof that no route exists".
@@ -118,11 +118,13 @@ Polar Moon target + practice Earth grid, no rover. Expected: `R-THERMAL` UNKNOWN
 
 ## 7. Scripted synthetic agent roles (platform test driver)
 
-In `synthetic` and `replay` modes the ten roles run through a **scripted provider** (Tanush). It makes role proposals from the tool receipts that actually exist; it never emits a scientific number or verdict itself. One **seeded defect** is injected (only in `synthetic-mars-mobility-v1`, flagged `defect_injection=true` in the fixture):
+In `synthetic` and `replay` modes the ten roles run through a **scripted provider** (Tanush). It makes role proposals from the tool receipts that actually exist; it never emits a scientific number or verdict itself. One **seeded defect** is injected (in `synthetic-mars-mobility-v1` **and** `local-dataset-practice-v1`, flagged `defect_injection=true` in the scenario fixture, so journeys J01 and J11 are identical):
 
 1. Scripted Qualification's first proposal for candidate A cites, for `R-TARGET-SLOPE-CONTEXT`, the 60 m Earth analysis evidence instead of the 480 m common-support comparison evidence (a **scale defect**).
 2. The platform's mechanical bundle review (`review_evidence_bundle`, `scale` check) detects `comparison_scale_m (60) < requirement.minimum_support_scale_m (480)` ⇒ BLOCKING `SCALE_MISMATCH` issue (`critic-card[data-severity=BLOCKING][data-status=OPEN]`).
 3. The affected claim is excluded from any positive statement while open (`SC-12`); the Director routes one repair round; Qualification revises citing the correct evidence; the issue becomes `RESOLVED` with `resolution_evidence_ids`; matrix revision 2 supersedes revision 1 and the UI shows **Previous → Current**.
+
+**Preparation (`draft_contract`/`revise_draft`) in synthetic/replay:** the scripted Requirements role proposes the scenario's `mission_preset` requirements (kit fixture) verbatim, validates them through `validate_mission_draft`, marks every requirement `origin=PROPOSED_DEFAULT`, keeps the user's objective/target, and emits the preset's assumptions as `assumption_proposals`; a body mismatch between the draft and the preset is a blocker (`NEEDS_USER_REVIEW`).
 
 Scripted Director/Scout/Test Designer/Verification choices come from `allowed_actions` and `DIAGNOSE_RESULT.recommended_*`; nothing scripts "attempt 3 passes" (perturbation tests change the geometry and the story changes).
 

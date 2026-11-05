@@ -295,7 +295,7 @@ def test_observable_policy_map_covers_all_practice_requirements() -> None:
 def test_ui_testid_contract_is_well_formed() -> None:
     doc = json.loads((CONTRACTS / "ui-testids.json").read_text())
     ids = [t["id"] for t in doc["testids"]]
-    assert len(ids) == len(set(ids)) and len(ids) >= 60
+    assert len(ids) == len(set(ids)) and len(ids) >= 70
     for entry in doc["testids"]:
         assert entry["id"] == entry["id"].lower() and " " not in entry["id"]
         assert all(a.startswith("data-") for a in entry["required_attributes"])

@@ -45,7 +45,7 @@
     },
     {
       "id": "R-TARGET-SLOPE-CONTEXT",
-      "label": "Candidate slope distribution within 6 deg (Wasserstein-1) of the target at common 1 km support",
+      "label": "Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support",
       "dimension": "TERRAIN",
       "observable": "slope_distribution_w1_deg",
       "operator": "LTE",

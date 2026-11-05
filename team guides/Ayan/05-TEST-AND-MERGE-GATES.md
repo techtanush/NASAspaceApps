@@ -6,7 +6,7 @@ A gate passes only when its tests **execute and assert**. Skips, xfails, deselec
 
 ```bash
 python3 "../architecture files/contracts/kit/materialize.py" --verify                        # KIT-01
-uv run pytest tests/contracts/kit -q                                                          # KIT-02 (19+)
+uv run pytest tests/contracts/kit -q                                                          # KIT-02 (20)
 uv run pytest tests/unit/science tests/property/science tests/integration/science tests/contracts/science -q --strict-markers \
     -p no:randomly --timeout=600                                                              # SCN-01..SCN-21 offline
 uv run pytest tests/replay/science -q                                                         # recorded/format-faithful fixtures

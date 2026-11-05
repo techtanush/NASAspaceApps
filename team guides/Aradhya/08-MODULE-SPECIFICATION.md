@@ -104,4 +104,4 @@ A stateful in-memory MSW server implements every endpoint the UI calls (all 43 o
 
 ## 9. Acceptance numbers
 
-All ids of `ui-testids.json` implemented (≥ 64); J1–J13 pass in mock mode (UIX-05/04) and are real-backend-ready (`test:e2e` with `E2E_TARGET=real` uses the same specs plus API assertions that are skipped **only** in mock mode through an explicit `isMock` helper — never by deleting assertions); renderer: 9 bundle fixtures × 3 formats deterministic; hostile-string suite finds no executable HTML and no active CSV formula; axe: 0 critical/serious at 1440/900/390.
+All ids of `ui-testids.json` implemented (all 77; the kit test fails if the contract shrinks below 70); J1–J13 pass in mock mode (UIX-05/04) and are real-backend-ready (`test:e2e` with `E2E_TARGET=real` uses the same specs plus API assertions that are skipped **only** in mock mode through an explicit `isMock` helper — never by deleting assertions); renderer: 9 bundle fixtures × 3 formats deterministic; hostile-string suite finds no executable HTML and no active CSV formula; axe: 0 critical/serious at 1440/900/390.

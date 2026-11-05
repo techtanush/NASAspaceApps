@@ -185,8 +185,8 @@
     },
     {
       "path": "architecture files/36-DATASET-PLUG-IN-AND-NASA-SLOT.md",
-      "bytes": 16215,
-      "sha256": "fc3d29affc5fbc66b9145bb7dd7541d796f08aa4d9fd42a322229f7fc50d6fa8"
+      "bytes": 16347,
+      "sha256": "a02e125d5fdac3559b7c0cc4d4cc7df2c9f60b565fdeaca28c1017a63586fb9a"
     },
     {
       "path": "architecture files/37-HACKATHON-DAY-RUNBOOK.md",
@@ -200,13 +200,13 @@
     },
     {
       "path": "architecture files/39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md",
-      "bytes": 21425,
-      "sha256": "f774e04d2a4b25d07bc5ab5bda9851e68b6d08b22f1813bddc89f21d35654d36"
+      "bytes": 21424,
+      "sha256": "95b614408ad78baeefc119e7341b8f380a7ba04d8702e97e5257175190c7bc23"
     },
     {
       "path": "architecture files/40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md",
-      "bytes": 20993,
-      "sha256": "976dbc69f7a1bec9fe22acd780ab86c8431c564fa5a1e190ea1413461c8bc4f0"
+      "bytes": 22672,
+      "sha256": "bf58a547c4abc9af8d581100ca7415bb05cecc36b82fc0d1f6b5efe0cfd2ebae"
     },
     {
       "path": "architecture files/FILE-INDEX.md",
@@ -426,7 +426,7 @@
     {
       "path": "architecture files/contracts/kit/files/tests/contracts/kit/test_kit_contracts.py",
       "bytes": 16396,
-      "sha256": "ef6f44d0964feda4da8ac18934abc46a51b186acf9ffc70ea7364fc49bb7069f"
+      "sha256": "9ce92a80fbad13a15756b02d9c0136284014edea473a045b9024ff6694cf3a46"
     },
     {
       "path": "architecture files/contracts/kit/files/tests/fixtures/kit/blueprint-assurance-blocked-claim.json",
@@ -490,13 +490,13 @@
     },
     {
       "path": "architecture files/contracts/kit/files/tests/fixtures/kit/missions/mission-mars-mobility.json",
-      "bytes": 8849,
-      "sha256": "c57248632a57b7c3526eb609becdf746b524458ec74ed20e4130690e58e14537"
+      "bytes": 8859,
+      "sha256": "bfc832330de9a7c2c6e28888d35126332ac8fae8e3bb10922a39e9579d613d6f"
     },
     {
       "path": "architecture files/contracts/kit/files/tests/fixtures/kit/missions/mission-moon-gap.json",
-      "bytes": 5076,
-      "sha256": "fb635d808494a3909d40be3d9d7e357e064882894c4b3f6726b140ca80cec7e3"
+      "bytes": 5086,
+      "sha256": "e628ba62710800ee5328610e81d25a7b2f1e42c495eed543f9b25bce17149411"
     },
     {
       "path": "architecture files/contracts/kit/files/tests/fixtures/kit/rovers/ares-1.json",
@@ -521,7 +521,7 @@
     {
       "path": "architecture files/contracts/kit/kit-manifest.json",
       "bytes": 5825,
-      "sha256": "3497520e4c86c54d5b375c8e29c632ecfcd404d2023308820a36cf9f238315ab"
+      "sha256": "f5efe004d129d26dfbf41e8df43de514e71c7c9cf7ebbf22e52a8d514e6bcb0e"
     },
     {
       "path": "architecture files/contracts/kit/materialize.py",
