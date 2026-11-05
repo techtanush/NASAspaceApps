@@ -46,6 +46,8 @@ make check PROFILE=tanush                                                       
 | `integration/test_recovery.py` | — | kill API mid-run ⇒ snapshot+events recover; kill worker mid-search ⇒ replacement completes without duplicates |
 | `integration/test_rls.py` | PLT-04 | RLS enabled in hosted mode under a non-superuser role blocks cross-workspace SQL |
 
+Every suite that uses a science/renderer double must run in both implementations: `AF_SCIENCE_IMPL=fake AF_RENDERER_IMPL=fake uv run pytest …` (your gate) and `AF_SCIENCE_IMPL=real AF_RENDERER_IMPL=real uv run pytest …` (merge gate; in your branch the `real` run must fail with the named missing-entry-point error, and a test proves it does).
+
 ## 3. Frozen thresholds
 
 Lease 120 s / heartbeat 20 s / reaper 30 s; event visible ≤ 2 s locally; cancellation acknowledged ≤ 2 s and CPU child terminated ≤ 5 s; health < 100 ms; ordinary reads p95 < 500 ms (measured and recorded, not claimed); `MAX_RUN_MODEL_CALLS=40`, `MAX_RUN_SECONDS=900`, replans 3, preparation 4.

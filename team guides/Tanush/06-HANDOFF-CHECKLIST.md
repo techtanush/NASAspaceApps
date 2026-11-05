@@ -15,7 +15,7 @@ Tick only with observed evidence recorded in `STATUS.json`.
 - [ ] Exports: 202→200, headers, byte stability, authorization; renderer loaded only via entry point.
 - [ ] Dataset CLI (scaffold/validate/lock/bind/generate-*), lock tamper detection, `MODE_MISMATCH`, scenario availability rules.
 - [ ] Preflight (10 stages) truthful offline and for `live` (names exactly what is missing); capabilities correct; no key needed for synthetic.
-- [ ] Journey J1 API-level test passes with `fake_science` and asserts persisted receipts.
+- [ ] Journey J1 API-level test passes with `fake_science` and asserts persisted receipts; every double-using suite is switchable through `AF_SCIENCE_IMPL`/`AF_RENDERER_IMPL` and the `real` run fails with the named missing-entry-point error on this branch.
 - [ ] No platform code computes a scientific metric; no science/renderer import at top level; no secrets/signed URLs anywhere; test hooks inert by default.
 - [ ] No `NotImplementedError`/`TODO`/`FIXME`/`HACK`; no hard-coded storyline outcomes in `src/`; no weakened/skipped tests; mutation checks demonstrate tests can fail.
 - [ ] `STATUS.json` complete and truthful; contradictions and cross-area defects listed; committed (with `uv.lock`); pushed to `origin tanush/platform-agents-integration`.

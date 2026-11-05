@@ -9,6 +9,7 @@ File-by-file contract for the platform branch. Types come from the kit (`analogf
 * No scientific number is computed in the platform. Policy compares/validates; science computes. A platform function that turns raw rasters/routes into a metric is a defect.
 * `AUTH_MODE=local` binds `127.0.0.1` only (startup error otherwise); one seeded workspace/user/OWNER. OIDC mode is implemented and tested with a fake issuer but is not exercised by the journeys.
 * Logs/SSE/exports/errors never contain secrets, DSNs, signed URLs, hidden reasoning, raw prompts with secrets.
+* **Switchable doubles (merge contract):** every platform test that touches science or the renderer obtains it from a fixture in `tests/support/factories.py` that honors the environment variables `AF_SCIENCE_IMPL` and `AF_RENDERER_IMPL` ∈ {`fake` (default), `real`}. `real` loads the actual entry points (a missing entry point then **fails** the test, it never falls back). The merging agent re-runs the identical suites with both set to `real`; `test_journey_api.py` must pass unchanged with the real facade and renderer, which is the platform side of the integration proof.
 * Test doubles: `tests/support/fake_science.py` (kit-valid canned results reproducing the storylines of architecture 40 §6, **constructed through the kit models**, never importable from `src/`), `tests/support/fake_openai_server.py`, `tests/support/fake_renderer.py`.
 
 ## 2. File manifest (every file must exist and be implemented)
