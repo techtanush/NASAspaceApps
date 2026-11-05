@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "person": null,
+  "branch": null,
+  "tested_sha": null,
+  "worktree": null,
+  "checked_at": null,
+  "generic": {
+    "G-01": {"status": "NOT_RUN", "notes": null}, "G-02": {"status": "NOT_RUN"}, "G-03": {"status": "NOT_RUN"}, "G-04": {"status": "NOT_RUN"},
+    "G-05": {"status": "NOT_RUN"}, "G-06": {"status": "NOT_RUN"}, "G-07": {"status": "NOT_RUN"}, "G-08": {"status": "NOT_RUN"},
+    "G-09": {"status": "NOT_RUN"}, "G-10": {"status": "NOT_RUN"}, "G-11": {"status": "NOT_RUN"}, "G-12": {"status": "NOT_RUN"}, "G-13": {"status": "NOT_RUN"}
+  },
+  "specific": {},
+  "own_mutations": [{"mutation": null, "killed_by": null}, {"mutation": null, "killed_by": null}, {"mutation": null, "killed_by": null}],
+  "defects": [{"id": null, "severity": "S1|S2|S3", "description": null, "repair_branch": null, "fixed": null}],
+  "environment_blocks": [],
+  "pure": false,
+  "verdict_rule": "pure only if every generic and specific row is PASS; BLOCKED_ENVIRONMENT means not yet proven pure"
+}
