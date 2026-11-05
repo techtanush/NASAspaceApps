@@ -74,6 +74,6 @@ Keep `PROGRESS.md` current after every phase: what is done (with commit SHAs), w
 1. Run your full gate suite from your `05-…` file; fix failures; rerun until green or honestly blocked.
 2. Execute your `09-SELF-AUDIT-AND-LOOPHOLE-CHECKLIST.md` completely (including the adversarial reviewers and mutation checks).
 3. `materialize.py --verify`, ownership check, forbidden-pattern scan (`09`), secret scan.
-4. Fill `STATUS.json` (every catalog id with status, command, exit code, counts; `ready_to_merge` only if all required rows are `PASSED`).
+4. Fill `STATUS.json` (every catalog id with status, command, exit code, counts; `ready_to_merge` only if all required rows are `PASSED`). A row marked `BLOCKED_ENVIRONMENT` or `BLOCKED_EXTERNAL` must carry a `"proof"` field (every command tried and its error output, or the exact missing credential); without it the merging agent treats the row as unproven.
 5. Commit; push; verify with `git log origin/<branch> -1`.
 6. Print a final summary: unmet gates first, then passed gates, the pushed SHA, and the three things the merging agent should check first.

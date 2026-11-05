@@ -8,7 +8,7 @@ This is the single catalog of tests that decide whether a branch is *pure* (§1�
 | ID | Check |
 | --- | --- |
 | KIT-01 | `materialize.py --verify` → `PASS` |
-| KIT-02 | `pytest tests/contracts/kit` passes unchanged (19+ tests) |
+| KIT-02 | `pytest tests/contracts/kit` passes unchanged (20 tests) |
 
 ### Platform (Tanush) — path prefix `tests/{unit,integration,contracts}/platform`
 | ID | Check |

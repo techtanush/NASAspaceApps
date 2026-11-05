@@ -176,6 +176,7 @@ These examples show *shape and semantics*; granule names, versions and WKT must 
 
 ```bash
 analogforge datasets list                              # every incoming/<id> with validation state
+analogforge datasets scaffold <dataset_id> --body <EARTH|MOON|MARS> --role <ROLE>   # draft manifest.yaml (TODO_FILL_IN provenance)
 analogforge datasets validate <dataset_id> [--write-checksums]   # manifest + file + semantic checks; exit 1 on FAIL
 analogforge datasets lock --policy-id live-hackathon-policy-v1 --datasets <id> [<id> ...]
 analogforge scenario bind live-hackathon-v1 --target-terrain <id> --earth-terrain <id> \
