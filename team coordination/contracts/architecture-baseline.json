@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "baseline": "C3-contract-change-001",
-  "note": "Refreshed by refresh_baseline.py for TANUSH-CR-001; see team handoffs/merging/CONTRACT-CHANGE-001.json.",
+  "baseline": "C3-frontend-design-standard",
+  "note": "Refreshed by refresh_baseline.py after a recorded change (see contracts/C2-ONE-SHOT-KIT-CHANGE.json).",
   "files": [
     {
       "path": "architecture files/00-ARCHITECTURE-DECISIONS.md",
@@ -95,8 +95,8 @@
     },
     {
       "path": "architecture files/18-MAPS-LAYERS-AND-VISUAL-DESIGN.md",
-      "bytes": 16378,
-      "sha256": "9b56cc41bf8837fd4433fbbb29d41eb0a163e2e50bec3ef3c3087578076b0550"
+      "bytes": 16720,
+      "sha256": "2bb824276cb8ab2d0867b7b345a5d718c7df721eeae59a283117fc5911e8e8be"
     },
     {
       "path": "architecture files/19-ANALOG-PASSPORT-AND-EXPORTS.md",
@@ -175,8 +175,8 @@
     },
     {
       "path": "architecture files/34-ONE-SHOT-BUILD-PROFILE-AND-ERRATA.md",
-      "bytes": 13499,
-      "sha256": "7fd4147954b71b1f065f7b784f27a9be9ebb250b3c6c8b50eb07678578e0de09"
+      "bytes": 14031,
+      "sha256": "3d8dd68079121790ede3e331409d8c8ecc29123b52e540801c893f4913e78871"
     },
     {
       "path": "architecture files/35-FROZEN-CONTRACT-KIT-AND-CROSS-BRANCH-SEAMS.md",
@@ -200,8 +200,8 @@
     },
     {
       "path": "architecture files/39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md",
-      "bytes": 21424,
-      "sha256": "95b614408ad78baeefc119e7341b8f380a7ba04d8702e97e5257175190c7bc23"
+      "bytes": 22584,
+      "sha256": "5247f738fef112ea2cfaf635160fe48a8e77732db5017ac1bf930a9c302ab3b8"
     },
     {
       "path": "architecture files/40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md",
@@ -209,14 +209,19 @@
       "sha256": "bf58a547c4abc9af8d581100ca7415bb05cecc36b82fc0d1f6b5efe0cfd2ebae"
     },
     {
+      "path": "architecture files/41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md",
+      "bytes": 57235,
+      "sha256": "9d7c46c36e5c6ffba53deeb339340a9c61618382c1e5b80dd7e0b9a1df7ab972"
+    },
+    {
       "path": "architecture files/FILE-INDEX.md",
-      "bytes": 9664,
-      "sha256": "3fce3a643e3133eb9c30bb1c3937f00ce3ed251166f429e2ad0210da54cb2da9"
+      "bytes": 9914,
+      "sha256": "8b36430d8a90f10caec7c473d8471917d705e762c4934a63a0f1164d3294b6c0"
     },
     {
       "path": "architecture files/README.md",
-      "bytes": 10261,
-      "sha256": "e8a1b9be39a7f334dc516cbc31a4c1d064a864a6144b196dacc7e2d323167a09"
+      "bytes": 10449,
+      "sha256": "e1880b70af4f5bf47f44039b9dff361b7a3b5237fd92b2cf1cf44d9981b6241b"
     },
     {
       "path": "architecture files/agents/01-mission-director.md",
@@ -345,8 +350,8 @@
     },
     {
       "path": "architecture files/contracts/kit/files/contracts/ui-testids.json",
-      "bytes": 12554,
-      "sha256": "b8377b886fdf049b400a0dcb7aaae20fd0ad277e7c9943c78b81265acb1ceabb"
+      "bytes": 13446,
+      "sha256": "a949e002c4e5ea91bd30c2c94ae735ecf828f38f899e3aacd52ca95d06a21a21"
     },
     {
       "path": "architecture files/contracts/kit/files/pyproject.toml",
@@ -521,7 +526,7 @@
     {
       "path": "architecture files/contracts/kit/kit-manifest.json",
       "bytes": 5825,
-      "sha256": "98e213b4f47503efc944921840957d54c53f60203ee187a972cd9e34ae07160e"
+      "sha256": "78e5d8719bf05907fb904559f2118c5e1dbc25694bd4cc6529fe03b44687ad97"
     },
     {
       "path": "architecture files/contracts/kit/materialize.py",

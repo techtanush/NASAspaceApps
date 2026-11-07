@@ -25,3 +25,8 @@ Playwright J01–J13 in mock mode (`test:e2e:mock`), written so the **same specs
 
 ## U7 Report and push
 `materialize.py --verify`, ownership check, full gate, fill `STATUS.json`, commit (no build output), push, print summary.
+
+
+## Design phase V (interleaved)
+
+Phase V of [10-DESIGN-SYSTEM-AND-VISUAL-QA.md](10-DESIGN-SYSTEM-AND-VISUAL-QA.md) runs inside U1 (tokens, fonts, themes, shell), U1b (component kit + `/__styleguide`), U3 (per-screen visual pass and audit after each screen), U5 (full `audit:visual`) and U6 (design mutations M25–M36 + three-reviewer design review). **Exit additions:** U1 — `verify_tokens` 150/150, shell screenshots; U1b — styleguide complete; U3 — per-screen audit clean; U5 — UIX-12, UIX-13; U6 — DR-01..04.

@@ -36,6 +36,16 @@ def main() -> int:
         if spec['branch'] not in prompt:
             errors.append(f'Missing expected branch in {person} prompt')
     checks['personal_required_files'] = len(required) * 3
+    # Aradhya owns the frontend: the design guide and verified design assets are mandatory.
+    for extra in ['10-DESIGN-SYSTEM-AND-VISUAL-QA.md', 'design/tokens.json', 'design/verify_tokens.py', 'design/gen_tokens_css.py']:
+        if not (root / 'team guides/Aradhya' / extra).is_file():
+            errors.append(f'Missing Aradhya/{extra}')
+    if (root / 'team guides/Aradhya/design/verify_tokens.py').is_file():
+        import subprocess, sys
+        r = subprocess.run([sys.executable, str(root / 'team guides/Aradhya/design/verify_tokens.py')], capture_output=True, text=True)
+        if r.returncode != 0:
+            errors.append('Aradhya design tokens fail contrast verification: ' + r.stdout.strip()[-300:])
+        checks['design_token_verification'] = 1
 
     docs = [root / 'README.md']
     for directory in ['team guides', 'team coordination']:
