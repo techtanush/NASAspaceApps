@@ -639,5 +639,25 @@
     "delivered_central_checkpoint": "635df8de41b838b69369e21a6c814ce1889178cf",
     "source_checkpoint": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
     "method": "Successful atomic fast-forward push; remote refs verified. This receipt-only child commit preserves identical tested application source. pushed_sha records the delivered ancestor to avoid a self-referential Git hash."
+  },
+  "integration_revalidation": {
+    "date": "2026-11-07",
+    "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
+    "action": "Merged main (frozen-kit update: central contract correction TANUSH-CR-001 + 4 UI test ids) into the branch; ran materialize --repair (openapi.bundled.json, ui-testids.json only); re-ran every Tanush gate against real PostgreSQL 16 + PostGIS 3.4.",
+    "results": {
+      "kit_tests": "20 passed",
+      "platform_suite": "278 passed, 0 failed, 0 errors, 0 skipped (revalidation-platform-junit.xml)",
+      "ruff": "clean",
+      "mypy": "clean (123 files)",
+      "forbidden_scan": "0 findings",
+      "mutation_check": "20/20 killed",
+      "export_openapi": "43 operations, identical to kit bundle",
+      "entry_point_real_switch": "fails with named missing-entry-point errors as required",
+      "ownership": "PASS",
+      "wire_check_after_tanush": "PASS",
+      "validate_docs": "PASS"
+    },
+    "defect_fixed": "tests/integration/platform/test_runtime_journey.py hardcoded a developer-machine DSN (postgresql+psycopg://tanushchokshi@127.0.0.1:5433/analogforge_test); it fails on any other machine. REPLACED with the required TEST_DATABASE_URL (pytest.fail if absent), like every other DB test.",
+    "details": "team handoffs/tanush/DEBUG-REVIEW.md"
   }
 }

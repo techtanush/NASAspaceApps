@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from types import SimpleNamespace
 from uuid import uuid4
@@ -16,13 +17,15 @@ from analogforge.ports.hashing import bytes_sha256, canonical_json_bytes, canoni
 from analogforge.ports.science import ScienceOperation
 from tests.support.factories import renderer_factory, science_factory
 
-DB = "postgresql+psycopg://tanushchokshi@127.0.0.1:5433/analogforge_test"
 ROOT = Path(__file__).resolve().parents[3]
 
 
 @pytest.fixture
 def runtime(tmp_path):
-    store = Store(DB)
+    database_url = os.environ.get("TEST_DATABASE_URL")
+    if not database_url:
+        pytest.fail("TEST_DATABASE_URL is required for executed PostgreSQL gates")
+    store = Store(database_url)
     store.migrate()
     ws = str(uuid4())
     store.ensure_workspace(ws)

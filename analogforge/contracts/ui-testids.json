@@ -487,6 +487,32 @@
         "data-available"
       ],
       "description": "Availability note shown next to the scenario select (AWAITING_DATASETS etc.)"
+    },
+    {
+      "id": "theme-toggle",
+      "required_attributes": [
+        "data-theme-choice"
+      ],
+      "description": "Header control cycling Dark/Light/System; data-theme-choice is dark|light|system (architecture 41 s4)"
+    },
+    {
+      "id": "density-toggle",
+      "required_attributes": [
+        "data-density"
+      ],
+      "description": "Header control for table/control density; data-density is compact|default|comfortable (architecture 41 s5.4)"
+    },
+    {
+      "id": "copy-hash",
+      "required_attributes": [
+        "data-hash-kind"
+      ],
+      "description": "Copy-to-clipboard button next to a displayed hash; data-hash-kind is manifest|file|evidence|contract|receipt (architecture 41 s8)"
+    },
+    {
+      "id": "shortcut-help",
+      "required_attributes": [],
+      "description": "Keyboard shortcut help dialog opened with ? (architecture 41 s13)"
     }
   ]
 }
