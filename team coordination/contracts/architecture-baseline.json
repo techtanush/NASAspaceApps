@@ -320,8 +320,8 @@
     },
     {
       "path": "architecture files/contracts/kit/files/contracts/openapi.bundled.json",
-      "bytes": 204625,
-      "sha256": "a6c415ba9150064361620b060639303872ad9e89ecdeb6bfdc837cb283e7df08"
+      "bytes": 215595,
+      "sha256": "e12d367326e478ca7fe60fb10f6d482991e6569863b0e9952c6a0a3327a63756"
     },
     {
       "path": "architecture files/contracts/kit/files/contracts/passport-export-bundle.schema.json",
@@ -526,7 +526,7 @@
     {
       "path": "architecture files/contracts/kit/kit-manifest.json",
       "bytes": 5825,
-      "sha256": "30c569f5fa603ed4a3501544ede853a6a8b359ba8b854837853210d4d26294fa"
+      "sha256": "78e5d8719bf05907fb904559f2118c5e1dbc25694bd4cc6529fe03b44687ad97"
     },
     {
       "path": "architecture files/contracts/kit/materialize.py",
@@ -540,8 +540,8 @@
     },
     {
       "path": "architecture files/contracts/openapi.yaml",
-      "bytes": 142775,
-      "sha256": "e1014ae2d49709bef9ac6d5508626c94945a156077e65ee7986f8464f691686c"
+      "bytes": 153745,
+      "sha256": "1772b4ab706044f058b9bf1c9676ebe0b689a8d6f0ac4a20c240483262ee265c"
     },
     {
       "path": "architecture files/contracts/requirements-traceability.csv",
@@ -560,8 +560,8 @@
     },
     {
       "path": "architecture files/contracts/validate_blueprint.py",
-      "bytes": 14021,
-      "sha256": "3386441b04a810a1cdd2bd06564ea62448cae53fbb36bc9c7421c48babc2110a"
+      "bytes": 16723,
+      "sha256": "219c324dcfb66c24d5b712d91f5b04817d942cba46614486876e5a7103cceab7"
     },
     {
       "path": "architecture files/examples/.env.example",
