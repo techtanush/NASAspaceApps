@@ -7,6 +7,7 @@ import resource
 import time
 from collections.abc import Callable
 from multiprocessing.connection import Connection
+from multiprocessing.process import BaseProcess
 from typing import Any
 
 from analogforge.db.store import PersistenceError
@@ -18,6 +19,18 @@ from analogforge.ports.science import (
     ScienceRequest,
     ScienceService,
 )
+
+
+def _stop_child(process: BaseProcess) -> None:
+    """Bound termination to one second of grace plus one second after SIGKILL."""
+    if process.is_alive():
+        process.terminate()
+    process.join(timeout=1)
+    if process.is_alive():
+        process.kill()
+        process.join(timeout=1)
+    if process.is_alive():
+        raise PersistenceError("SYSTEM", "CPU child could not be stopped within its termination budget")
 
 
 def _child(
@@ -49,6 +62,8 @@ def run_science(
 ) -> ScienceComputationResult:
     if timeout_seconds <= 0 or memory_bytes <= 0:
         raise ValueError("CPU budgets must be positive")
+    if check_cancelled is not None:
+        check_cancelled()
     # Spawn avoids inheriting DB sockets or locks from the lease-heartbeat thread.
     # The worker passes the stateless facade and an immutable artifact/path context.
     parent, child = multiprocessing.get_context("spawn").Pipe(duplex=False)
@@ -79,13 +94,10 @@ def run_science(
             if not process.is_alive():
                 raise PersistenceError("SYSTEM", "Science subprocess exited without a result")
     finally:
-        if process.is_alive():
-            process.terminate()
-        process.join(timeout=5)
-        if process.is_alive():
-            process.kill()
-            process.join(timeout=1)
-        parent.close()
+        try:
+            _stop_child(process)
+        finally:
+            parent.close()
 
 
 def run_callable(function: Callable[..., Any], *args: Any, timeout_seconds: float = 30) -> Any:
@@ -101,10 +113,10 @@ def run_callable(function: Callable[..., Any], *args: Any, timeout_seconds: floa
             raise PersistenceError("TOOL_TIMEOUT", "CPU deadline exceeded")
         return parent.recv()
     finally:
-        if process.is_alive():
-            process.terminate()
-        process.join(timeout=5)
-        parent.close()
+        try:
+            _stop_child(process)
+        finally:
+            parent.close()
 
 
 def _callable_child(connection: Connection, function: Callable[..., Any], args: tuple[Any, ...]) -> None:

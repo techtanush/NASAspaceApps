@@ -4,6 +4,7 @@ from typing import Any
 
 import pytest
 
+from analogforge.api.errors import ApiError
 from analogforge.db.store import Store
 from analogforge.jobs.worker import Worker
 from analogforge.ports.science import ScienceCancelled, ScienceDeadlineExceeded
@@ -83,3 +84,42 @@ def test_export_failure_preserves_completed_scientific_run(
     with platform_store.transaction(workspace) as unit:
         assert unit.require("runs", run["id"])["state"] == "COMPLETED"
         assert unit.require("jobs", job["id"])["state"] == "FAILED"
+
+
+@pytest.mark.db
+@pytest.mark.parametrize("error_kind", ["key", "attribute", "api", "assertion"])
+def test_unexpected_handler_error_fails_closed_and_next_job_runs(
+    platform_store: Store, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture, error_kind: str
+) -> None:
+    workspace, failing_run = seed_run(platform_store)
+    _, following_run = seed_run(platform_store, workspace)
+    with platform_store.transaction(workspace) as unit:
+        failing = unit.enqueue("ADVANCE_RUN", {"run_id": failing_run["id"]}, run_id=failing_run["id"])
+        following = unit.enqueue("ADVANCE_RUN", {"run_id": following_run["id"]}, run_id=following_run["id"])
+    real_claim = platform_store.claim_job
+    monkeypatch.setattr(platform_store, "claim_job", lambda lease_seconds: real_claim(lease_seconds, workspace))
+    private_message = "private-handler-content-that-must-not-be-logged"
+    handled: list[str] = []
+
+    def malformed(job: dict[str, Any]) -> None:
+        handled.append(job["id"])
+        if job["id"] == failing["id"]:
+            errors: dict[str, Exception] = {
+                "key": KeyError(private_message),
+                "attribute": AttributeError(private_message),
+                "api": ApiError("INPUT_INVALID", private_message),
+                "assertion": AssertionError(private_message),
+            }
+            raise errors[error_kind]
+
+    worker = Worker(platform_store, malformed)
+    assert worker.run_once() and worker.run_once()
+    assert handled == [failing["id"], following["id"]]
+    with platform_store.transaction(workspace) as unit:
+        assert unit.require("jobs", failing["id"])["state"] == "FAILED"
+        assert unit.require("jobs", failing["id"])["error"]["code"] == "SYSTEM"
+        assert unit.require("runs", failing_run["id"])["state"] == "FAILED"
+        assert unit.require("jobs", following["id"])["state"] == "SUCCEEDED"
+    assert private_message not in caplog.text
+    errors = [record for record in caplog.records if record.getMessage() == "worker.handler_failed"]
+    assert errors and all(record.exc_info is None for record in errors)

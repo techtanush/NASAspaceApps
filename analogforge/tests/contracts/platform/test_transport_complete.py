@@ -340,7 +340,12 @@ def test_all_43_operations_have_real_validated_responses(journey_store: Store, t
             "responses": transport.observations,
             "known_contract_conflicts": [
                 "OpenAPI JSON passport export declares string; architecture 35 requires the actual JSON object."
-            ],
+            ]
+            if any(
+                observation["schema"] == "KNOWN_JSON_EXPORT_CONTRACT_CONFLICT"
+                for observation in transport.observations
+            )
+            else [],
         }
         out = Path("out")
         out.mkdir(exist_ok=True)

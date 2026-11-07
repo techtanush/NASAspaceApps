@@ -1,5 +1,6 @@
 """PLT-05/06: exclusive leases, late-publication fencing and cancellation."""
 
+import multiprocessing
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -20,7 +21,11 @@ __all__ = ["platform_store"]
 
 
 class _SlowScience:
+    def __init__(self, started: Any) -> None:
+        self.started = started
+
     def execute(self, request: Any, context: Any) -> Any:
+        self.started.set()
         time.sleep(10)
         raise RuntimeError("Cancellation did not stop this test child")
 
@@ -125,10 +130,18 @@ def test_crash_after_blob_move_rolls_back_records_and_retry_deduplicates(platfor
 @pytest.mark.db
 def test_cancel_during_actual_cpu_child_is_prompt(platform_store: Store) -> None:
     workspace, run = seed_run(platform_store)
+    started = multiprocessing.get_context("spawn").Event()
+    previous_children = {process.pid for process in multiprocessing.active_children()}
+    timestamps: dict[str, float] = {}
+    failures: list[str] = []
 
     def cancel() -> None:
-        time.sleep(0.15)
+        if not started.wait(timeout=15):
+            failures.append("The science child never entered execute")
+            return
+        timestamps["cancel_requested"] = time.monotonic()
         platform_store.cancel_run(workspace, run["id"])
+        timestamps["cancel_acknowledged"] = time.monotonic()
 
     def check_cancelled() -> None:
         with platform_store.transaction(workspace) as unit:
@@ -137,17 +150,20 @@ def test_cancel_during_actual_cpu_child_is_prompt(platform_store: Store) -> None
 
     thread = threading.Thread(target=cancel)
     thread.start()
-    started = time.monotonic()
     with pytest.raises(ScienceCancelled):
         run_science(
-            cast(ScienceService, _SlowScience()),
+            cast(ScienceService, _SlowScience(started)),
             cast(ScienceRequest, None),
             cast(ScienceContext, None),
             check_cancelled=check_cancelled,
         )
+    child_terminated = time.monotonic()
     thread.join(timeout=2)
     assert not thread.is_alive()
-    assert time.monotonic() - started < 2
+    assert not failures and started.is_set()
+    assert timestamps["cancel_acknowledged"] - timestamps["cancel_requested"] <= 2
+    assert child_terminated - timestamps["cancel_acknowledged"] <= 5
+    assert {process.pid for process in multiprocessing.active_children()} == previous_children
     with platform_store.transaction(workspace) as unit:
         assert unit.require("runs", run["id"])["state"] == "CANCELLED"
         assert unit.list("test_results", {"run_id": run["id"]}) == []

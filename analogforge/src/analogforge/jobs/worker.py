@@ -65,6 +65,9 @@ class Worker:
         except (OSError, RuntimeError, ValueError, TypeError, SQLAlchemyError) as exc:
             error_code = str(getattr(exc, "code", "SYSTEM"))
             logger.error("worker.handler_failed", extra={"job_id": job["id"], "error_type": type(exc).__name__})
+        except Exception as exc:  # noqa: BLE001 - process boundary records failure without message or traceback
+            error_code = "SYSTEM"
+            logger.error("worker.handler_failed", extra={"job_id": job["id"], "error_type": type(exc).__name__})
         finally:
             done.set()
             heartbeat_thread.join(timeout=self.heartbeat_seconds + 1)
