@@ -164,6 +164,77 @@ def renderer_import_findings(repo: Path) -> list[dict]:
     return findings
 
 
+
+UI_SRC_PREFIX = 'analogforge/apps/web/src/'
+UI_EXT = {'.css', '.ts', '.tsx'}
+UI_SLOP_PATTERNS = {
+    'UI_HEX_OR_RGB_LITERAL': re.compile(r'#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\('),
+    'UI_GRADIENT': re.compile(r'(linear|radial|conic)-gradient'),
+    'UI_BACKDROP_FILTER': re.compile(r'backdrop-filter'),
+    'UI_TEXT_SHADOW': re.compile(r'text-shadow'),
+    'UI_BIG_RADIUS': re.compile(r'border-radius\s*:\s*(?:[7-9]|[1-9]\d+)(?:px|rem)'),
+    'UI_EMOJI': re.compile('[\U0001F300-\U0001FAFF☀-➿⭐⬆✅❌]'),
+    'UI_PLACEHOLDER_COPY': re.compile(r'lorem ipsum|coming soon', re.I),
+    'UI_FONT_CDN': re.compile(r'fonts\.googleapis|fonts\.gstatic|use\.typekit|cdnjs\.|unpkg\.com|cdn\.jsdelivr'),
+    'UI_BANNED_LIBRARY': re.compile(r"""from\s+['"](@mui/|antd|@chakra-ui/|@mantine/|bootstrap|react-bootstrap|framer-motion|gsap|lottie|chart\.js|echarts)"""),
+    'UI_NASA_INSIGNIA': re.compile(r'meatball|nasa[-_]?logo|nasa[-_]?worm', re.I),
+}
+UI_SLOP_SKIP = ('/generated/', '/styles/tokens.css', '/maps/', '/mock/fixtures/', '/test/', '/styleguide/')
+UI_SLOP_NOT_IN_TESTS = True
+
+
+def ui_design_findings(repo: Path, files: list[str]) -> list[dict]:
+    """Architecture 41 section 2 (banned slop) as a static scan; a line carrying 'allowed:' is exempt (reviewed by hand)."""
+    findings = []
+    for rel in files:
+        if not rel.startswith(UI_SRC_PREFIX) or Path(rel).suffix not in UI_EXT:
+            continue
+        if any(x in '/' + rel for x in UI_SLOP_SKIP) or rel.endswith(('.test.ts', '.test.tsx')):
+            continue
+        try:
+            lines = (repo / rel).read_text(errors='ignore').splitlines()
+        except OSError:
+            continue
+        for number, line in enumerate(lines, 1):
+            if 'allowed:' in line:
+                continue
+            for name, rx in UI_SLOP_PATTERNS.items():
+                if rx.search(line):
+                    findings.append({'file': rel, 'line': number, 'pattern': name, 'text': line.strip()[:160]})
+    return findings
+
+
+def design_asset_findings(repo: Path) -> list[dict]:
+    """Design assets must equal the guide copies; tokens must pass contrast verification; tokens.css must be generated."""
+    findings = []
+    guide = repo / 'team guides/Aradhya/design'
+    web = repo / 'analogforge/apps/web'
+    scripts = repo / 'analogforge/scripts/ui'
+    pairs = [(guide / 'verify_tokens.py', scripts / 'verify_tokens.py', True),
+             (guide / 'gen_tokens_css.py', scripts / 'gen_tokens_css.py', True),
+             (guide / 'tokens.json', web / 'design/tokens.json', False)]
+    for src, dst, strict in pairs:
+        if not dst.is_file():
+            findings.append({'problem': f'missing {dst.relative_to(repo)}'})
+        elif src.is_file() and src.read_bytes() != dst.read_bytes():
+            decisions = repo / 'team handoffs/aradhya/DECISIONS.md'
+            recorded = (not strict) and decisions.is_file() and 'tokens.json' in decisions.read_text(errors='ignore')
+            if not recorded:
+                findings.append({'problem': f'{dst.relative_to(repo)} differs from the guide copy without a recorded decision'})
+    tokens, css = web / 'design/tokens.json', web / 'src/styles/tokens.css'
+    if tokens.is_file() and (scripts / 'verify_tokens.py').is_file():
+        code, out = run([sys.executable, str(scripts / 'verify_tokens.py'), str(tokens)])
+        if code != 0:
+            findings.append({'problem': 'verify_tokens.py failed: ' + out[-300:]})
+        if css.is_file() and (scripts / 'gen_tokens_css.py').is_file():
+            code, gen = run([sys.executable, str(scripts / 'gen_tokens_css.py'), str(tokens)])
+            if code != 0 or gen.strip() != css.read_text().strip():
+                findings.append({'problem': 'src/styles/tokens.css is not the regenerated output of design/tokens.json'})
+        else:
+            findings.append({'problem': 'tokens.css or gen_tokens_css.py missing'})
+    return findings
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--person', required=True, choices=['tanush', 'ayan', 'aradhya', 'merging'])
@@ -243,6 +314,9 @@ def main() -> int:
         if person == 'aradhya':
             findings += renderer_import_findings(repo)
         record('G-04', not findings, f'{len(scoped)} files scanned', findings)
+        if person == 'aradhya':
+            design = ui_design_findings(repo, files) + design_asset_findings(repo)
+            record('D-01', not design, 'architecture 41 banned patterns + design assets + tokens (mechanical subset; the hands-on design review is MRG-11)', design)
 
         # G-09 STATUS claims coherence
         claim_problems = []
@@ -277,6 +351,8 @@ def main() -> int:
             allfind += forbidden_import_findings(repo, sf, prefixes, who in IMPORT_SCAN_SKIP_TESTS)
         allfind += renderer_import_findings(repo)
         record('G-04', not allfind, 'merged-tree forbidden patterns', allfind)
+        design = ui_design_findings(repo, files) + design_asset_findings(repo)
+        record('D-01', not design, 'merged-tree design standard (architecture 41)', design)
 
     # G-05 secrets / data / build output (all persons)
     sec_findings = []

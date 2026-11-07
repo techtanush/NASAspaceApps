@@ -70,6 +70,19 @@ Requirements while running:
 
 If your environment provides a browser/computer-use tool, open `http://localhost:5173` and perform J01 manually: create the mission, import the ARES-1 file, build the fingerprint, accept, start, inspect each tab, select candidate A, press PROVE IT, watch the three attempts, open the passport, download the three files. Record anything that looks wrong or confusing (misleading label, missing unit, hidden unknown) in the report even if tests pass; screenshots to `out/screens/`.
 
+## 4b. Professional-quality verification of the merged build (MRG-11)
+
+The product must look like a delivered mission-operations tool (architecture 41). Mechanical audits on the Aradhya branch prove it in mock mode; you must prove it on the **merged, real-backend** build.
+
+1. **Assets intact:** `python3 "merging guide/scripts/purity_check.py" --person merging --repo . ` shows `D-01` PASS (design assets equal the guide copies, tokens verified, no slop patterns).
+2. **Re-run the visual audit against the merged app:** `pnpm run audit:visual` (mock mode) must still pass after wiring edits; then run the same crawl with mocks off against `http://localhost:5173` during the J01 real journey and collect screenshots of S01–S12 plus empty/error/loading/disabled states, dark and light, 1440×900 and 390×844, into `out/visual/`.
+3. **Check the mock-vs-real gap:** real data produces strings the mocks did not (long names, big numbers, unexpected nulls, many requirements). Look for overflow, truncated values, un-tabular numerals, unit-less numbers, raw enum names, `undefined`/`null` text, console errors. Fix in the cheapest correct place (usually a formatter) and record each as a wiring edit.
+4. **Independent design review of the real-backend screenshots:** spawn **three fresh reviewer subagents** (HMI operator / accessibility+typography / slop detector) and give them only architecture 41, the screenshots and the rubric of 41 §20; require ≥ 5 concrete, selector-level defects each (or an evidenced statement that fewer exist). Fix every blocker/major, re-shoot, re-review with new subagents until every criterion ≥ 3 and mean ≥ 3.5. Paste verbatim reports into `team handoffs/merging/DESIGN-REVIEW-MERGED.md`.
+5. **Your own judgment pass:** answer the §6 checklist of `team guides/Aradhya/10-DESIGN-SYSTEM-AND-VISUAL-QA.md` yourself from the screenshots. Any "no" is a defect: repair it (replace the offending code; do not layer overrides).
+6. **Print:** print the real passport route to PDF; confirm page 1 shows mode badge, headline, manifest digest; no clipped tables.
+
+MRG-11 is `PASSED` only when 1–6 are evidenced in `MERGE-REPORT.json.visual_review`.
+
 ## 5. Recovery and resilience (MRG-07)
 
 ```bash
@@ -108,4 +121,4 @@ Must pass using committed files only (no leftover `.env`, caches, data, `node_mo
 
 ## 10. Exit criteria for this plan
 
-All MRG-01…MRG-10 rows `PASSED` (or an honestly blocked row with an explicit reason that the merge-report summary lists first and that does not involve an environment you could have obtained). Then proceed to `05`.
+All MRG-01…MRG-11 rows `PASSED` (or an honestly blocked row with an explicit reason that the merge-report summary lists first and that does not involve an environment you could have obtained). Then proceed to `05`.

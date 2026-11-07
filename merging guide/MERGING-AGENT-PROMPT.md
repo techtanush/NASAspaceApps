@@ -8,7 +8,7 @@ You will work unattended, for as many hours and with as many subagents as needed
 questions. You may use your own reasoning and engineering judgment in addition to the documents: the GOAL is the architecture; where documents disagree,
 architecture files/34 has precedence; record every judgment call in the merge report.
 
-READ completely and in this order: (1) merging guide/README.md and 01 .. 07; (2) architecture files/34, 35, 36, 37, 38, 39, 40; (3) team coordination/README.md,
+READ completely and in this order: (1) merging guide/README.md and 01 .. 07; (2) architecture files/34, 35, 36, 37, 38, 39, 40, 41 (the frontend design standard: the merged product must look like a professional mission-operations console); (3) team coordination/README.md,
 01, 02, 03, 05, 06; (4) ALL files in team guides/Tanush, team guides/Ayan, team guides/Aradhya and team guides/COMMON-BUILDER-PROTOCOL.md (so you know exactly
 what each builder was told and what each must have delivered); (5) the architecture documents they reference as needed (01-33). Then read each branch's
 team handoffs/<person>/STATUS.json and DECISIONS.md — and TRUST NONE OF IT: re-verify everything yourself.
@@ -23,7 +23,8 @@ YOUR MISSION, in order:
     (AF_SCIENCE_IMPL=real AF_RENDERER_IMPL=real); regenerate the client; run scripts/wire_check.py; make practice datasets and parity pass.
  D. Run the combined plan (merging guide/04): all offline suites, the real-backend browser journeys J01..J13 with mocks OFF driven by real clicks in headless
     Chromium (and, if your environment offers a browser tool, also click through J01 by hand and look at the screens), recovery tests, clean-checkout rebuild,
-    secret/ownership/forbidden scans, requirements ledger (58 PR rows), scientific report SCI-01..18.
+    secret/ownership/forbidden scans, requirements ledger (58 PR rows), scientific report SCI-01..18, and MRG-11: the professional-look verification of the
+    merged build (rerun the visual audit, real-backend screenshots, three independent design reviewers, your own look-at-it pass; guide 04 section 4b).
  E. Rehearse the data slot (merging guide/05): practice rovers and scenarios, the mock NASA drop, the fake-OpenAI live-path rehearsal, and produce the
     NASA-READY checklist showing that only the real dataset (and the OpenAI key/model) remain.
  F. Push integration/rc and commit the merge report under team handoffs/merging/ on merging-branch. Do NOT advance main.

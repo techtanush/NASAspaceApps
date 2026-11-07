@@ -5,7 +5,7 @@
 1. All three branches proven **pure** (`purity-<person>.json`), with the Repair Log complete (or "no repairs needed" with evidence of the checks run).
 2. `integration/rc` contains the three merges (and any repair branches), the kit verifies (`materialize --verify` PASS), and the lock is consistent.
 3. Wiring W-01…W-15 PASS; `wire_check.py --stage final` PASS.
-4. MRG-01…MRG-10 `PASSED` (or an explicitly justified `BLOCKED_ENVIRONMENT`/`BLOCKED_EXTERNAL` that is listed first in the summary and is not something you could have obtained).
+4. MRG-01…MRG-11 `PASSED` (or an explicitly justified `BLOCKED_ENVIRONMENT`/`BLOCKED_EXTERNAL` that is listed first in the summary and is not something you could have obtained).
 5. Journeys J01–J13 pass in real mode with mocks off, run twice; recovery tests pass; clean-checkout rebuild passes.
 6. Practice matrix P1–P10, perturbations, mock NASA drop, live-path rehearsal done; NASA-READY checklist N-1…N-10 all evidenced.
 7. Requirements ledger: all 58 `PR-*` rows with module/test/observed result; none left `NOT_IMPLEMENTED` without a recorded exception.

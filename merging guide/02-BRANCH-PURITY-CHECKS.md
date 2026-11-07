@@ -5,7 +5,7 @@ A branch is **pure** when it can be merged without bringing hidden defects: it f
 ```bash
 python3 "merging guide/scripts/purity_check.py" --person <tanush|ayan|aradhya> --repo ../af-verify-<person> --base origin/main --json out/purity-<person>.json
 ```
-`purity_check.py` automates the structural checks (G-01…G-09 below). The rest you run and judge yourself.
+`purity_check.py` automates the structural checks (G-01…G-09 and the design check D-01 below). The rest you run and judge yourself.
 
 ## 1. Generic checks (every branch)
 
@@ -84,6 +84,10 @@ Imports forbidden in science: `fastapi`, `sqlalchemy`, `psycopg`, `openai`, `ana
 | P-R-09 | **Truthfulness:** in mock mode J01, confirm GAP vs FAIL vs UNKNOWN vs PENDING differ in label/icon/`data-status`; null measurements show `Unknown`; no similarity percentages anywhere. |
 | P-R-10 | **Accessibility:** run the a11y suite; manual keyboard pass over J01 steps 1–4 and 8–9. |
 | P-R-11 | **Mock fidelity:** mock fixtures validate against the bundled spec; mock exports are produced by the real renderer (re-run `scripts/build_mock_exports.py` and `git diff` is empty). |
+| P-R-12 | **Design assets (automated D-01):** `analogforge/apps/web/design/tokens.json`, `scripts/ui/verify_tokens.py`, `scripts/ui/gen_tokens_css.py` equal `team guides/Aradhya/design/` (tokens may differ only with a `DECISIONS.md` entry **and** a passing verifier); `python3 scripts/ui/verify_tokens.py` prints 150/150 (or all checks pass if tokens were changed); `src/styles/tokens.css` equals the regenerated output. |
+| P-R-13 | **Slop scan (automated D-01):** no hex/rgb literal outside tokens/maps, gradient, backdrop-filter, text-shadow, radius > 6 px, emoji, placeholder copy, font CDN, banned UI/animation library, NASA insignia (architecture 41 §2). Lines tagged `allowed:` are exempt — **read every one** and judge it. |
+| P-R-14 | **Visual audit:** `pnpm run audit:visual` exits 0; open `out/visual/report.json` (0 findings, 0 skipped checks, both themes, 6 viewports) and confirm the script's constants equal architecture 41 §20 (C20). Weakened thresholds or wholesale allow-lists ⇒ S1. |
+| P-R-15 | **Look at it:** run `pnpm run dev:mock`, open `/__styleguide` and S01, S06, S07, S10, S12 in dark and light at 1440×900 and 390×844 with your own eyes (browser tool/screenshots). Apply the §20 rubric of architecture 41; read `team handoffs/aradhya/DESIGN-REVIEW.md` and check the reviewer reports are verbatim and from separate rounds. |
 
 Imports forbidden in the renderer: anything but stdlib, `jinja2`, `markupsafe`, `pydantic`, kit modules.
 
