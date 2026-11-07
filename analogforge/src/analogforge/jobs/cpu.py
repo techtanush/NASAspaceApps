@@ -46,7 +46,7 @@ def _child(
         connection.send(("cancelled", "ScienceCancelled"))
     except ScienceDeadlineExceeded:
         connection.send(("deadline", "ScienceDeadlineExceeded"))
-    except (RuntimeError, ValueError, OSError, MemoryError, TypeError) as exc:
+    except Exception as exc:  # noqa: BLE001 - child boundary sends only a sanitized exception type
         connection.send(("error", type(exc).__name__))
     finally:
         connection.close()
