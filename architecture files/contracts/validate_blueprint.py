@@ -135,7 +135,42 @@ def main() -> int:
                 p.get('$ref', '').endswith('/IdempotencyKey') for p in parameters
             ):
                 fail(f'Missing mutation idempotency parameter at {path}')
+            required_errors = ('404', '422') if method == 'get' else ('413',) if method == 'post' else ()
+            for status in required_errors:
+                schema = (operation['responses'].get(status, {}).get('content', {})
+                          .get('application/json', {}).get('schema'))
+                if schema != {'$ref': '#/components/schemas/ErrorEnvelope'}:
+                    fail(f'Missing ErrorEnvelope response {status} at {method.upper()} {path}')
+                CHECKS['standard_error_responses'] += 1
             CHECKS['api_operations'] += 1
+    if len(seen) != 43:
+        fail(f'Expected exactly 43 API operations, got {len(seen)}')
+
+    export_schema = (api['paths']['/passports/{id}/exports/{format}']['get']['responses']['200']
+                     ['content']['application/json']['schema'])
+    Draft202012Validator.check_schema(export_schema)
+    export_fields = {'export_schema_version', 'manifest_sha256', 'canonical_manifest', 'bundle'}
+    bundle_schema = load(ROOT / 'contracts/kit/files/contracts/passport-export-bundle.schema.json')
+    bundle_fields = set(bundle_schema['properties']) - {'canonical_manifest_json', 'assets'}
+    if (export_schema.get('type') != 'object' or set(export_schema.get('required', [])) != export_fields
+            or set(export_schema.get('properties', {})) != export_fields
+            or export_schema.get('additionalProperties') is not False
+            or export_schema['properties']['bundle'].get('type') != 'object'
+            or set(export_schema['properties']['bundle'].get('required', [])) != bundle_fields
+            or set(export_schema['properties']['bundle'].get('properties', {})) != bundle_fields
+            or export_schema['properties']['bundle'].get('additionalProperties') is not False):
+        fail('JSON export schema does not match architecture 35 section 4 and the frozen bundle fields')
+    CHECKS['json_export_schema'] += 1
+    compatibility = api['components']['schemas']['CompatibilityAssessment']
+    preliminary_schema = {'type': 'boolean', 'description': 'True until a verified route exists.'}
+    if (compatibility.get('properties', {}).get('preliminary') != preliminary_schema
+            or 'preliminary' not in compatibility.get('required', [])):
+        fail('CompatibilityAssessment must expose the required preliminary flag')
+    CHECKS['compatibility_preliminary_flag'] += 1
+    bundled = load(ROOT / 'contracts/kit/files/contracts/openapi.bundled.json')
+    if bundled['paths'] != api['paths'] or bundled['components']['schemas']['CompatibilityAssessment'] != compatibility:
+        fail('Bundled OpenAPI must contain the current authoritative API paths and compatibility schema')
+    CHECKS['bundled_openapi_alignment'] += 1
 
     api_schema = {'$schema': 'https://json-schema.org/draft/2020-12/schema',
                   '$id': api_path.as_uri(), 'components': api['components']}

@@ -4,9 +4,13 @@
   "checks": {
     "json_files": 52,
     "domain_definitions": 29,
-    "schema_references": 410,
+    "schema_references": 432,
     "api_component_schemas": 57,
+    "standard_error_responses": 77,
     "api_operations": 43,
+    "json_export_schema": 1,
+    "compatibility_preliminary_flag": 1,
+    "bundled_openapi_alignment": 1,
     "schema_validated_examples": 7,
     "scientific_gate_definitions": 15,
     "assurance_validated_examples": 4,
@@ -14,7 +18,7 @@
     "example_hashes": 2,
     "source_hashes": 3,
     "traceable_product_requirements": 58,
-    "local_document_links": 302,
+    "local_document_links": 316,
     "json_document_examples": 14,
     "synthetic_graph_attempts": 2
   },

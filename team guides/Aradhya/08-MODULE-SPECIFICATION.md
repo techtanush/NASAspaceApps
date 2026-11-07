@@ -4,7 +4,9 @@ File-by-file contract for the frontend and the pure passport renderer. Types com
 
 ## 1. Global rules
 
-* Stack: React 19, TypeScript (strict), Vite, React Router, TanStack Query, MapLibre GL JS, native accessible HTML/CSS, `lucide-react` icons, Vitest + Testing Library, Playwright, `msw` (mock mode only), `ajv` (2020-12) for fixture/spec validation, `@axe-core/playwright`, `openapi-typescript`. Node 22, pnpm 10 (lockfile committed).
+* **Look and feel is binding: [architecture 41](../../architecture%20files/41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md) and [10](10-DESIGN-SYSTEM-AND-VISUAL-QA.md).** Component libraries that impose a look (MUI, Ant, Chakra, Mantine, Bootstrap), animation libraries and CDN fonts are forbidden; styling is plain CSS using only variables from the generated `tokens.css`.
+
+* Stack: React 19, TypeScript (strict), Vite, React Router, TanStack Query, MapLibre GL JS, native accessible HTML/CSS, `lucide-react` icons (16 px, stroke 1.5), Radix primitives (dialog, popover, tooltip, tabs, select, toggle-group, dropdown-menu) for accessible behavior, `@tanstack/react-table`/`react-virtual`, `d3-scale|shape|axis|array|format|time-format` for charts, `@fontsource-variable/inter` + `@fontsource/ibm-plex-mono` (self-hosted), `clsx`, Vitest + Testing Library, Playwright, `msw` (mock mode only), `ajv` (2020-12) for fixture/spec validation, `@axe-core/playwright`, `openapi-typescript`. Node 22, pnpm 10 (lockfile committed).
 * **One OpenAPI:** generate `apps/web/src/generated/schema.d.ts` from `../../contracts/openapi.bundled.json` with `openapi-typescript`; never hand-edit; `pnpm run generate:client` + `git diff --exit-code` must be clean (UIX-02). No scientific enum is redeclared by hand — import `components["schemas"]["QualificationStatus"]` etc.
 * **Server-owned truth:** statuses, selection pointers (`selected_candidate_id`, `selected_portfolio_id`), revisions, cursors and allowed actions come from responses. No optimistic scientific updates. Null measurements render the text `Unknown` inside `data-testid="unknown-value"`, never `0`, `NaN`, `-` alone or blank.
 * **Test ids:** implement **every** id in `contracts/ui-testids.json` with its required `data-*` attributes. A Vitest test loads the JSON and fails if an id does not occur in `apps/web/src`; a Playwright journey asserts each id where it should appear (UIX-04).
@@ -27,7 +29,10 @@ apps/web/src/
   features/{workspace,missions,rovers,runs,targets,analogs,qualification,compatibility,portfolio,testLab,passport,operations}/**
   components/{ui,evidence,operations}/**
   maps/{EarthMap.tsx,PlanetaryPanel.tsx,layerRegistry.ts,affine.ts,routeLayers.ts}
-  styles/{tokens.css,layout.css,print.css}
+  styles/{tokens.css (GENERATED),reset.css,base.css,layout.css,print.css}
+  design/ (apps/web/design/tokens.json)  public/theme-init.js  public/fonts? (none: fonts come from @fontsource into dist)
+  styleguide/Styleguide.tsx  (route /__styleguide, dev+mock only; excluded from production build)
+  components/ui/* includes StatusBadge, StatusGlyph, ModeBadge, Button, Table, Drawer, Dialog, Tabs, Banner, EmptyState, ErrorPanel, Skeleton, Quantity, Timestamp, Hash/CopyHash, Stepper, Timeline, Chart/* (arch 41 §19)
   mock/{server.ts,handlers.ts,state.ts,scripts/*.ts,fixtures/**,exports/**}      (only loaded when VITE_API_MOCK=1)
   test/{setup.ts,msw-validate.test.ts,testids.test.ts,*.test.tsx}
 apps/web/e2e/ or analogforge/tests/e2e/{journeys/J01..J13*.spec.ts,support/*.ts,playwright.config.ts}
@@ -37,7 +42,11 @@ analogforge/src/analogforge/rendering/passport/
 analogforge/tests/unit/passport_renderer/{test_*.py,fixtures/bundles/*.json,conftest.py}
 analogforge/tests/contracts/ui/{test_openapi_fixtures.py,test_bundle_fixtures.py}
 analogforge/scripts/build_mock_exports.py     (renders the mock export files with the REAL renderer)
-analogforge/scripts/ui/{forbidden_scan.py,mutation_check.py,verify_exports.py}
+analogforge/scripts/ui/{forbidden_scan.py,mutation_check.py,verify_exports.py,verify_tokens.py,gen_tokens_css.py,visual_audit.mjs}
+analogforge/apps/web/design/tokens.json
+analogforge/apps/web/docs/design-review/styleguide-*.png  (≤ 12 files)
+analogforge/apps/web/THIRD-PARTY.md  (licence table of every dependency and font)
+team handoffs/aradhya/DESIGN-REVIEW.md
 ```
 
 ## 3. API layer
@@ -100,8 +109,8 @@ A stateful in-memory MSW server implements every endpoint the UI calls (all 43 o
 
 ## 8. Packages and scripts
 
-`pnpm run`: `dev`, `dev:mock`, `generate:client`, `typecheck`, `lint`, `test`, `test:contracts` (testids + fixture validation), `build`, `test:e2e` (real backend; env `E2E_BASE_URL`, `E2E_API_URL`), `test:e2e:mock` (starts the Vite mock server itself), `a11y`. `analogforge/package.json` delegates to `apps/web`. Python extras for the renderer go into `extra-aradhya` (`jinja2`, `markupsafe` are already kit dependencies).
+`pnpm run`: `dev`, `dev:mock`, `generate:client`, `typecheck`, `lint`, `test`, `test:contracts` (testids + fixture validation), `build`, `test:e2e` (real backend; env `E2E_BASE_URL`, `E2E_API_URL`), `test:e2e:mock` (starts the Vite mock server itself), `a11y`, `audit:visual` (builds mock mode, runs `scripts/ui/visual_audit.mjs`), `verify:tokens`. `analogforge/package.json` delegates to `apps/web`. Python extras for the renderer go into `extra-aradhya` (`jinja2`, `markupsafe` are already kit dependencies).
 
 ## 9. Acceptance numbers
 
-All ids of `ui-testids.json` implemented (all 77; the kit test fails if the contract shrinks below 70); J1–J13 pass in mock mode (UIX-05/04) and are real-backend-ready (`test:e2e` with `E2E_TARGET=real` uses the same specs plus API assertions that are skipped **only** in mock mode through an explicit `isMock` helper — never by deleting assertions); renderer: 9 bundle fixtures × 3 formats deterministic; hostile-string suite finds no executable HTML and no active CSV formula; axe: 0 critical/serious at 1440/900/390.
+All ids of `ui-testids.json` implemented (all 81; the kit test fails if the contract shrinks below 70) — including the design-system ids `theme-toggle[data-theme-choice]`, `density-toggle[data-density]`, `copy-hash[data-hash-kind]`, `shortcut-help`; J1–J13 pass in mock mode (UIX-05/04) and are real-backend-ready (`test:e2e` with `E2E_TARGET=real` uses the same specs plus API assertions that are skipped **only** in mock mode through an explicit `isMock` helper — never by deleting assertions); renderer: 9 bundle fixtures × 3 formats deterministic; hostile-string suite finds no executable HTML and no active CSV formula; axe: 0 critical/serious at 1440/900/390.

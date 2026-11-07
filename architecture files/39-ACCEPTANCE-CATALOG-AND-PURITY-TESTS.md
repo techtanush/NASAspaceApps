@@ -74,6 +74,9 @@ This is the single catalog of tests that decide whether a branch is *pure* (§1�
 | UIX-09 | Renderer purity: subprocess import test shows no network/DB/model modules; all attempts/GAP/UNKNOWN present in HTML |
 | UIX-10 | Mock mode: permanent `MOCK PREVIEW` banner; production build fails when mock flag set |
 | UIX-11 | WebGL-failure fallback keeps candidate list, matrix, route table and exports |
+| UIX-12 | Design tokens: `verify_tokens.py` 150/150 (WCAG contrast + state distinctness); `tokens.css` regenerates byte-identically from `tokens.json`; no hex literals outside tokens ([41](41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md) §18) |
+| UIX-13 | Visual audit `visual_audit.mjs` C01–C20 over all screens × 6 viewports × dark/light: fonts, min size, contrast, 4 px grid, overflow, targets, focus, greyscale state distinctness, numerals, slop patterns, CLS, console, print, styleguide, prod bundle ([41](41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md) §20; guide `10` §3) |
+| DR-01…DR-04 | Design review: styleguide complete; three independent reviewer subagents score the 12-criterion rubric ≥ 3 each (mean ≥ 3.5); no open slop (X-xx) finding; `DESIGN-REVIEW.md` with verbatim reviewer reports |
 
 ### Merge (merging agent) — see `merging guide/`
 | ID | Check |
@@ -88,6 +91,7 @@ This is the single catalog of tests that decide whether a branch is *pure* (§1�
 | MRG-08 | Secret/ownership/forbidden-pattern scan on the merged tree |
 | MRG-09 | Requirements ledger: all 58 `PR-*` rows with module, test, observed result |
 | MRG-10 | Scientific validation report with SCI-01…SCI-18 for the exact merged SHA |
+| MRG-11 | Visual/professional-quality verification of the **merged** build: re-run `audit:visual` and the three-reviewer design review on screenshots taken from the real-backend journeys (J1–J13, mocks off), plus the merging agent's own hands-on rubric; design assets byte-identical to `team guides/Aradhya/design/` |
 
 ## 2. Branch purity (what "pure" means)
 

@@ -65,6 +65,7 @@ Each ruling applies everywhere; where a numbered document says otherwise, this t
 | E-16 | 20 implies Earthdata tokens are needed for live work. | A **file-drop dataset needs no network and no token.** `EARTHDATA_TOKEN` is needed only for the optional network adapters (`earthdata`, `pds`). |
 | E-17 | Root README describes per-person local worktrees. | Each person simply **clones their own branch**. Worktrees are an optional convenience. |
 | E-18 | Doc 26 says `make test-live` exists; live gates cannot run without credentials. | `make test-live` must exist, must `SKIP` with a printed reason when credentials are absent, and its result is reported as `BLOCKED_EXTERNAL`, never `PASSED`. |
+| E-19 | [18](18-MAPS-LAYERS-AND-VISUAL-DESIGN.md) §7–§8 give *proposed* tokens, fonts ("system fonts") and layout; they are not specific enough to guarantee a professional result. | [41](41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md) is binding for all visual design: tokens (`team guides/Aradhya/design/tokens.json`, verified contrast), self-hosted Inter + IBM Plex Mono (not system fonts, no CDN), shell layout, components, copy voice and the banned-"slop" list. 18 keeps authority over map/layer **behavior**. |
 
 If you discover another contradiction while building: do not silently pick a side. Record it in your `STATUS.json.contradictions_found` with the files, the choice you made, and the reasoning, and continue. The merging agent reconciles the list.
 

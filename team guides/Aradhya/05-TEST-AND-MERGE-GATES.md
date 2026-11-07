@@ -15,6 +15,8 @@ pnpm run generate:client && git diff --exit-code apps/web/src/generated         
 pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run test:contracts && pnpm run build   # UIX-01/03/04/05/06/10
 pnpm run test:e2e:mock                                                                      # journeys J01..J13 in mock mode
 pnpm run a11y                                                                               # UIX-07
+python3 scripts/ui/verify_tokens.py && python3 scripts/ui/gen_tokens_css.py | diff - apps/web/src/styles/tokens.css   # UIX-12
+pnpm run audit:visual                                                                       # UIX-13 (architecture 41 section 20, guide 10 section 3)
 python3 scripts/ui/forbidden_scan.py --json out/forbidden.json && python3 scripts/ui/mutation_check.py --json out/mutations.json
 python3 "../team coordination/scripts/check_branch_ownership.py" --person aradhya --repo ..   # PASS
 ```
@@ -44,6 +46,10 @@ python3 "../team coordination/scripts/check_branch_ownership.py" --person aradhy
 | `tests/e2e/journeys/J01…J13*.spec.ts` | UIX-04/05/07/10/11 | the click scripts of architecture 39 §3, exactly, in mock mode (mock banner present) |
 | `tests/e2e/a11y.spec.ts` | UIX-07 | axe: 0 critical/serious on S01–S12 at 1440/900/390; keyboard path; 200 % zoom; reduced motion |
 | `tests/e2e/webgl-fallback.spec.ts` | UIX-11 | with WebGL disabled the candidate list, matrix, route table and exports still work |
+| `scripts/ui/visual_audit.mjs` (+ `visual_audit.thresholds.test`) | UIX-13 | checks C01–C20 of `10` §3 over every screen × 6 viewports × 2 themes; 0 findings; thresholds equal arch 41 §20 |
+| `apps/web/design/tokens.json` + `scripts/ui/verify_tokens.py` + `gen_tokens_css.py` | UIX-12 | 150/150 contrast/distinctness checks; files byte-identical to the guide copies; `tokens.css` regenerates identically; no hex literals outside tokens |
+| `apps/web/src/components/ui/*.test.tsx` | UIX-05 | component behaviors: keyboard, aria, focus return, disabled-reason, status badge shape+glyph+word |
+| `team handoffs/aradhya/DESIGN-REVIEW.md` | DR-01..04 | `/__styleguide` complete; three reviewers, final scores ≥ 3 each and mean ≥ 3.5; no open X-xx slop finding |
 | `tests/e2e/prod-build-guard.test` | UIX-10 | build with `VITE_API_MOCK=1 NODE_ENV=production` fails; real build has no `msw` in the bundle |
 
 ## 3. Frozen thresholds
@@ -52,4 +58,4 @@ Journey step timeouts: preparation 60 s, run to `AWAITING_REVIEW` 180 s (mock: �
 
 ## 4. Merge readiness
 
-`STATUS.json.ready_to_merge = true` only if: every UIX row `PASSED`; J01–J13 pass in mock mode with **0 skipped**; kit verify and ownership `PASS`; all linters/typecheck clean; forbidden/mutation checks clean; the self-audit complete. Real-backend execution of the journeys is **not possible in your environment** and is listed `BLOCKED_ENVIRONMENT` for `MRG-03` only (it belongs to the merging agent); your specs must already contain the real-mode assertions (guarded by `isMock()`).
+`STATUS.json.ready_to_merge = true` only if: every UIX row (UIX-01…UIX-13) `PASSED`; DR-01…DR-04 `PASSED`; J01–J13 pass in mock mode with **0 skipped**; kit verify and ownership `PASS`; all linters/typecheck clean; forbidden/mutation checks clean; the self-audit complete. Real-backend execution of the journeys is **not possible in your environment** and is listed `BLOCKED_ENVIRONMENT` for `MRG-03` only (it belongs to the merging agent); your specs must already contain the real-mode assertions (guarded by `isMock()`).

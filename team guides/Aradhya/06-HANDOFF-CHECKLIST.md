@@ -13,6 +13,7 @@ Tick only with observed evidence recorded in `STATUS.json`.
 - [ ] Mock backend implements all 43 operations, fixtures validate against the bundled OpenAPI, storylines of architecture 40 replayed, banner visible, impossible in production builds; mock exports are **real renderer output**.
 - [ ] Renderer: html/json/csv deterministic, escaped, complete (every requirement/attempt/GAP/UNKNOWN), correct headline logic, exact CSV columns, canonical-manifest digest reproduces, pure (subprocess import test), `RendererError` codes, 9 fixtures.
 - [ ] Journeys J01–J13 pass in mock mode (0 skipped) and contain the real-mode assertions behind `isMock()`.
+- [ ] **Professional look (architecture 41):** tokens verified 150/150 and generated CSS identical (UIX-12); `audit:visual` clean over all screens × 6 viewports × dark/light (UIX-13); `/__styleguide` complete; three-reviewer design review passed with rubric ≥ 3 each / mean ≥ 3.5 and `DESIGN-REVIEW.md` written (DR-01..04); none of the banned slop patterns (X-01…X-29) present; fonts self-hosted; no NASA insignia.
 - [ ] axe 0 critical/serious at 1440/900/390; keyboard-only path; 200 % zoom; reduced motion.
 - [ ] No `eval`/`dangerouslySetInnerHTML`/`localStorage` run state/external requests/secrets; no `TODO`/`FIXME`/`HACK`; no weakened/skipped tests; mutation checks demonstrate tests can fail.
 - [ ] `STATUS.json` complete and truthful; contradictions and cross-area defects listed; committed; pushed to `origin aradhya/frontend-experience`.
