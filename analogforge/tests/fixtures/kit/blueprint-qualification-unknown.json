@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "workspace_id": "00000000-0000-4000-8000-000000000001",
+  "run_id": "00000000-0000-4000-8000-000000000006",
+  "mode": "synthetic",
+  "created_at": "2026-11-04T00:00:00Z",
+  "id": "00000000-0000-4000-8000-000000000008",
+  "candidate_id": "00000000-0000-4000-8000-000000000009",
+  "requirement_id": "R-CLEARANCE",
+  "status": "UNKNOWN",
+  "evidence_ids": [],
+  "rule_id": "scale-supported-clearance",
+  "rule_version": "1.0",
+  "confidence": "UNASSESSED",
+  "comparison_scale_m": 60,
+  "explanation": "Terrain support cannot establish0.20m clearance.",
+  "limitations": [
+    "This is an intentionally synthetic unknown-state fixture."
+  ],
+  "critic_status": "UNREVIEWED",
+  "critique_evidence_ids": []
+}

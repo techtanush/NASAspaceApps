@@ -1,0 +1,35 @@
+{
+  "name": "PRACTICE-SMALL-BATTERY",
+  "mass_kg": 42,
+  "max_slope_deg": 18,
+  "ground_clearance_m": 0.2,
+  "wheel_diameter_m": 0.3,
+  "max_obstacle_height_m": null,
+  "battery_wh": 30,
+  "min_reserve_pct": 20,
+  "nominal_speed_mps": 0.5,
+  "max_route_m": null,
+  "sensors": [
+    "stereo_camera",
+    "imu",
+    "lidar"
+  ],
+  "capabilities": [
+    "autonomous_navigation",
+    "geological_sampling"
+  ],
+  "energy_model": {
+    "model_id": "earth-simple-v1",
+    "rolling_coefficient": 0.06,
+    "drive_efficiency": 0.65,
+    "idle_power_w": 35,
+    "science_task_wh": 10,
+    "roughness_multiplier": 1,
+    "uncertainty_fraction": 0.25,
+    "calibration_status": "ASSUMED",
+    "calibration_evidence_id": null
+  },
+  "assumptions": [
+    "Practice rover with a 30 Wh battery: a kilometre-scale route must FAIL ENERGY_RESERVE_SHORTFALL (category ROVER) under unchanged requirements."
+  ]
+}

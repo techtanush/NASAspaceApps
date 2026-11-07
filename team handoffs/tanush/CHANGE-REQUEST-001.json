@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "request_id": "TANUSH-CR-001",
+  "requester": "Tanush platform implementation",
+  "status": "PROPOSED",
+  "owner": "tanush",
+  "current_contract_sha256": "a6c415ba9150064361620b060639303872ad9e89ecdeb6bfdc837cb283e7df08",
+  "affected_fields_or_paths": [
+    "paths./passports/{id}/exports/{format}.get.responses.200.content.application/json.schema",
+    "paths.*.get.responses.422",
+    "paths./configuration/scenarios/{id}.get.responses.404",
+    "paths.*.post.responses.413"
+  ],
+  "before": "JSON export schema is type:string. Several later-added read operations omit validation/not-found error declarations. POST operations omit bounded-input 413.",
+  "after": "JSON export schema must describe architecture35 section4 export object (export_schema_version, manifest_sha256, canonical_manifest, bundle). Add ErrorEnvelope declarations for reachable 404/422 and 413, preserving all43 operations and existing payloads.",
+  "reason": "Architecture35 explicitly requires an export JSON object and an independently re-canonicalized manifest. Serializing that object as a JSON string would break the renderer seam and consumers. Rejecting invalid parameters and excessive request bodies is necessary; disguising them as successful responses is incorrect. Frozen kit bytes were preserved. Artifact responses were adapted to declared200 application/octet-stream; ranges are not advertised.",
+  "scientific_meaning_changes": false,
+  "compatibility": "REQUIRES_MERGE_OWNER_SCHEMA_CORRECTION",
+  "affected_consumers": [
+    "Tanush API and conformance tests",
+    "Aradhya generated frontend client and passport renderer",
+    "merging-branch contract kit"
+  ],
+  "required_migration": "No database migration. Regenerate bundled OpenAPI/kit and generated client centrally, then rerun kit and43-operation tests.",
+  "required_tests": [
+    "tests/contracts/platform/test_transport_complete.py",
+    "tests/integration/platform/test_journey_api.py",
+    "tests/contracts/kit",
+    "frontend generated client and export parsing"
+  ],
+  "accepted_checkpoint_sha": null
+}
