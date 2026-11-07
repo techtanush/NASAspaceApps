@@ -1,0 +1,635 @@
+{
+  "schema_version": "2.0",
+  "person": "Tanush",
+  "branch": "tanush/platform-agents-integration",
+  "base_main_sha": "825d204b3e8cee8ade01db40ca8fb4020d0ec943",
+  "tested_commit_sha": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+  "kit_version": "1.0.0",
+  "kit_verify": {
+    "status": "PASSED",
+    "command": ".venv/bin/python '../architecture files/contracts/kit/materialize.py' --verify",
+    "exit_code": 0
+  },
+  "environment": {
+    "python": "3.12.13",
+    "uv": "uv 0.10.12 (Homebrew 2026-03-19 aarch64-apple-darwin)",
+    "postgres_method": "Private native PostgreSQL on loopback port5433, documented Docker fallback",
+    "postgres_version": "17.11",
+    "postgis_version": "3.7",
+    "docker": "BLOCKED_ENVIRONMENT: daemon unavailable",
+    "notes": [
+      "Final application/test databases use UTF8 with template0. Original databases retained.",
+      "Docker image static checks passed; actual image build not run.",
+      "API/worker process startup and warmed local latency measured; processes stopped after smoke.",
+      "Optional ccc search executable unavailable; scoped rg and direct reads used.",
+      "Final synthetic preflight reports storage WARN with 1692418048 free bytes. Live preflight requires 10 GiB; no live-readiness claim."
+    ]
+  },
+  "ownership_check": {
+    "status": "PASSED",
+    "exit_code": 0,
+    "base": "origin/main",
+    "accepted_base_sha": "825d204b3e8cee8ade01db40ca8fb4020d0ec943",
+    "output_file": "validation/ownership.json",
+    "changed_path_count": 301
+  },
+  "catalog": {
+    "KIT-01": {
+      "status": "PASSED",
+      "command": ".venv/bin/python '../architecture files/contracts/kit/materialize.py' --verify",
+      "exit_code": 0,
+      "output_file": "validation/kit-verify.log"
+    },
+    "KIT-02": {
+      "status": "PASSED",
+      "command": "pytest tests/contracts/kit -q --strict-markers -p no:randomly",
+      "exit_code": 0,
+      "tests_passed": 20,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/kit-junit.xml"
+    },
+    "PLT-01": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_migrations"
+      ],
+      "tests_passed": 3,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-02": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_openapi_conformance",
+        "test_transport_complete"
+      ],
+      "tests_passed": 14,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/c3-transport-coverage.json",
+      "scope": "CENTRAL_C3_INTEGRATION_PREVIEW; local C2 remains a known schema contradiction",
+      "strict_response_count": 81,
+      "operations_validated": 43,
+      "accepted_contract_checkpoint": "4c9897c96dc082b82b654988ff6898f85b90e504",
+      "integration_report": "validation/c3-preview.json"
+    },
+    "PLT-03": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_idempotency_revisions",
+        "test_transport_mutations"
+      ],
+      "tests_passed": 3,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-04": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_workspace_isolation",
+        "test_rls",
+        "test_http_security"
+      ],
+      "tests_passed": 9,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-05": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_jobs_leases",
+        "test_recovery",
+        "test_process_recovery"
+      ],
+      "tests_passed": 14,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-06": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_jobs_leases",
+        "test_persistence_cpu",
+        "test_persistence_worker"
+      ],
+      "tests_passed": 22,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-07": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_sse",
+        "test_process_recovery"
+      ],
+      "tests_passed": 6,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-08": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_registrar"
+      ],
+      "tests_passed": 13,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-09": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_policy",
+        "test_council",
+        "test_live_choices"
+      ],
+      "tests_passed": 20,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-10": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_council_scripted",
+        "test_runtime_journey"
+      ],
+      "tests_passed": 11,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-11": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_budgets",
+        "test_preparation_context",
+        "test_preparation"
+      ],
+      "tests_passed": 32,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-12": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_assurance",
+        "test_assurance_atomicity"
+      ],
+      "tests_passed": 35,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-13": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_passport_assembly"
+      ],
+      "tests_passed": 12,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-14": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_exports"
+      ],
+      "tests_passed": 10,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-15": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_entry_points"
+      ],
+      "tests_passed": 5,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-16": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_live_gates",
+        "test_seed_and_capabilities",
+        "test_http_errors"
+      ],
+      "tests_passed": 10,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-17": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_dataset_cli",
+        "test_science_context"
+      ],
+      "tests_passed": 4,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-18": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_live_gates"
+      ],
+      "tests_passed": 3,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-19": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_secrets"
+      ],
+      "tests_passed": 2,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-20": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_seed_and_capabilities"
+      ],
+      "tests_passed": 7,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    },
+    "PLT-21": {
+      "status": "PASSED",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "evidence_modules": [
+        "test_live_rehearsal",
+        "test_live_choices"
+      ],
+      "tests_passed": 17,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "validation/platform-junit.xml",
+      "scope": "Tanush platform with explicit synthetic science/renderer doubles; local HTTP model and real PostgreSQL/processes"
+    }
+  },
+  "status_values": [
+    "PASSED",
+    "FAILED",
+    "BLOCKED_ENVIRONMENT",
+    "BLOCKED_EXTERNAL",
+    "NOT_IMPLEMENTED",
+    "NOT_RUN"
+  ],
+  "sci_tests": {
+    "SCI-01": "NOT_RUN",
+    "SCI-02": "NOT_RUN",
+    "SCI-03": "NOT_RUN",
+    "SCI-04": "NOT_RUN",
+    "SCI-05": "NOT_RUN",
+    "SCI-06": "NOT_RUN",
+    "SCI-07": "NOT_RUN",
+    "SCI-08": "NOT_RUN",
+    "SCI-09": "NOT_RUN",
+    "SCI-10": "NOT_RUN",
+    "SCI-11": "NOT_RUN",
+    "SCI-12": "NOT_RUN",
+    "SCI-13": "NOT_RUN",
+    "SCI-14": "NOT_RUN",
+    "SCI-15": "NOT_RUN",
+    "SCI-16": "NOT_RUN",
+    "SCI-17": "NOT_RUN",
+    "SCI-18": "NOT_RUN"
+  },
+  "openapi": {
+    "operations_implemented": 43,
+    "operations_expected": 43,
+    "conformance_test": "PLT-02",
+    "local_C2_schema_conflict": "Still present in byte-identical feature kit; not represented as conformant. The accepted central C3 correction and strict final-preview responses are the merge target.",
+    "central_correction_sha": "4c9897c96dc082b82b654988ff6898f85b90e504",
+    "C3_preview_status": "PASSED_AFFECTED_CHECKS_WITH_FULL_SUITE_EQUIVALENCE",
+    "C3_preview_report": "validation/c3-preview.json"
+  },
+  "roles_implemented": [
+    "mission_director",
+    "requirements",
+    "rover_systems",
+    "planetary_target",
+    "earth_scout",
+    "qualification",
+    "scientific_critic",
+    "test_designer",
+    "verification_replanning",
+    "evidence_passport"
+  ],
+  "tools_implemented": [
+    "get_run_snapshot",
+    "inspect_contract",
+    "validate_mission_draft",
+    "validate_rover_profile",
+    "resolve_dataset_coverage",
+    "fetch_dataset",
+    "characterize_target",
+    "screen_earth_candidates",
+    "analyze_earth_candidate",
+    "compare_requirement",
+    "assess_rover_compatibility",
+    "review_evidence_bundle",
+    "design_test",
+    "search_route",
+    "verify_route",
+    "diagnose_verification",
+    "optimize_portfolio",
+    "get_evidence",
+    "compare_evidence",
+    "build_passport_manifest",
+    "submit_role_result"
+  ],
+  "journey_api": {
+    "J1_api_level": "PASSED",
+    "variants_passed": 6,
+    "tests_skipped": 0,
+    "output_file": "validation/platform-junit.xml",
+    "attempts_observed": [
+      "FAIL ROUTE",
+      "FAIL ANALOG",
+      "PASS on candidate B"
+    ],
+    "scope": "API, database and worker are real; science and renderer are explicit doubles"
+  },
+  "self_audit": {
+    "forbidden_scan": {
+      "status": "PASSED",
+      "findings": 0,
+      "output_file": "validation/forbidden.json"
+    },
+    "mutation_check": {
+      "status": "PASSED",
+      "mutants": 20,
+      "killed": 20,
+      "output_file": "validation/mutations.json"
+    },
+    "perturbations": {
+      "verification_and_diagnosis": {
+        "baseline": [
+          "FAIL",
+          "PASS"
+        ],
+        "perturbed": [
+          "FAIL",
+          "FAIL"
+        ],
+        "behavior": "Verifier PASS changed to FAIL; diagnosis no-repair terminates honestly without verified-route claim.",
+        "test": "tests/integration/platform/test_runtime_journey.py::test_runtime_changed_verifier_and_diagnosis_change_storyline"
+      },
+      "provider_choice": {
+        "baseline_repair": "NEW_ROUTE",
+        "changed_repair": "NEW_CANDIDATE",
+        "changed_strategy": "MINIMUM_FEASIBLE_ROUTE",
+        "behavior": "Actual local HTTP Responses provider selects second eligible candidate; accepted hashes and previous FAIL remain unchanged.",
+        "test": "tests/integration/platform/test_live_choices.py"
+      },
+      "invalid_source_url": {
+        "behavior": "Malformed source URL rejected with failed receipt and scratch quarantine.",
+        "test": "tests/unit/platform/test_registrar.py"
+      },
+      "child_error": {
+        "before": "Unexpected exception can write raw token-bearing source URL to stderr",
+        "after": "Only exception type is transported; child exits with empty stderr",
+        "test": "tests/unit/platform/test_persistence_cpu.py::test_spawned_child_sanitizes_unexpected_error_without_stderr_leak"
+      }
+    },
+    "adversarial_reviewers": [
+      {
+        "surface": "Policy bypass",
+        "report": "audits/policy-bypass.md",
+        "status": "RECHECK_PASSED; central C3 strict conformance closure recorded in validation/c3-preview.json"
+      },
+      {
+        "surface": "Concurrency and recovery",
+        "report": "audits/concurrency-recovery.md",
+        "status": "RECHECK_PASSED; central C3 strict conformance closure recorded in validation/c3-preview.json"
+      },
+      {
+        "surface": "43-operation contract",
+        "report": "audits/contract-audit.md",
+        "status": "RECHECK_PASSED; central C3 strict conformance closure recorded in validation/c3-preview.json"
+      },
+      {
+        "surface": "Security",
+        "report": "audits/security.md",
+        "status": "RECHECK_PASSED; central C3 strict conformance closure recorded in validation/c3-preview.json"
+      },
+      {
+        "surface": "Hardcoding and outcomes",
+        "report": "audits/hardcoding.md",
+        "status": "RECHECK_PASSED; central C3 strict conformance closure recorded in validation/c3-preview.json"
+      }
+    ],
+    "final_truth_checks": {
+      "fresh_local_bootstrap": {
+        "status": "PASSED",
+        "method": "New UTF8 database analogforge_test_clean_gate and fresh .runtime/clean-gate-data; make bootstrap, make migrate seed-synthetic, followed by final frozen make check. Originals preserved."
+      },
+      "no_keys": {
+        "status": "PASSED",
+        "evidence": "Six synthetic API journeys and exact live dependency rejection tests in validation/platform-junit.xml"
+      },
+      "real_entry_points": {
+        "status": "PASSED",
+        "behavior": "No production fallback; missing science and renderer are named by tests and actual preflight",
+        "evidence": "validation/preflight-synthetic.json"
+      },
+      "process_recovery": {
+        "status": "PASSED",
+        "evidence": "test_process_recovery.py in validation/platform-junit.xml; actual SIGKILL API/worker recovery"
+      },
+      "child_error_redaction": {
+        "status": "PASSED",
+        "cases": [
+          "KeyError",
+          "AttributeError",
+          "AssertionError"
+        ],
+        "evidence": "test_persistence_cpu.py in validation/platform-junit.xml; real spawn, normal child exit, empty stderr"
+      },
+      "secret_scan": {
+        "status": "PASSED",
+        "evidence": "validation/tracked-secrets.json"
+      },
+      "openapi_parity": {
+        "status": "PASSED",
+        "evidence": "validation/openapi-comparison.json"
+      },
+      "owned_source_frozen": {
+        "status": "PASSED",
+        "source_commit": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+        "method": "git diff --quiet SOURCE -- analogforge/src analogforge/tests analogforge/pyproject.toml analogforge/uv.lock; final commits contain delivery metadata only"
+      }
+    }
+  },
+  "lint": {
+    "ruff": {
+      "status": "PASSED",
+      "exit_code": 0
+    },
+    "mypy": {
+      "status": "PASSED",
+      "exit_code": 0,
+      "source_files": 123
+    }
+  },
+  "contradictions_found": [
+    "Frozen C2 JSON export string schema conflicts with architecture35 required object; resolved centrally by CR001, feature kit preserved.",
+    "Mission accepted_at versus immutable content resolved with external append-only acceptance overlay.",
+    "Later diagnosis versus immutable test inputs resolved through separate diagnosis records.",
+    "Preflight exit0 requirement conflicts with mandatory real-entry-point failure on isolated branch; report named blocker rather than substituting fakes.",
+    "Combined KIT+platform pytest process contaminates kit import-isolation check during collection; Makefile uses separate processes, matching guide05.",
+    "Git diff whitespace warning in newly materialized frozen science_payloads.py is preserved byte-for-byte; owned files are clean."
+  ],
+  "defects_in_other_areas": [],
+  "change_requests": [
+    {
+      "request_id": "TANUSH-CR-001",
+      "status": "ACCEPTED_CENTRAL_SCHEMA_CORRECTION",
+      "accepted_checkpoint_sha": "4c9897c96dc082b82b654988ff6898f85b90e504",
+      "feature_kit_changed": false,
+      "validation": "PASSED: strict final C3 transport and affected-delta checks, preceding C3 full baseline, final root full suite; see validation/c3-preview.json"
+    }
+  ],
+  "external_blockers": [
+    {
+      "scope": "External live OpenAI",
+      "status": "BLOCKED_EXTERNAL",
+      "reason": "No real key/model call performed. Local fake-HTTP strict provider rehearsal passes."
+    },
+    {
+      "scope": "Actual science/renderer and NASA acquisition",
+      "status": "BLOCKED_EXTERNAL",
+      "reason": "Ayan and Aradhya entry points/configuration absent on this branch. Real-switch probes fail with SCIENCE_FACADE_MISSING / RENDERER_MISSING, as required."
+    },
+    {
+      "scope": "Docker image build",
+      "status": "BLOCKED_ENVIRONMENT",
+      "reason": "Daemon unavailable; native PostgreSQL fallback used; image static checks pass."
+    }
+  ],
+  "known_limitations": [
+    "Platform integrity and control flow tested with explicit scientific/renderer doubles; no physical or real-source scientific validation claimed.",
+    "Production preflight truthfully fails missing collaborator components; make check therefore cannot exit0 on this isolated platform branch.",
+    "Merge requires the accepted central C3 contract checkpoint and later real-component/client/browser gates.",
+    "Local latency is30 warmed requests under the observed workstation load, not a capacity claim.",
+    "pushed_sha will record a delivered ancestor; a later delivery-receipt-only commit cannot embed its own hash."
+  ],
+  "platform_ready": true,
+  "decisions": "see team handoffs/tanush/DECISIONS.md",
+  "ready_to_merge": true,
+  "ready_to_merge_rule": "true only if every required catalog row is PASSED (DB rows may be BLOCKED_ENVIRONMENT only with attempted-command proof), kit_verify and ownership_check PASS, lint clean, self_audit complete, no hidden skips; BLOCKED_EXTERNAL allowed only for real-OpenAI/real-network rows with an offline PASSED equivalent",
+  "pushed_sha": null,
+  "uv_lock_committed": true,
+  "secrets_not_committed": true,
+  "data_not_committed": true,
+  "production_checkpoint_sha": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+  "created_at": "2026-11-07T06:11:47.232092+00:00",
+  "finalized_at": "2026-11-07T06:34:09.507754+00:00",
+  "platform_test_gate": {
+    "status": "PASSED",
+    "tested_commit_sha": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+    "passed": 278,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "output_file": "validation/platform-junit.xml"
+  },
+  "aggregate_make_check": {
+    "status": "BLOCKED_EXTERNAL",
+    "exit_code": 2,
+    "output_file": "validation/make-check.log",
+    "reason": "All platform tests, docs, lint and types pass; production preflight correctly fails absent Ayan configuration/science and Aradhya renderer. Remaining checks executed separately with their own evidence."
+  },
+  "ready_to_merge_scope": "Into merging-branch containing central C3 checkpoint 4c9897c96dc082b82b654988ff6898f85b90e504; not standalone old C2 main or full-product release readiness",
+  "required_contract_checkpoint": "4c9897c96dc082b82b654988ff6898f85b90e504",
+  "full_product_ready": false,
+  "central_delivery_checkpoint": "635df8de41b838b69369e21a6c814ce1889178cf",
+  "merge_prerequisites": [
+    {
+      "branch": "merging-branch",
+      "required_ancestor": "4c9897c96dc082b82b654988ff6898f85b90e504",
+      "evidence_checkpoint": "635df8de41b838b69369e21a6c814ce1889178cf",
+      "reason": "Accepted corrected C3 HTTP contract; feature frozen C2 bytes remain unchanged"
+    }
+  ]
+}

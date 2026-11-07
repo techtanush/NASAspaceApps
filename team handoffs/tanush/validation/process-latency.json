@@ -1,0 +1,26 @@
+{
+  "/api/v1/health/live": {
+    "requests": 30,
+    "median_ms": 0.617,
+    "p95_ms": 1.454,
+    "max_ms": 1.456
+  },
+  "/api/v1/health/ready": {
+    "requests": 30,
+    "median_ms": 1.034,
+    "p95_ms": 1.482,
+    "max_ms": 2.221
+  },
+  "/api/v1/missions": {
+    "requests": 30,
+    "median_ms": 0.996,
+    "p95_ms": 1.146,
+    "max_ms": 1.183
+  },
+  "/api/v1/capabilities": {
+    "requests": 30,
+    "median_ms": 5.642,
+    "p95_ms": 6.397,
+    "max_ms": 6.458
+  }
+}

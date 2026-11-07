@@ -1,0 +1,861 @@
+{
+  "schema_version": "1.0",
+  "scope": "TANUSH_PLATFORM_INTEGRITY_S0; REAL_SCIENCE_NOT_RUN",
+  "tested_commit_sha": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+  "accepted_main_sha": "825d204b3e8cee8ade01db40ca8fb4020d0ec943",
+  "created_at": "2026-11-07T06:01:49.415216+00:00",
+  "locks": {
+    "schema_sha256": "f88986b65b31ac8fbd2e6ad0fa05b31792a1b065786983789d174dec2008fa65",
+    "science_port_sha256": "db5a08e1cd74c9e78aa4d12895e9f2c38b76067c280b3141fa54a3a6de149b47",
+    "assurance_policy_sha256": "e49313ac4a8e84ae60a5f05fe8f909294ea1b9598cab1adde8d2b242d0a363ce",
+    "algorithm_lock_sha256": null,
+    "dataset_policy_sha256": null,
+    "acquired_manifest_sha256": null
+  },
+  "integrity_tests": [
+    {
+      "test_id": "SCI-01",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Run actual source acquisition/decoding and mutate real acquired bytes/checksums; demonstrate exclusion before scientific comparison. Citation-to-analyzed-asset semantics require real producer receipts."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_assurance.py::test_mechanical_integrity_cannot_be_waived",
+          "tests/integration/platform/test_passport_assembly.py::test_inconsistent_frozen_snapshot_is_rejected",
+          "tests/integration/platform/test_passport_assembly.py::test_multinode_evidence_cycle_is_rejected"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py",
+          "src/analogforge/application/passports.py"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "Platform rejects missing, failed-receipt, mode-mismatched or dangling evidence, inconsistent frozen/audit hashes and cyclic lineage. No fabricated evidence UUID becomes an accepted claim.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-02",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Ayan must execute body/frame, physical-quantity and vertical-scale adversaries through real decoders and comparisons. Typed handcrafted gates do not demonstrate this behavior."
+      ],
+      "platform_part": {
+        "status": "NOT_RUN",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [],
+        "implementation_paths": [],
+        "observation_ids": [],
+        "evidence_ids": [],
+        "observed_behavior": null,
+        "exact_final_commit_retest_required": true
+      }
+    },
+    {
+      "test_id": "SCI-03",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Run actual coarse native terrain and its upsampled derivative through clearance computation; verify UNKNOWN and unchanged physical support, including real presentation."
+      ],
+      "platform_part": {
+        "status": "NOT_RUN",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [],
+        "implementation_paths": [],
+        "observation_ids": [],
+        "evidence_ids": [],
+        "observed_behavior": null,
+        "exact_final_commit_retest_required": true
+      }
+    },
+    {
+      "test_id": "SCI-04",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Real nodata stripe, zero-fill and denominator perturbations have not been computed. Actual route rejection and visible masks/coverage denominators require Ayan science and Aradhya presentation."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_assurance.py::test_every_scientific_gate_blocks_an_unearned_positive",
+          "tests/integration/platform/test_assurance.py::test_missing_gate_is_not_assessed_not_success"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "When the typed adequacy gate is UNSATISFIED or missing, the platform rejects a dependent positive claim; all mandatory gate rows remain explicit.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-05",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Execute absent mineral, absent compatible thermal and absent optional layer with real producer inputs and renderer. Synthetic UNKNOWN rows exercise orchestration only and are not real retrieval/comparison evidence."
+      ],
+      "platform_part": {
+        "status": "NOT_RUN",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py"
+        ],
+        "observation_ids": [],
+        "evidence_ids": [],
+        "observed_behavior": null,
+        "exact_final_commit_retest_required": true
+      }
+    },
+    {
+      "test_id": "SCI-06",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "No supported interval, uncertainty propagation, sensitivity calculation or threshold-straddle oracle was computed. Real policy-driven classification remains unrun."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_assurance.py::test_every_scientific_gate_blocks_an_unearned_positive",
+          "tests/integration/platform/test_assurance.py::test_honest_limited_findings_publish",
+          "tests/integration/platform/test_assurance.py::test_nominal_models_are_limited_and_do_not_claim_observed_performance"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py",
+          "src/analogforge/application/passports.py"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "Typed failed uncertainty/adequacy gates cannot authorize positive publication; PARTIAL/UNKNOWN remain limited, and nominal-model statements do not become observed performance.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-07",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Actual energy/calibration and Earth-route wrong-Mars-gravity computations were not performed. No reserve, mobility, safety or physical performance certification is established."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_assurance.py::test_nominal_models_are_limited_and_do_not_claim_observed_performance",
+          "tests/integration/platform/test_assurance.py::test_every_scientific_gate_blocks_an_unearned_positive"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "Platform retains unquantified model limitations, labels accepted nominal models and withholds qualified-use conclusions. Failed typed model-adequacy gates reject unsupported positives.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-08",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Real NASADEM/SRTM shared-source ancestry and independent-corroboration policy must be exercised by the science implementation. Evidence DAG acyclicity alone does not prove source independence."
+      ],
+      "platform_part": {
+        "status": "NOT_RUN",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [],
+        "implementation_paths": [],
+        "observation_ids": [],
+        "evidence_ids": [],
+        "observed_behavior": null,
+        "exact_final_commit_retest_required": true
+      }
+    },
+    {
+      "test_id": "SCI-09",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "The platform consumes producer/verifier status. It has not independently recomputed energy, exposure, diagonal legality, nodata traversal or exhausted-search semantics from actual geometry. Fake INCONCLUSIVE statuses are not infeasibility proof."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_assurance.py::test_verification_requires_independent_gate_and_final_route_rows",
+          "tests/integration/platform/test_assurance.py::test_every_scientific_gate_blocks_an_unearned_positive"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py",
+          "src/analogforge/application/passports.py"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "A route-qualified conclusion requires the independent-verification gate and final route PASS rows; a missing/failed mandatory verification gate blocks publication.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-10",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Those metrics are supplied by FakeScienceService, not computed graph search. The 340 m/34 Wh/150 m supplied-route oracle, actual repair search, independent verifier and real renderer must run after integration. Fresh final-candidate journey evidence is pending."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_journey_api.py::test_full_accepted_contract_to_immutable_passport_and_downloads"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/passports.py",
+          "src/analogforge/application/exports.py",
+          "tests/support/fake_science.py"
+        ],
+        "observation_ids": [
+          "OBS-JOURNEY-HISTORICAL",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "Historical API/worker journeys with typed test doubles preserved immutable attempt sequences and accepted mission/rover hashes through publication and downloads. Fake canonical-graph rows carry 120 m/26 Wh/0 m then 230 m/30 Wh/150 m.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-11",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Root must attach final exact-SHA policy/API/critic tests, including model/user proposals, then exercise actual scientific remediation through integrated producers. This report does not establish a live model run."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_assurance.py::test_negative_findings_cannot_invent_evidence_or_relabel_missing_data_as_failure",
+          "tests/integration/platform/test_assurance.py::test_unresolved_critic_rejects_positive_but_preserves_negative",
+          "tests/integration/platform/test_assurance.py::test_mechanical_integrity_cannot_be_waived",
+          "tests/integration/platform/test_assurance_atomicity.py::test_invalid_positive_rolls_back_evidence_receipt_and_public_qualification",
+          "tests/integration/platform/test_assurance_atomicity.py::test_supported_negative_has_persisted_audit_before_public_row"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py",
+          "src/analogforge/application/passports.py"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-PLATFORM-ATOMIC-2",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "No-evidence or unresolved-critic positive is rejected; frozen-input drift cannot be waived. Real PostgreSQL tests observed atomic rollback of an invalid positive and a persisted audit preceding a supported negative public row.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-12",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Attach the root final PostgreSQL lease/cancellation/workspace tests. Actual changed source/algorithm recomputation under a new scientific lock is unrun. A passing owned guard test is not a full worker-fencing or real-source release proof."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_assurance.py::test_mechanical_integrity_cannot_be_waived",
+          "tests/integration/platform/test_assurance.py::test_policy_digest_pins_observable_rules_together_with_gate_registry",
+          "tests/integration/platform/test_passport_assembly.py::test_inconsistent_frozen_snapshot_is_rejected"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py",
+          "src/analogforge/application/passports.py",
+          "src/analogforge/application/exports.py"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "Stale snapshot, mismatched frozen hashes, changed policy identity, failed receipt, mode mismatch and inconsistent audit/manifest locks reject at the owned assurance/publication boundaries.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-13",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Constructed live-labelled unit objects are adversarial fixtures, not acquired assets or actual live execution. Real UI, source decoding, independent verification and mode/level presentation have not been jointly validated."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_assurance.py::test_mechanical_integrity_cannot_be_waived",
+          "tests/integration/platform/test_assurance.py::test_validation_level_requires_the_correct_executed_receipt_kind_and_algorithm",
+          "tests/integration/platform/test_passport_assembly.py::test_inconsistent_frozen_snapshot_is_rejected"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py",
+          "src/analogforge/application/passports.py"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "Synthetic evidence cannot assert S4; cross-mode evidence is rejected. Higher levels require correctly scoped registered evidence, successful receipts, and the expected kind/algorithm, rather than an arbitrary UUID.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-14",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Actual bounded-discovery computation, mission-sensitivity response and held-out negative controls remain unrun. The two passed tests below establish bounded wording and schema enforcement only; they do not demonstrate global novelty or scientific sensitivity."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/unit/platform/test_novelty_scope.py::test_discovery_claim_is_explicitly_bounded_by_search_and_reference_scope",
+          "tests/unit/platform/test_novelty_scope.py::test_reference_list_absence_is_preserved_and_global_novelty_label_is_rejected"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py",
+          "src/analogforge/application/discovery.py",
+          "src/analogforge/application/passports.py"
+        ],
+        "observation_ids": [
+          "ROOT-SCI14-2-PASSED",
+          "OBS-SCI14-FINAL-2",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "The actual claim compiler includes the declared search/reference scope; the candidate boundary preserves NOT_IN_REFERENCE_LIST and rejects GLOBALLY_NOVEL. Both tests passed again on production source checkpoint 54650090245c90ae257ae25aeb8c85e461944b4d. These are wording/schema guards, not discovery computation or negative-control validation.",
+        "exact_final_commit_retest_required": false,
+        "tested_commit_sha": "54650090245c90ae257ae25aeb8c85e461944b4d"
+      }
+    },
+    {
+      "test_id": "SCI-15",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Real browser and Aradhya renderer comparison for the same audited scientific run is unrun. Fake HTML/JSON/CSV agreement does not prove real UI preserves denominators, proxy scope, every warning or all attempts. CR001 blocks full JSON transport conformance."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_assurance.py::test_supported_negative_is_allowed_and_does_not_become_success",
+          "tests/integration/platform/test_assurance.py::test_honest_limited_findings_publish",
+          "tests/integration/platform/test_passport_assembly.py::test_changing_scientific_limitation_changes_manifest",
+          "tests/integration/platform/test_exports.py::test_renderer_seam_has_exact_deterministic_bytes_and_separate_file_digest",
+          "tests/integration/platform/test_exports.py::test_platform_rejects_renderer_digest_format_identity_or_version_drift"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py",
+          "src/analogforge/application/passports.py",
+          "src/analogforge/application/exports.py"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "Owned deterministic conclusions preserve FAIL/UNKNOWN/GAP, limitations affect the frozen manifest digest, and the export boundary rejects rendition identity/digest/format drift. Fake renderer bytes preserve the tested bundle fields.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-16",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Repeat fresh exact-candidate journeys, then demonstrate truthful negative and limited outcomes from actual scientific producers and the real renderer. A canned negative outcome is not a scientifically established negative control."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_assurance.py::test_supported_negative_is_allowed_and_does_not_become_success",
+          "tests/integration/platform/test_assurance.py::test_honest_limited_findings_publish",
+          "tests/integration/platform/test_assurance_atomicity.py::test_supported_negative_has_persisted_audit_before_public_row",
+          "tests/integration/platform/test_journey_api.py::test_full_accepted_contract_to_immutable_passport_and_downloads"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py",
+          "src/analogforge/application/passports.py"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-PLATFORM-ATOMIC-2",
+          "OBS-JOURNEY-HISTORICAL",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "Supported negative may publish ALLOWED with outcome FAIL; honest UNKNOWN/GAP/PARTIAL may publish LIMITED without qualified-use success. Historical no-rover journey published site qualification and blocked rover proof, using real API/worker/storage with science/renderer doubles.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-17",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Byte/manifest reproducibility is software provenance evidence. No real derived scientific metric has been independently recomputed from acquired source, algorithm, parameters and tolerances. Deterministic fake output cannot satisfy numerical reproducibility."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_passport_assembly.py::test_manifest_is_independently_reproducible_and_acyclic",
+          "tests/integration/platform/test_passport_assembly.py::test_changing_scientific_limitation_changes_manifest",
+          "tests/integration/platform/test_exports.py::test_renderer_seam_has_exact_deterministic_bytes_and_separate_file_digest",
+          "tests/unit/platform/test_science_seam_contract.py::test_all_fifteen_operation_results_and_scratch_artifacts_are_typed_and_hashed"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/passports.py",
+          "src/analogforge/application/exports.py",
+          "tests/support/fake_science.py"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "Manifest expectation independently uses hashlib.sha256(rfc8785.dumps(parsed)).hexdigest(); changed limitations change identity. Fifteen typed fake operations emit actual scratch bytes with matching hashes; rendition file digest is separate from scientific manifest digest.",
+        "exact_final_commit_retest_required": false
+      }
+    },
+    {
+      "test_id": "SCI-18",
+      "status": "NOT_RUN",
+      "test_path": null,
+      "command": null,
+      "exit_code": null,
+      "mode": null,
+      "evidence_ids": [],
+      "notes": [
+        "Root must attach final unknown-gate/schema/transport tests and same-run real UI/export checks. The owned fast suite is not the combined scientific release gate; unresolved frozen JSON response schema remains explicit."
+      ],
+      "platform_part": {
+        "status": "PASSED",
+        "scope": "Isolated platform software responsibility only; not full SCI acceptance",
+        "test_paths": [
+          "tests/integration/platform/test_assurance.py::test_missing_gate_is_not_assessed_not_success",
+          "tests/integration/platform/test_assurance.py::test_required_gate_cannot_be_marked_not_applicable",
+          "tests/integration/platform/test_assurance.py::test_mechanical_integrity_cannot_be_waived",
+          "tests/integration/platform/test_passport_assembly.py::test_inconsistent_frozen_snapshot_is_rejected",
+          "tests/integration/platform/test_passport_assembly.py::test_multinode_evidence_cycle_is_rejected"
+        ],
+        "implementation_paths": [
+          "src/analogforge/application/assurance.py",
+          "src/analogforge/application/passports.py",
+          "src/analogforge/application/exports.py",
+          "contracts/scientific-assurance.schema.json"
+        ],
+        "observation_ids": [
+          "OBS-PLATFORM-FAST-58",
+          "OBS-FINAL-PLATFORM-278"
+        ],
+        "evidence_ids": [],
+        "observed_behavior": "Missing/duplicate mandatory gates, unauthorized NOT_APPLICABLE, altered audit bytes/hash, mode/lock drift, missing requirement rows and cyclic evidence fail the owned checks. Passport assembly requires its exact registered assurance pointer and hash.",
+        "exact_final_commit_retest_required": false
+      }
+    }
+  ],
+  "validation_levels": {
+    "S0": {
+      "status": "PASSED",
+      "evidence": [
+        "OBS-FINAL-PLATFORM-278"
+      ],
+      "scope": "Explicit synthetic software/typed-contract guards only; final root278 and central strict conformance proof"
+    },
+    "S1": {
+      "status": "NOT_RUN",
+      "evidence": [],
+      "notes": [
+        "No scientific validation level is established by a fake producer, even when fixture payloads contain an asserted level."
+      ]
+    },
+    "S2": {
+      "status": "NOT_RUN",
+      "evidence": [],
+      "notes": [
+        "No scientific validation level is established by a fake producer, even when fixture payloads contain an asserted level."
+      ]
+    },
+    "S3": {
+      "status": "NOT_RUN",
+      "evidence": [],
+      "notes": [
+        "No scientific validation level is established by a fake producer, even when fixture payloads contain an asserted level."
+      ]
+    },
+    "S4": {
+      "status": "NOT_RUN",
+      "evidence": [],
+      "notes": [
+        "No scientific validation level is established by a fake producer, even when fixture payloads contain an asserted level."
+      ]
+    },
+    "S5": {
+      "status": "NOT_IMPLEMENTED",
+      "evidence": [],
+      "notes": [
+        "Physical rover/site validation is outside the baseline; no physical experiment was conducted."
+      ]
+    }
+  },
+  "source_paths": {
+    "Earth": {
+      "status": "NOT_RUN",
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": []
+    },
+    "Moon": {
+      "status": "NOT_RUN",
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": []
+    },
+    "Mars": {
+      "status": "NOT_RUN",
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": []
+    }
+  },
+  "controls": {
+    "status": "NOT_RUN",
+    "manifest_sha256": null,
+    "tuning_ids": [],
+    "held_out_ids": [],
+    "positive_control_evidence": [],
+    "negative_control_evidence": [],
+    "mission_sensitivity_evidence": [],
+    "ancestry_or_selection_limitations": [
+      "No locked real-science tuning/held-out/control experiment was executed. Synthetic scenario variants are software fixtures, not scientific controls."
+    ]
+  },
+  "published_examples": {
+    "supported_positive": [],
+    "supported_negative": [],
+    "limited_unknown": [],
+    "rejected_claim_audits": [],
+    "ui_export_comparisons": []
+  },
+  "live_model": {
+    "status": "NOT_RUN",
+    "receipts": []
+  },
+  "blockers": [
+    {
+      "id": "REAL_SCIENCE_INTEGRATION_PENDING",
+      "status": "NOT_RUN",
+      "detail": "Actual science implementation, observable policies, acquired-source receipts, numerical oracles, independent verifier, bounded discovery controls and real renderer/browser have not been validated together."
+    }
+  ],
+  "limitations": [
+    "This report establishes only observed owned platform guard behavior. No full SCI-01..SCI-18 combined scientific test is marked passed.",
+    "S1/S2/S3/S4 scientific validation is NOT_RUN; S5 physical validation is NOT_IMPLEMENTED. S0 denotes the explicitly narrow software fixture scope only.",
+    "No real NASA Earth/Moon/Mars product was acquired, decoded, compared or numerically reproduced for this report. Source paths and actual evidence arrays remain empty.",
+    "tests/support/fake_science.py supplies deterministic synthetic statuses and metrics for all fifteen typed operations. It cannot establish terrain, exposure, energy, mineral, thermal, scale, uncertainty, novelty or mission-sensitivity correctness.",
+    "Fake renderer output exercises the platform rendition seam. Aradhya real renderer, generated client and real browser presentation are unrun here.",
+    "No external live model/provider call was executed by this validation scope. Live mode must fail explicitly if its real dependency is absent; fake factory success is not live readiness.",
+    "No independently locked held-out source/control manifest or actual negative-control experiment exists for this report.",
+    "Current observable-policy digest includes an empty observable map because Ayan algorithms.yaml is absent. Runtime pinning can identify this configuration; it does not supply scientific adequacy policy.",
+    "Software passing tests neither qualify an Earth site for a real mission nor establish rover safety, reserve certification, global novelty, source independence or physical analogue validity.",
+    "The platform frozen compatibility contract omits the guide-requested preliminary flag. Central C3 reconciliation is accepted; final regenerated client/presentation and full conformance must be verified against the accepted central checkpoint.",
+    "The final full platform gate and strict C3 conformance are executed software checks. Actual science, source, UI and renderer acceptance remains integration work."
+  ],
+  "permitted_release_claims": [
+    "Observed local platform tests reject unsupported positive publication when registered evidence, frozen context or mandatory gate evidence is invalid.",
+    "Observed local platform tests preserve truthful negative/limited decisions and deterministic audit/manifest identities under the tested synthetic fixtures.",
+    "The typed seam can orchestrate fifteen scientific operations with explicit registered artifact/receipt boundaries; its test double produces real scratch bytes with verified hashes.",
+    "Historical synthetic journeys exercised real local API, database, worker and publication orchestration with fake science and fake renderer; they are software workflow demonstrations."
+  ],
+  "prohibited_or_unproven_claims": [
+    "The app has passed the complete SCI-01..SCI-18 scientific release gate or is fully ready to merge/release.",
+    "Real NASA products have been successfully decoded/analyzed or real Earth/Moon/Mars source pathways validated by these tests.",
+    "The canonical route search, independent verifier, energy model, uncertainty propagation or real scientific metrics are proven correct because canned graph metrics match expected values.",
+    "A non-reference candidate is globally new, a held-out negative control is scientifically validated, or mission sensitivity is established from scenario names.",
+    "Actual S1/S2/S3/S4 or S5 science validation, live-agent readiness, physical rover safety, or NASA endorsement/competition outcome is established.",
+    "The real renderer/browser preserves every scientific caveat, or frozen JSON export transport conformance is complete while CR001 remains unresolved."
+  ],
+  "ready_for_declared_scope": true,
+  "status_vocabulary": [
+    "NOT_RUN",
+    "PASSED",
+    "FAILED",
+    "BLOCKED_EXTERNAL",
+    "SKIPPED",
+    "NOT_IMPLEMENTED"
+  ],
+  "note": "Final Tanush S0 platform software scope only: 278 platform tests and 20 separate kit tests pass without skips. Accepted C3 contract verified by strict final integration checks and full-suite equivalence. Every full SCI acceptance row remains NOT_RUN; S1-S4 NOT_RUN, S5 NOT_IMPLEMENTED. No real source or scientific computation is established.",
+  "lock_definitions": {
+    "schema_sha256": "SHA-256 of contracts/scientific-assurance.schema.json at draft creation; not a claim that every consumer schema is compatible.",
+    "science_port_sha256": "SHA-256 of src/analogforge/ports/science.py at draft creation.",
+    "assurance_policy_sha256": "Current deterministic digest of the parsed observable policy map plus scientific gate registry. config/algorithms.yaml is absent on this platform branch, so the observable policy map is empty. This identifies current platform configuration; it is not a validated scientific policy lock.",
+    "algorithm_lock_sha256": "Null: no final real-science algorithm lock was executed or established for this report.",
+    "dataset_policy_sha256": "Null: no actual-source validation run was executed for this report.",
+    "acquired_manifest_sha256": "Null: no actual-source acquired-asset manifest was executed for this report.",
+    "accepted_main_sha": "Read-only accepted base of this branch; not the pending tested source checkpoint.",
+    "domain_schema_sha256": "cd051f476020752eca804d65ee2bb693c39109523a2d3bd69f49f3e923c6ecdf"
+  },
+  "platform_observations": [
+    {
+      "observation_id": "OBS-PLATFORM-FAST-58",
+      "status": "PASSED",
+      "scope": "Current owned fast assurance, immutable bundle, export seam and typed fake-operation tests; working tree not yet checkpointed",
+      "command": "rtk proxy .venv/bin/pytest -q tests/integration/platform/test_assurance.py tests/integration/platform/test_passport_assembly.py tests/integration/platform/test_exports.py tests/unit/platform/test_science_seam_contract.py",
+      "exit_code": 0,
+      "passed": 58,
+      "elapsed_seconds": 0.42,
+      "mode": "SYNTHETIC_TEST_DOUBLE",
+      "raw_evidence_path": null,
+      "notes": [
+        "Observed after direct independent RFC8785 expectation edits. No final commit SHA exists yet. Pytest emitted an unset asyncio_default_fixture_loop_scope deprecation warning.",
+        "The isolated validation-level adversary includes constructed live-labelled typed records; no external live execution occurs."
+      ]
+    },
+    {
+      "observation_id": "OBS-MANIFEST-EXPORT-21",
+      "status": "PASSED",
+      "scope": "Focused independent manifest and export checks after expected-hash edits",
+      "command": "rtk proxy .venv/bin/pytest -q tests/integration/platform/test_passport_assembly.py tests/integration/platform/test_exports.py",
+      "exit_code": 0,
+      "passed": 21,
+      "elapsed_seconds": 0.47,
+      "mode": "SYNTHETIC_TEST_DOUBLE",
+      "raw_evidence_path": null,
+      "notes": [
+        "Subset of the later 58-test observation; do not sum the counts."
+      ]
+    },
+    {
+      "observation_id": "OBS-PLATFORM-ATOMIC-2",
+      "status": "PASSED",
+      "scope": "Historical real PostgreSQL atomic registration tests using synthetic typed scientific inputs",
+      "command": "rtk proxy .venv/bin/pytest -q tests/integration/platform/test_assurance_atomicity.py",
+      "environment_requirement": "TEST_DATABASE_URL points to a disposable UTF8 local PostgreSQL/PostGIS database; do not put credentials in this report.",
+      "exit_code": 0,
+      "passed": 2,
+      "elapsed_seconds": 1.87,
+      "mode": "SYNTHETIC_TEST_DOUBLE",
+      "raw_evidence_path": null,
+      "notes": [
+        "Observed earlier in this working session. Root final exact-SHA retest and raw output capture are pending.",
+        "PostgreSQL transactions are real; adequacy statuses and science metrics are synthetic fixtures."
+      ]
+    },
+    {
+      "observation_id": "OBS-JOURNEY-HISTORICAL",
+      "status": "PASSED",
+      "scope": "Historical individual synthetic end-to-end scenario passes, across separate invocations, not a final candidate gate",
+      "test_paths": [
+        "tests/integration/platform/test_journey_api.py::test_full_accepted_contract_to_immutable_passport_and_downloads"
+      ],
+      "command": null,
+      "exit_code": null,
+      "mode": "SYNTHETIC_TEST_DOUBLE",
+      "raw_evidence_path": null,
+      "notes": [
+        "Six scenario variants were observed passing across earlier runs: Mars, graph, Moon/no-rover, PRACTICE-LITE, no-energy-repair and small-battery. There is no claimed single fresh six-scenario gate here.",
+        "The graph variant passed alone: 1 passed, 5 deselected in 18.22 seconds. The later UTF8 Moon/Lite/no-energy/small-battery subset passed: 4 passed, 2 deselected in 151.04 seconds.",
+        "An earlier broad invocation passed Mars and graph before encountering SQL_ASCII Unicode failures. Disposable databases were subsequently created with TEMPLATE template0 ENCODING UTF8.",
+        "A duplicate full run was interrupted at the root agent request while its separate final gate ran. This is not recorded as a final gate pass or scientific failure.",
+        "Uses real FastAPI routes, PostgreSQL, worker, scheduler, registrar, assurance, passport and export orchestration. Both scientific service and renderer are selected via test factories and are doubles."
+      ]
+    },
+    {
+      "observation_id": "OBS-FINAL-PLATFORM-278",
+      "status": "PASSED",
+      "production_sha": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+      "command": "pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml",
+      "exit_code": 0,
+      "passed": 278,
+      "failed": 0,
+      "skipped": 0,
+      "raw_evidence_path": "validation/platform-junit.xml",
+      "scope": "All platform tests, including six API journeys, atomicity, SCI14 wording guards and process recovery. Science/renderer doubles; no real science."
+    }
+  ],
+  "supplemental_observations": [
+    {
+      "id": "ROOT-SCI14-2-PASSED",
+      "command": ".venv/bin/python -m pytest tests/unit/platform/test_novelty_scope.py -q",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "production_sha": "737102a17fdb0ed15c7f7350aa88dc231d2824ec",
+      "test_commit_sha": "a5fc6c51de4a1c98f6cd4acaed7747131f65d070"
+    },
+    {
+      "id": "OBS-SCI14-FINAL-2",
+      "status": "PASSED",
+      "command": "rtk proxy .venv/bin/pytest -q tests/unit/platform/test_novelty_scope.py",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "elapsed_seconds": 0.35,
+      "production_sha": "54650090245c90ae257ae25aeb8c85e461944b4d",
+      "test_commit_sha": "a5fc6c51de4a1c98f6cd4acaed7747131f65d070",
+      "mode": "SYNTHETIC_TEST_DOUBLE",
+      "raw_evidence_path": null,
+      "notes": [
+        "Observed by handoff author on final committed production source. No source or test files were changed.",
+        "Only bounded statement and novelty-status schema behavior was tested; no scientific discovery/control experiment was performed."
+      ]
+    }
+  ],
+  "finalized_at": "2026-11-07T06:34:09.510940+00:00",
+  "final_checkpoint": {
+    "production_source_sha": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+    "sci14_test_commit_sha": "a5fc6c51de4a1c98f6cd4acaed7747131f65d070",
+    "accepted_c3_contract_checkpoint_sha": "4c9897c96dc082b82b654988ff6898f85b90e504",
+    "root_full_gate": {
+      "status": "PASSED",
+      "tested_commit_sha": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+      "passed": 278,
+      "failed": 0,
+      "skipped": 0,
+      "platform_test_exit_code": 0,
+      "aggregate_make_check_exit_code": 2,
+      "aggregate_limit": "Expected missing production dependencies; recorded separately",
+      "raw_evidence_path": "validation/platform-junit.xml"
+    },
+    "central_c3_final_preview": {
+      "status": "PASSED",
+      "production_source_sha": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+      "contract_checkpoint_sha": "4c9897c96dc082b82b654988ff6898f85b90e504",
+      "method": "Preceding full C3 baseline plus final affected checks and root full-suite source equivalence; not a claim of a second final full C3 run",
+      "raw_evidence_path": "validation/c3-preview.json"
+    },
+    "previous_c3_preview": {
+      "status": "PASSED",
+      "passed": 267,
+      "source_checkpoint_sha": "737102a17fdb0ed15c7f7350aa88dc231d2824ec",
+      "contract_checkpoint_sha": "4c9897c96dc082b82b654988ff6898f85b90e504",
+      "raw_evidence_path": null,
+      "provenance": "Reported by root; previous preview only. This is not a final 5465009 rerun result."
+    }
+  },
+  "resolved_conditions": [
+    {
+      "id": "FINAL_FULL_GATE_PENDING",
+      "status": "PASSED",
+      "report": "validation/platform-junit.xml"
+    },
+    {
+      "id": "TANUSH-CR-001",
+      "status": "PASSED",
+      "checkpoint": "4c9897c96dc082b82b654988ff6898f85b90e504",
+      "report": "validation/c3-preview.json"
+    }
+  ]
+}
