@@ -86,6 +86,7 @@ Every file below belongs to the implementation blueprint. Validation reports des
 | [38-RUNTIME-KEYS-AND-LOCAL-SETUP.md](38-RUNTIME-KEYS-AND-LOCAL-SETUP.md) | Runtime, API keys and local setup |
 | [39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md](39-ACCEPTANCE-CATALOG-AND-PURITY-TESTS.md) | Acceptance catalog, purity tests and browser journeys |
 | [40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md](40-PRACTICE-SCENARIOS-AND-FIXTURE-SPECS.md) | Practice scenarios and fixture specifications |
+| [41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md](41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md) | Binding frontend design system: professional mission-console look, tokens, components, screen briefs, banned slop, visual QA |
 | [contracts/kit/materialize.py](contracts/kit/materialize.py) | Kit materialize/verify tool (stdlib only) |
 | [contracts/kit/kit-manifest.json](contracts/kit/kit-manifest.json) | SHA-256 manifest of every frozen kit file |
 | [contracts/kit/tools/build_kit.py](contracts/kit/tools/build_kit.py) | Kit regeneration tool (contract-change process only) |

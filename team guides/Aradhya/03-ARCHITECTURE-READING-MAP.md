@@ -49,3 +49,8 @@ These describe the product’s Agent Council, not permission to spawn additional
 ## Required scientific credibility reading
 
 Follow your [scientific credibility implementation requirements](07-SCIENTIFIC-CREDIBILITY-REQUIREMENTS.md) and [shared gate06](../../team%20coordination/06-SCIENTIFIC-CREDIBILITY-AND-RELEASE-GATE.md). Include actual SC gate/SCI test evidence, policy/algorithm/source hashes, validated claim scope and visible unknowns in your checkpoint. The required C1 audit must cross the real science→backend→UI/export boundary before combined acceptance. Missing/unrun external validation remains explicit; it cannot be called passed.
+
+
+## Design standard (read before any component)
+
+[Architecture 41](../../architecture%20files/41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md) (complete, binding; overrides 18 §7–§8 for visuals), then [10-DESIGN-SYSTEM-AND-VISUAL-QA.md](10-DESIGN-SYSTEM-AND-VISUAL-QA.md) and `design/tokens.json`.

@@ -98,6 +98,8 @@ Every graph has a table equivalent. Do not animate a passing curve before measur
 
 ## 7. Visual system
 
+> **Superseded for visuals by [41](41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md) (ruling E-19).** The token table below is historical guidance; use `team guides/Aradhya/design/tokens.json`, the typography, layout and component rules of 41. This document remains authoritative for map and layer behavior (§1–§6, §9–§10).
+
 The workbench should feel focused and readable: clear hierarchy, generous panel spacing, compact informative tables and a dark terrain canvas balanced with high-contrast surfaces. Choose one coherent token system; do not imitate a dense cinematic cockpit at the cost of legibility. These are proposed design tokens, to verify in implementation:
 
 | Token | Intended role |
