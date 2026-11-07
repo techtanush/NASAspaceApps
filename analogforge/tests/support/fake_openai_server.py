@@ -11,7 +11,7 @@ from typing import Any
 
 
 @contextmanager
-def fake_responses_server(mode: str = "normal"):
+def fake_responses_server(mode: str = "normal", transform_submission=None):
     requests: list[dict[str, Any]] = []
 
     class Handler(BaseHTTPRequestHandler):
@@ -68,6 +68,8 @@ def fake_responses_server(mode: str = "normal"):
                         name, args = "get_run_snapshot", {"sections": ["contract"]}
                     else:
                         name, args = "submit_role_result", task["payload"]["prepared_submission"]
+                        if transform_submission is not None:
+                            args = transform_submission(args, task)
                 else:
                     name, args = "submit_role_result", {}
                 arguments = (

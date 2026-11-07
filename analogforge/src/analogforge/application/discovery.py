@@ -39,9 +39,9 @@ def candidate_record(
     }
 
 
-def pick_replan_candidate(
+def eligible_replan_candidates(
     candidates: list[dict[str, Any]], qualifications: list[dict[str, Any]], attempted_ids: set[str]
-) -> dict[str, Any] | None:
+) -> list[dict[str, Any]]:
     eligible: list[dict[str, Any]] = []
     for candidate in candidates:
         if candidate["id"] in attempted_ids or not candidate.get("analysis_payload"):
@@ -60,4 +60,11 @@ def pick_replan_candidate(
         band_area = sum(sum(z["band_area_m2"].values()) for z in zones if z["contains_start"])
         return (-band_area, candidate.get("screening_rank") or 10**6, candidate["window_id"])
 
-    return min(eligible, key=order) if eligible else None
+    return sorted(eligible, key=order)
+
+
+def pick_replan_candidate(
+    candidates: list[dict[str, Any]], qualifications: list[dict[str, Any]], attempted_ids: set[str]
+) -> dict[str, Any] | None:
+    eligible = eligible_replan_candidates(candidates, qualifications, attempted_ids)
+    return eligible[0] if eligible else None

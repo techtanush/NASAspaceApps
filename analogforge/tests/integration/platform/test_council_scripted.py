@@ -113,3 +113,63 @@ def test_requirements_changed_contract_and_rover_limits_are_rejected():
     )
     with pytest.raises(PolicyViolation, match="FROZEN"):
         validate_submission(task, submission)
+
+
+@pytest.mark.parametrize("mutation", ["repair_kind", "foreign_target", "strategy", "verdict"])
+def test_repair_choices_are_bounded_by_server_issued_options(mutation):
+    task, _, _, _, _ = task_and_context()
+    test_id, result_id, candidate_id = [str(uuid4()) for _ in range(3)]
+    payload = {
+        "test_revision_id": test_id,
+        "result_revision_id": result_id,
+        "search_attempt_id": None,
+        "outcome": "FAIL",
+        "primary_failure_category": "ROUTE",
+        "secondary_failure_categories": [],
+        "violated_constraint_ids": [],
+        "diagnosis_receipt_id": None,
+        "repair": {
+            "kind": "NEW_CANDIDATE",
+            "target_revision_ids": [candidate_id],
+            "addresses_constraint_ids": [],
+            "preserved_contract_sha256": task.contract_hash,
+            "strategy": "MINIMUM_FEASIBLE_ROUTE",
+            "expected_check": "Independent verification",
+            "requires_new_run": False,
+        },
+        "stop_reason": None,
+    }
+    baseline = {
+        **task.payload["prepared_submission"],
+        "role_key": "verification_replanning",
+        "task_kind": "diagnose_failed_attempt",
+        "payload": payload,
+    }
+    task = task.model_copy(
+        update={
+            "role_key": "verification_replanning",
+            "task_kind": "diagnose_failed_attempt",
+            "payload": {
+                "authoritative_submission": deepcopy(baseline),
+                "permitted_repairs": ["NEW_ROUTE", "NEW_CANDIDATE"],
+                "allowed_choices": {
+                    "repair_kinds": ["NEW_CANDIDATE"],
+                    "repair_target_revision_ids": {"NEW_CANDIDATE": [candidate_id]},
+                    "strategies": ["MINIMUM_FEASIBLE_ROUTE"],
+                },
+            },
+        }
+    )
+    validate_submission(task, RoleSubmission.model_validate(baseline))
+    changed = deepcopy(baseline)
+    repair = changed["payload"]["repair"]
+    if mutation == "repair_kind":
+        repair["kind"] = "NEW_ROUTE"
+    elif mutation == "foreign_target":
+        repair["target_revision_ids"] = [str(uuid4())]
+    elif mutation == "strategy":
+        repair["strategy"] = "RECOVERY_ALTERNATIVE"
+    else:
+        changed["payload"]["outcome"] = "PASS"
+    with pytest.raises(PolicyViolation):
+        validate_submission(task, RoleSubmission.model_validate(changed))

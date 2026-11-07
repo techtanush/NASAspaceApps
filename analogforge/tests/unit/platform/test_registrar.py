@@ -111,12 +111,15 @@ def test_valid_registration_resolves_all_refs_and_lineage(registration):
         "mode",
         "symlink",
         "media",
+        "malformed_url",
     ],
 )
 def test_rejections_do_not_publish_domain_or_evidence(registration, mutation):
     registrar, store, request, result, kwargs = registration
     raw = result.model_dump(mode="json")
-    if mutation == "hash":
+    if mutation == "malformed_url":
+        raw["evidence_drafts"][0]["source_uri"] = "https://[bad"
+    elif mutation == "hash":
         raw["artifacts"][0]["sha256"] = "0" * 64
     elif mutation == "size":
         raw["artifacts"][0]["size_bytes"] += 1

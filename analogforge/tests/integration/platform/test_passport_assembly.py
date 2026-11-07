@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -7,6 +8,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
+import rfc8785
 
 from analogforge.application.assurance import ScientificClaimRejected, audit
 from analogforge.application.passports import PassportSnapshot, assemble_bundle
@@ -108,7 +110,7 @@ def test_manifest_is_independently_reproducible_and_acyclic():
     snapshot = passport_case()
     bundle = assemble_bundle(snapshot)
     parsed = json.loads(bundle.canonical_manifest_json)
-    assert bytes_sha256(canonical_json_bytes(parsed)) == bundle.manifest_sha256
+    assert hashlib.sha256(rfc8785.dumps(parsed)).hexdigest() == bundle.manifest_sha256
     assert bundle.manifest_sha256 == bundle.passport.manifest_sha256
     assert "manifest_sha256" not in parsed
     assert str(snapshot.assurance_evidence.id) == parsed["decisions"]["assurance_evidence_id"]

@@ -109,11 +109,12 @@ MUTANTS = (
     ),
     Mutant(
         "M10",
-        "contaminate export digest with wall clock",
+        "inject wall clock into frozen export input",
         "application/exports.py",
-        "bytes_sha256(result.content) or result.renderer_version",
-        'bytes_sha256(result.content + str(__import__("time").time_ns()).encode()) or result.renderer_version',
-        "tests/integration/platform/test_seed_and_capabilities.py::test_renderer_digest_is_stable_under_export_validation",
+        "rendered = actual_renderer.render(bundle, assets, fmt)",
+        'rendered = actual_renderer.render(bundle.model_copy(update={"generated_at": '
+        '__import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()}), assets, fmt)',
+        "tests/integration/platform/test_exports.py::test_platform_passes_frozen_export_time_to_renderer",
     ),
     Mutant(
         "M11",

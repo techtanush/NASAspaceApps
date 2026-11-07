@@ -88,9 +88,13 @@ class Transport:
             exported = response.json()
             assert isinstance(exported, dict) and exported["export_schema_version"] == "1.0"
             assert {"manifest_sha256", "canonical_manifest", "bundle"} <= exported.keys()
-            with pytest.raises(ValidationError):
+            if schema == {"type": "string"}:
+                with pytest.raises(ValidationError):
+                    validate_document(exported, schema)
+            else:
+                # The central C3 correction can now be tested unchanged in the
+                # integration checkout; no response is exempted from validation.
                 validate_document(exported, schema)
-            assert schema == {"type": "string"}
         elif schema.get("type") == "string":
             validate_document(response.text, schema)
         else:
@@ -107,7 +111,10 @@ class Transport:
                 "operation_id": operation_id,
                 "status": status,
                 "schema": "KNOWN_JSON_EXPORT_CONTRACT_CONFLICT"
-                if operation_id == "getPassportExport" and status == 200 and response_type == "application/json"
+                if operation_id == "getPassportExport"
+                and status == 200
+                and response_type == "application/json"
+                and schema == {"type": "string"}
                 else "PASSED",
             }
         )

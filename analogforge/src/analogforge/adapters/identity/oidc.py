@@ -40,7 +40,7 @@ class OIDCClient:
             response = self.client.request(method, url, data=data)
             response.raise_for_status()
             value = response.json()
-        except (httpx.HTTPError, ValueError) as exc:
+        except (httpx.HTTPError, httpx.InvalidURL, ValueError) as exc:
             raise PersistenceError(
                 "IDENTITY_PROVIDER_UNAVAILABLE", "The configured identity provider did not return a valid response"
             ) from exc
@@ -53,9 +53,15 @@ class OIDCClient:
         if result.get("issuer") != self.issuer:
             raise PersistenceError("AUTHENTICATION_REQUIRED", "OIDC discovery issuer mismatch")
         for key in ("authorization_endpoint", "token_endpoint", "jwks_uri"):
-            endpoint = urlsplit(result.get(key, ""))
+            value = result.get(key)
+            if not isinstance(value, str) or not value or len(value) > 2048:
+                raise PersistenceError("OIDC_CONFIGURATION_INVALID", "OIDC endpoint must be a bounded URL string")
+            try:
+                endpoint = urlsplit(value)
+            except ValueError as exc:
+                raise PersistenceError("OIDC_CONFIGURATION_INVALID", "OIDC endpoint URL is invalid") from exc
             issuer = urlsplit(self.issuer)
-            if (endpoint.scheme, endpoint.netloc) != (issuer.scheme, issuer.netloc):
+            if (endpoint.scheme, endpoint.netloc) != (issuer.scheme, issuer.netloc) or endpoint.fragment:
                 raise PersistenceError(
                     "OIDC_CONFIGURATION_INVALID", "OIDC endpoints must use the configured issuer origin"
                 )
@@ -78,7 +84,7 @@ class OIDCClient:
             )
         return (
             str(metadata["authorization_endpoint"])
-            + "?"
+            + ("&" if urlsplit(metadata["authorization_endpoint"]).query else "?")
             + urlencode(
                 {
                     "response_type": "code",

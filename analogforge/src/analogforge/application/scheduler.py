@@ -605,6 +605,12 @@ class WorkflowEngine:
             **(extra or {}),
         }
         payload = project_payload(role, facts)
+        choices = (extra or {}).get("allowed_choices", {})
+        if role == "verification_replanning" and choices and payload.get("repair"):
+            repair = payload["repair"]
+            allowed = choices.get("repair_target_revision_ids", {}).get(repair["kind"], [])
+            if allowed:
+                repair["target_revision_ids"] = [allowed[0]]
         proposal: dict[str, Any] = {
             "schema_version": "1.0",
             "role_key": role,
@@ -644,6 +650,7 @@ class WorkflowEngine:
                 "untrusted_sources": [],
                 "authoritative_rover": rover,
                 "permitted_repairs": (extra or {}).get("diagnosis", {}).get("permitted_repairs", []),
+                "allowed_choices": (extra or {}).get("allowed_choices", {}),
                 "receipt_summaries": [
                     {k: r[k] for k in ("id", "tool_name", "status", "evidence_ids")} for r in receipts
                 ],
@@ -1312,6 +1319,29 @@ class WorkflowEngine:
             tests = self._rows(workspace_id, "tests", run_id)
             prior = self._attempt_summaries(workspace_id, run_id)
             strategy = runtime.get("strategy", "WAYPOINT_RETURN")
+            strategies = ["WAYPOINT_RETURN"] if not tests else ["EXPOSURE_COVERAGE", "MINIMUM_FEASIBLE_ROUTE"]
+            if runtime.get("blocked_edge_ids"):
+                strategies.append("RECOVERY_ALTERNATIVE")
+            preview = {
+                "id": None,
+                "strategy": strategy,
+                "search_payload": None,
+                "requirement_mapping": [],
+                "unverified_requirement_ids": [row["id"] for row in mission["requirements"]],
+            }
+            proposed = self._role(
+                "test_designer",
+                "design_benchmark" if not tests else "design_replan",
+                run_id,
+                workspace_id,
+                {
+                    "candidate": candidate,
+                    "test": preview,
+                    "allowed_choices": {"candidate_revision_ids": [candidate["id"]], "strategies": strategies},
+                },
+            )
+            candidate = next(c for c in candidates if c["id"] == proposed.payload["candidate_revision_id"])
+            strategy = proposed.payload["strategy"]
             analysis_id = next(
                 (
                     e["id"]
@@ -1487,6 +1517,36 @@ class WorkflowEngine:
                     fresh = tx.require("runs", run_id)
                     fresh["test_result_ids"].append(result["id"])
                     tx.replace("runs", run_id, fresh, fresh["revision"])
+            candidates = self._rows(workspace_id, "candidates", run_id)
+            eligible = discovery.eligible_replan_candidates(
+                candidates,
+                self._latest_qualifications(workspace_id, run_id),
+                {attempt["candidate_id"] for attempt in tests},
+            )
+            repair_targets = {
+                "NEW_ROUTE": [test["id"]],
+                "NEW_ZONE": [test["candidate_id"]],
+                "NEW_CANDIDATE": [candidate["id"] for candidate in eligible],
+                "COMPOSITE_PORTFOLIO": [test["id"]],
+                "DATA_REPAIR": [test["id"]],
+                "NEW_CONTRACT_REQUIRED": [test["id"]],
+            }
+            permitted = [kind for kind in diagnosis["permitted_repairs"] if repair_targets.get(kind)]
+            if ledger.remaining("replans_total") < 1:
+                permitted = [kind for kind in permitted if kind not in {"NEW_ROUTE", "NEW_ZONE", "NEW_CANDIDATE"}]
+            if ledger.remaining("route_repairs_same_candidate") < 1:
+                permitted = [kind for kind in permitted if kind not in {"NEW_ROUTE", "NEW_ZONE"}]
+            if ledger.remaining("candidate_switches") < 1:
+                permitted = [kind for kind in permitted if kind != "NEW_CANDIDATE"]
+            recommended = (
+                diagnosis["recommended_repair"]
+                if diagnosis["recommended_repair"] in permitted
+                else (permitted[0] if permitted else None)
+            )
+            bounded_diagnosis = {**diagnosis, "permitted_repairs": permitted, "recommended_repair": recommended}
+            strategies = ["EXPOSURE_COVERAGE", "MINIMUM_FEASIBLE_ROUTE"]
+            if runtime.get("blocked_edge_ids"):
+                strategies.append("RECOVERY_ALTERNATIVE")
             decision = self._role(
                 "verification_replanning",
                 "diagnose_failed_attempt",
@@ -1495,8 +1555,14 @@ class WorkflowEngine:
                 {
                     "test": test,
                     "result": result,
-                    "diagnosis": diagnosis,
+                    "diagnosis": bounded_diagnosis,
                     "diagnosis_receipt_id": diagnosed.receipt["id"],
+                    "allowed_choices": {
+                        "repair_kinds": permitted,
+                        "repair_target_revision_ids": repair_targets,
+                        "candidate_revision_ids": [candidate["id"] for candidate in eligible],
+                        "strategies": strategies,
+                    },
                 },
             )
             proposed_repair = decision.payload.get("repair")
@@ -1505,7 +1571,12 @@ class WorkflowEngine:
                     **diagnosis,
                     "recommended_repair": proposed_repair["kind"],
                     "recommended_strategy": proposed_repair["strategy"],
+                    "selected_candidate_id": proposed_repair["target_revision_ids"][0]
+                    if proposed_repair["kind"] == "NEW_CANDIDATE"
+                    else None,
                 }
+            else:
+                diagnosis = {**diagnosis, "recommended_repair": None}
             repair = diagnosis["recommended_repair"]
             stop = repair is None or repair in {"NEW_CONTRACT_REQUIRED", "DATA_REPAIR", "COMPOSITE_PORTFOLIO"}
             return finish(
@@ -1535,8 +1606,15 @@ class WorkflowEngine:
             if repair == "NEW_CANDIDATE":
                 candidates = self._rows(workspace_id, "candidates", run_id)
                 attempted = {t["candidate_id"] for t in self._rows(workspace_id, "tests", run_id)}
-                next_candidate = discovery.pick_replan_candidate(
+                eligible = discovery.eligible_replan_candidates(
                     candidates, self._latest_qualifications(workspace_id, run_id), attempted
+                )
+                selected_choice = diagnosis.get("selected_candidate_id")
+                if selected_choice is not None and selected_choice not in {candidate["id"] for candidate in eligible}:
+                    raise PolicyViolation("CANDIDATE_CHOICE_NOT_PERMITTED")
+                next_candidate = next(
+                    (candidate for candidate in eligible if candidate["id"] == selected_choice),
+                    eligible[0] if eligible else None,
                 )
                 if next_candidate is None:
                     return finish("BUILDING_PASSPORT", runtime={"stop_reason": "NO_PERMITTED_REPAIR"})

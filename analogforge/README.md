@@ -2,6 +2,8 @@
 
 AnalogForge qualifies Earth analog sites against Moon and Mars mission requirements, then records rover route verification, uncertainty, and a traceable passport. Practice scenarios run without an OpenAI key or network data. Live mode needs an operator-selected model and bound datasets.
 
+The Tanush branch implements the platform, API, agents, jobs, identity, assurance and export orchestration. `make test` exercises these services with explicit test doubles. Production preflight requires Ayan's science/configuration and Aradhya's renderer through the frozen entry points. Integrate those branches to run the complete application; missing components are reported by name. The accepted central C3 schema correction is recorded in `team handoffs/tanush/CHANGE-REQUEST-001.json` and must be included by the merging agent.
+
 ## Local start
 
 Use Python 3.12 or 3.13, `uv`, Docker with Compose, and PostgreSQL 16/PostGIS 3.4. Copy `.env.example` to `.env`; set `DATA_ROOT` to an absolute writable path such as this checkout's `data/`, set `DATABASE_URL` to `127.0.0.1` with the selected local port, and set a local database password. Then run `make bootstrap`. For native macOS development, set `DB_PORT` to the chosen private port before bootstrapping. Run `make dev`; it starts the database, migrations, local seed, API, worker, and the web dev server when `apps/web` is installed. Stop with Ctrl-C, then `make down` for the Compose database. `AUTH_MODE=local` requires a loopback `API_HOST`.

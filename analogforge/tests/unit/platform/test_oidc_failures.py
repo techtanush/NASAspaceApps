@@ -7,7 +7,9 @@ from analogforge.adapters.identity.oidc import OIDCClient
 from analogforge.db.store import PersistenceError
 
 
-@pytest.mark.parametrize("kind", ["outage", "malformed", "array", "issuer", "foreign_endpoint"])
+@pytest.mark.parametrize(
+    "kind", ["outage", "malformed", "array", "issuer", "foreign_endpoint", "endpoint_type", "endpoint_url"]
+)
 def test_discovery_failure_is_typed_and_contains_no_provider_body(kind):
     marker = "private-provider-error-body"
 
@@ -22,7 +24,11 @@ def test_discovery_failure_is_typed_and_contains_no_provider_body(kind):
             200,
             json={
                 "issuer": "https://other.example" if kind == "issuer" else "https://issuer.example",
-                "authorization_endpoint": "https://attacker.example/auth",
+                "authorization_endpoint": []
+                if kind == "endpoint_type"
+                else "https://[bad"
+                if kind == "endpoint_url"
+                else "https://attacker.example/auth",
                 "token_endpoint": "https://issuer.example/token",
                 "jwks_uri": "https://issuer.example/jwks",
             },

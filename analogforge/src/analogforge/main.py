@@ -124,9 +124,20 @@ def create_app(
             "CSRF_INVALID": 403,
             "SOURCE_UNAVAILABLE": 503,
             "IDENTITY_PROVIDER_UNAVAILABLE": 503,
+            "OIDC_CONFIGURATION_INVALID": 503,
         }
         status = statuses.get(code, 422)
         safe = ApiError(code, "The operation could not be applied to this workspace record.", status)
+        if code == "SCIENTIFIC_CLAIM_REJECTED":
+            from analogforge.application.assurance import ScientificClaimRejected
+
+            if isinstance(error, ScientificClaimRejected):
+                safe = ApiError(
+                    code,
+                    "The scientific claim failed publication checks.",
+                    status,
+                    details={"issue_codes": error.issue_codes},
+                )
         return JSONResponse(safe.envelope(getattr(request.state, "request_id", None)), status_code=status)
 
     @application.exception_handler(RequestValidationError)

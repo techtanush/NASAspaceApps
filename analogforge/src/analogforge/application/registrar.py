@@ -225,7 +225,12 @@ class Registrar:
                 for parent_id in draft.parent_evidence_ids:
                     if str(parent_id) not in supplied:
                         raise RegistrationRejected("Unprovided evidence parent", "MODEL_OUTPUT_INVALID")
-                uri = urlsplit(draft.source_uri) if draft.source_uri else None
+                try:
+                    uri = urlsplit(draft.source_uri) if draft.source_uri else None
+                    if uri is not None:
+                        _ = uri.port
+                except ValueError as exc:
+                    raise RegistrationRejected("Source URI is malformed") from exc
                 if uri and (uri.scheme != "https" or not uri.hostname or not uri.netloc):
                     raise RegistrationRejected("Source URI requires an approved HTTPS origin")
                 if uri and not any(

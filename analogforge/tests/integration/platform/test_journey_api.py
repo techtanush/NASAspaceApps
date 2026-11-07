@@ -6,11 +6,13 @@ an endpoint, write a verdict or replace any scheduler/registrar implementation.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from uuid import uuid4
 
 import pytest
+import rfc8785
 import sqlalchemy as sa
 from fastapi.testclient import TestClient
 
@@ -19,7 +21,7 @@ from analogforge.application.seed import seed_synthetic
 from analogforge.db.store import Store
 from analogforge.jobs.worker import Worker
 from analogforge.main import create_app
-from analogforge.ports.hashing import bytes_sha256, canonical_json_bytes
+from analogforge.ports.hashing import bytes_sha256
 from analogforge.settings import Settings
 from tests.integration.platform.test_migrations import platform_store
 from tests.support.factories import renderer_factory, science_factory
@@ -267,7 +269,10 @@ def test_full_accepted_contract_to_immutable_passport_and_downloads(
             assert b"EARTHDATA_TOKEN" not in first.content
             if fmt == "json":
                 exported = first.json()
-                assert bytes_sha256(canonical_json_bytes(exported["canonical_manifest"])) == passport["manifest_sha256"]
+                assert (
+                    hashlib.sha256(rfc8785.dumps(exported["canonical_manifest"])).hexdigest()
+                    == passport["manifest_sha256"]
+                )
                 assert len(exported["bundle"]["attempts"]) == len(expected_outcomes)
         with platform_store.transaction(workspace_id) as unit:
             persisted = unit.require("runs", run_id)

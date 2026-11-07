@@ -90,12 +90,20 @@ def validate_authoritative_payload(task: AgentTask, submission: RoleSubmission) 
         for key in ("qualified_use_requirement_ids", "partial_use_requirement_ids", "unsupported_use_requirement_ids"):
             if set(payload[key]) != set(expected.get(key, [])):
                 raise PolicyViolation("QUALIFIED_USE_CHANGED")
-    # Revision pointers/verification verdicts must be projections of the authoritative staged receipt.
+    choices = task.payload.get("allowed_choices", {})
+    if task.role_key == "test_designer" and choices:
+        if payload["candidate_revision_id"] not in choices.get("candidate_revision_ids", []):
+            raise PolicyViolation("CANDIDATE_CHOICE_NOT_PERMITTED")
+        if payload["strategy"] not in choices.get("strategies", []):
+            raise PolicyViolation("STRATEGY_CHOICE_NOT_PERMITTED")
+    # Revision pointers/verification verdicts remain fixed; explicitly issued operational choices vary.
     for key, value in payload.items():
         if key in expected and (
             key.endswith("_revision_id")
             or key in {"outcome", "primary_failure_category", "strategy", "screened_region_count"}
         ):
+            if task.role_key == "test_designer" and choices and key in {"candidate_revision_id", "strategy"}:
+                continue
             if value != expected[key]:
                 raise PolicyViolation("AUTHORITATIVE_ROLE_FACT_CHANGED")
     if task.role_key == "verification_replanning" and payload.get("repair"):
@@ -103,3 +111,14 @@ def validate_authoritative_payload(task: AgentTask, submission: RoleSubmission) 
         permitted = task.payload.get("permitted_repairs", [])
         if repair["kind"] not in permitted or repair["preserved_contract_sha256"] != task.contract_hash:
             raise PolicyViolation("REPAIR_NOT_PERMITTED")
+        if choices:
+            if repair["kind"] not in choices.get("repair_kinds", []):
+                raise PolicyViolation("REPAIR_CHOICE_NOT_PERMITTED")
+            targets = choices.get("repair_target_revision_ids", {}).get(repair["kind"], [])
+            selected = repair["target_revision_ids"]
+            if not selected or any(target not in targets for target in selected) or len(selected) != len(set(selected)):
+                raise PolicyViolation("REPAIR_TARGET_CHOICE_NOT_PERMITTED")
+            if repair["kind"] == "NEW_CANDIDATE" and len(selected) != 1:
+                raise PolicyViolation("REPAIR_TARGET_CHOICE_NOT_PERMITTED")
+            if repair["strategy"] is not None and repair["strategy"] not in choices.get("strategies", []):
+                raise PolicyViolation("STRATEGY_CHOICE_NOT_PERMITTED")
