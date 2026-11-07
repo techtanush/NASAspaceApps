@@ -39,3 +39,7 @@ Production checkpoint: `737102a17fdb0ed15c7f7350aa88dc231d2824ec`. Final test ch
 - Aggregate `make check` exits2 at the required truthful production preflight: missing Ayan configurations/science and Aradhya renderer. No test double is injected into production preflight. The remaining checks were executed separately.
 - Full SCI01–18 remains NOT_RUN; S1–S4 NOT_RUN, S5 NOT_IMPLEMENTED. Only the declared S0 platform software scope is ready; no real-source, numerical, physical, renderer/browser or external-live validation is claimed.
 - Publication follows final handoff/ownership/source-equivalence checks. No source change is planned; delivery receipts are recorded separately after the push succeeds.
+
+## Verified publication
+
+Atomic push succeeded: Tanush feature checkpoint `2ca4d15d0abfdedf9ce5b6f2d1d353eeb5deada0` and central C3/evidence checkpoint `635df8de41b838b69369e21a6c814ce1889178cf`. Remote refs were verified. This delivery-receipt-only follow-up preserves final tested source `eb4cd4c63e4477a050370c8084c89c596e9ea1af`; no main or teammate branch was modified.

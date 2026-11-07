@@ -31,7 +31,7 @@
     "base": "origin/main",
     "accepted_base_sha": "825d204b3e8cee8ade01db40ca8fb4020d0ec943",
     "output_file": "validation/ownership.json",
-    "changed_path_count": 301
+    "changed_path_count": 302
   },
   "catalog": {
     "KIT-01": {
@@ -598,7 +598,7 @@
   "decisions": "see team handoffs/tanush/DECISIONS.md",
   "ready_to_merge": true,
   "ready_to_merge_rule": "true only if every required catalog row is PASSED (DB rows may be BLOCKED_ENVIRONMENT only with attempted-command proof), kit_verify and ownership_check PASS, lint clean, self_audit complete, no hidden skips; BLOCKED_EXTERNAL allowed only for real-OpenAI/real-network rows with an offline PASSED equivalent",
-  "pushed_sha": null,
+  "pushed_sha": "2ca4d15d0abfdedf9ce5b6f2d1d353eeb5deada0",
   "uv_lock_committed": true,
   "secrets_not_committed": true,
   "data_not_committed": true,
@@ -631,5 +631,13 @@
       "evidence_checkpoint": "635df8de41b838b69369e21a6c814ce1889178cf",
       "reason": "Accepted corrected C3 HTTP contract; feature frozen C2 bytes remain unchanged"
     }
-  ]
+  ],
+  "central_pushed_sha": "635df8de41b838b69369e21a6c814ce1889178cf",
+  "delivery_receipt": {
+    "verified_at": "2026-11-07T06:36:37.533171+00:00",
+    "delivered_feature_checkpoint": "2ca4d15d0abfdedf9ce5b6f2d1d353eeb5deada0",
+    "delivered_central_checkpoint": "635df8de41b838b69369e21a6c814ce1889178cf",
+    "source_checkpoint": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+    "method": "Successful atomic fast-forward push; remote refs verified. This receipt-only child commit preserves identical tested application source. pushed_sha records the delivered ancestor to avoid a self-referential Git hash."
+  }
 }
