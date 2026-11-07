@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "baseline": "C2-one-shot-kit",
-  "note": "Refreshed by refresh_baseline.py after a recorded change (see contracts/C2-ONE-SHOT-KIT-CHANGE.json).",
+  "baseline": "C3-contract-change-001",
+  "note": "Refreshed by refresh_baseline.py for TANUSH-CR-001; see team handoffs/merging/CONTRACT-CHANGE-001.json.",
   "files": [
     {
       "path": "architecture files/00-ARCHITECTURE-DECISIONS.md",
@@ -315,8 +315,8 @@
     },
     {
       "path": "architecture files/contracts/kit/files/contracts/openapi.bundled.json",
-      "bytes": 204625,
-      "sha256": "a6c415ba9150064361620b060639303872ad9e89ecdeb6bfdc837cb283e7df08"
+      "bytes": 215595,
+      "sha256": "e12d367326e478ca7fe60fb10f6d482991e6569863b0e9952c6a0a3327a63756"
     },
     {
       "path": "architecture files/contracts/kit/files/contracts/passport-export-bundle.schema.json",
@@ -521,7 +521,7 @@
     {
       "path": "architecture files/contracts/kit/kit-manifest.json",
       "bytes": 5825,
-      "sha256": "f5efe004d129d26dfbf41e8df43de514e71c7c9cf7ebbf22e52a8d514e6bcb0e"
+      "sha256": "98e213b4f47503efc944921840957d54c53f60203ee187a972cd9e34ae07160e"
     },
     {
       "path": "architecture files/contracts/kit/materialize.py",
@@ -535,8 +535,8 @@
     },
     {
       "path": "architecture files/contracts/openapi.yaml",
-      "bytes": 142775,
-      "sha256": "e1014ae2d49709bef9ac6d5508626c94945a156077e65ee7986f8464f691686c"
+      "bytes": 153745,
+      "sha256": "1772b4ab706044f058b9bf1c9676ebe0b689a8d6f0ac4a20c240483262ee265c"
     },
     {
       "path": "architecture files/contracts/requirements-traceability.csv",
@@ -555,8 +555,8 @@
     },
     {
       "path": "architecture files/contracts/validate_blueprint.py",
-      "bytes": 14021,
-      "sha256": "3386441b04a810a1cdd2bd06564ea62448cae53fbb36bc9c7421c48babc2110a"
+      "bytes": 16723,
+      "sha256": "219c324dcfb66c24d5b712d91f5b04817d942cba46614486876e5a7103cceab7"
     },
     {
       "path": "architecture files/examples/.env.example",

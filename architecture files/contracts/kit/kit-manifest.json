@@ -16,7 +16,7 @@
     "contracts/dataset-manifest.schema.json": "6c618d9aa7ccea32a59b905bce0b37ea3141ed5fc7dfbfa64036ccf5414647a5",
     "contracts/domain.schema.json": "cd051f476020752eca804d65ee2bb693c39109523a2d3bd69f49f3e923c6ecdf",
     "contracts/error-codes.json": "46629281a6f62acc8a57721ee28140e9841bbbcd171f5ae5d8d5649603ba6dc1",
-    "contracts/openapi.bundled.json": "a6c415ba9150064361620b060639303872ad9e89ecdeb6bfdc837cb283e7df08",
+    "contracts/openapi.bundled.json": "e12d367326e478ca7fe60fb10f6d482991e6569863b0e9952c6a0a3327a63756",
     "contracts/passport-export-bundle.schema.json": "3b86e38f182c6d5f2c5afe1d03f8759dcab63be7fd8433d77f24b60675385801",
     "contracts/route-artifact.schema.json": "cdba44630e0f9c2a0b878973a5559972d0459c05dad366d9d618a980a55e62f1",
     "contracts/scientific-assurance.schema.json": "f88986b65b31ac8fbd2e6ad0fa05b31792a1b065786983789d174dec2008fa65",

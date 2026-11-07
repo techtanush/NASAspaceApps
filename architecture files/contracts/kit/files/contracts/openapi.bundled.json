@@ -108,6 +108,16 @@
                 }
               }
             }
+          },
+          "413": {
+            "description": "Request body too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -528,6 +538,16 @@
                 }
               }
             }
+          },
+          "413": {
+            "description": "Request body too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -636,6 +656,16 @@
           },
           "503": {
             "description": "Required dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body too large",
             "content": {
               "application/json": {
                 "schema": {
@@ -758,6 +788,16 @@
                 }
               }
             }
+          },
+          "413": {
+            "description": "Request body too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -857,6 +897,16 @@
           },
           "503": {
             "description": "Required dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body too large",
             "content": {
               "application/json": {
                 "schema": {
@@ -1284,6 +1334,16 @@
                 }
               }
             }
+          },
+          "413": {
+            "description": "Request body too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -1383,6 +1443,16 @@
           },
           "503": {
             "description": "Required dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body too large",
             "content": {
               "application/json": {
                 "schema": {
@@ -1704,6 +1774,16 @@
           },
           "503": {
             "description": "Required dependency unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Request body too large",
             "content": {
               "application/json": {
                 "schema": {
@@ -3156,7 +3236,141 @@
               },
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "description": "Structured JSON export defined by architecture 35 section 4; bundle is the serialized PassportExportBundle without canonical_manifest_json or assets.",
+                  "properties": {
+                    "export_schema_version": {
+                      "type": "string",
+                      "const": "1.0"
+                    },
+                    "manifest_sha256": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{64}$"
+                    },
+                    "canonical_manifest": {
+                      "type": "object"
+                    },
+                    "bundle": {
+                      "type": "object",
+                      "properties": {
+                        "schema_version": {
+                          "type": "string",
+                          "const": "1.0"
+                        },
+                        "is_draft": {
+                          "type": "boolean"
+                        },
+                        "generated_at": {
+                          "type": "string"
+                        },
+                        "mode": {
+                          "$ref": "#/components/schemas/RuntimeMode"
+                        },
+                        "replay_source_run_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "format": "uuid"
+                        },
+                        "passport": {
+                          "type": "object"
+                        },
+                        "manifest_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "mission": {
+                          "type": "object"
+                        },
+                        "rover": {
+                          "type": [
+                            "object",
+                            "null"
+                          ]
+                        },
+                        "target_profile": {
+                          "type": [
+                            "object",
+                            "null"
+                          ]
+                        },
+                        "candidates": {
+                          "type": "array"
+                        },
+                        "qualifications": {
+                          "type": "array"
+                        },
+                        "compatibility": {
+                          "type": "array"
+                        },
+                        "critiques": {
+                          "type": "array"
+                        },
+                        "attempts": {
+                          "type": "array"
+                        },
+                        "portfolio": {
+                          "type": [
+                            "object",
+                            "null"
+                          ]
+                        },
+                        "evidence_appendix": {
+                          "type": "array"
+                        },
+                        "assurance": {
+                          "type": [
+                            "object",
+                            "null"
+                          ]
+                        },
+                        "source_locks": {
+                          "type": "object"
+                        },
+                        "search_limitations": {
+                          "type": "array"
+                        },
+                        "not_run_reason": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "schema_version",
+                        "is_draft",
+                        "generated_at",
+                        "mode",
+                        "replay_source_run_id",
+                        "passport",
+                        "manifest_sha256",
+                        "mission",
+                        "rover",
+                        "target_profile",
+                        "candidates",
+                        "qualifications",
+                        "compatibility",
+                        "critiques",
+                        "attempts",
+                        "portfolio",
+                        "evidence_appendix",
+                        "assurance",
+                        "source_locks",
+                        "search_limitations",
+                        "not_run_reason"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "export_schema_version",
+                    "manifest_sha256",
+                    "canonical_manifest",
+                    "bundle"
+                  ],
+                  "additionalProperties": false
                 }
               },
               "text/csv": {
@@ -3669,7 +3883,24 @@
             }
           },
           "404": {
-            "description": "Not found"
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -3700,7 +3931,24 @@
             }
           },
           "404": {
-            "description": "Not found"
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -3806,6 +4054,16 @@
                 }
               }
             }
+          },
+          "413": {
+            "description": "Request body too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -3871,6 +4129,16 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -3902,6 +4170,16 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
             "content": {
               "application/json": {
                 "schema": {
@@ -3973,6 +4251,16 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -4011,6 +4299,16 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -4035,6 +4333,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ScenarioConfig"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
                 }
               }
             }
@@ -4081,6 +4399,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ListDisplayLayerManifest"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
                 }
               }
             }
@@ -7294,6 +7632,10 @@
               ],
               "additionalProperties": false
             }
+          },
+          "preliminary": {
+            "type": "boolean",
+            "description": "True until a verified route exists."
           }
         },
         "required": [
@@ -7302,7 +7644,8 @@
           "candidate_id",
           "rover_revision_id",
           "mode",
-          "dimensions"
+          "dimensions",
+          "preliminary"
         ],
         "additionalProperties": false
       },

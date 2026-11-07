@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "request_id": "TANUSH-CR-001",
+  "source_request": "team handoffs/tanush/CHANGE-REQUEST-001.json in the Tanush worktree",
+  "decision": "ACCEPTED_CENTRAL_SCHEMA_CORRECTION",
+  "status": "LOCAL_CENTRAL_COMMIT_ONLY; CONSUMER_INTEGRATION_PENDING",
+  "merging_branch_base_sha": "9cf84ac351bd2629e1b88eb97989e4271d30c578",
+  "old_bundled_openapi_sha256": "a6c415ba9150064361620b060639303872ad9e89ecdeb6bfdc837cb283e7df08",
+  "new_bundled_openapi_sha256": "e12d367326e478ca7fe60fb10f6d482991e6569863b0e9952c6a0a3327a63756",
+  "reason": "Architecture 35 section 4 requires a JSON export object; the frozen OpenAPI declared a string. The later read operations omitted reachable 404/422 ErrorEnvelope responses, and all POST operations omitted the bounded-body 413 response. The compatibility science payload and stored row contain preliminary, but the public schema caused the platform projection to omit it even though the UI test-id contract requires it.",
+  "changes": [
+    "GET /passports/{id}/exports/{format} 200 application/json now describes the four-field export object and every serialized PassportExportBundle field except canonical_manifest_json and assets.",
+    "All GET operations declare 404 and 422 ErrorEnvelope responses, including the later-added reads; all POST operations declare 413 ErrorEnvelope responses.",
+    "CompatibilityAssessment requires the existing preliminary boolean from the science payload.",
+    "Regenerated the bundled OpenAPI and kit manifest with kit/tools/build_kit.py; refreshed the central architecture baseline. Operation IDs, count (43), domain schema, port models, fixtures and scientific meanings are unchanged."
+  ],
+  "consumers": {
+    "tanush_platform": "The API already emits the structured JSON export and stores preliminary. In a local integration preview, materialize the corrected kit, then rerun every platform transport response and journey gate; verify GET /compatibility includes preliminary after the corrected schema projection.",
+    "aradhya_frontend_renderer": "Regenerate apps/web/src/generated from the corrected bundled OpenAPI, verify the JSON export parser uses the object, and bind compat-table[data-preliminary] to the public preliminary boolean. Rerun renderer, client, mock and browser contract gates.",
+    "merging_integration": "Carry this central commit into the local integration candidate, materialize the corrected kit after merging contributor code, then rerun kit, blueprint, transport, client, browser and combined gates. Record the correction in MERGE-REPORT.json."
+  },
+  "migration": {
+    "database": "None",
+    "wire": "JSON exports are parsed as objects, never double-encoded strings; compatibility responses expose the existing preliminary flag.",
+    "client": "Regenerate the TypeScript client from analogforge/contracts/openapi.bundled.json after materialization."
+  },
+  "branch_and_ownership_instructions": [
+    "Do not cherry-pick this central commit into the Tanush, Ayan or Aradhya feature branch. Their architecture and frozen kit remain the original origin/main baseline, and their ownership checks must continue to use --base origin/main.",
+    "Tanush may finish and commit owned-path work locally, keeping the original kit bytes and CHANGE-REQUEST-001.json. Until an integration preview proves PLT-02 against this correction, report the unresolved branch-local contract mismatch and keep ready_to_merge false; do not relabel an unrun gate as passed.",
+    "The merge owner can create a throwaway local integration worktree from this central commit, merge Tanush's local committed branch there without pushing, run materialize.py --repair only in that integration checkout to refresh the old materialized kit copy, then run the required platform gates and record exact results. Do not run --repair in Tanush's feature checkout.",
+    "Only after the corrected kit and all consumer gates pass should the root coordinator authorize any push. The central architecture-baseline.json is C3; the feature worktrees retain their truthful C2 baseline until integration."
+  ],
+  "central_validation": {
+    "kit_build": "PASS: 48 files rebuilt",
+    "blueprint": "PASS: 43 operations, 77 standard error responses, export shape, preliminary flag and bundled/source alignment",
+    "kit_tests": "PASS: 20 tests",
+    "materialize_verify": "PASS",
+    "team_setup": "PASS: 132 baseline files match refreshed C3 snapshot",
+    "independent_export_schema_check": "PASS: object accepted, double-encoded string and canonical_manifest_json in bundle rejected; RFC 8785 digest reproduced"
+  },
+  "not_yet_claimed": [
+    "Tanush PLT-02 and complete platform gate",
+    "Aradhya generated client, renderer and browser gates",
+    "combined integration gates or release readiness"
+  ],
+  "push_performed": false
+}
