@@ -94,6 +94,8 @@ export async function newMission(page: Page, options: { moon?: boolean; rover?: 
  await expect(page.getByTestId('btn-build-fingerprint')).toBeEnabled();
  await page.getByTestId('btn-build-fingerprint').click();
  await expect(page.locator('[data-testid=preparation-status][data-job-state=SUCCEEDED]')).toBeVisible({ timeout: 60000 });
+ // Job completion precedes retrieval of the accepted-contract proposal.
+ await expect(page.getByTestId('btn-accept-contract')).toBeEnabled();
  await inspectHooks(page);
  await choose(page, 'select-scenario', options.scenario || (options.moon ? 'synthetic-moon-gap-v1' : 'synthetic-mars-mobility-v1'));
  await choose(page, 'select-mode', options.mode || 'synthetic');
