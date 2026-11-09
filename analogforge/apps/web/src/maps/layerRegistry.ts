@@ -1,0 +1,5 @@
+import type { components } from '../generated/schema';
+type Layer=components['schemas']['DisplayLayerManifest'];
+export function validateEarthLayer(layer:Layer):Layer {if(layer.body!=='EARTH'||layer.rendering!=='EARTH_WEBMERCATOR_IMAGE'||!layer.earth_corners||layer.earth_corners.length!==4||!/(3857|Mercator)/i.test(layer.display_crs_wkt))throw new Error('Earth layer body, CRS or corner order unavailable');return layer;}
+export function validatePlanetaryLayer(layer:Layer):Layer {if(layer.body==='EARTH'||layer.rendering!=='PLANETARY_PLANAR_IMAGE'||layer.earth_corners!==null||!new RegExp(layer.body,'i').test(layer.display_crs_wkt))throw new Error('Planetary panel requires matching body-specific planar CRS');return layer;}
+export class LayerRegistry {private layers=new Map<string,Layer>();setCandidate(candidateId:string,layers:Layer[]):void {this.layers.clear();for(const layer of layers){validateEarthLayer(layer);if(layer.candidate_id!==candidateId)throw new Error('Candidate mismatch');this.layers.set(layer.id,layer);}} all():Layer[]{return [...this.layers.values()];}clear():void{this.layers.clear();}}

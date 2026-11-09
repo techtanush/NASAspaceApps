@@ -1,0 +1,518 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Stable UI test hooks shared by Aradhya's UI, the platform e2e and the merging agent's browser tests (architecture 35 s6). Use data-testid=<id>; attributes listed are REQUIRED on that element. Ids never change without a contract change.",
+  "testids": [
+    {
+      "id": "app-shell",
+      "required_attributes": [],
+      "description": "Root element of the authenticated workbench"
+    },
+    {
+      "id": "mode-badge",
+      "required_attributes": [
+        "data-mode"
+      ],
+      "description": "Immutable runtime mode badge: live|replay|synthetic. Present on every run screen, print and export"
+    },
+    {
+      "id": "run-state-banner",
+      "required_attributes": [
+        "data-state"
+      ],
+      "description": "Run state banner; data-state is a RunState value"
+    },
+    {
+      "id": "connection-indicator",
+      "required_attributes": [
+        "data-connection"
+      ],
+      "description": "connected|paused|reconnecting"
+    },
+    {
+      "id": "btn-new-mission",
+      "required_attributes": [],
+      "description": "Workspace: start a mission"
+    },
+    {
+      "id": "mission-list",
+      "required_attributes": [],
+      "description": "Workspace mission list"
+    },
+    {
+      "id": "run-list",
+      "required_attributes": [],
+      "description": "Workspace run list"
+    },
+    {
+      "id": "run-row",
+      "required_attributes": [
+        "data-run-id",
+        "data-state",
+        "data-mode"
+      ],
+      "description": "One run in the workspace list"
+    },
+    {
+      "id": "input-mission-name",
+      "required_attributes": [],
+      "description": "Mission name field"
+    },
+    {
+      "id": "input-objective",
+      "required_attributes": [],
+      "description": "Mission objective textarea"
+    },
+    {
+      "id": "radio-body",
+      "required_attributes": [
+        "data-body"
+      ],
+      "description": "Body choice radio (MOON|MARS)"
+    },
+    {
+      "id": "select-target-preset",
+      "required_attributes": [],
+      "description": "Target preset select"
+    },
+    {
+      "id": "input-bbox",
+      "required_attributes": [
+        "data-edge"
+      ],
+      "description": "Numeric bbox field; data-edge is min_lon|min_lat|max_lon|max_lat"
+    },
+    {
+      "id": "save-indicator",
+      "required_attributes": [
+        "data-save-state"
+      ],
+      "description": "saved|saving|conflict|error|unsaved"
+    },
+    {
+      "id": "btn-build-fingerprint",
+      "required_attributes": [],
+      "description": "Build Mission Fingerprint"
+    },
+    {
+      "id": "preparation-status",
+      "required_attributes": [
+        "data-job-state"
+      ],
+      "description": "Preparation job state (QUEUED|RUNNING|SUCCEEDED|FAILED|BLOCKED|CANCELLED)"
+    },
+    {
+      "id": "rover-form",
+      "required_attributes": [],
+      "description": "Manual rover editor form"
+    },
+    {
+      "id": "input-rover-field",
+      "required_attributes": [
+        "data-field"
+      ],
+      "description": "One rover field; data-field is the RoverInput property name"
+    },
+    {
+      "id": "rover-field-error",
+      "required_attributes": [
+        "data-field"
+      ],
+      "description": "Field-level validation error for a rover field"
+    },
+    {
+      "id": "file-rover-import",
+      "required_attributes": [],
+      "description": "Rover JSON file input"
+    },
+    {
+      "id": "rover-import-preview",
+      "required_attributes": [],
+      "description": "Parsed-import preview before persisting"
+    },
+    {
+      "id": "btn-rover-save",
+      "required_attributes": [],
+      "description": "Save rover revision"
+    },
+    {
+      "id": "btn-continue-no-rover",
+      "required_attributes": [],
+      "description": "Continue with site qualification only (null rover)"
+    },
+    {
+      "id": "select-rover",
+      "required_attributes": [],
+      "description": "Pin an existing rover revision"
+    },
+    {
+      "id": "requirement-row",
+      "required_attributes": [
+        "data-requirement-id",
+        "data-origin"
+      ],
+      "description": "One requirement row in fingerprint review"
+    },
+    {
+      "id": "assumption-card",
+      "required_attributes": [
+        "data-origin"
+      ],
+      "description": "Proposed assumption awaiting acceptance"
+    },
+    {
+      "id": "btn-accept-contract",
+      "required_attributes": [],
+      "description": "Accept the exact displayed contract revision"
+    },
+    {
+      "id": "select-scenario",
+      "required_attributes": [],
+      "description": "Scenario select (values come from /capabilities)"
+    },
+    {
+      "id": "select-mode",
+      "required_attributes": [],
+      "description": "Runtime mode select"
+    },
+    {
+      "id": "btn-start-run",
+      "required_attributes": [],
+      "description": "Create the run (POST /runs)"
+    },
+    {
+      "id": "run-nav-tab",
+      "required_attributes": [
+        "data-tab"
+      ],
+      "description": "Run navigation; data-tab is mission|target|analogs|qualification|compatibility|portfolio|test-lab|passport"
+    },
+    {
+      "id": "target-panel",
+      "required_attributes": [],
+      "description": "Target profile screen root"
+    },
+    {
+      "id": "planetary-panel",
+      "required_attributes": [
+        "data-body"
+      ],
+      "description": "Body-aware planar image panel (never an Earth map)"
+    },
+    {
+      "id": "earth-map",
+      "required_attributes": [],
+      "description": "Earth MapLibre container"
+    },
+    {
+      "id": "candidate-list",
+      "required_attributes": [],
+      "description": "Accessible candidate list (always present, independent of WebGL)"
+    },
+    {
+      "id": "candidate-row",
+      "required_attributes": [
+        "data-candidate-name",
+        "data-origin",
+        "data-selected"
+      ],
+      "description": "One candidate"
+    },
+    {
+      "id": "btn-select-candidate",
+      "required_attributes": [
+        "data-candidate-name"
+      ],
+      "description": "SELECT_CANDIDATE action"
+    },
+    {
+      "id": "qualification-matrix",
+      "required_attributes": [],
+      "description": "Requirement x candidate matrix"
+    },
+    {
+      "id": "qual-cell",
+      "required_attributes": [
+        "data-requirement-id",
+        "data-candidate-name",
+        "data-status",
+        "data-stage"
+      ],
+      "description": "One qualification cell; data-status is PASS|PARTIAL|FAIL|GAP|UNKNOWN|PENDING"
+    },
+    {
+      "id": "evidence-link",
+      "required_attributes": [
+        "data-evidence-id"
+      ],
+      "description": "Opens the evidence drawer"
+    },
+    {
+      "id": "evidence-drawer",
+      "required_attributes": [],
+      "description": "Evidence drawer root"
+    },
+    {
+      "id": "critic-card",
+      "required_attributes": [
+        "data-severity",
+        "data-status"
+      ],
+      "description": "Critic issue card"
+    },
+    {
+      "id": "review-panel",
+      "required_attributes": [
+        "data-review-kind"
+      ],
+      "description": "Pending human review"
+    },
+    {
+      "id": "btn-approve-evidence",
+      "required_attributes": [],
+      "description": "APPROVE_EVIDENCE"
+    },
+    {
+      "id": "btn-reject-evidence",
+      "required_attributes": [],
+      "description": "REJECT_EVIDENCE"
+    },
+    {
+      "id": "compat-table",
+      "required_attributes": [
+        "data-preliminary"
+      ],
+      "description": "Rover compatibility table"
+    },
+    {
+      "id": "compat-row",
+      "required_attributes": [
+        "data-metric-id",
+        "data-status"
+      ],
+      "description": "One compatibility dimension"
+    },
+    {
+      "id": "btn-prove-it",
+      "required_attributes": [
+        "data-enabled"
+      ],
+      "description": "PROVE IT action"
+    },
+    {
+      "id": "prove-it-disabled-reason",
+      "required_attributes": [],
+      "description": "Why PROVE IT is unavailable"
+    },
+    {
+      "id": "benchmark-preview",
+      "required_attributes": [],
+      "description": "Pre-click benchmark preview"
+    },
+    {
+      "id": "test-lab",
+      "required_attributes": [],
+      "description": "Test Lab screen root"
+    },
+    {
+      "id": "attempt-row",
+      "required_attributes": [
+        "data-attempt-number",
+        "data-outcome",
+        "data-candidate-name"
+      ],
+      "description": "One immutable attempt"
+    },
+    {
+      "id": "benchmark-row",
+      "required_attributes": [
+        "data-constraint-id",
+        "data-status"
+      ],
+      "description": "One benchmark residual row"
+    },
+    {
+      "id": "failure-category",
+      "required_attributes": [
+        "data-category"
+      ],
+      "description": "Failure category label"
+    },
+    {
+      "id": "replan-diff",
+      "required_attributes": [],
+      "description": "Changed elements between attempts"
+    },
+    {
+      "id": "route-playback",
+      "required_attributes": [],
+      "description": "Modeled route playback control"
+    },
+    {
+      "id": "btn-cancel-run",
+      "required_attributes": [],
+      "description": "CANCEL action"
+    },
+    {
+      "id": "btn-retry-dependency",
+      "required_attributes": [
+        "data-dependency-id"
+      ],
+      "description": "RETRY action"
+    },
+    {
+      "id": "btn-build-portfolio",
+      "required_attributes": [],
+      "description": "BUILD_PORTFOLIO action"
+    },
+    {
+      "id": "portfolio-panel",
+      "required_attributes": [],
+      "description": "Portfolio screen root"
+    },
+    {
+      "id": "portfolio-row",
+      "required_attributes": [
+        "data-requirement-id",
+        "data-coverage"
+      ],
+      "description": "Requirement-to-site assignment"
+    },
+    {
+      "id": "operations-timeline",
+      "required_attributes": [],
+      "description": "Operations drawer timeline"
+    },
+    {
+      "id": "operation-row",
+      "required_attributes": [
+        "data-event-type",
+        "data-seq"
+      ],
+      "description": "One committed event"
+    },
+    {
+      "id": "passport-view",
+      "required_attributes": [
+        "data-draft"
+      ],
+      "description": "Passport screen root"
+    },
+    {
+      "id": "passport-claim",
+      "required_attributes": [
+        "data-claim-kind"
+      ],
+      "description": "One audited statement"
+    },
+    {
+      "id": "assurance-badge",
+      "required_attributes": [
+        "data-publication"
+      ],
+      "description": "ALLOWED|LIMITED|BLOCKED|INCOMPLETE"
+    },
+    {
+      "id": "export-btn",
+      "required_attributes": [
+        "data-format"
+      ],
+      "description": "Download an export (html|json|csv)"
+    },
+    {
+      "id": "export-status",
+      "required_attributes": [
+        "data-format",
+        "data-state"
+      ],
+      "description": "preparing|ready|failed"
+    },
+    {
+      "id": "manifest-digest",
+      "required_attributes": [],
+      "description": "Server manifest_sha256 text"
+    },
+    {
+      "id": "file-digest",
+      "required_attributes": [
+        "data-format"
+      ],
+      "description": "Server export-file SHA-256 text"
+    },
+    {
+      "id": "error-panel",
+      "required_attributes": [
+        "data-error-code"
+      ],
+      "description": "Structured API error"
+    },
+    {
+      "id": "empty-state",
+      "required_attributes": [
+        "data-reason"
+      ],
+      "description": "Distinct empty states (NO_CANDIDATES|NO_COVERAGE|SEARCH_LIMIT|...)"
+    },
+    {
+      "id": "unknown-value",
+      "required_attributes": [],
+      "description": "Rendered wherever a null measurement is shown (text 'Unknown')"
+    },
+    {
+      "id": "excluded-window",
+      "required_attributes": [
+        "data-window-id",
+        "data-reason"
+      ],
+      "description": "A screened window that was excluded or not detailed, with its reason code (WATER_ONLY, INSUFFICIENT_VALID_DATA, BELOW_SHORTLIST_CUTOFF ...)"
+    },
+    {
+      "id": "qual-history",
+      "required_attributes": [
+        "data-requirement-id",
+        "data-candidate-name"
+      ],
+      "description": "Previous -> Current revision history for one qualification cell"
+    },
+    {
+      "id": "remediation-hint",
+      "required_attributes": [
+        "data-dependency"
+      ],
+      "description": "Actionable remediation for a missing dependency (OPENAI_API_KEY, OPENAI_MODEL, dataset binding, worker)"
+    },
+    {
+      "id": "scenario-note",
+      "required_attributes": [
+        "data-scenario-id",
+        "data-available"
+      ],
+      "description": "Availability note shown next to the scenario select (AWAITING_DATASETS etc.)"
+    },
+    {
+      "id": "theme-toggle",
+      "required_attributes": [
+        "data-theme-choice"
+      ],
+      "description": "Header control cycling Dark/Light/System; data-theme-choice is dark|light|system (architecture 41 s4)"
+    },
+    {
+      "id": "density-toggle",
+      "required_attributes": [
+        "data-density"
+      ],
+      "description": "Header control for table/control density; data-density is compact|default|comfortable (architecture 41 s5.4)"
+    },
+    {
+      "id": "copy-hash",
+      "required_attributes": [
+        "data-hash-kind"
+      ],
+      "description": "Copy-to-clipboard button next to a displayed hash; data-hash-kind is manifest|file|evidence|contract|receipt (architecture 41 s8)"
+    },
+    {
+      "id": "shortcut-help",
+      "required_attributes": [],
+      "description": "Keyboard shortcut help dialog opened with ? (architecture 41 s13)"
+    }
+  ]
+}

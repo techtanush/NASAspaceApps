@@ -1,0 +1,3127 @@
+{
+  "$defs": {
+    "AnalogPassport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "live",
+            "replay",
+            "synthetic"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "mission_revision_id": {
+          "format": "uuid",
+          "title": "Mission Revision Id",
+          "type": "string"
+        },
+        "rover_revision_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rover Revision Id"
+        },
+        "candidate_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Candidate Ids",
+          "type": "array"
+        },
+        "portfolio_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Portfolio Id"
+        },
+        "qualification_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Qualification Ids",
+          "type": "array"
+        },
+        "test_result_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Test Result Ids",
+          "type": "array"
+        },
+        "qualified_uses": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Qualified Uses",
+          "type": "array"
+        },
+        "partial_uses": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Partial Uses",
+          "type": "array"
+        },
+        "unsupported_uses": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unsupported Uses",
+          "type": "array"
+        },
+        "unknowns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unknowns",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "manifest_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Manifest Sha256",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "next_steps": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Next Steps",
+          "type": "array"
+        },
+        "assurance_evidence_id": {
+          "description": "Required DERIVED scientific-assurance evidence; also in evidence_ids and frozen manifest.",
+          "format": "uuid",
+          "title": "Assurance Evidence Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "mission_revision_id",
+        "rover_revision_id",
+        "candidate_ids",
+        "portfolio_id",
+        "qualification_ids",
+        "test_result_ids",
+        "qualified_uses",
+        "partial_uses",
+        "unsupported_uses",
+        "unknowns",
+        "evidence_ids",
+        "manifest_sha256",
+        "limitations",
+        "next_steps",
+        "assurance_evidence_id"
+      ],
+      "title": "AnalogPassport",
+      "type": "object"
+    },
+    "AreaOfInterest": {
+      "additionalProperties": false,
+      "properties": {
+        "body": {
+          "enum": [
+            "EARTH",
+            "MOON",
+            "MARS"
+          ],
+          "title": "Body",
+          "type": "string"
+        },
+        "bbox": {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 4,
+          "minItems": 4,
+          "title": "Bbox",
+          "type": "array"
+        },
+        "longitude_convention": {
+          "enum": [
+            "NEG180_180",
+            "ZERO_360"
+          ],
+          "title": "Longitude Convention",
+          "type": "string"
+        },
+        "latitude_type": {
+          "enum": [
+            "PLANETOCENTRIC",
+            "PLANETOGRAPHIC",
+            "GEODETIC"
+          ],
+          "title": "Latitude Type",
+          "type": "string"
+        },
+        "crs_wkt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Crs Wkt"
+        },
+        "vertical_datum": {
+          "title": "Vertical Datum",
+          "type": "string"
+        }
+      },
+      "required": [
+        "body",
+        "bbox",
+        "longitude_convention",
+        "latitude_type",
+        "crs_wkt",
+        "vertical_datum"
+      ],
+      "title": "AreaOfInterest",
+      "type": "object"
+    },
+    "AttemptRecord": {
+      "additionalProperties": false,
+      "description": "One PROVE IT attempt, in order. All attempts appear, including failures.",
+      "properties": {
+        "attempt_number": {
+          "minimum": 1,
+          "title": "Attempt Number",
+          "type": "integer"
+        },
+        "parent_attempt_number": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Parent Attempt Number"
+        },
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "candidate_name": {
+          "title": "Candidate Name",
+          "type": "string"
+        },
+        "strategy": {
+          "title": "Strategy",
+          "type": "string"
+        },
+        "test": {
+          "$ref": "#/$defs/VerificationTest"
+        },
+        "result": {
+          "$ref": "#/$defs/TestResult"
+        },
+        "benchmark_rows": {
+          "items": {
+            "$ref": "#/$defs/BenchmarkRow"
+          },
+          "title": "Benchmark Rows",
+          "type": "array"
+        },
+        "violations": {
+          "items": {
+            "$ref": "#/$defs/RouteViolation"
+          },
+          "title": "Violations",
+          "type": "array"
+        },
+        "diagnosis_category": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Diagnosis Category"
+        },
+        "diagnosis_explanation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Diagnosis Explanation"
+        },
+        "changed_elements": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Changed Elements",
+          "type": "array"
+        },
+        "route_image_asset_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Route Image Asset Key"
+        }
+      },
+      "required": [
+        "attempt_number",
+        "parent_attempt_number",
+        "candidate_id",
+        "candidate_name",
+        "strategy",
+        "test",
+        "result",
+        "benchmark_rows",
+        "violations",
+        "diagnosis_category",
+        "diagnosis_explanation",
+        "changed_elements"
+      ],
+      "title": "AttemptRecord",
+      "type": "object"
+    },
+    "BenchmarkRow": {
+      "additionalProperties": false,
+      "properties": {
+        "constraint_id": {
+          "title": "Constraint Id",
+          "type": "string"
+        },
+        "requirement_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Requirement Id"
+        },
+        "rule": {
+          "title": "Rule",
+          "type": "string"
+        },
+        "measured": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Measured"
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Threshold"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unit"
+        },
+        "margin": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Margin"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "INCONCLUSIVE"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "constraint_id",
+        "requirement_id",
+        "rule",
+        "measured",
+        "threshold",
+        "unit",
+        "margin",
+        "status"
+      ],
+      "title": "BenchmarkRow",
+      "type": "object"
+    },
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "minLength": 1,
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "claim_type": {
+          "enum": [
+            "QUALIFICATION",
+            "VERIFICATION",
+            "DISCOVERY",
+            "CONTEXT"
+          ],
+          "title": "Claim Type",
+          "type": "string"
+        },
+        "requirement_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Requirement Id"
+        },
+        "candidate_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Candidate Ids",
+          "type": "array"
+        },
+        "scope": {
+          "minLength": 1,
+          "title": "Scope",
+          "type": "string"
+        },
+        "disposition": {
+          "enum": [
+            "SUPPORTED",
+            "LIMITED",
+            "UNSUPPORTED",
+            "UNKNOWN",
+            "GAP",
+            "REJECTED"
+          ],
+          "title": "Disposition",
+          "type": "string"
+        },
+        "qualification_status": {
+          "anyOf": [
+            {
+              "enum": [
+                "PASS",
+                "PARTIAL",
+                "FAIL",
+                "GAP",
+                "UNKNOWN"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Qualification Status"
+        },
+        "verification_status": {
+          "anyOf": [
+            {
+              "enum": [
+                "PASS",
+                "FAIL",
+                "INCONCLUSIVE"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Verification Status"
+        },
+        "validation_level": {
+          "enum": [
+            "S0",
+            "S1",
+            "S2",
+            "S3",
+            "S4"
+          ],
+          "title": "Validation Level",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "assumption_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Assumption Evidence Ids",
+          "type": "array"
+        },
+        "gates": {
+          "items": {
+            "$ref": "#/$defs/Gate"
+          },
+          "maxItems": 15,
+          "minItems": 15,
+          "title": "Gates",
+          "type": "array"
+        },
+        "permitted_statement": {
+          "minLength": 1,
+          "title": "Permitted Statement",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "claim_id",
+        "claim_type",
+        "requirement_id",
+        "candidate_ids",
+        "scope",
+        "disposition",
+        "qualification_status",
+        "verification_status",
+        "validation_level",
+        "evidence_ids",
+        "assumption_evidence_ids",
+        "gates",
+        "permitted_statement",
+        "limitations"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "CompatibilityBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "rover_revision_id": {
+          "format": "uuid",
+          "title": "Rover Revision Id",
+          "type": "string"
+        },
+        "preliminary": {
+          "title": "Preliminary",
+          "type": "boolean"
+        },
+        "dimensions": {
+          "items": {
+            "$ref": "#/$defs/CompatibilityDimension"
+          },
+          "title": "Dimensions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "rover_revision_id",
+        "preliminary",
+        "dimensions"
+      ],
+      "title": "CompatibilityBlock",
+      "type": "object"
+    },
+    "CompatibilityDimension": {
+      "additionalProperties": false,
+      "properties": {
+        "metric_id": {
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "PARTIAL",
+            "FAIL",
+            "GAP",
+            "UNKNOWN"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "rover_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rover Value"
+        },
+        "required_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Required Value"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unit"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "metric_id",
+        "status",
+        "rover_value",
+        "required_value",
+        "unit",
+        "explanation"
+      ],
+      "title": "CompatibilityDimension",
+      "type": "object"
+    },
+    "CompositePortfolio": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "live",
+            "replay",
+            "synthetic"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "candidate_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Candidate Ids",
+          "type": "array"
+        },
+        "requirement_assignments": {
+          "items": {
+            "$ref": "#/$defs/RequirementAssignment"
+          },
+          "title": "Requirement Assignments",
+          "type": "array"
+        },
+        "objective_value": {
+          "title": "Objective Value",
+          "type": "number"
+        },
+        "algorithm_id": {
+          "title": "Algorithm Id",
+          "type": "string"
+        },
+        "residual_requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Residual Requirement Ids",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "candidate_ids",
+        "requirement_assignments",
+        "objective_value",
+        "algorithm_id",
+        "residual_requirement_ids",
+        "limitations"
+      ],
+      "title": "CompositePortfolio",
+      "type": "object"
+    },
+    "CritiqueIssue": {
+      "additionalProperties": false,
+      "properties": {
+        "issue_id": {
+          "format": "uuid",
+          "title": "Issue Id",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Candidate Id"
+        },
+        "requirement_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Requirement Id"
+        },
+        "target_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Target Evidence Ids",
+          "type": "array"
+        },
+        "reason_code": {
+          "title": "Reason Code",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "INFO",
+            "WARNING",
+            "BLOCKING"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "OPEN",
+            "RESOLVED",
+            "ACCEPTED_LIMITATION",
+            "REJECTED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "repair_request": {
+          "title": "Repair Request",
+          "type": "string"
+        },
+        "resolution_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Resolution Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "issue_id",
+        "run_id",
+        "candidate_id",
+        "requirement_id",
+        "target_evidence_ids",
+        "reason_code",
+        "severity",
+        "status",
+        "summary",
+        "repair_request",
+        "resolution_evidence_ids"
+      ],
+      "title": "CritiqueIssue",
+      "type": "object"
+    },
+    "EarthAnalogCandidate": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "live",
+            "replay",
+            "synthetic"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "aoi": {
+          "$ref": "#/$defs/AreaOfInterest"
+        },
+        "origin": {
+          "enum": [
+            "KNOWN_CONTROL",
+            "DISCOVERED",
+            "USER_SUPPLIED",
+            "SYNTHETIC_CONTROL"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "discovery_method": {
+          "title": "Discovery Method",
+          "type": "string"
+        },
+        "novelty_status": {
+          "enum": [
+            "NOT_ASSESSED",
+            "NOT_IN_REFERENCE_LIST",
+            "KNOWN_ANALOG"
+          ],
+          "title": "Novelty Status",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/MeasuredMetric"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "accessibility_status": {
+          "enum": [
+            "NOT_ASSESSED",
+            "DOCUMENTED"
+          ],
+          "title": "Accessibility Status",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "name",
+        "aoi",
+        "origin",
+        "discovery_method",
+        "novelty_status",
+        "evidence_ids",
+        "metrics",
+        "accessibility_status",
+        "limitations"
+      ],
+      "title": "EarthAnalogCandidate",
+      "type": "object"
+    },
+    "EnergyModel": {
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "title": "Model Id",
+          "type": "string"
+        },
+        "rolling_coefficient": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Rolling Coefficient",
+          "type": "number"
+        },
+        "drive_efficiency": {
+          "exclusiveMinimum": 0.0,
+          "maximum": 1.0,
+          "title": "Drive Efficiency",
+          "type": "number"
+        },
+        "idle_power_w": {
+          "minimum": 0.0,
+          "title": "Idle Power W",
+          "type": "number"
+        },
+        "science_task_wh": {
+          "minimum": 0.0,
+          "title": "Science Task Wh",
+          "type": "number"
+        },
+        "roughness_multiplier": {
+          "minimum": 1.0,
+          "title": "Roughness Multiplier",
+          "type": "number"
+        },
+        "uncertainty_fraction": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Uncertainty Fraction",
+          "type": "number"
+        },
+        "calibration_status": {
+          "enum": [
+            "ASSUMED",
+            "CALIBRATED"
+          ],
+          "title": "Calibration Status",
+          "type": "string"
+        },
+        "calibration_evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Calibration Evidence Id"
+        }
+      },
+      "required": [
+        "model_id",
+        "rolling_coefficient",
+        "drive_efficiency",
+        "idle_power_w",
+        "science_task_wh",
+        "roughness_multiplier",
+        "uncertainty_fraction",
+        "calibration_status",
+        "calibration_evidence_id"
+      ],
+      "title": "EnergyModel",
+      "type": "object"
+    },
+    "EvidenceRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "live",
+            "replay",
+            "synthetic"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "SOURCE",
+            "DERIVED",
+            "COMPARISON",
+            "VERIFICATION",
+            "CRITIQUE",
+            "ASSUMPTION",
+            "REPLAY"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "artifact_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Artifact Sha256"
+        },
+        "artifact_media_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Artifact Media Type"
+        },
+        "source_uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Uri"
+        },
+        "dataset_product_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dataset Product Id"
+        },
+        "dataset_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dataset Version"
+        },
+        "granule_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Granule Id"
+        },
+        "license_note": {
+          "title": "License Note",
+          "type": "string"
+        },
+        "body": {
+          "enum": [
+            "EARTH",
+            "MOON",
+            "MARS"
+          ],
+          "title": "Body",
+          "type": "string"
+        },
+        "aoi": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AreaOfInterest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "input_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Input Evidence Ids",
+          "type": "array"
+        },
+        "parameters_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Parameters Sha256",
+          "type": "string"
+        },
+        "algorithm_id": {
+          "title": "Algorithm Id",
+          "type": "string"
+        },
+        "algorithm_version": {
+          "title": "Algorithm Version",
+          "type": "string"
+        },
+        "native_resolution_m": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Native Resolution M"
+        },
+        "comparison_scale_m": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Comparison Scale M"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/MeasuredMetric"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "kind",
+        "artifact_sha256",
+        "artifact_media_type",
+        "source_uri",
+        "dataset_product_id",
+        "dataset_version",
+        "granule_id",
+        "license_note",
+        "body",
+        "aoi",
+        "input_evidence_ids",
+        "parameters_sha256",
+        "algorithm_id",
+        "algorithm_version",
+        "native_resolution_m",
+        "comparison_scale_m",
+        "metrics",
+        "limitations"
+      ],
+      "title": "EvidenceRecord",
+      "type": "object"
+    },
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "description": "Reference to evidence: EITHER a draft in the same ScienceComputationResult (local_key)\nOR an existing persisted EvidenceRecord supplied in ScienceRequest.input_evidence.",
+      "properties": {
+        "local_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Local Key"
+        },
+        "evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Id"
+        }
+      },
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "Gate": {
+      "additionalProperties": false,
+      "properties": {
+        "gate_id": {
+          "enum": [
+            "SC-01",
+            "SC-02",
+            "SC-03",
+            "SC-04",
+            "SC-05",
+            "SC-06",
+            "SC-07",
+            "SC-08",
+            "SC-09",
+            "SC-10",
+            "SC-11",
+            "SC-12",
+            "SC-13",
+            "SC-14",
+            "SC-15"
+          ],
+          "title": "Gate Id",
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "SATISFIED",
+            "UNSATISFIED",
+            "NOT_ASSESSED",
+            "NOT_APPLICABLE"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "gate_id",
+        "outcome",
+        "reason",
+        "evidence_ids"
+      ],
+      "title": "Gate",
+      "type": "object"
+    },
+    "MeasuredMetric": {
+      "additionalProperties": false,
+      "properties": {
+        "metric_id": {
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "support_scale_m": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Support Scale M"
+        },
+        "quantity_kind": {
+          "enum": [
+            "MEASURED",
+            "DERIVED",
+            "PROXY",
+            "ASSUMED"
+          ],
+          "title": "Quantity Kind",
+          "type": "string"
+        },
+        "method_id": {
+          "title": "Method Id",
+          "type": "string"
+        },
+        "valid_fraction": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Valid Fraction",
+          "type": "number"
+        },
+        "uncertainty_note": {
+          "title": "Uncertainty Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metric_id",
+        "value",
+        "unit",
+        "support_scale_m",
+        "quantity_kind",
+        "method_id",
+        "valid_fraction",
+        "uncertainty_note"
+      ],
+      "title": "MeasuredMetric",
+      "type": "object"
+    },
+    "MissionTestContract": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "mission_id": {
+          "format": "uuid",
+          "title": "Mission Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "accepted_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Accepted At"
+        },
+        "content_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Content Sha256",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "objective": {
+          "title": "Objective",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/AreaOfInterest"
+        },
+        "requirements": {
+          "items": {
+            "$ref": "#/$defs/Requirement"
+          },
+          "minItems": 1,
+          "title": "Requirements",
+          "type": "array"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "forbidden_actions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Forbidden Actions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "mission_id",
+        "workspace_id",
+        "revision",
+        "created_at",
+        "accepted_at",
+        "content_sha256",
+        "name",
+        "objective",
+        "target",
+        "requirements",
+        "assumptions",
+        "forbidden_actions"
+      ],
+      "title": "MissionTestContract",
+      "type": "object"
+    },
+    "PlanetaryTargetProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "live",
+            "replay",
+            "synthetic"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/AreaOfInterest"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/MeasuredMetric"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "unavailable_dimensions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unavailable Dimensions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "target",
+        "evidence_ids",
+        "metrics",
+        "unavailable_dimensions"
+      ],
+      "title": "PlanetaryTargetProfile",
+      "type": "object"
+    },
+    "QualificationDimension": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "live",
+            "replay",
+            "synthetic"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "requirement_id": {
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "PARTIAL",
+            "FAIL",
+            "GAP",
+            "UNKNOWN"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "rule_id": {
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "rule_version": {
+          "title": "Rule Version",
+          "type": "string"
+        },
+        "confidence": {
+          "enum": [
+            "HIGH",
+            "MEDIUM",
+            "LOW",
+            "UNASSESSED"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "comparison_scale_m": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Comparison Scale M"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        },
+        "critic_status": {
+          "enum": [
+            "UNREVIEWED",
+            "ACCEPTED",
+            "CHALLENGED",
+            "RESOLVED"
+          ],
+          "title": "Critic Status",
+          "type": "string"
+        },
+        "critique_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Critique Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "candidate_id",
+        "requirement_id",
+        "status",
+        "evidence_ids",
+        "rule_id",
+        "rule_version",
+        "confidence",
+        "comparison_scale_m",
+        "explanation",
+        "limitations",
+        "critic_status",
+        "critique_evidence_ids"
+      ],
+      "title": "QualificationDimension",
+      "type": "object"
+    },
+    "RequiredExposure": {
+      "additionalProperties": false,
+      "properties": {
+        "requirement_id": {
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "metric_id": {
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "lower": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lower"
+        },
+        "upper": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upper"
+        },
+        "minimum_distance_m": {
+          "minimum": 0.0,
+          "title": "Minimum Distance M",
+          "type": "number"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "metric_id",
+        "lower",
+        "upper",
+        "minimum_distance_m"
+      ],
+      "title": "RequiredExposure",
+      "type": "object"
+    },
+    "Requirement": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "dimension": {
+          "enum": [
+            "TERRAIN",
+            "SCIENCE",
+            "OPERATIONS",
+            "THERMAL",
+            "ILLUMINATION",
+            "ARIDITY",
+            "GRAVITY",
+            "ATMOSPHERE",
+            "RADIATION",
+            "REGOLITH"
+          ],
+          "title": "Dimension",
+          "type": "string"
+        },
+        "observable": {
+          "title": "Observable",
+          "type": "string"
+        },
+        "operator": {
+          "enum": [
+            "BETWEEN",
+            "GTE",
+            "LTE",
+            "EQUALS",
+            "PRESENT",
+            "NOT_NATURALLY_REPRODUCIBLE"
+          ],
+          "title": "Operator",
+          "type": "string"
+        },
+        "lower": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lower"
+        },
+        "upper": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upper"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "mandatory": {
+          "title": "Mandatory",
+          "type": "boolean"
+        },
+        "weight": {
+          "exclusiveMinimum": 0,
+          "title": "Weight",
+          "type": "number"
+        },
+        "evidence_scope": {
+          "enum": [
+            "regional_context",
+            "terrain_model",
+            "field_validation"
+          ],
+          "title": "Evidence Scope",
+          "type": "string"
+        },
+        "minimum_support_scale_m": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minimum Support Scale M"
+        },
+        "maximum_support_scale_m": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Maximum Support Scale M"
+        },
+        "origin": {
+          "enum": [
+            "USER",
+            "TARGET_DERIVED",
+            "PROPOSED_DEFAULT"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "acceptance_note": {
+          "title": "Acceptance Note",
+          "type": "string"
+        },
+        "parameters": {
+          "$ref": "#/$defs/RequirementParameters"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "dimension",
+        "observable",
+        "operator",
+        "lower",
+        "upper",
+        "unit",
+        "mandatory",
+        "weight",
+        "evidence_scope",
+        "minimum_support_scale_m",
+        "maximum_support_scale_m",
+        "origin",
+        "acceptance_note",
+        "parameters"
+      ],
+      "title": "Requirement",
+      "type": "object"
+    },
+    "RequirementAssignment": {
+      "additionalProperties": false,
+      "properties": {
+        "requirement_id": {
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "candidate_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Candidate Ids",
+          "type": "array"
+        },
+        "coverage": {
+          "enum": [
+            "FULL",
+            "PARTIAL",
+            "NONE",
+            "UNKNOWN",
+            "GAP"
+          ],
+          "title": "Coverage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "candidate_ids",
+        "coverage"
+      ],
+      "title": "RequirementAssignment",
+      "type": "object"
+    },
+    "RequirementParameters": {
+      "additionalProperties": false,
+      "properties": {
+        "slope_band_deg": {
+          "anyOf": [
+            {
+              "items": {
+                "maximum": 90.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Slope Band Deg"
+        },
+        "exposure_counting": {
+          "anyOf": [
+            {
+              "enum": [
+                "UNIQUE_UNDIRECTED_EDGE_DISTANCE",
+                "TOTAL_TRAVERSED_DISTANCE"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Exposure Counting"
+        },
+        "task_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Task Ids",
+          "type": "array"
+        },
+        "co_location_group": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Co Location Group"
+        },
+        "comparison_rule_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Comparison Rule Id"
+        },
+        "temporal_support": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Temporal Support"
+        }
+      },
+      "required": [
+        "slope_band_deg",
+        "exposure_counting",
+        "task_ids",
+        "co_location_group",
+        "comparison_rule_id",
+        "temporal_support"
+      ],
+      "title": "RequirementParameters",
+      "type": "object"
+    },
+    "RouteViolation": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "MAX_SLOPE_EXCEEDED",
+            "FORBIDDEN_INTERSECTION",
+            "UNKNOWN_TERRAIN",
+            "WAYPOINT_MISSED",
+            "TASK_CAPABILITY_MISSING",
+            "RETURN_NOT_COMPLETED",
+            "EXPOSURE_SHORTFALL",
+            "CLASS_DIVERSITY_SHORTFALL",
+            "ENERGY_RESERVE_SHORTFALL",
+            "MAX_DISTANCE_EXCEEDED",
+            "MAX_DURATION_EXCEEDED",
+            "SCALE_UNSUPPORTED",
+            "EDGE_TRAVERSAL_LIMIT_EXCEEDED",
+            "DISCONTINUOUS_ROUTE",
+            "STALE_INPUT_HASH"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "requirement_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Requirement Id"
+        },
+        "constraint_id": {
+          "title": "Constraint Id",
+          "type": "string"
+        },
+        "observed": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Observed"
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Threshold"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unit"
+        },
+        "segment_from_index": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Segment From Index"
+        },
+        "segment_to_index": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Segment To Index"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "requirement_id",
+        "constraint_id",
+        "observed",
+        "threshold",
+        "unit",
+        "message"
+      ],
+      "title": "RouteViolation",
+      "type": "object"
+    },
+    "RoverProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "rover_id": {
+          "format": "uuid",
+          "title": "Rover Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "content_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Content Sha256",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "mass_kg": {
+          "exclusiveMinimum": 0,
+          "title": "Mass Kg",
+          "type": "number"
+        },
+        "max_slope_deg": {
+          "exclusiveMaximum": 90.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Max Slope Deg",
+          "type": "number"
+        },
+        "ground_clearance_m": {
+          "minimum": 0.0,
+          "title": "Ground Clearance M",
+          "type": "number"
+        },
+        "wheel_diameter_m": {
+          "exclusiveMinimum": 0,
+          "title": "Wheel Diameter M",
+          "type": "number"
+        },
+        "max_obstacle_height_m": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Obstacle Height M"
+        },
+        "battery_wh": {
+          "exclusiveMinimum": 0,
+          "title": "Battery Wh",
+          "type": "number"
+        },
+        "min_reserve_pct": {
+          "maximum": 100.0,
+          "minimum": 0.0,
+          "title": "Min Reserve Pct",
+          "type": "number"
+        },
+        "nominal_speed_mps": {
+          "exclusiveMinimum": 0,
+          "title": "Nominal Speed Mps",
+          "type": "number"
+        },
+        "max_route_m": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Route M"
+        },
+        "sensors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Sensors",
+          "type": "array"
+        },
+        "capabilities": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "energy_model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EnergyModel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "rover_id",
+        "workspace_id",
+        "revision",
+        "created_at",
+        "content_sha256",
+        "name",
+        "mass_kg",
+        "max_slope_deg",
+        "ground_clearance_m",
+        "wheel_diameter_m",
+        "max_obstacle_height_m",
+        "battery_wh",
+        "min_reserve_pct",
+        "nominal_speed_mps",
+        "max_route_m",
+        "sensors",
+        "capabilities",
+        "energy_model",
+        "assumptions"
+      ],
+      "title": "RoverProfile",
+      "type": "object"
+    },
+    "ScientificAssuranceArtifact": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "audit_id": {
+          "format": "uuid",
+          "title": "Audit Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "synthetic",
+            "replay",
+            "live"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "snapshot_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Snapshot Sha256",
+          "type": "string"
+        },
+        "mission_content_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Mission Content Sha256",
+          "type": "string"
+        },
+        "rover_content_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rover Content Sha256"
+        },
+        "dataset_policy_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Dataset Policy Sha256",
+          "type": "string"
+        },
+        "acquired_manifest_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Acquired Manifest Sha256",
+          "type": "string"
+        },
+        "algorithm_lock_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Algorithm Lock Sha256",
+          "type": "string"
+        },
+        "assurance_policy_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Assurance Policy Sha256",
+          "type": "string"
+        },
+        "critique_evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Critique Evidence Ids",
+          "type": "array"
+        },
+        "claims": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "minItems": 1,
+          "title": "Claims",
+          "type": "array"
+        },
+        "publication": {
+          "enum": [
+            "ALLOWED",
+            "LIMITED",
+            "BLOCKED"
+          ],
+          "title": "Publication",
+          "type": "string"
+        },
+        "blocking_issue_codes": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Blocking Issue Codes",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "audit_id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "snapshot_sha256",
+        "mission_content_sha256",
+        "rover_content_sha256",
+        "dataset_policy_sha256",
+        "acquired_manifest_sha256",
+        "algorithm_lock_sha256",
+        "assurance_policy_sha256",
+        "critique_evidence_ids",
+        "claims",
+        "publication",
+        "blocking_issue_codes",
+        "limitations"
+      ],
+      "title": "ScientificAssuranceArtifact",
+      "type": "object"
+    },
+    "SolverConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "max_expansions": {
+          "minimum": 1,
+          "title": "Max Expansions",
+          "type": "integer"
+        },
+        "max_seconds": {
+          "minimum": 1,
+          "title": "Max Seconds",
+          "type": "integer"
+        },
+        "max_labels_per_node": {
+          "minimum": 1,
+          "title": "Max Labels Per Node",
+          "type": "integer"
+        },
+        "seed": {
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_expansions",
+        "max_seconds",
+        "max_labels_per_node",
+        "seed"
+      ],
+      "title": "SolverConfig",
+      "type": "object"
+    },
+    "SourceLocks": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_policy_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Dataset Policy Sha256",
+          "type": "string"
+        },
+        "acquired_manifest_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Acquired Manifest Sha256",
+          "type": "string"
+        },
+        "build_lock_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Build Lock Sha256"
+        },
+        "config_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Config Sha256",
+          "type": "string"
+        },
+        "algorithm_lock_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Algorithm Lock Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataset_policy_sha256",
+        "acquired_manifest_sha256",
+        "config_sha256",
+        "algorithm_lock_sha256"
+      ],
+      "title": "SourceLocks",
+      "type": "object"
+    },
+    "TestResult": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "live",
+            "replay",
+            "synthetic"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "test_id": {
+          "format": "uuid",
+          "title": "Test Id",
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "INCONCLUSIVE"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "failure_category": {
+          "anyOf": [
+            {
+              "enum": [
+                "ROUTE",
+                "ROVER",
+                "ANALOG",
+                "DATA",
+                "REQUIREMENT",
+                "SEARCH_LIMIT",
+                "SYSTEM"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Failure Category"
+        },
+        "search_status": {
+          "enum": [
+            "FOUND",
+            "EXHAUSTIVE_INFEASIBLE",
+            "BUDGET_EXHAUSTED",
+            "NOT_RUN",
+            "ERROR"
+          ],
+          "title": "Search Status",
+          "type": "string"
+        },
+        "verified_route_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Verified Route Sha256"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/$defs/MeasuredMetric"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "violations": {
+          "items": {
+            "$ref": "#/$defs/Violation"
+          },
+          "title": "Violations",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "verifier_version": {
+          "title": "Verifier Version",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "test_id",
+        "outcome",
+        "failure_category",
+        "search_status",
+        "verified_route_sha256",
+        "metrics",
+        "violations",
+        "evidence_ids",
+        "verifier_version",
+        "limitations"
+      ],
+      "title": "TestResult",
+      "type": "object"
+    },
+    "VerificationTest": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "live",
+            "replay",
+            "synthetic"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "candidate_id": {
+          "format": "uuid",
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "mission_revision_id": {
+          "format": "uuid",
+          "title": "Mission Revision Id",
+          "type": "string"
+        },
+        "rover_revision_id": {
+          "format": "uuid",
+          "title": "Rover Revision Id",
+          "type": "string"
+        },
+        "test_revision": {
+          "minimum": 1,
+          "title": "Test Revision",
+          "type": "integer"
+        },
+        "requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Requirement Ids",
+          "type": "array"
+        },
+        "route_artifact_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Route Artifact Sha256"
+        },
+        "waypoints_artifact_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Waypoints Artifact Sha256"
+        },
+        "constraints_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Constraints Sha256",
+          "type": "string"
+        },
+        "required_exposures": {
+          "items": {
+            "$ref": "#/$defs/RequiredExposure"
+          },
+          "title": "Required Exposures",
+          "type": "array"
+        },
+        "solver_config": {
+          "$ref": "#/$defs/SolverConfig"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "id",
+        "workspace_id",
+        "run_id",
+        "mode",
+        "created_at",
+        "candidate_id",
+        "mission_revision_id",
+        "rover_revision_id",
+        "test_revision",
+        "requirement_ids",
+        "route_artifact_sha256",
+        "waypoints_artifact_sha256",
+        "constraints_sha256",
+        "required_exposures",
+        "solver_config",
+        "assumptions"
+      ],
+      "title": "VerificationTest",
+      "type": "object"
+    },
+    "Violation": {
+      "additionalProperties": false,
+      "properties": {
+        "requirement_id": {
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "code",
+        "message",
+        "evidence_ids"
+      ],
+      "title": "Violation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "is_draft": {
+      "title": "Is Draft",
+      "type": "boolean"
+    },
+    "generated_at": {
+      "title": "Generated At",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "live",
+        "replay",
+        "synthetic"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "replay_source_run_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Replay Source Run Id"
+    },
+    "passport": {
+      "$ref": "#/$defs/AnalogPassport"
+    },
+    "manifest_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Manifest Sha256",
+      "type": "string"
+    },
+    "canonical_manifest_json": {
+      "title": "Canonical Manifest Json",
+      "type": "string"
+    },
+    "mission": {
+      "$ref": "#/$defs/MissionTestContract"
+    },
+    "rover": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RoverProfile"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "target_profile": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PlanetaryTargetProfile"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "candidates": {
+      "items": {
+        "$ref": "#/$defs/EarthAnalogCandidate"
+      },
+      "title": "Candidates",
+      "type": "array"
+    },
+    "qualifications": {
+      "items": {
+        "$ref": "#/$defs/QualificationDimension"
+      },
+      "title": "Qualifications",
+      "type": "array"
+    },
+    "compatibility": {
+      "items": {
+        "$ref": "#/$defs/CompatibilityBlock"
+      },
+      "title": "Compatibility",
+      "type": "array"
+    },
+    "critiques": {
+      "items": {
+        "$ref": "#/$defs/CritiqueIssue"
+      },
+      "title": "Critiques",
+      "type": "array"
+    },
+    "attempts": {
+      "items": {
+        "$ref": "#/$defs/AttemptRecord"
+      },
+      "title": "Attempts",
+      "type": "array"
+    },
+    "portfolio": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CompositePortfolio"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "evidence_appendix": {
+      "items": {
+        "$ref": "#/$defs/EvidenceRecord"
+      },
+      "title": "Evidence Appendix",
+      "type": "array"
+    },
+    "assurance": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ScientificAssuranceArtifact"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source_locks": {
+      "$ref": "#/$defs/SourceLocks"
+    },
+    "search_limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Search Limitations",
+      "type": "array"
+    },
+    "not_run_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Not Run Reason"
+    }
+  },
+  "required": [
+    "is_draft",
+    "generated_at",
+    "mode",
+    "passport",
+    "manifest_sha256",
+    "canonical_manifest_json",
+    "mission",
+    "rover",
+    "target_profile",
+    "candidates",
+    "qualifications",
+    "assurance",
+    "source_locks"
+  ],
+  "title": "PassportExportBundle",
+  "type": "object",
+  "$comment": "Generated from analogforge.ports models by kit/tools/build_kit.py. Do not edit."
+}

@@ -1,0 +1,1 @@
+export const graphRegression={first:{distance:120,energy:26,exposure:0,outcome:'FAIL',strategy:'WAYPOINT_RETURN'},second:{distance:230,energy:30,exposure:150,reserve:98.33333333333333,outcome:'PASS',strategy:'EXPOSURE_COVERAGE'}};

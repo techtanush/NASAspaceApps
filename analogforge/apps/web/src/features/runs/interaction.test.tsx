@@ -1,0 +1,26 @@
+import { beforeEach,describe,expect,it,vi } from 'vitest';
+import { render,screen,within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+import { QueryClient,QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
+import seed from '../../mock/fixtures/seed.json';
+import type { components } from '../../generated/schema';
+import { RunContext,type RunContextValue } from './RunContext';
+import { QualificationView } from '../qualification/QualificationView';
+import { AnalogsView } from '../analogs/AnalogsView';
+import { PassportView } from '../passport/PassportView';
+type S=components['schemas'];
+vi.mock('../../maps/EarthMap',()=>({EarthMap:()=> <div data-testid="earth-map">Map context</div>}));
+vi.mock('../../api/artifacts',async importOriginal=>{const actual=await importOriginal<Record<string,unknown>>();return {...actual,findEvidenceByAlgorithm:async()=>undefined};});
+vi.mock('../../api/client',()=>({api:{get:vi.fn(async(path:string)=>path.startsWith('/critiques')?{items:[],next_cursor:null}:path.startsWith('/tests')?{items:[],next_cursor:null}:null)}}));
+const contract={...seed.missionPresets.MARS,id:'contract',mission_id:'mission',schema_version:'1.0',workspace_id:seed.workspaceId,revision:2,created_at:seed.createdAt,accepted_at:seed.createdAt,content_sha256:seed.hash} as S['MissionTestContract'];
+function context():RunContextValue{return {snapshot:{id:'run',run_id:'run',workspace_id:seed.workspaceId,schema_version:'1.0',mode:'synthetic',created_at:seed.createdAt,state:'AWAITING_REVIEW',revision:6,last_event_seq:4,mission_revision_id:'contract',rover_revision_id:'rover',target_profile_id:'target',candidate_ids:seed.candidates.map(candidate=>candidate.id),qualification_ids:seed.qualifications.map(row=>row.id),test_ids:[],test_result_ids:[],portfolio_ids:[],passport_id:null,pending_review:null,blocked_dependencies:[],config_sha256:seed.hash,selected_candidate_id:null,selected_portfolio_id:null,scenario_config_id:'synthetic-mars-mobility-v1',dataset_lock_id:'practice-lock-v1'},contract,candidates:seed.candidates as S['EarthAnalogCandidate'][],qualifications:seed.qualifications as S['QualificationDimension'][],pending:false,action:vi.fn(async()=>true),showEvidence:vi.fn()};}
+function wrapper(value:RunContextValue,children:ReactNode){return <QueryClientProvider client={new QueryClient({defaultOptions:{queries:{retry:false}}})}><MemoryRouter><RunContext.Provider value={value}>{children}</RunContext.Provider></MemoryRouter></QueryClientProvider>;}
+beforeEach(()=>vi.clearAllMocks());
+describe('FE scientific state and acknowledgement boundaries',()=>{
+ it('FE-006 does not select a candidate before the server acknowledges it',async()=>{const value=context();let acknowledge:(result:boolean)=>void=()=>undefined;value.action=vi.fn(()=>new Promise<boolean>(resolve=>{acknowledge=resolve;}));render(wrapper(value,<AnalogsView/>));const row=screen.getAllByTestId('candidate-row')[0]!;await userEvent.click(within(row).getByRole('button',{name:'Select candidate'}));expect(value.action).toHaveBeenCalledOnce();expect(row).toHaveAttribute('data-selected','false');acknowledge(true);expect(row).toHaveAttribute('data-selected','false');});
+ it('FE-006 retains the selection after a rejected semantic action',async()=>{const value=context();value.action=vi.fn(async()=>false);render(wrapper(value,<AnalogsView/>));await userEvent.click(screen.getAllByTestId('btn-select-candidate')[0]!);expect(screen.getAllByTestId('candidate-row')[0]).toHaveAttribute('data-selected','false');});
+ it('FE-002 / UX-004 shows optional unknowns and physical gaps until explicitly filtered',async()=>{const value=context();render(wrapper(value,<QualificationView/>));const mineral=screen.getAllByTestId('qual-cell').filter(cell=>cell.getAttribute('data-requirement-id')==='R-MINERAL');expect(mineral).toHaveLength(6);expect(mineral.every(cell=>cell.getAttribute('data-status')==='UNKNOWN')).toBe(true);expect(screen.getAllByTestId('qual-cell').some(cell=>cell.getAttribute('data-status')==='GAP')).toBe(true);await userEvent.click(screen.getByRole('checkbox'));expect(screen.getByText(/of 9 hidden/)).toBeVisible();});
+ it('FE-010 missing assurance stays incomplete and synthetic mode persists in draft',()=>{render(wrapper(context(),<PassportView/>));expect(screen.getByTestId('assurance-badge')).toHaveAttribute('data-publication','INCOMPLETE');expect(screen.getByTestId('assurance-badge')).not.toHaveTextContent('ALLOWED');expect(screen.getByTestId('mode-badge')).toHaveAttribute('data-mode','synthetic');expect(screen.getByTestId('passport-view')).toHaveAttribute('data-draft','true');expect(screen.getByText('DRAFT — INCOMPLETE')).toBeVisible();});
+});

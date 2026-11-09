@@ -1,0 +1,247 @@
+{
+  "schema_version": "2.0",
+  "person": "Aradhya",
+  "branch": "aradhya/frontend-experience",
+  "template_note": "Copy to team handoffs/aradhya/STATUS.json. Replace every null with an observed value or leave null with a reason. Never invent results.",
+  "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
+  "tested_commit_sha": null,
+  "kit_version": "1.0.0",
+  "kit_verify": {
+    "status": "NOT_RUN",
+    "command": "python3 \"architecture files/contracts/kit/materialize.py\" --verify",
+    "exit_code": null
+  },
+  "environment": {
+    "node": "22.21.1",
+    "pnpm": "10.22.0",
+    "python": "3.12.13",
+    "playwright_browser": "Installed Google Chrome headless; launch passed",
+    "notes": [
+      "Use PATH /Users/aradhyamishra/.npm/_npx/35c91942bfecc55d/node_modules/.bin for pinned Node and pnpm. No browser download needed."
+    ]
+  },
+  "ownership_check": {
+    "status": "NOT_RUN",
+    "exit_code": null
+  },
+  "catalog": {
+    "KIT-01": {
+      "status": "NOT_RUN",
+      "command": null,
+      "exit_code": null,
+      "tests_passed": null,
+      "tests_failed": null,
+      "tests_skipped": null,
+      "output_file": null
+    },
+    "KIT-02": {
+      "status": "NOT_RUN",
+      "command": null,
+      "exit_code": null,
+      "tests_passed": null,
+      "tests_failed": null,
+      "tests_skipped": null,
+      "output_file": null
+    },
+    "UIX-01": {
+      "status": "NOT_RUN"
+    },
+    "UIX-02": {
+      "status": "NOT_RUN"
+    },
+    "UIX-03": {
+      "status": "NOT_RUN"
+    },
+    "UIX-04": {
+      "status": "NOT_RUN"
+    },
+    "UIX-05": {
+      "status": "NOT_RUN"
+    },
+    "UIX-06": {
+      "status": "NOT_RUN"
+    },
+    "UIX-07": {
+      "status": "NOT_RUN"
+    },
+    "UIX-08": {
+      "status": "NOT_RUN"
+    },
+    "UIX-09": {
+      "status": "NOT_RUN"
+    },
+    "UIX-10": {
+      "status": "NOT_RUN"
+    },
+    "UIX-11": {
+      "status": "NOT_RUN"
+    },
+    "UIX-12": {
+      "status": "NOT_RUN"
+    },
+    "UIX-13": {
+      "status": "NOT_RUN"
+    }
+  },
+  "journeys_mock_mode": {
+    "J01": "NOT_RUN",
+    "J02": "NOT_RUN",
+    "J03": "NOT_RUN",
+    "J04": "NOT_RUN",
+    "J05": "NOT_RUN",
+    "J06": "NOT_RUN",
+    "J07": "NOT_RUN",
+    "J08": "NOT_RUN",
+    "J09": "NOT_RUN",
+    "J10": "NOT_RUN",
+    "J11": "NOT_RUN",
+    "J12": "NOT_RUN",
+    "J13": "NOT_RUN"
+  },
+  "journeys_real_mode": "BLOCKED_ENVIRONMENT (belongs to the merging agent; real-mode assertions present behind isMock())",
+  "status_values": [
+    "PASSED",
+    "FAILED",
+    "BLOCKED_ENVIRONMENT",
+    "BLOCKED_EXTERNAL",
+    "NOT_IMPLEMENTED",
+    "NOT_RUN"
+  ],
+  "sci_tests": {
+    "SCI-03": "NOT_RUN",
+    "SCI-05": "NOT_RUN",
+    "SCI-10": "NOT_RUN",
+    "SCI-13": "NOT_RUN",
+    "SCI-15": "NOT_RUN",
+    "SCI-16": "NOT_RUN",
+    "SCI-18": "NOT_RUN"
+  },
+  "testids": {
+    "expected": null,
+    "implemented": null,
+    "asserted_by_playwright": null
+  },
+  "renderer": {
+    "fixtures": 0,
+    "formats_deterministic": null,
+    "hostile_string_suite": "NOT_RUN",
+    "purity_subprocess_test": "NOT_RUN"
+  },
+  "accessibility": {
+    "axe_critical_serious": null,
+    "viewports": [
+      1440,
+      900,
+      390
+    ],
+    "keyboard_only": "NOT_RUN",
+    "zoom_200": "NOT_RUN"
+  },
+  "self_audit": {
+    "forbidden_scan": {
+      "status": "NOT_RUN",
+      "findings": 0
+    },
+    "mutation_check": {
+      "status": "NOT_RUN",
+      "mutants": 36,
+      "killed": null
+    },
+    "truthfulness_proof": {},
+    "adversarial_reviewers": [],
+    "final_truth_checks": {}
+  },
+  "lint": {
+    "eslint": {
+      "status": "NOT_RUN",
+      "exit_code": null
+    },
+    "tsc": {
+      "status": "NOT_RUN",
+      "exit_code": null
+    },
+    "ruff": {
+      "status": "NOT_RUN",
+      "exit_code": null
+    },
+    "mypy": {
+      "status": "NOT_RUN",
+      "exit_code": null
+    }
+  },
+  "contradictions_found": [
+    {
+      "files": [
+        "team guides/Aradhya/08-MODULE-SPECIFICATION.md",
+        "analogforge/src/analogforge/ports/domain_models.py"
+      ],
+      "issue": "CSV evaluation_stage requested but QualificationDimension frozen model lacks field.",
+      "choice": "Empty CSV stage permitted by renderer guide; frontend reads stage from compare-requirement artifact."
+    },
+    {
+      "files": [
+        "team guides/Aradhya/05-TEST-AND-MERGE-GATES.md",
+        "analogforge/src/analogforge/ports/passport_renderer.py"
+      ],
+      "issue": "Frozen kit import itself loads socket through Pydantic internals; exact no-socket import requirement impossible without kit edits.",
+      "choice": "Purity tests preload frozen kit baseline; renderer must add none of forbidden modules and perform no environment/network/filesystem writes."
+    },
+    {
+      "files": [
+        "team guides/Aradhya/10-DESIGN-SYSTEM-AND-VISUAL-QA.md",
+        "team guides/Aradhya/08-MODULE-SPECIFICATION.md"
+      ],
+      "issue": "Visual audit requests mock build while production mock builds prohibited.",
+      "choice": "All builds reject mock flag. Audit runs explicitly bannered dev server."
+    }
+  ],
+  "defects_in_other_areas": [],
+  "change_requests": [],
+  "external_blockers": [],
+  "known_limitations": [],
+  "decisions": "see team handoffs/aradhya/DECISIONS.md",
+  "ready_to_merge": false,
+  "ready_to_merge_rule": "true only if every UIX row (UIX-01..13) and DR-01..04 is PASSED, J01-J13 pass in mock mode with 0 skipped, kit_verify and ownership_check PASS, lint/typecheck clean, self_audit complete, no hidden skips",
+  "pushed_sha": null,
+  "secrets_not_committed": null,
+  "build_output_not_committed": null,
+  "design": {
+    "tokens_verify": {
+      "status": "NOT_RUN",
+      "checks_passed": null
+    },
+    "tokens_css_identical": "NOT_RUN",
+    "visual_audit": {
+      "status": "NOT_RUN",
+      "screens": null,
+      "viewports": [
+        1920,
+        1440,
+        1280,
+        1024,
+        768,
+        390
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "findings": null,
+      "skipped_checks": null
+    },
+    "styleguide": "NOT_RUN",
+    "design_review": {
+      "DR-01": "NOT_RUN",
+      "DR-02": "NOT_RUN",
+      "DR-03": "NOT_RUN",
+      "DR-04": "NOT_RUN",
+      "rounds": [],
+      "final_scores": {},
+      "review_file": "team handoffs/aradhya/DESIGN-REVIEW.md"
+    },
+    "slop_findings_open": null,
+    "fonts_self_hosted": null,
+    "external_requests_seen": null,
+    "third_party_licences_recorded": null
+  }
+}

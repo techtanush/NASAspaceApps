@@ -1,0 +1,17 @@
+# Aradhya build progress
+
+Repo branch aradhya/frontend-experience. Base36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0. Kitmaterialized/read-only; correctownedpaths. No commits/push yet. Gitpushdryrun succeeds.
+
+Environment pinned Node22.21.1/pnpm10.22.0 via PATH /Users/aradhyamishra/.npm/_npx/35c91942bfecc55d/node_modules/.bin, Python3.12.13 in analogforge/.venv. Chrome installed app headless executable configured. Kit20 tests+token150 pass.
+
+All UI/API/mock/renderer built, productionbuild passes, type/lintpass. Renderer independentattacks fixed: canonicalJSON, staleauditinputbinding, all evidence references, SVGprocessinginstructions. Renderer+contract105pass beforeadditionalCSVheaderregression; CSVheader nowplainfrozencolumns.9bundlesx3realexports. Mockdynamicexports use devonlyVitePythonbridge, exactruntimebundle/fileshashes andPythoncanonicalmanifest. ActualpreparedPNGdisplayfixtures andallscienceartifactmodels nowimplemented+validated.
+
+Independent reviewers: renderer4findingsfixed; state6findingsfixed (externalwrongrunprobeexpectsresolutionbutnowcorrectlyrejects; actualbrowserreloadpendingtest underway); truth5attacktestsnowpass; accessibility4findingsfixedinclasyncrunheadingfocus anddisabledreasons. Needfinalfollow-upvalidation.
+
+Initial13journeys10pass; J01CSVfixed, J02graphandJ08offlinefixed. ParentJ01rerunsinterruptedHMR whileUIbeingedited; needsstablefinalrerun. Parentcontractedges4/4pass (approve/reject/retry/portfolio). Journey_checks agentownsJ02-J13,a11y,webgltests strengtheningrealmode/keyboard/zoom/reload. UIagentownsfullvisualtest+screens+allUI; APIagentfinishespublication-singleflightbug andsame-sourceassertions. ParentownsJ01/support/config/mutation/audittools/status.
+
+DesignsmokeS01+styleguideboth themes1440/390passes0findings. FullvisualcrawlUIagentactive. Needallrequiredscreens6viewports2themes, full36mutations,3freshdesignreviewers, wholefrozengates, runtime81hookcoverage, cleanrebuild, ownership/secretchecks, finalstatus/commit/push. Mutationunit12allkilledincludingfixedM5optimismprobeandM16assertionclassification. Helpersapi6andrenderer9previouslyallkilled; fullre-runneededafterchanges.
+
+Diskpressure: Macswap9.6GB, availablebriefly0; onlytaskdownloadedduplicatepnpmcache anduvwheelcache pruned withCLIs, nosource/personalfiledeletion. Browserrunsmustserialize; journeyagentinitiallylaunched2commands+UIvisual. Parentedgefinishedclosed; instructedagentsserialize. StopparentpersistentVitesession46270 beforeisolatedbrowsermutants (5176). Metadataexcludesanalogforge/out soartifactsgeneratednotcommitted. STATUS.json hascontradictions/environmentdraft. Keepactualevidencehonest.
+
+Latest:128Python tests pass;55frontendunit tests pass; renderer9mutantsre-killed;4edgeflows pass; actualmidverificationbrowserreload mechanics nowPASS8.4s retainingfirstresultID+3uniqueattempts; strictTab-only390px and720CSS/deviceScale2zoom mechanicsPASS. ProductionpublicMSWleakfixedwithstaticemitplugin +regressionpass; productionauditliteralURLsclassifiedmetadata/docs,noforeignresources. ParentrequestAJVhook validatesallactualUImutations; RoverRevisionInput.profile mismatchfixedbyUI. Fullvisualremaining; browserrunsserialized. Needwholefinalsuiteandfull36mutationrun, hook81aggregatedandfreshdesignreview3agents.

@@ -1,0 +1,13 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { HelpCircle } from 'lucide-react';
+import { Button, Dialog, IconButton, KbdHint } from './index';
+export function AppHeader(){
+  const [theme,setTheme]=useState(()=>localStorage.getItem('af.theme')??'dark'); // allowed: view-preference
+  const [density,setDensity]=useState(()=>localStorage.getItem('af.density')??'default'); // allowed: view-preference
+  const [help,setHelp]=useState(false);
+  useEffect(()=>{document.documentElement.dataset.theme=theme==='system'?(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'):theme;localStorage.setItem('af.theme',theme);},[theme]); // allowed: view-preference
+  useEffect(()=>{document.documentElement.dataset.density=density;localStorage.setItem('af.density',density);},[density]); // allowed: view-preference
+  useEffect(()=>{const key=(event:KeyboardEvent)=>{if(event.defaultPrevented||event.ctrlKey||event.altKey||event.metaKey||(event.target instanceof Element&&event.target.closest('input,textarea,[contenteditable],[role=combobox],[role=option],[role=listbox]')))return;if(event.key==='?'){event.preventDefault();setHelp(value=>!value);}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[]);
+  return <><header className="app-header"><Link to="/" className="wordmark"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" fill="none"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>AnalogForge</Link><span className="header-context helper">Mission-conditioned analog qualification</span><div className="header-cluster"><Button data-testid="theme-toggle" data-theme-choice={theme} onClick={()=>setTheme(theme==='dark'?'light':theme==='light'?'system':'dark')}>Theme: {theme}</Button><Button data-testid="density-toggle" data-density={density} onClick={()=>setDensity(density==='default'?'compact':density==='compact'?'comfortable':'default')}>Density: {density}</Button><IconButton label="Keyboard shortcuts" onClick={()=>setHelp(true)}><HelpCircle size={16}/></IconButton></div></header><Dialog title="Keyboard shortcuts" open={help} onOpenChange={setHelp} testid="shortcut-help"><dl className="readout-list">{[['/','Focus search'],['[', 'Previous run tab'],[']','Next run tab'],['e','Toggle evidence drawer'],['o','Toggle operations drawer'],['?','Keyboard shortcut help'],['Esc','Close drawer or dialog']].map(([key,label])=><div className="inline-fields" key={key}><dt><KbdHint>{key}</KbdHint></dt><dd>{label}</dd></div>)}</dl><p className="helper">Shortcuts pause while typing in a field.</p></Dialog></>;
+}

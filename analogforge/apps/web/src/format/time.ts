@@ -1,0 +1,2 @@
+export function formatTime(iso:string):string {const time=new Date(iso);return Number.isNaN(time.valueOf())?'Unknown':time.toISOString().replace('T',' ').replace(/\.\d{3}Z$/,'Z');}
+export function duration(seconds:number):string {if(seconds<60)return `${Math.round(seconds)} s`;if(seconds<3600)return `${Math.floor(seconds/60)} min ${Math.round(seconds%60)} s`;return `${Math.floor(seconds/3600)} h ${Math.floor(seconds%3600/60).toString().padStart(2,'0')} min`;}

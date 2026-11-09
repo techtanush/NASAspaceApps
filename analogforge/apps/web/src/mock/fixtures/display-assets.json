@@ -1,0 +1,298 @@
+{
+  "assets": {
+    "earth": {
+      "mediaType": "image/png",
+      "sha256": "d01234cfbfa098d4f970243fd8da1a4ffc0890264972f7a5b8846ef2b96aa43c",
+      "contentBase64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAe0lEQVR42u3aIRUAIBBEweuCJgENyEAH+itIAIJ7DzXi2xWjN0pt67U+5rHM7s8CAAAAAAAAAAAAAAAAAAAA+AIQlwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAADpNl7ZusL9GtMRAAAAAElFTkSuQmCC",
+      "width": 64,
+      "height": 64,
+      "mask": {
+        "encoding": "ALPHA",
+        "transparent_pixel_count": 217,
+        "meaning": "Water, nodata or outside valid target wedge; no values inferred"
+      }
+    },
+    "mars": {
+      "mediaType": "image/png",
+      "sha256": "fb19d7c9d7b2809d419984c3b6c96cce5547835f791ca2925fb087b1d92c7450",
+      "contentBase64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAh0lEQVR42u3QMQ2AMBBA0fPCjAIcVAMemDCBCcaKqAY00YSpK7mpyRv+8scXy7q9mcp+/CmGvnded6ranlQBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzA/QAQtp5t1uT7/pAAAAAElFTkSuQmCC",
+      "width": 64,
+      "height": 64,
+      "mask": {
+        "encoding": "ALPHA",
+        "transparent_pixel_count": 192,
+        "meaning": "Water, nodata or outside valid target wedge; no values inferred"
+      }
+    },
+    "moon": {
+      "mediaType": "image/png",
+      "sha256": "18ab48a171c88e10a21d037284224b1df1262e4abc9b0e31281452d76dd94efe",
+      "contentBase64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAi0lEQVR42u3QMRlAYBhG0a+LWQINZNDBpIQSRiFkkIl/9Ng87+gMN8A91fVDJY3THLWsW9R+nFEFAAAAAAC+dT1rE1FtIqpNvAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgnwA1varyz25h3zgAAAABJRU5ErkJggg==",
+      "width": 64,
+      "height": 64,
+      "mask": {
+        "encoding": "ALPHA",
+        "transparent_pixel_count": 1776,
+        "meaning": "Water, nodata or outside valid target wedge; no values inferred"
+      }
+    }
+  },
+  "layers": {
+    "Practice grid-r0c1": {
+      "body": "EARTH",
+      "rendering": "EARTH_WEBMERCATOR_IMAGE",
+      "display_crs_wkt": "PROJCRS[\"WGS 84 / Pseudo-Mercator\",BASEGEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],MEMBER[\"World Geodetic System 1984 (G2139)\"],MEMBER[\"World Geodetic System 1984 (G2296)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],ID[\"EPSG\",4326]],CONVERSION[\"Popular Visualisation Pseudo-Mercator\",METHOD[\"Popular Visualisation Pseudo Mercator\",ID[\"EPSG\",1024]],PARAMETER[\"Latitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8801]],PARAMETER[\"Longitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8802]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting (X)\",east,ORDER[1],LENGTHUNIT[\"metre\",1]],AXIS[\"northing (Y)\",north,ORDER[2],LENGTHUNIT[\"metre\",1]],USAGE[SCOPE[\"Web mapping and visualisation.\"],AREA[\"World between 85.06\u00b0S and 85.06\u00b0N.\"],BBOX[-85.06,-180,85.06,180]],ID[\"EPSG\",3857]]",
+      "pixel_to_world": [
+        -12356463.478053367,
+        52.18101130935247,
+        0,
+        4167958.771950031,
+        0,
+        -63.71293571464048
+      ],
+      "earth_corners": [
+        [
+          -111.0,
+          35.03
+        ],
+        [
+          -110.97,
+          35.03
+        ],
+        [
+          -110.97,
+          35
+        ],
+        [
+          -111.0,
+          35
+        ]
+      ],
+      "support_scale_m": 60,
+      "asset": "earth"
+    },
+    "Practice grid-r0c0": {
+      "body": "EARTH",
+      "rendering": "EARTH_WEBMERCATOR_IMAGE",
+      "display_crs_wkt": "PROJCRS[\"WGS 84 / Pseudo-Mercator\",BASEGEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],MEMBER[\"World Geodetic System 1984 (G2139)\"],MEMBER[\"World Geodetic System 1984 (G2296)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],ID[\"EPSG\",4326]],CONVERSION[\"Popular Visualisation Pseudo-Mercator\",METHOD[\"Popular Visualisation Pseudo Mercator\",ID[\"EPSG\",1024]],PARAMETER[\"Latitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8801]],PARAMETER[\"Longitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8802]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting (X)\",east,ORDER[1],LENGTHUNIT[\"metre\",1]],AXIS[\"northing (Y)\",north,ORDER[2],LENGTHUNIT[\"metre\",1]],USAGE[SCOPE[\"Web mapping and visualisation.\"],AREA[\"World between 85.06\u00b0S and 85.06\u00b0N.\"],BBOX[-85.06,-180,85.06,180]],ID[\"EPSG\",3857]]",
+      "pixel_to_world": [
+        -12352010.698421635,
+        52.18101130935247,
+        0,
+        4167958.771950031,
+        0,
+        -63.71293571464048
+      ],
+      "earth_corners": [
+        [
+          -110.96,
+          35.03
+        ],
+        [
+          -110.92999999999999,
+          35.03
+        ],
+        [
+          -110.92999999999999,
+          35
+        ],
+        [
+          -110.96,
+          35
+        ]
+      ],
+      "support_scale_m": 60,
+      "asset": "earth"
+    },
+    "Practice grid-r2c2": {
+      "body": "EARTH",
+      "rendering": "EARTH_WEBMERCATOR_IMAGE",
+      "display_crs_wkt": "PROJCRS[\"WGS 84 / Pseudo-Mercator\",BASEGEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],MEMBER[\"World Geodetic System 1984 (G2139)\"],MEMBER[\"World Geodetic System 1984 (G2296)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],ID[\"EPSG\",4326]],CONVERSION[\"Popular Visualisation Pseudo-Mercator\",METHOD[\"Popular Visualisation Pseudo Mercator\",ID[\"EPSG\",1024]],PARAMETER[\"Latitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8801]],PARAMETER[\"Longitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8802]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting (X)\",east,ORDER[1],LENGTHUNIT[\"metre\",1]],AXIS[\"northing (Y)\",north,ORDER[2],LENGTHUNIT[\"metre\",1]],USAGE[SCOPE[\"Web mapping and visualisation.\"],AREA[\"World between 85.06\u00b0S and 85.06\u00b0N.\"],BBOX[-85.06,-180,85.06,180]],ID[\"EPSG\",3857]]",
+      "pixel_to_world": [
+        -12347557.918789905,
+        52.18101130935247,
+        0,
+        4167958.771950031,
+        0,
+        -63.71293571464048
+      ],
+      "earth_corners": [
+        [
+          -110.92,
+          35.03
+        ],
+        [
+          -110.89,
+          35.03
+        ],
+        [
+          -110.89,
+          35
+        ],
+        [
+          -110.92,
+          35
+        ]
+      ],
+      "support_scale_m": 60,
+      "asset": "earth"
+    },
+    "Practice grid-r0c2": {
+      "body": "EARTH",
+      "rendering": "EARTH_WEBMERCATOR_IMAGE",
+      "display_crs_wkt": "PROJCRS[\"WGS 84 / Pseudo-Mercator\",BASEGEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],MEMBER[\"World Geodetic System 1984 (G2139)\"],MEMBER[\"World Geodetic System 1984 (G2296)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],ID[\"EPSG\",4326]],CONVERSION[\"Popular Visualisation Pseudo-Mercator\",METHOD[\"Popular Visualisation Pseudo Mercator\",ID[\"EPSG\",1024]],PARAMETER[\"Latitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8801]],PARAMETER[\"Longitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8802]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting (X)\",east,ORDER[1],LENGTHUNIT[\"metre\",1]],AXIS[\"northing (Y)\",north,ORDER[2],LENGTHUNIT[\"metre\",1]],USAGE[SCOPE[\"Web mapping and visualisation.\"],AREA[\"World between 85.06\u00b0S and 85.06\u00b0N.\"],BBOX[-85.06,-180,85.06,180]],ID[\"EPSG\",3857]]",
+      "pixel_to_world": [
+        -12343105.139158173,
+        52.18101130932337,
+        0,
+        4167958.771950031,
+        0,
+        -63.71293571464048
+      ],
+      "earth_corners": [
+        [
+          -110.88,
+          35.03
+        ],
+        [
+          -110.85,
+          35.03
+        ],
+        [
+          -110.85,
+          35
+        ],
+        [
+          -110.88,
+          35
+        ]
+      ],
+      "support_scale_m": 60,
+      "asset": "earth"
+    },
+    "Practice grid-r1c0": {
+      "body": "EARTH",
+      "rendering": "EARTH_WEBMERCATOR_IMAGE",
+      "display_crs_wkt": "PROJCRS[\"WGS 84 / Pseudo-Mercator\",BASEGEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],MEMBER[\"World Geodetic System 1984 (G2139)\"],MEMBER[\"World Geodetic System 1984 (G2296)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],ID[\"EPSG\",4326]],CONVERSION[\"Popular Visualisation Pseudo-Mercator\",METHOD[\"Popular Visualisation Pseudo Mercator\",ID[\"EPSG\",1024]],PARAMETER[\"Latitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8801]],PARAMETER[\"Longitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8802]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting (X)\",east,ORDER[1],LENGTHUNIT[\"metre\",1]],AXIS[\"northing (Y)\",north,ORDER[2],LENGTHUNIT[\"metre\",1]],USAGE[SCOPE[\"Web mapping and visualisation.\"],AREA[\"World between 85.06\u00b0S and 85.06\u00b0N.\"],BBOX[-85.06,-180,85.06,180]],ID[\"EPSG\",3857]]",
+      "pixel_to_world": [
+        -12338652.359526442,
+        52.18101130935247,
+        0,
+        4167958.771950031,
+        0,
+        -63.71293571464048
+      ],
+      "earth_corners": [
+        [
+          -110.84,
+          35.03
+        ],
+        [
+          -110.81,
+          35.03
+        ],
+        [
+          -110.81,
+          35
+        ],
+        [
+          -110.84,
+          35
+        ]
+      ],
+      "support_scale_m": 60,
+      "asset": "earth"
+    },
+    "Practice grid-r2c0": {
+      "body": "EARTH",
+      "rendering": "EARTH_WEBMERCATOR_IMAGE",
+      "display_crs_wkt": "PROJCRS[\"WGS 84 / Pseudo-Mercator\",BASEGEOGCRS[\"WGS 84\",ENSEMBLE[\"World Geodetic System 1984 ensemble\",MEMBER[\"World Geodetic System 1984 (Transit)\"],MEMBER[\"World Geodetic System 1984 (G730)\"],MEMBER[\"World Geodetic System 1984 (G873)\"],MEMBER[\"World Geodetic System 1984 (G1150)\"],MEMBER[\"World Geodetic System 1984 (G1674)\"],MEMBER[\"World Geodetic System 1984 (G1762)\"],MEMBER[\"World Geodetic System 1984 (G2139)\"],MEMBER[\"World Geodetic System 1984 (G2296)\"],ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]],ENSEMBLEACCURACY[2.0]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],ID[\"EPSG\",4326]],CONVERSION[\"Popular Visualisation Pseudo-Mercator\",METHOD[\"Popular Visualisation Pseudo Mercator\",ID[\"EPSG\",1024]],PARAMETER[\"Latitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8801]],PARAMETER[\"Longitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8802]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting (X)\",east,ORDER[1],LENGTHUNIT[\"metre\",1]],AXIS[\"northing (Y)\",north,ORDER[2],LENGTHUNIT[\"metre\",1]],USAGE[SCOPE[\"Web mapping and visualisation.\"],AREA[\"World between 85.06\u00b0S and 85.06\u00b0N.\"],BBOX[-85.06,-180,85.06,180]],ID[\"EPSG\",3857]]",
+      "pixel_to_world": [
+        -12334199.579894712,
+        52.181011309381574,
+        0,
+        4167958.771950031,
+        0,
+        -63.71293571464048
+      ],
+      "earth_corners": [
+        [
+          -110.8,
+          35.03
+        ],
+        [
+          -110.77,
+          35.03
+        ],
+        [
+          -110.77,
+          35
+        ],
+        [
+          -110.8,
+          35
+        ]
+      ],
+      "support_scale_m": 60,
+      "asset": "earth"
+    },
+    "MARS": {
+      "body": "MARS",
+      "rendering": "PLANETARY_PLANAR_IMAGE",
+      "display_crs_wkt": "PROJCRS[\"Mars 2000 synthetic display\",BASEGEOGCRS[\"Mars 2000 body-fixed sphere\",DATUM[\"Mars synthetic reference sphere\",ELLIPSOID[\"Mars reference sphere\",3396190,0,LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]],PRIMEM[\"Reference meridian\",0,ANGLEUNIT[\"degree\",0.0174532925199433,ID[\"EPSG\",9122]]]],CONVERSION[\"unknown\",METHOD[\"Equidistant Cylindrical (Spherical)\",ID[\"EPSG\",1029]],PARAMETER[\"Latitude of 1st standard parallel\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8823]],PARAMETER[\"Longitude of natural origin\",137.5,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8802]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"(E)\",east,ORDER[1],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]],AXIS[\"(N)\",north,ORDER[2],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]]",
+      "pixel_to_world": [
+        -29637.34876165311,
+        926.1671488016597,
+        0,
+        -237098.79009322487,
+        0,
+        -926.1671488016596
+      ],
+      "earth_corners": null,
+      "support_scale_m": 480,
+      "asset": "mars"
+    },
+    "MOON": {
+      "body": "MOON",
+      "rendering": "PLANETARY_PLANAR_IMAGE",
+      "display_crs_wkt": "PROJCRS[\"Moon 2000 synthetic display\",BASEGEOGCRS[\"Moon 2000 body-fixed sphere\",DATUM[\"Moon synthetic reference sphere\",ELLIPSOID[\"Moon reference sphere\",1737400,0,LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]],PRIMEM[\"Reference meridian\",0,ANGLEUNIT[\"degree\",0.0174532925199433,ID[\"EPSG\",9122]]]],CONVERSION[\"unknown\",METHOD[\"Polar Stereographic (variant B)\",ID[\"EPSG\",9829]],PARAMETER[\"Latitude of standard parallel\",-90,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8832]],PARAMETER[\"Longitude of origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8833]],PARAMETER[\"False easting\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"(E)\",north,MERIDIAN[90,ANGLEUNIT[\"degree\",0.0174532925199433,ID[\"EPSG\",9122]]],ORDER[1],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]],AXIS[\"(N)\",north,MERIDIAN[0,ANGLEUNIT[\"degree\",0.0174532925199433,ID[\"EPSG\",9122]]],ORDER[2],LENGTHUNIT[\"metre\",1,ID[\"EPSG\",9001]]]]",
+      "pixel_to_world": [
+        -13162,
+        411.3125,
+        0,
+        75800,
+        0,
+        -947.5
+      ],
+      "earth_corners": null,
+      "support_scale_m": 960,
+      "asset": "moon"
+    }
+  },
+  "legend": [
+    {
+      "label": "0\u20135 deg",
+      "lower": 0,
+      "upper": 5,
+      "color": "#232d3b"
+    },
+    {
+      "label": "5\u201312 deg",
+      "lower": 5,
+      "upper": 12,
+      "color": "#4a5c6f"
+    },
+    {
+      "label": "12\u201318 deg",
+      "lower": 12,
+      "upper": 18,
+      "color": "#758a9f"
+    },
+    {
+      "label": "18\u201325 deg",
+      "lower": 18,
+      "upper": 25,
+      "color": "#a7bbcd"
+    }
+  ]
+}

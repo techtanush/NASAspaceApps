@@ -1,0 +1,158 @@
+{
+  "name": "Synthetic Mars mobility regression",
+  "objective": "Exercise fixed slope exposure and two designated task waypoints on a synthetic Earth test graph.",
+  "target": {
+    "body": "MARS",
+    "bbox": [
+      137.0,
+      -5.0,
+      138.0,
+      -4.0
+    ],
+    "longitude_convention": "NEG180_180",
+    "latitude_type": "PLANETOCENTRIC",
+    "crs_wkt": null,
+    "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+  },
+  "requirements": [
+    {
+      "id": "R-EXPOSURE",
+      "label": "At least100m unique12to18degree terrain",
+      "dimension": "TERRAIN",
+      "observable": "unique_slope_exposure_m",
+      "operator": "GTE",
+      "lower": 100,
+      "upper": null,
+      "unit": "m",
+      "mandatory": true,
+      "weight": 1,
+      "evidence_scope": "terrain_model",
+      "minimum_support_scale_m": null,
+      "maximum_support_scale_m": 60,
+      "origin": "PROPOSED_DEFAULT",
+      "acceptance_note": "Synthetic regression fixture assumption; not inferred from NASA data.",
+      "parameters": {
+        "slope_band_deg": [
+          12,
+          18
+        ],
+        "exposure_counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE",
+        "task_ids": [],
+        "co_location_group": "campaign-A",
+        "comparison_rule_id": null,
+        "temporal_support": null
+      }
+    },
+    {
+      "id": "R-TASKS",
+      "label": "Visit W1 and W2",
+      "dimension": "SCIENCE",
+      "observable": "completed_task_count",
+      "operator": "GTE",
+      "lower": 2,
+      "upper": null,
+      "unit": "count",
+      "mandatory": true,
+      "weight": 1,
+      "evidence_scope": "terrain_model",
+      "minimum_support_scale_m": null,
+      "maximum_support_scale_m": 60,
+      "origin": "PROPOSED_DEFAULT",
+      "acceptance_note": "Synthetic regression fixture assumption; not inferred from NASA data.",
+      "parameters": {
+        "slope_band_deg": null,
+        "exposure_counting": null,
+        "task_ids": [
+          "W1",
+          "W2"
+        ],
+        "co_location_group": "campaign-A",
+        "comparison_rule_id": null,
+        "temporal_support": null
+      }
+    },
+    {
+      "id": "R-RESERVE",
+      "label": "Return with20percent reserve",
+      "dimension": "OPERATIONS",
+      "observable": "final_battery_reserve_pct",
+      "operator": "GTE",
+      "lower": 20,
+      "upper": null,
+      "unit": "percent",
+      "mandatory": true,
+      "weight": 1,
+      "evidence_scope": "terrain_model",
+      "minimum_support_scale_m": null,
+      "maximum_support_scale_m": 60,
+      "origin": "PROPOSED_DEFAULT",
+      "acceptance_note": "Synthetic regression fixture assumption; not inferred from NASA data.",
+      "parameters": {
+        "slope_band_deg": null,
+        "exposure_counting": null,
+        "task_ids": [],
+        "co_location_group": "campaign-A",
+        "comparison_rule_id": null,
+        "temporal_support": null
+      }
+    },
+    {
+      "id": "R-GRAVITY",
+      "label": "Mars gravity remains a natural-site gap",
+      "dimension": "GRAVITY",
+      "observable": "planetary_gravity",
+      "operator": "NOT_NATURALLY_REPRODUCIBLE",
+      "lower": null,
+      "upper": null,
+      "unit": "m/s2",
+      "mandatory": false,
+      "weight": 1,
+      "evidence_scope": "field_validation",
+      "minimum_support_scale_m": null,
+      "maximum_support_scale_m": null,
+      "origin": "PROPOSED_DEFAULT",
+      "acceptance_note": "Synthetic regression fixture assumption; not inferred from NASA data.",
+      "parameters": {
+        "slope_band_deg": null,
+        "exposure_counting": null,
+        "task_ids": [],
+        "co_location_group": null,
+        "comparison_rule_id": null,
+        "temporal_support": null
+      }
+    },
+    {
+      "id": "R-CLEARANCE",
+      "label": "Physical clearance evidence is unavailable",
+      "dimension": "TERRAIN",
+      "observable": "ground_clearance_m",
+      "operator": "GTE",
+      "lower": 0.2,
+      "upper": null,
+      "unit": "m",
+      "mandatory": false,
+      "weight": 1,
+      "evidence_scope": "field_validation",
+      "minimum_support_scale_m": null,
+      "maximum_support_scale_m": 0.02,
+      "origin": "PROPOSED_DEFAULT",
+      "acceptance_note": "Synthetic regression fixture assumption; not inferred from NASA data.",
+      "parameters": {
+        "slope_band_deg": null,
+        "exposure_counting": null,
+        "task_ids": [],
+        "co_location_group": null,
+        "comparison_rule_id": null,
+        "temporal_support": null
+      }
+    }
+  ],
+  "assumptions": [
+    "All source terrain and graph values are synthetic test data.",
+    "Task locations are designated waypoints; mineral identity is not established."
+  ],
+  "forbidden_actions": [
+    "Relax accepted requirements during replanning",
+    "Use synthetic graph resource provider in live mode"
+  ]
+}

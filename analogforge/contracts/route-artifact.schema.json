@@ -1,0 +1,188 @@
+{
+  "$defs": {
+    "GeoJSONLineString": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "LineString",
+          "default": "LineString",
+          "title": "Type",
+          "type": "string"
+        },
+        "coordinates": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "minItems": 2,
+          "title": "Coordinates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "coordinates"
+      ],
+      "title": "GeoJSONLineString",
+      "type": "object"
+    },
+    "SolverClaimedTotals": {
+      "additionalProperties": false,
+      "description": "What the searcher believes. The verifier MUST NOT trust these (architecture 12 s7).",
+      "properties": {
+        "distance_m": {
+          "minimum": 0,
+          "title": "Distance M",
+          "type": "number"
+        },
+        "energy_conservative_wh": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Energy Conservative Wh"
+        },
+        "unique_exposure_m": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Unique Exposure M",
+          "type": "object"
+        }
+      },
+      "required": [
+        "distance_m"
+      ],
+      "title": "SolverClaimedTotals",
+      "type": "object"
+    },
+    "TaskEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "node_id": {
+          "title": "Node Id",
+          "type": "string"
+        },
+        "arrival_distance_m": {
+          "minimum": 0,
+          "title": "Arrival Distance M",
+          "type": "number"
+        },
+        "dwell_s": {
+          "minimum": 0,
+          "title": "Dwell S",
+          "type": "number"
+        }
+      },
+      "required": [
+        "task_id",
+        "node_id",
+        "arrival_distance_m",
+        "dwell_s"
+      ],
+      "title": "TaskEvent",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Executable route proposal. Stored as a JSON blob (role ROUTE).",
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "route_key": {
+      "title": "Route Key",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "live",
+        "replay",
+        "synthetic"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "constraints_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Constraints Sha256",
+      "type": "string"
+    },
+    "strategy": {
+      "enum": [
+        "WAYPOINT_RETURN",
+        "EXPOSURE_COVERAGE",
+        "MINIMUM_FEASIBLE_ROUTE",
+        "RECOVERY_ALTERNATIVE"
+      ],
+      "title": "Strategy",
+      "type": "string"
+    },
+    "graph_revision": {
+      "title": "Graph Revision",
+      "type": "string"
+    },
+    "node_sequence": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 2,
+      "title": "Node Sequence",
+      "type": "array"
+    },
+    "task_events": {
+      "items": {
+        "$ref": "#/$defs/TaskEvent"
+      },
+      "title": "Task Events",
+      "type": "array"
+    },
+    "display_geometry": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GeoJSONLineString"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "solver_claimed": {
+      "$ref": "#/$defs/SolverClaimedTotals"
+    }
+  },
+  "required": [
+    "route_key",
+    "mode",
+    "constraints_sha256",
+    "strategy",
+    "graph_revision",
+    "node_sequence",
+    "solver_claimed"
+  ],
+  "title": "RouteArtifact",
+  "type": "object",
+  "$comment": "Generated from analogforge.ports models by kit/tools/build_kit.py. Do not edit."
+}

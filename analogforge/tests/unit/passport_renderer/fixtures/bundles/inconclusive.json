@@ -1,0 +1,3382 @@
+{
+  "schema_version": "1.0",
+  "is_draft": false,
+  "generated_at": "2026-11-08T12:00:00Z",
+  "mode": "synthetic",
+  "replay_source_run_id": null,
+  "passport": {
+    "schema_version": "1.0",
+    "id": "70000000-0000-4000-8000-000000000032",
+    "workspace_id": "70000000-0000-4000-8000-000000000001",
+    "run_id": "70000000-0000-4000-8000-000000000002",
+    "mode": "synthetic",
+    "created_at": "2026-11-08T12:00:00Z",
+    "mission_revision_id": "70000000-0000-4000-8000-000000000003",
+    "rover_revision_id": "70000000-0000-4000-8000-000000000005",
+    "candidate_ids": [
+      "70000000-0000-4000-8000-00000000000a",
+      "70000000-0000-4000-8000-00000000000b",
+      "70000000-0000-4000-8000-00000000000c",
+      "70000000-0000-4000-8000-00000000000d",
+      "70000000-0000-4000-8000-00000000000e",
+      "70000000-0000-4000-8000-00000000000f"
+    ],
+    "portfolio_id": null,
+    "qualification_ids": [
+      "70000000-0000-4000-8000-0000000003e8",
+      "70000000-0000-4000-8000-0000000003e9",
+      "70000000-0000-4000-8000-0000000003ea",
+      "70000000-0000-4000-8000-0000000003eb",
+      "70000000-0000-4000-8000-0000000003ec",
+      "70000000-0000-4000-8000-0000000003ed",
+      "70000000-0000-4000-8000-0000000003ee",
+      "70000000-0000-4000-8000-0000000003ef",
+      "70000000-0000-4000-8000-0000000003f0",
+      "70000000-0000-4000-8000-0000000003fc",
+      "70000000-0000-4000-8000-0000000003fd",
+      "70000000-0000-4000-8000-0000000003fe",
+      "70000000-0000-4000-8000-0000000003ff",
+      "70000000-0000-4000-8000-000000000400",
+      "70000000-0000-4000-8000-000000000401",
+      "70000000-0000-4000-8000-000000000402",
+      "70000000-0000-4000-8000-000000000403",
+      "70000000-0000-4000-8000-000000000404",
+      "70000000-0000-4000-8000-000000000410",
+      "70000000-0000-4000-8000-000000000411",
+      "70000000-0000-4000-8000-000000000412",
+      "70000000-0000-4000-8000-000000000413",
+      "70000000-0000-4000-8000-000000000414",
+      "70000000-0000-4000-8000-000000000415",
+      "70000000-0000-4000-8000-000000000416",
+      "70000000-0000-4000-8000-000000000417",
+      "70000000-0000-4000-8000-000000000418",
+      "70000000-0000-4000-8000-000000000424",
+      "70000000-0000-4000-8000-000000000425",
+      "70000000-0000-4000-8000-000000000426",
+      "70000000-0000-4000-8000-000000000427",
+      "70000000-0000-4000-8000-000000000428",
+      "70000000-0000-4000-8000-000000000429",
+      "70000000-0000-4000-8000-00000000042a",
+      "70000000-0000-4000-8000-00000000042b",
+      "70000000-0000-4000-8000-00000000042c",
+      "70000000-0000-4000-8000-000000000438",
+      "70000000-0000-4000-8000-000000000439",
+      "70000000-0000-4000-8000-00000000043a",
+      "70000000-0000-4000-8000-00000000043b",
+      "70000000-0000-4000-8000-00000000043c",
+      "70000000-0000-4000-8000-00000000043d",
+      "70000000-0000-4000-8000-00000000043e",
+      "70000000-0000-4000-8000-00000000043f",
+      "70000000-0000-4000-8000-000000000440",
+      "70000000-0000-4000-8000-00000000044c",
+      "70000000-0000-4000-8000-00000000044d",
+      "70000000-0000-4000-8000-00000000044e",
+      "70000000-0000-4000-8000-00000000044f",
+      "70000000-0000-4000-8000-000000000450",
+      "70000000-0000-4000-8000-000000000451",
+      "70000000-0000-4000-8000-000000000452",
+      "70000000-0000-4000-8000-000000000453",
+      "70000000-0000-4000-8000-000000000454"
+    ],
+    "test_result_ids": [
+      "70000000-0000-4000-8000-00000000012d"
+    ],
+    "qualified_uses": [],
+    "partial_uses": [],
+    "unsupported_uses": [
+      "Planetary gravity and atmosphere"
+    ],
+    "unknowns": [
+      "Physical clearance",
+      "Mineral identity"
+    ],
+    "evidence_ids": [
+      "70000000-0000-4000-8000-000000000014",
+      "70000000-0000-4000-8000-000000000015",
+      "70000000-0000-4000-8000-000000000016",
+      "70000000-0000-4000-8000-000000000017",
+      "70000000-0000-4000-8000-000000000018",
+      "70000000-0000-4000-8000-000000000019",
+      "70000000-0000-4000-8000-000000000029"
+    ],
+    "manifest_sha256": "ea2c2915396698ec3ba0b02d61efc69327ed0cf35fef51e9f383e2618058b518",
+    "limitations": [
+      "Not NASA data; not physical rover execution."
+    ],
+    "next_steps": [
+      "Acquire field evidence at the required physical clearance support."
+    ],
+    "assurance_evidence_id": "70000000-0000-4000-8000-000000000029"
+  },
+  "manifest_sha256": "ea2c2915396698ec3ba0b02d61efc69327ed0cf35fef51e9f383e2618058b518",
+  "canonical_manifest_json": "{\"attempts\":[{\"attempt_number\":1,\"benchmark_rows\":[{\"constraint_id\":\"C-EXPOSURE-R-EXPOSURE\",\"margin\":null,\"measured\":null,\"requirement_id\":\"R-EXPOSURE\",\"rule\":\">=100 m unique exposure\",\"status\":\"INCONCLUSIVE\",\"threshold\":100,\"unit\":\"m\"}],\"candidate_id\":\"70000000-0000-4000-8000-00000000000b\",\"candidate_name\":\"Practice grid-r0c0\",\"changed_elements\":[],\"diagnosis_category\":\"SEARCH_LIMIT\",\"diagnosis_explanation\":\"Modeled terrain-feasibility result only.\",\"parent_attempt_number\":null,\"result\":{\"created_at\":\"2026-11-08T12:00:00Z\",\"evidence_ids\":[\"70000000-0000-4000-8000-000000000015\"],\"failure_category\":\"SEARCH_LIMIT\",\"id\":\"70000000-0000-4000-8000-00000000012d\",\"limitations\":[\"Bounded search; not proof that no route exists.\"],\"metrics\":[{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"unique_exposure_m:R-EXPOSURE\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"m\",\"valid_fraction\":1,\"value\":null}],\"mode\":\"synthetic\",\"outcome\":\"INCONCLUSIVE\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"search_status\":\"BUDGET_EXHAUSTED\",\"test_id\":\"70000000-0000-4000-8000-0000000000c9\",\"verified_route_sha256\":null,\"verifier_version\":\"presentation-fixture-v1\",\"violations\":[],\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},\"strategy\":\"EXPOSURE_COVERAGE\",\"test\":{\"assumptions\":[\"Synthetic presentation receipt; limits unchanged.\"],\"candidate_id\":\"70000000-0000-4000-8000-00000000000b\",\"constraints_sha256\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"created_at\":\"2026-11-08T12:00:00Z\",\"id\":\"70000000-0000-4000-8000-0000000000c9\",\"mission_revision_id\":\"70000000-0000-4000-8000-000000000003\",\"mode\":\"synthetic\",\"required_exposures\":[{\"lower\":12,\"metric_id\":\"surface_slope_deg\",\"minimum_distance_m\":100,\"requirement_id\":\"R-EXPOSURE\",\"upper\":18}],\"requirement_ids\":[\"R-SLOPE-AVAILABILITY\",\"R-TARGET-SLOPE-CONTEXT\",\"R-EXPOSURE\",\"R-TASKS\",\"R-RESERVE\",\"R-MINERAL\",\"R-CLEARANCE\",\"R-GRAVITY\",\"R-ATMOSPHERE\"],\"route_artifact_sha256\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"rover_revision_id\":\"70000000-0000-4000-8000-000000000005\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"solver_config\":{\"max_expansions\":1,\"max_labels_per_node\":100,\"max_seconds\":60,\"seed\":1},\"test_revision\":1,\"waypoints_artifact_sha256\":\"1111111111111111111111111111111111111111111111111111111111111111\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},\"violations\":[]}],\"candidates\":[{\"accessibility_status\":\"NOT_ASSESSED\",\"aoi\":{\"bbox\":[-116,35,-115.9,35.1],\"body\":\"EARTH\",\"crs_wkt\":null,\"latitude_type\":\"GEODETIC\",\"longitude_convention\":\"NEG180_180\",\"vertical_datum\":\"SYNTHETIC_EARTH_REFERENCE\"},\"created_at\":\"2026-11-08T12:00:00Z\",\"discovery_method\":\"Synthetic practice screening\",\"evidence_ids\":[\"70000000-0000-4000-8000-000000000014\"],\"id\":\"70000000-0000-4000-8000-00000000000a\",\"limitations\":[\"Synthetic practice data; field access is not assessed.\"],\"metrics\":[{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_area_fraction:12-18\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"fraction\",\"valid_fraction\":1,\"value\":0.4},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_w1_deg\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":480,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"deg\",\"valid_fraction\":1,\"value\":4},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"unique_exposure_m:R-EXPOSURE\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"m\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"tasks_completed\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"count\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"reserve_pct\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"percent\",\"valid_fraction\":1,\"value\":null}],\"mode\":\"synthetic\",\"name\":\"Practice grid-r0c1\",\"novelty_status\":\"NOT_IN_REFERENCE_LIST\",\"origin\":\"DISCOVERED\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"accessibility_status\":\"NOT_ASSESSED\",\"aoi\":{\"bbox\":[-115,35,-114.9,35.1],\"body\":\"EARTH\",\"crs_wkt\":null,\"latitude_type\":\"GEODETIC\",\"longitude_convention\":\"NEG180_180\",\"vertical_datum\":\"SYNTHETIC_EARTH_REFERENCE\"},\"created_at\":\"2026-11-08T12:00:00Z\",\"discovery_method\":\"Synthetic practice screening\",\"evidence_ids\":[\"70000000-0000-4000-8000-000000000015\"],\"id\":\"70000000-0000-4000-8000-00000000000b\",\"limitations\":[\"Synthetic practice data; field access is not assessed.\"],\"metrics\":[{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_area_fraction:12-18\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"fraction\",\"valid_fraction\":1,\"value\":0.1},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_w1_deg\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":480,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"deg\",\"valid_fraction\":1,\"value\":4},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"unique_exposure_m:R-EXPOSURE\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"m\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"tasks_completed\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"count\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"reserve_pct\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"percent\",\"valid_fraction\":1,\"value\":null}],\"mode\":\"synthetic\",\"name\":\"Practice grid-r0c0\",\"novelty_status\":\"NOT_IN_REFERENCE_LIST\",\"origin\":\"DISCOVERED\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"accessibility_status\":\"NOT_ASSESSED\",\"aoi\":{\"bbox\":[-114,35,-113.9,35.1],\"body\":\"EARTH\",\"crs_wkt\":null,\"latitude_type\":\"GEODETIC\",\"longitude_convention\":\"NEG180_180\",\"vertical_datum\":\"SYNTHETIC_EARTH_REFERENCE\"},\"created_at\":\"2026-11-08T12:00:00Z\",\"discovery_method\":\"Synthetic practice screening\",\"evidence_ids\":[\"70000000-0000-4000-8000-000000000016\"],\"id\":\"70000000-0000-4000-8000-00000000000c\",\"limitations\":[\"Synthetic practice data; field access is not assessed.\"],\"metrics\":[{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_area_fraction:12-18\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"fraction\",\"valid_fraction\":1,\"value\":0.08},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_w1_deg\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":480,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"deg\",\"valid_fraction\":1,\"value\":4},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"unique_exposure_m:R-EXPOSURE\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"m\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"tasks_completed\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"count\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"reserve_pct\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"percent\",\"valid_fraction\":1,\"value\":null}],\"mode\":\"synthetic\",\"name\":\"Practice grid-r2c2\",\"novelty_status\":\"KNOWN_ANALOG\",\"origin\":\"KNOWN_CONTROL\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"accessibility_status\":\"NOT_ASSESSED\",\"aoi\":{\"bbox\":[-113,35,-112.9,35.1],\"body\":\"EARTH\",\"crs_wkt\":null,\"latitude_type\":\"GEODETIC\",\"longitude_convention\":\"NEG180_180\",\"vertical_datum\":\"SYNTHETIC_EARTH_REFERENCE\"},\"created_at\":\"2026-11-08T12:00:00Z\",\"discovery_method\":\"Synthetic practice screening\",\"evidence_ids\":[\"70000000-0000-4000-8000-000000000017\"],\"id\":\"70000000-0000-4000-8000-00000000000d\",\"limitations\":[\"Synthetic practice data; field access is not assessed.\"],\"metrics\":[{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_area_fraction:12-18\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"fraction\",\"valid_fraction\":1,\"value\":0.03},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_w1_deg\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":480,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"deg\",\"valid_fraction\":1,\"value\":4},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"unique_exposure_m:R-EXPOSURE\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"m\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"tasks_completed\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"count\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"reserve_pct\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"percent\",\"valid_fraction\":1,\"value\":null}],\"mode\":\"synthetic\",\"name\":\"Practice grid-r1c0\",\"novelty_status\":\"NOT_IN_REFERENCE_LIST\",\"origin\":\"DISCOVERED\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"accessibility_status\":\"NOT_ASSESSED\",\"aoi\":{\"bbox\":[-112,35,-111.9,35.1],\"body\":\"EARTH\",\"crs_wkt\":null,\"latitude_type\":\"GEODETIC\",\"longitude_convention\":\"NEG180_180\",\"vertical_datum\":\"SYNTHETIC_EARTH_REFERENCE\"},\"created_at\":\"2026-11-08T12:00:00Z\",\"discovery_method\":\"Synthetic practice screening\",\"evidence_ids\":[\"70000000-0000-4000-8000-000000000018\"],\"id\":\"70000000-0000-4000-8000-00000000000e\",\"limitations\":[\"Synthetic practice data; field access is not assessed.\"],\"metrics\":[{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_area_fraction:12-18\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"fraction\",\"valid_fraction\":1,\"value\":0.02},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_w1_deg\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":480,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"deg\",\"valid_fraction\":1,\"value\":4},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"unique_exposure_m:R-EXPOSURE\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"m\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"tasks_completed\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"count\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"reserve_pct\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"percent\",\"valid_fraction\":1,\"value\":null}],\"mode\":\"synthetic\",\"name\":\"Practice grid-r2c0\",\"novelty_status\":\"NOT_IN_REFERENCE_LIST\",\"origin\":\"DISCOVERED\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"accessibility_status\":\"NOT_ASSESSED\",\"aoi\":{\"bbox\":[-111,35,-110.9,35.1],\"body\":\"EARTH\",\"crs_wkt\":null,\"latitude_type\":\"GEODETIC\",\"longitude_convention\":\"NEG180_180\",\"vertical_datum\":\"SYNTHETIC_EARTH_REFERENCE\"},\"created_at\":\"2026-11-08T12:00:00Z\",\"discovery_method\":\"Synthetic practice screening\",\"evidence_ids\":[\"70000000-0000-4000-8000-000000000019\"],\"id\":\"70000000-0000-4000-8000-00000000000f\",\"limitations\":[\"Synthetic practice data; field access is not assessed.\"],\"metrics\":[{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_area_fraction:12-18\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"fraction\",\"valid_fraction\":1,\"value\":0},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"slope_w1_deg\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":480,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"deg\",\"valid_fraction\":1,\"value\":4},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"unique_exposure_m:R-EXPOSURE\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"m\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"tasks_completed\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"count\",\"valid_fraction\":1,\"value\":null},{\"method_id\":\"synthetic-presentation-fixture-v1\",\"metric_id\":\"reserve_pct\",\"quantity_kind\":\"DERIVED\",\"support_scale_m\":60,\"uncertainty_note\":\"Synthetic fixture; not a field measurement.\",\"unit\":\"percent\",\"valid_fraction\":1,\"value\":null}],\"mode\":\"synthetic\",\"name\":\"Practice grid-r0c2\",\"novelty_status\":\"NOT_IN_REFERENCE_LIST\",\"origin\":\"SYNTHETIC_CONTROL\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"}],\"limitations\":[\"Synthetic presentation fixtures, not executed science.\"],\"mission_sha256\":\"449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854\",\"mode\":\"synthetic\",\"qualifications\":[{\"candidate_id\":\"70000000-0000-4000-8000-00000000000a\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000014\"],\"explanation\":\"Synthetic presentation receipt: PASS.\",\"id\":\"70000000-0000-4000-8000-0000000003e8\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-SLOPE-AVAILABILITY\",\"rule_id\":\"slope-band-area-fraction-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"PASS\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000a\",\"comparison_scale_m\":480,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000014\"],\"explanation\":\"Synthetic presentation receipt: PASS.\",\"id\":\"70000000-0000-4000-8000-0000000003e9\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TARGET-SLOPE-CONTEXT\",\"rule_id\":\"slope-w1-common-support-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"PASS\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000a\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000014\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-0000000003ea\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-EXPOSURE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000a\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000014\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-0000000003eb\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TASKS\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000a\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000014\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-0000000003ec\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-RESERVE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000a\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000014\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-0000000003ed\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-MINERAL\",\"rule_id\":\"emit-mineral-presence-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000a\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000014\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-0000000003ee\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-CLEARANCE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000a\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000014\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-0000000003ef\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-GRAVITY\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000a\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000014\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-0000000003f0\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-ATMOSPHERE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000b\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000015\"],\"explanation\":\"Synthetic presentation receipt: PASS.\",\"id\":\"70000000-0000-4000-8000-0000000003fc\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-SLOPE-AVAILABILITY\",\"rule_id\":\"slope-band-area-fraction-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"PASS\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000b\",\"comparison_scale_m\":480,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000015\"],\"explanation\":\"Synthetic presentation receipt: PASS.\",\"id\":\"70000000-0000-4000-8000-0000000003fd\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TARGET-SLOPE-CONTEXT\",\"rule_id\":\"slope-w1-common-support-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"PASS\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000b\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000015\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-0000000003fe\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-EXPOSURE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000b\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000015\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-0000000003ff\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TASKS\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000b\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000015\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000400\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-RESERVE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000b\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000015\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000401\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-MINERAL\",\"rule_id\":\"emit-mineral-presence-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000b\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000015\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000402\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-CLEARANCE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000b\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000015\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-000000000403\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-GRAVITY\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000b\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000015\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-000000000404\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-ATMOSPHERE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000c\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000016\"],\"explanation\":\"Synthetic presentation receipt: PASS.\",\"id\":\"70000000-0000-4000-8000-000000000410\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-SLOPE-AVAILABILITY\",\"rule_id\":\"slope-band-area-fraction-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"PASS\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000c\",\"comparison_scale_m\":480,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000016\"],\"explanation\":\"Synthetic presentation receipt: PASS.\",\"id\":\"70000000-0000-4000-8000-000000000411\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TARGET-SLOPE-CONTEXT\",\"rule_id\":\"slope-w1-common-support-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"PASS\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000c\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000016\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000412\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-EXPOSURE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000c\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000016\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000413\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TASKS\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000c\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000016\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000414\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-RESERVE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000c\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000016\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000415\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-MINERAL\",\"rule_id\":\"emit-mineral-presence-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000c\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000016\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000416\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-CLEARANCE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000c\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000016\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-000000000417\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-GRAVITY\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000c\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000016\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-000000000418\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-ATMOSPHERE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000d\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000017\"],\"explanation\":\"Synthetic presentation receipt: FAIL.\",\"id\":\"70000000-0000-4000-8000-000000000424\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-SLOPE-AVAILABILITY\",\"rule_id\":\"slope-band-area-fraction-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"FAIL\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000d\",\"comparison_scale_m\":480,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000017\"],\"explanation\":\"Synthetic presentation receipt: PASS.\",\"id\":\"70000000-0000-4000-8000-000000000425\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TARGET-SLOPE-CONTEXT\",\"rule_id\":\"slope-w1-common-support-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"PASS\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000d\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000017\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000426\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-EXPOSURE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000d\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000017\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000427\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TASKS\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000d\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000017\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000428\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-RESERVE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000d\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000017\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000429\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-MINERAL\",\"rule_id\":\"emit-mineral-presence-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000d\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000017\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-00000000042a\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-CLEARANCE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000d\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000017\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-00000000042b\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-GRAVITY\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000d\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000017\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-00000000042c\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-ATMOSPHERE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000e\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000018\"],\"explanation\":\"Synthetic presentation receipt: FAIL.\",\"id\":\"70000000-0000-4000-8000-000000000438\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-SLOPE-AVAILABILITY\",\"rule_id\":\"slope-band-area-fraction-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"FAIL\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000e\",\"comparison_scale_m\":480,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000018\"],\"explanation\":\"Synthetic presentation receipt: PASS.\",\"id\":\"70000000-0000-4000-8000-000000000439\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TARGET-SLOPE-CONTEXT\",\"rule_id\":\"slope-w1-common-support-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"PASS\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000e\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000018\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-00000000043a\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-EXPOSURE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000e\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000018\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-00000000043b\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TASKS\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000e\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000018\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-00000000043c\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-RESERVE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000e\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000018\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-00000000043d\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-MINERAL\",\"rule_id\":\"emit-mineral-presence-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000e\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000018\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-00000000043e\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-CLEARANCE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000e\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000018\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-00000000043f\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-GRAVITY\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000e\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000018\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-000000000440\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-ATMOSPHERE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000f\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000019\"],\"explanation\":\"Synthetic presentation receipt: FAIL.\",\"id\":\"70000000-0000-4000-8000-00000000044c\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-SLOPE-AVAILABILITY\",\"rule_id\":\"slope-band-area-fraction-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"FAIL\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000f\",\"comparison_scale_m\":480,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000019\"],\"explanation\":\"Synthetic presentation receipt: PASS.\",\"id\":\"70000000-0000-4000-8000-00000000044d\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TARGET-SLOPE-CONTEXT\",\"rule_id\":\"slope-w1-common-support-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"PASS\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000f\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000019\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-00000000044e\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-EXPOSURE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000f\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000019\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-00000000044f\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-TASKS\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000f\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000019\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000450\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-RESERVE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000f\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000019\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000451\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-MINERAL\",\"rule_id\":\"emit-mineral-presence-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000f\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000019\"],\"explanation\":\"Synthetic presentation receipt: UNKNOWN.\",\"id\":\"70000000-0000-4000-8000-000000000452\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-CLEARANCE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"UNKNOWN\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000f\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000019\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-000000000453\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-GRAVITY\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"},{\"candidate_id\":\"70000000-0000-4000-8000-00000000000f\",\"comparison_scale_m\":60,\"confidence\":\"MEDIUM\",\"created_at\":\"2026-11-08T12:00:00Z\",\"critic_status\":\"RESOLVED\",\"critique_evidence_ids\":[],\"evidence_ids\":[\"70000000-0000-4000-8000-000000000019\"],\"explanation\":\"Synthetic presentation receipt: GAP.\",\"id\":\"70000000-0000-4000-8000-000000000454\",\"limitations\":[\"No physical validation; accepted constraints unchanged.\"],\"mode\":\"synthetic\",\"requirement_id\":\"R-ATMOSPHERE\",\"rule_id\":\"route-verification-v1\",\"rule_version\":\"1.0\",\"run_id\":\"70000000-0000-4000-8000-000000000002\",\"schema_version\":\"1.0\",\"status\":\"GAP\",\"workspace_id\":\"70000000-0000-4000-8000-000000000001\"}],\"scenario\":\"S-RASTER-1\",\"schema_version\":\"1.0\"}",
+  "mission": {
+    "schema_version": "1.0",
+    "id": "70000000-0000-4000-8000-000000000003",
+    "mission_id": "70000000-0000-4000-8000-000000000004",
+    "workspace_id": "70000000-0000-4000-8000-000000000001",
+    "revision": 1,
+    "created_at": "2026-11-08T12:00:00Z",
+    "accepted_at": "2026-11-08T12:00:00Z",
+    "content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
+    "name": "Practice Mars rover mobility and sampling test",
+    "objective": "Test autonomous Mars rover mobility on steep rocky terrain and access two geological sampling waypoints, returning with at least 20% modeled battery reserve.",
+    "target": {
+      "body": "MARS",
+      "bbox": [
+        137.0,
+        -5.0,
+        138.0,
+        -4.0
+      ],
+      "longitude_convention": "NEG180_180",
+      "latitude_type": "PLANETOCENTRIC",
+      "crs_wkt": null,
+      "vertical_datum": "SYNTHETIC_MARS_REFERENCE_SPHERE_3396190M"
+    },
+    "requirements": [
+      {
+        "id": "R-SLOPE-AVAILABILITY",
+        "label": "At least 5% of valid candidate area lies in the 12-18 deg slope band",
+        "dimension": "TERRAIN",
+        "observable": "slope_band_area_fraction",
+        "operator": "GTE",
+        "lower": 0.05,
+        "upper": null,
+        "unit": "fraction",
+        "mandatory": true,
+        "weight": 1.0,
+        "evidence_scope": "terrain_model",
+        "minimum_support_scale_m": null,
+        "maximum_support_scale_m": 60.0,
+        "origin": "PROPOSED_DEFAULT",
+        "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+        "parameters": {
+          "slope_band_deg": [
+            12.0,
+            18.0
+          ],
+          "exposure_counting": null,
+          "task_ids": [],
+          "co_location_group": null,
+          "comparison_rule_id": "slope-band-area-fraction-v1",
+          "temporal_support": null
+        }
+      },
+      {
+        "id": "R-TARGET-SLOPE-CONTEXT",
+        "label": "Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support",
+        "dimension": "TERRAIN",
+        "observable": "slope_distribution_w1_deg",
+        "operator": "LTE",
+        "lower": null,
+        "upper": 6.0,
+        "unit": "deg",
+        "mandatory": false,
+        "weight": 1.0,
+        "evidence_scope": "regional_context",
+        "minimum_support_scale_m": 480.0,
+        "maximum_support_scale_m": 1000.0,
+        "origin": "PROPOSED_DEFAULT",
+        "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+        "parameters": {
+          "slope_band_deg": null,
+          "exposure_counting": null,
+          "task_ids": [],
+          "co_location_group": null,
+          "comparison_rule_id": "slope-w1-common-support-v1",
+          "temporal_support": null
+        }
+      },
+      {
+        "id": "R-EXPOSURE",
+        "label": "At least 100 m unique route distance in the 12-18 deg slope band",
+        "dimension": "TERRAIN",
+        "observable": "unique_slope_exposure_m",
+        "operator": "GTE",
+        "lower": 100.0,
+        "upper": null,
+        "unit": "m",
+        "mandatory": true,
+        "weight": 1.0,
+        "evidence_scope": "terrain_model",
+        "minimum_support_scale_m": null,
+        "maximum_support_scale_m": 60.0,
+        "origin": "PROPOSED_DEFAULT",
+        "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+        "parameters": {
+          "slope_band_deg": [
+            12.0,
+            18.0
+          ],
+          "exposure_counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE",
+          "task_ids": [],
+          "co_location_group": "campaign-A",
+          "comparison_rule_id": null,
+          "temporal_support": null
+        }
+      },
+      {
+        "id": "R-TASKS",
+        "label": "Visit sampling waypoints W1 and W2 on the same route",
+        "dimension": "SCIENCE",
+        "observable": "completed_task_count",
+        "operator": "GTE",
+        "lower": 2.0,
+        "upper": null,
+        "unit": "count",
+        "mandatory": true,
+        "weight": 1.0,
+        "evidence_scope": "terrain_model",
+        "minimum_support_scale_m": null,
+        "maximum_support_scale_m": 60.0,
+        "origin": "PROPOSED_DEFAULT",
+        "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+        "parameters": {
+          "slope_band_deg": null,
+          "exposure_counting": null,
+          "task_ids": [
+            "W1",
+            "W2"
+          ],
+          "co_location_group": "campaign-A",
+          "comparison_rule_id": null,
+          "temporal_support": null
+        }
+      },
+      {
+        "id": "R-RESERVE",
+        "label": "Return to start with at least 20% modeled battery reserve",
+        "dimension": "OPERATIONS",
+        "observable": "final_battery_reserve_pct",
+        "operator": "GTE",
+        "lower": 20.0,
+        "upper": null,
+        "unit": "percent",
+        "mandatory": true,
+        "weight": 1.0,
+        "evidence_scope": "terrain_model",
+        "minimum_support_scale_m": null,
+        "maximum_support_scale_m": 60.0,
+        "origin": "PROPOSED_DEFAULT",
+        "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+        "parameters": {
+          "slope_band_deg": null,
+          "exposure_counting": null,
+          "task_ids": [],
+          "co_location_group": "campaign-A",
+          "comparison_rule_id": null,
+          "temporal_support": null
+        }
+      },
+      {
+        "id": "R-MINERAL",
+        "label": "Exposed mineral context present at sampling area (optional)",
+        "dimension": "SCIENCE",
+        "observable": "mineral_class_present",
+        "operator": "PRESENT",
+        "lower": null,
+        "upper": null,
+        "unit": "class",
+        "mandatory": false,
+        "weight": 1.0,
+        "evidence_scope": "regional_context",
+        "minimum_support_scale_m": null,
+        "maximum_support_scale_m": 100.0,
+        "origin": "PROPOSED_DEFAULT",
+        "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+        "parameters": {
+          "slope_band_deg": null,
+          "exposure_counting": null,
+          "task_ids": [],
+          "co_location_group": null,
+          "comparison_rule_id": "emit-mineral-presence-v1",
+          "temporal_support": null
+        }
+      },
+      {
+        "id": "R-CLEARANCE",
+        "label": "Obstacles below 0.20 m rover clearance (physical field evidence)",
+        "dimension": "TERRAIN",
+        "observable": "ground_clearance_m",
+        "operator": "GTE",
+        "lower": 0.2,
+        "upper": null,
+        "unit": "m",
+        "mandatory": false,
+        "weight": 1.0,
+        "evidence_scope": "field_validation",
+        "minimum_support_scale_m": null,
+        "maximum_support_scale_m": 0.02,
+        "origin": "PROPOSED_DEFAULT",
+        "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+        "parameters": {
+          "slope_band_deg": null,
+          "exposure_counting": null,
+          "task_ids": [],
+          "co_location_group": null,
+          "comparison_rule_id": null,
+          "temporal_support": null
+        }
+      },
+      {
+        "id": "R-GRAVITY",
+        "label": "Mars gravity (3.71 m/s2) for mobility behavior",
+        "dimension": "GRAVITY",
+        "observable": "planetary_gravity",
+        "operator": "NOT_NATURALLY_REPRODUCIBLE",
+        "lower": null,
+        "upper": null,
+        "unit": "m/s2",
+        "mandatory": false,
+        "weight": 1.0,
+        "evidence_scope": "field_validation",
+        "minimum_support_scale_m": null,
+        "maximum_support_scale_m": null,
+        "origin": "PROPOSED_DEFAULT",
+        "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+        "parameters": {
+          "slope_band_deg": null,
+          "exposure_counting": null,
+          "task_ids": [],
+          "co_location_group": null,
+          "comparison_rule_id": null,
+          "temporal_support": null
+        }
+      },
+      {
+        "id": "R-ATMOSPHERE",
+        "label": "Mars atmospheric pressure and composition",
+        "dimension": "ATMOSPHERE",
+        "observable": "planetary_atmosphere",
+        "operator": "NOT_NATURALLY_REPRODUCIBLE",
+        "lower": null,
+        "upper": null,
+        "unit": "Pa",
+        "mandatory": false,
+        "weight": 1.0,
+        "evidence_scope": "field_validation",
+        "minimum_support_scale_m": null,
+        "maximum_support_scale_m": null,
+        "origin": "PROPOSED_DEFAULT",
+        "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+        "parameters": {
+          "slope_band_deg": null,
+          "exposure_counting": null,
+          "task_ids": [],
+          "co_location_group": null,
+          "comparison_rule_id": null,
+          "temporal_support": null
+        }
+      }
+    ],
+    "assumptions": [
+      "All terrain in this scenario is synthetic practice data generated from documented formulas; it is not NASA data.",
+      "Sampling waypoints W1/W2 are user-designated task locations; mineral identity is not established.",
+      "Sampling waypoints W1/W2 are placed inside the candidate zone by the deterministic auto-waypoints-v1 rule (procedural task locations; not evidence-supported sample sites)."
+    ],
+    "forbidden_actions": [
+      "Relax accepted requirements during replanning",
+      "Use the test-only mock graph resource provider in live mode"
+    ]
+  },
+  "rover": {
+    "schema_version": "1.0",
+    "id": "70000000-0000-4000-8000-000000000005",
+    "rover_id": "70000000-0000-4000-8000-000000000006",
+    "workspace_id": "70000000-0000-4000-8000-000000000001",
+    "revision": 1,
+    "created_at": "2026-11-08T12:00:00Z",
+    "content_sha256": "a7ccd7337c17794fe8c904709f7006f887b9bc290f5aaf72c872f43d9326c39c",
+    "name": "ARES-1",
+    "mass_kg": 42.0,
+    "max_slope_deg": 18.0,
+    "ground_clearance_m": 0.2,
+    "wheel_diameter_m": 0.3,
+    "max_obstacle_height_m": null,
+    "battery_wh": 1800.0,
+    "min_reserve_pct": 20.0,
+    "nominal_speed_mps": 0.5,
+    "max_route_m": 400.0,
+    "sensors": [
+      "stereo_camera",
+      "imu",
+      "lidar"
+    ],
+    "capabilities": [
+      "autonomous_navigation",
+      "geological_sampling"
+    ],
+    "energy_model": {
+      "model_id": "earth-simple-v1",
+      "rolling_coefficient": 0.06,
+      "drive_efficiency": 0.65,
+      "idle_power_w": 35.0,
+      "science_task_wh": 10.0,
+      "roughness_multiplier": 1.0,
+      "uncertainty_fraction": 0.25,
+      "calibration_status": "ASSUMED",
+      "calibration_evidence_id": null
+    },
+    "assumptions": [
+      "Illustrative engineering values; no claim of calibrated rover performance.",
+      "The separate synthetic graph fixture uses explicitly mocked edge energies rather than this physical model."
+    ]
+  },
+  "target_profile": {
+    "schema_version": "1.0",
+    "id": "70000000-0000-4000-8000-00000000001e",
+    "workspace_id": "70000000-0000-4000-8000-000000000001",
+    "run_id": "70000000-0000-4000-8000-000000000002",
+    "mode": "synthetic",
+    "created_at": "2026-11-08T12:00:00Z",
+    "target": {
+      "body": "MARS",
+      "bbox": [
+        137.0,
+        -5.0,
+        138.0,
+        -4.0
+      ],
+      "longitude_convention": "NEG180_180",
+      "latitude_type": "PLANETOCENTRIC",
+      "crs_wkt": null,
+      "vertical_datum": "SYNTHETIC_MARS_REFERENCE_SPHERE_3396190M"
+    },
+    "evidence_ids": [],
+    "metrics": [
+      {
+        "metric_id": "slope_area_fraction:12-18",
+        "value": 0.2,
+        "unit": "fraction",
+        "support_scale_m": 480.0,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-presentation-fixture-v1",
+        "valid_fraction": 1.0,
+        "uncertainty_note": "Synthetic fixture; not a field measurement."
+      }
+    ],
+    "unavailable_dimensions": [
+      "MINERAL",
+      "PHYSICAL_CLEARANCE"
+    ]
+  },
+  "candidates": [
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000000a",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "name": "Practice grid-r0c1",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -116.0,
+          35.0,
+          -115.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "origin": "DISCOVERED",
+      "discovery_method": "Synthetic practice screening",
+      "novelty_status": "NOT_IN_REFERENCE_LIST",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.4,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "Synthetic practice data; field access is not assessed."
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000000b",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "name": "Practice grid-r0c0",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -115.0,
+          35.0,
+          -114.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "origin": "DISCOVERED",
+      "discovery_method": "Synthetic practice screening",
+      "novelty_status": "NOT_IN_REFERENCE_LIST",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000015"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.1,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "Synthetic practice data; field access is not assessed."
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000000c",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "name": "Practice grid-r2c2",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -114.0,
+          35.0,
+          -113.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "origin": "KNOWN_CONTROL",
+      "discovery_method": "Synthetic practice screening",
+      "novelty_status": "KNOWN_ANALOG",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000016"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.08,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "Synthetic practice data; field access is not assessed."
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000000d",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "name": "Practice grid-r1c0",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -113.0,
+          35.0,
+          -112.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "origin": "DISCOVERED",
+      "discovery_method": "Synthetic practice screening",
+      "novelty_status": "NOT_IN_REFERENCE_LIST",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000017"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.03,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "Synthetic practice data; field access is not assessed."
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000000e",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "name": "Practice grid-r2c0",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -112.0,
+          35.0,
+          -111.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "origin": "DISCOVERED",
+      "discovery_method": "Synthetic practice screening",
+      "novelty_status": "NOT_IN_REFERENCE_LIST",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000018"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.02,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "Synthetic practice data; field access is not assessed."
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000000f",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "name": "Practice grid-r0c2",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -111.0,
+          35.0,
+          -110.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "origin": "SYNTHETIC_CONTROL",
+      "discovery_method": "Synthetic practice screening",
+      "novelty_status": "NOT_IN_REFERENCE_LIST",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000019"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.0,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "Synthetic practice data; field access is not assessed."
+      ]
+    }
+  ],
+  "qualifications": [
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003e8",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000a",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "PASS",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: PASS.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003e9",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000a",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "PASS",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480.0,
+      "explanation": "Synthetic presentation receipt: PASS.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003ea",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000a",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003eb",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000a",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003ec",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000a",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003ed",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000a",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003ee",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000a",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003ef",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000a",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003f0",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000a",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003fc",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000b",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "PASS",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000015"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: PASS.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003fd",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000b",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "PASS",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000015"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480.0,
+      "explanation": "Synthetic presentation receipt: PASS.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003fe",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000b",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000015"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-0000000003ff",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000b",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000015"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000400",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000b",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000015"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000401",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000b",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000015"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000402",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000b",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000015"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000403",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000b",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000015"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000404",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000b",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000015"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000410",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000c",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "PASS",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000016"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: PASS.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000411",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000c",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "PASS",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000016"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480.0,
+      "explanation": "Synthetic presentation receipt: PASS.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000412",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000c",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000016"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000413",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000c",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000016"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000414",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000c",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000016"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000415",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000c",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000016"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000416",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000c",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000016"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000417",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000c",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000016"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000418",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000c",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000016"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000424",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000d",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "FAIL",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000017"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: FAIL.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000425",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000d",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "PASS",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000017"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480.0,
+      "explanation": "Synthetic presentation receipt: PASS.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000426",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000d",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000017"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000427",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000d",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000017"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000428",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000d",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000017"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000429",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000d",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000017"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000042a",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000d",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000017"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000042b",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000d",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000017"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000042c",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000d",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000017"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000438",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000e",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "FAIL",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000018"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: FAIL.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000439",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000e",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "PASS",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000018"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480.0,
+      "explanation": "Synthetic presentation receipt: PASS.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000043a",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000e",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000018"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000043b",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000e",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000018"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000043c",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000e",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000018"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000043d",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000e",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000018"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000043e",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000e",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000018"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000043f",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000e",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000018"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000440",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000e",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000018"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000044c",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000f",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "FAIL",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000019"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: FAIL.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000044d",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000f",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "PASS",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000019"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480.0,
+      "explanation": "Synthetic presentation receipt: PASS.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000044e",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000f",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000019"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-00000000044f",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000f",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000019"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000450",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000f",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000019"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000451",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000f",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000019"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000452",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000f",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000019"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: UNKNOWN.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000453",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000f",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000019"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000454",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "candidate_id": "70000000-0000-4000-8000-00000000000f",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000019"
+      ],
+      "rule_id": "route-verification-v1",
+      "rule_version": "1.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60.0,
+      "explanation": "Synthetic presentation receipt: GAP.",
+      "limitations": [
+        "No physical validation; accepted constraints unchanged."
+      ],
+      "critic_status": "RESOLVED",
+      "critique_evidence_ids": []
+    }
+  ],
+  "compatibility": [
+    {
+      "candidate_id": "70000000-0000-4000-8000-00000000000a",
+      "rover_revision_id": "70000000-0000-4000-8000-000000000005",
+      "preliminary": true,
+      "dimensions": [
+        {
+          "metric_id": "max_surface_slope_deg",
+          "status": "PASS",
+          "rover_value": 18.0,
+          "required_value": 18.0,
+          "unit": "deg",
+          "explanation": "Declared capability; not observed traversal.",
+          "evidence": []
+        },
+        {
+          "metric_id": "ground_clearance_m",
+          "status": "UNKNOWN",
+          "rover_value": 0.2,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "60 m support cannot resolve physical clearance.",
+          "evidence": []
+        },
+        {
+          "metric_id": "energy_reserve_pct",
+          "status": "UNKNOWN",
+          "rover_value": 20.0,
+          "required_value": null,
+          "unit": "percent",
+          "explanation": "No verified route",
+          "evidence": []
+        },
+        {
+          "metric_id": "obstacle_height",
+          "status": "UNKNOWN",
+          "rover_value": null,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "No physical obstacle evidence.",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "candidate_id": "70000000-0000-4000-8000-00000000000b",
+      "rover_revision_id": "70000000-0000-4000-8000-000000000005",
+      "preliminary": true,
+      "dimensions": [
+        {
+          "metric_id": "max_surface_slope_deg",
+          "status": "PASS",
+          "rover_value": 18.0,
+          "required_value": 18.0,
+          "unit": "deg",
+          "explanation": "Declared capability; not observed traversal.",
+          "evidence": []
+        },
+        {
+          "metric_id": "ground_clearance_m",
+          "status": "UNKNOWN",
+          "rover_value": 0.2,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "60 m support cannot resolve physical clearance.",
+          "evidence": []
+        },
+        {
+          "metric_id": "energy_reserve_pct",
+          "status": "UNKNOWN",
+          "rover_value": 20.0,
+          "required_value": null,
+          "unit": "percent",
+          "explanation": "No verified route",
+          "evidence": []
+        },
+        {
+          "metric_id": "obstacle_height",
+          "status": "UNKNOWN",
+          "rover_value": null,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "No physical obstacle evidence.",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "candidate_id": "70000000-0000-4000-8000-00000000000c",
+      "rover_revision_id": "70000000-0000-4000-8000-000000000005",
+      "preliminary": true,
+      "dimensions": [
+        {
+          "metric_id": "max_surface_slope_deg",
+          "status": "PASS",
+          "rover_value": 18.0,
+          "required_value": 18.0,
+          "unit": "deg",
+          "explanation": "Declared capability; not observed traversal.",
+          "evidence": []
+        },
+        {
+          "metric_id": "ground_clearance_m",
+          "status": "UNKNOWN",
+          "rover_value": 0.2,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "60 m support cannot resolve physical clearance.",
+          "evidence": []
+        },
+        {
+          "metric_id": "energy_reserve_pct",
+          "status": "UNKNOWN",
+          "rover_value": 20.0,
+          "required_value": null,
+          "unit": "percent",
+          "explanation": "No verified route",
+          "evidence": []
+        },
+        {
+          "metric_id": "obstacle_height",
+          "status": "UNKNOWN",
+          "rover_value": null,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "No physical obstacle evidence.",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "candidate_id": "70000000-0000-4000-8000-00000000000d",
+      "rover_revision_id": "70000000-0000-4000-8000-000000000005",
+      "preliminary": true,
+      "dimensions": [
+        {
+          "metric_id": "max_surface_slope_deg",
+          "status": "PASS",
+          "rover_value": 18.0,
+          "required_value": 18.0,
+          "unit": "deg",
+          "explanation": "Declared capability; not observed traversal.",
+          "evidence": []
+        },
+        {
+          "metric_id": "ground_clearance_m",
+          "status": "UNKNOWN",
+          "rover_value": 0.2,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "60 m support cannot resolve physical clearance.",
+          "evidence": []
+        },
+        {
+          "metric_id": "energy_reserve_pct",
+          "status": "UNKNOWN",
+          "rover_value": 20.0,
+          "required_value": null,
+          "unit": "percent",
+          "explanation": "No verified route",
+          "evidence": []
+        },
+        {
+          "metric_id": "obstacle_height",
+          "status": "UNKNOWN",
+          "rover_value": null,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "No physical obstacle evidence.",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "candidate_id": "70000000-0000-4000-8000-00000000000e",
+      "rover_revision_id": "70000000-0000-4000-8000-000000000005",
+      "preliminary": true,
+      "dimensions": [
+        {
+          "metric_id": "max_surface_slope_deg",
+          "status": "PASS",
+          "rover_value": 18.0,
+          "required_value": 18.0,
+          "unit": "deg",
+          "explanation": "Declared capability; not observed traversal.",
+          "evidence": []
+        },
+        {
+          "metric_id": "ground_clearance_m",
+          "status": "UNKNOWN",
+          "rover_value": 0.2,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "60 m support cannot resolve physical clearance.",
+          "evidence": []
+        },
+        {
+          "metric_id": "energy_reserve_pct",
+          "status": "UNKNOWN",
+          "rover_value": 20.0,
+          "required_value": null,
+          "unit": "percent",
+          "explanation": "No verified route",
+          "evidence": []
+        },
+        {
+          "metric_id": "obstacle_height",
+          "status": "UNKNOWN",
+          "rover_value": null,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "No physical obstacle evidence.",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "candidate_id": "70000000-0000-4000-8000-00000000000f",
+      "rover_revision_id": "70000000-0000-4000-8000-000000000005",
+      "preliminary": true,
+      "dimensions": [
+        {
+          "metric_id": "max_surface_slope_deg",
+          "status": "PASS",
+          "rover_value": 18.0,
+          "required_value": 18.0,
+          "unit": "deg",
+          "explanation": "Declared capability; not observed traversal.",
+          "evidence": []
+        },
+        {
+          "metric_id": "ground_clearance_m",
+          "status": "UNKNOWN",
+          "rover_value": 0.2,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "60 m support cannot resolve physical clearance.",
+          "evidence": []
+        },
+        {
+          "metric_id": "energy_reserve_pct",
+          "status": "UNKNOWN",
+          "rover_value": 20.0,
+          "required_value": null,
+          "unit": "percent",
+          "explanation": "No verified route",
+          "evidence": []
+        },
+        {
+          "metric_id": "obstacle_height",
+          "status": "UNKNOWN",
+          "rover_value": null,
+          "required_value": null,
+          "unit": "m",
+          "explanation": "No physical obstacle evidence.",
+          "evidence": []
+        }
+      ]
+    }
+  ],
+  "critiques": [
+    {
+      "issue_id": "70000000-0000-4000-8000-000000000050",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "candidate_id": "70000000-0000-4000-8000-00000000000a",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "target_evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ],
+      "reason_code": "SCALE_MISMATCH",
+      "severity": "BLOCKING",
+      "status": "RESOLVED",
+      "summary": "60 m evidence replaced with 480 m common-support evidence.",
+      "repair_request": "Cite common-support comparison receipt",
+      "resolution_evidence_ids": [
+        "70000000-0000-4000-8000-000000000014"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "attempt_number": 1,
+      "parent_attempt_number": null,
+      "candidate_id": "70000000-0000-4000-8000-00000000000b",
+      "candidate_name": "Practice grid-r0c0",
+      "strategy": "EXPOSURE_COVERAGE",
+      "test": {
+        "schema_version": "1.0",
+        "id": "70000000-0000-4000-8000-0000000000c9",
+        "workspace_id": "70000000-0000-4000-8000-000000000001",
+        "run_id": "70000000-0000-4000-8000-000000000002",
+        "mode": "synthetic",
+        "created_at": "2026-11-08T12:00:00Z",
+        "candidate_id": "70000000-0000-4000-8000-00000000000b",
+        "mission_revision_id": "70000000-0000-4000-8000-000000000003",
+        "rover_revision_id": "70000000-0000-4000-8000-000000000005",
+        "test_revision": 1,
+        "requirement_ids": [
+          "R-SLOPE-AVAILABILITY",
+          "R-TARGET-SLOPE-CONTEXT",
+          "R-EXPOSURE",
+          "R-TASKS",
+          "R-RESERVE",
+          "R-MINERAL",
+          "R-CLEARANCE",
+          "R-GRAVITY",
+          "R-ATMOSPHERE"
+        ],
+        "route_artifact_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "waypoints_artifact_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "constraints_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "required_exposures": [
+          {
+            "requirement_id": "R-EXPOSURE",
+            "metric_id": "surface_slope_deg",
+            "lower": 12.0,
+            "upper": 18.0,
+            "minimum_distance_m": 100.0
+          }
+        ],
+        "solver_config": {
+          "max_expansions": 1,
+          "max_seconds": 60,
+          "max_labels_per_node": 100,
+          "seed": 1
+        },
+        "assumptions": [
+          "Synthetic presentation receipt; limits unchanged."
+        ]
+      },
+      "result": {
+        "schema_version": "1.0",
+        "id": "70000000-0000-4000-8000-00000000012d",
+        "workspace_id": "70000000-0000-4000-8000-000000000001",
+        "run_id": "70000000-0000-4000-8000-000000000002",
+        "mode": "synthetic",
+        "created_at": "2026-11-08T12:00:00Z",
+        "test_id": "70000000-0000-4000-8000-0000000000c9",
+        "outcome": "INCONCLUSIVE",
+        "failure_category": "SEARCH_LIMIT",
+        "search_status": "BUDGET_EXHAUSTED",
+        "verified_route_sha256": null,
+        "metrics": [
+          {
+            "metric_id": "unique_exposure_m:R-EXPOSURE",
+            "value": null,
+            "unit": "m",
+            "support_scale_m": 60.0,
+            "quantity_kind": "DERIVED",
+            "method_id": "synthetic-presentation-fixture-v1",
+            "valid_fraction": 1.0,
+            "uncertainty_note": "Synthetic fixture; not a field measurement."
+          }
+        ],
+        "violations": [],
+        "evidence_ids": [
+          "70000000-0000-4000-8000-000000000015"
+        ],
+        "verifier_version": "presentation-fixture-v1",
+        "limitations": [
+          "Bounded search; not proof that no route exists."
+        ]
+      },
+      "benchmark_rows": [
+        {
+          "constraint_id": "C-EXPOSURE-R-EXPOSURE",
+          "requirement_id": "R-EXPOSURE",
+          "rule": ">=100 m unique exposure",
+          "measured": null,
+          "threshold": 100.0,
+          "unit": "m",
+          "margin": null,
+          "status": "INCONCLUSIVE"
+        }
+      ],
+      "violations": [],
+      "diagnosis_category": "SEARCH_LIMIT",
+      "diagnosis_explanation": "Modeled terrain-feasibility result only.",
+      "changed_elements": [],
+      "route_image_asset_key": null
+    }
+  ],
+  "portfolio": null,
+  "evidence_appendix": [
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000014",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "kind": "DERIVED",
+      "artifact_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "artifact_media_type": "application/json",
+      "source_uri": null,
+      "dataset_product_id": "practice-earth-grid-v1",
+      "dataset_version": "1",
+      "granule_id": null,
+      "license_note": "Synthetic fixture only",
+      "body": "EARTH",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -116.0,
+          35.0,
+          -115.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "input_evidence_ids": [],
+      "parameters_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "algorithm_id": "analyze-candidate-v1",
+      "algorithm_version": "1.0",
+      "native_resolution_m": 60.0,
+      "comparison_scale_m": 60.0,
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.4,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "limitations": [
+        "Not physical rover execution."
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000015",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "kind": "DERIVED",
+      "artifact_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "artifact_media_type": "application/json",
+      "source_uri": null,
+      "dataset_product_id": "practice-earth-grid-v1",
+      "dataset_version": "1",
+      "granule_id": null,
+      "license_note": "Synthetic fixture only",
+      "body": "EARTH",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -115.0,
+          35.0,
+          -114.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "input_evidence_ids": [],
+      "parameters_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "algorithm_id": "analyze-candidate-v1",
+      "algorithm_version": "1.0",
+      "native_resolution_m": 60.0,
+      "comparison_scale_m": 60.0,
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.1,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "limitations": [
+        "Not physical rover execution."
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000016",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "kind": "DERIVED",
+      "artifact_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "artifact_media_type": "application/json",
+      "source_uri": null,
+      "dataset_product_id": "practice-earth-grid-v1",
+      "dataset_version": "1",
+      "granule_id": null,
+      "license_note": "Synthetic fixture only",
+      "body": "EARTH",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -114.0,
+          35.0,
+          -113.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "input_evidence_ids": [],
+      "parameters_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "algorithm_id": "analyze-candidate-v1",
+      "algorithm_version": "1.0",
+      "native_resolution_m": 60.0,
+      "comparison_scale_m": 60.0,
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.08,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "limitations": [
+        "Not physical rover execution."
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000017",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "kind": "DERIVED",
+      "artifact_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "artifact_media_type": "application/json",
+      "source_uri": null,
+      "dataset_product_id": "practice-earth-grid-v1",
+      "dataset_version": "1",
+      "granule_id": null,
+      "license_note": "Synthetic fixture only",
+      "body": "EARTH",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -113.0,
+          35.0,
+          -112.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "input_evidence_ids": [],
+      "parameters_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "algorithm_id": "analyze-candidate-v1",
+      "algorithm_version": "1.0",
+      "native_resolution_m": 60.0,
+      "comparison_scale_m": 60.0,
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.03,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "limitations": [
+        "Not physical rover execution."
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000018",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "kind": "DERIVED",
+      "artifact_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "artifact_media_type": "application/json",
+      "source_uri": null,
+      "dataset_product_id": "practice-earth-grid-v1",
+      "dataset_version": "1",
+      "granule_id": null,
+      "license_note": "Synthetic fixture only",
+      "body": "EARTH",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -112.0,
+          35.0,
+          -111.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "input_evidence_ids": [],
+      "parameters_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "algorithm_id": "analyze-candidate-v1",
+      "algorithm_version": "1.0",
+      "native_resolution_m": 60.0,
+      "comparison_scale_m": 60.0,
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.02,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "limitations": [
+        "Not physical rover execution."
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "70000000-0000-4000-8000-000000000019",
+      "workspace_id": "70000000-0000-4000-8000-000000000001",
+      "run_id": "70000000-0000-4000-8000-000000000002",
+      "mode": "synthetic",
+      "created_at": "2026-11-08T12:00:00Z",
+      "kind": "DERIVED",
+      "artifact_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "artifact_media_type": "application/json",
+      "source_uri": null,
+      "dataset_product_id": "practice-earth-grid-v1",
+      "dataset_version": "1",
+      "granule_id": null,
+      "license_note": "Synthetic fixture only",
+      "body": "EARTH",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -111.0,
+          35.0,
+          -110.9,
+          35.1
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_EARTH_REFERENCE"
+      },
+      "input_evidence_ids": [],
+      "parameters_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "algorithm_id": "analyze-candidate-v1",
+      "algorithm_version": "1.0",
+      "native_resolution_m": 60.0,
+      "comparison_scale_m": 60.0,
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.0,
+          "unit": "fraction",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.0,
+          "unit": "deg",
+          "support_scale_m": 480.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "unique_exposure_m:R-EXPOSURE",
+          "value": null,
+          "unit": "m",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "tasks_completed",
+          "value": null,
+          "unit": "count",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        },
+        {
+          "metric_id": "reserve_pct",
+          "value": null,
+          "unit": "percent",
+          "support_scale_m": 60.0,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-presentation-fixture-v1",
+          "valid_fraction": 1.0,
+          "uncertainty_note": "Synthetic fixture; not a field measurement."
+        }
+      ],
+      "limitations": [
+        "Not physical rover execution."
+      ]
+    }
+  ],
+  "assurance": {
+    "schema_version": "1.0",
+    "audit_id": "70000000-0000-4000-8000-000000000028",
+    "workspace_id": "70000000-0000-4000-8000-000000000001",
+    "run_id": "70000000-0000-4000-8000-000000000002",
+    "mode": "synthetic",
+    "created_at": "2026-11-08T12:00:00Z",
+    "snapshot_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
+    "rover_content_sha256": "a7ccd7337c17794fe8c904709f7006f887b9bc290f5aaf72c872f43d9326c39c",
+    "dataset_policy_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "acquired_manifest_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+    "algorithm_lock_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+    "assurance_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+    "critique_evidence_ids": [],
+    "claims": [
+      {
+        "claim_id": "clearance-unknown",
+        "claim_type": "QUALIFICATION",
+        "requirement_id": "R-CLEARANCE",
+        "candidate_ids": [
+          "70000000-0000-4000-8000-00000000000a",
+          "70000000-0000-4000-8000-00000000000b",
+          "70000000-0000-4000-8000-00000000000c",
+          "70000000-0000-4000-8000-00000000000d",
+          "70000000-0000-4000-8000-00000000000e",
+          "70000000-0000-4000-8000-00000000000f"
+        ],
+        "scope": "Synthetic test of inadequate terrain support for physical clearance.",
+        "disposition": "UNKNOWN",
+        "qualification_status": "UNKNOWN",
+        "verification_status": null,
+        "validation_level": "S0",
+        "evidence_ids": [
+          "70000000-0000-4000-8000-000000000014"
+        ],
+        "assumption_evidence_ids": [],
+        "gates": [
+          {
+            "gate_id": "SC-01",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-02",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-03",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "Abstract synthetic graph has no body-specific raster or physical coordinate frame.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-04",
+            "outcome": "UNSATISFIED",
+            "reason": "Synthetic inadequacy fixture: requested obstacle scale is finer than source support.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-05",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "No masked raster/AOI is used in this abstract graph regression.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-06",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "No time-varying measured source is used.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-07",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-08",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-09",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-10",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "No independent source corroboration is claimed.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-11",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "No rover supplied; site-only missing-evidence finding, no experiment verification claim.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-12",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-13",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "No candidate discovery or held-out real-source validation is claimed.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-14",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          },
+          {
+            "gate_id": "SC-15",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+            "evidence_ids": [
+              "70000000-0000-4000-8000-000000000014"
+            ]
+          }
+        ],
+        "permitted_statement": "Physical obstacle clearance is UNKNOWN at 60 m support.",
+        "limitations": [
+          "Fixture support is insufficient for the requested obstacle scale; no physical clearance claim is permitted."
+        ]
+      }
+    ],
+    "publication": "LIMITED",
+    "blocking_issue_codes": [],
+    "limitations": [
+      "Blueprint fixture only: UUIDs and hash strings are synthetic test identifiers, not executed application evidence.",
+      "Essential clearance evidence is unavailable; no blanket mission qualification or PROVE IT without rover."
+    ]
+  },
+  "source_locks": {
+    "dataset_policy_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "acquired_manifest_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+    "build_lock_sha256": null,
+    "config_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "algorithm_lock_sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+  },
+  "search_limitations": [
+    "Bounded search; not proof that no route exists."
+  ],
+  "not_run_reason": null
+}

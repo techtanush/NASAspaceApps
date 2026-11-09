@@ -1,0 +1,29 @@
+import templates from './fixtures/artifact-templates.json';
+import { clone,db,type MockRun,type ReplayAttempt } from './state';
+import { mockArtifactHash } from './contentAddressed';
+import type { components } from '../generated/schema';
+type M<K extends keyof components['schemas']>=components['schemas'][K];
+type Register=(algorithm:string,payload:unknown,kind?:M<'EvidenceRecord'>['kind'])=>M<'EvidenceRecord'>;
+function store(run:MockRun,payload:unknown):string {const hash=mockArtifactHash(payload);run.artifacts[hash]=payload;return hash;}
+export function publishAttemptArtifacts(run:MockRun,test:M<'VerificationTest'>,script:ReplayAttempt,register:Register):{evidenceIds:string[];routeHash:string|null;constraintsHash:string} {
+ const mission=db.contracts[run.snapshot.mission_revision_id]!;const rover=db.rovers[run.snapshot.rover_revision_id!]!;const candidate=run.candidates.find(c=>c.id===test.candidate_id)!;const graph=run.snapshot.scenario_config_id==='synthetic-graph-regression-v1';
+ const constraints=clone(graph?templates.graphConstraints:templates.constraints) as Record<string,unknown>;
+ constraints.mode=run.snapshot.mode;constraints.mission_revision_id=mission.id;constraints.mission_content_sha256=mission.content_sha256;constraints.rover_revision_id=rover.id;constraints.rover_content_sha256=rover.content_sha256;constraints.candidate_window_id=candidate.name.replace('Practice ','');constraints.test_revision=test.test_revision;constraints.strategy=script.strategy;constraints.surface_slope_cap_deg=rover.max_slope_deg;
+ if(constraints.grid){constraints.grid={...(constraints.grid as Record<string,unknown>),analysis_evidence_id:candidate.evidence_ids[1]||candidate.evidence_ids[0]};}
+ constraints.energy={model:clone(rover.energy_model),battery_wh:rover.battery_wh,min_reserve_pct:rover.min_reserve_pct,rover_mass_kg:rover.mass_kg,nominal_speed_mps:rover.nominal_speed_mps,gravity_mps2:9.80665};
+ constraints.max_distance_m=rover.max_route_m??(graph?400:8000);constraints.solver=clone(test.solver_config);
+ const exposure=mission.requirements.find(r=>r.id==='R-EXPOSURE');if(exposure)constraints.exposures=[{requirement_id:exposure.id,metric_id:'surface_slope_deg',band_deg:exposure.parameters.slope_band_deg||[12,18],upper_inclusive:true,minimum_distance_m:exposure.lower??100,counting:exposure.parameters.exposure_counting||'UNIQUE_UNDIRECTED_EDGE_DISTANCE'}];
+ const constraintsHash=store(run,constraints);test.constraints_sha256=constraintsHash;test.waypoints_artifact_sha256=store(run,{start:constraints.start,tasks:constraints.tasks});
+ const design=register('design-benchmark',{operation:'DESIGN_BENCHMARK',constraints,constraints_artifact_key:constraintsHash,constraints_sha256:constraintsHash,required_exposures:test.required_exposures,requirement_mapping:mission.requirements.map(requirement=>({requirement_id:requirement.id,constraint_ids:requirement.id==='R-EXPOSURE'?['C-EXPOSURE-R-EXPOSURE']:requirement.id==='R-TASKS'?['C-TASKS']:requirement.id==='R-RESERVE'?['C-ENERGY-RESERVE']:[],treatment:['R-EXPOSURE','R-TASKS','R-RESERVE'].includes(requirement.id)?'VERIFIED_BY_TOOL':requirement.operator==='NOT_NATURALLY_REPRODUCIBLE'?'GAP':'UNKNOWN',limitation:['R-EXPOSURE','R-TASKS','R-RESERVE'].includes(requirement.id)?null:'Not verified by this modeled route'})),unverified_requirement_ids:mission.requirements.filter(r=>!['R-EXPOSURE','R-TASKS','R-RESERVE'].includes(r.id)).map(r=>r.id),blockers:[]});
+ let route:Record<string,unknown>|null=null;let routeHash:string|null=null;
+ if(script.searchStatus==='FOUND'){
+ route=clone(templates.route) as Record<string,unknown>;route.mode=run.snapshot.mode;route.constraints_sha256=constraintsHash;route.strategy=script.strategy;route.route_key=`${candidate.name.replace('Practice ','')}-attempt-${test.test_revision}`;
+ route.node_sequence=script.strategy==='WAYPOINT_RETURN'?['S','A','W1','W2','W1','A','S']:['S','A','W1','W2','W1','C','B','S'];route.display_geometry=graph?null:clone(templates.route.display_geometry);
+ route.solver_claimed={distance_m:script.distance??0,energy_conservative_wh:rover.energy_model===null?null:script.energy,unique_exposure_m:{'R-EXPOSURE':script.exposure}};routeHash=store(run,route);
+ }
+ test.route_artifact_sha256=routeHash;
+ const search=register('search-route',{operation:'SEARCH_ROUTE',search_status:script.searchStatus,route,route_artifact_key:routeHash,route_sha256:routeHash,counters:{expansions:script.failureCategory==='SEARCH_LIMIT'?1:150,labels_created:script.failureCategory==='SEARCH_LIMIT'?1:200,labels_pruned_dominated:0,labels_pruned_lossy:script.failureCategory==='SEARCH_LIMIT'?1:0,elapsed_ms:1},approximation_flags:script.failureCategory==='SEARCH_LIMIT'?['BUDGET_EXHAUSTED']:[],optimistic_exposure_bound_m:script.searchStatus==='EXHAUSTIVE_INFEASIBLE'?{'R-EXPOSURE':0}:{},termination_reason:script.reason});
+ const repair=script.next||(script.failureCategory==='ROVER'?'NEW_CONTRACT_REQUIRED':script.failureCategory==='DATA'?'DATA_REPAIR':null);
+ const diagnosis=register('diagnose-result',{operation:'DIAGNOSE_RESULT',primary_category:script.failureCategory,secondary_categories:[],violated_constraint_ids:script.reason.startsWith('C-ENERGY-RESERVE')?['C-ENERGY-RESERVE']:script.outcome==='FAIL'?['C-EXPOSURE-R-EXPOSURE']:[],permitted_repairs:repair?[repair]:[],recommended_repair:repair,recommended_strategy:script.next==='NEW_ROUTE'?'EXPOSURE_COVERAGE':script.next==='NEW_CANDIDATE'?'EXPOSURE_COVERAGE':null,proof_scope:script.searchStatus==='EXHAUSTIVE_INFEASIBLE'?'discrete candidate domain under frozen constraints':script.failureCategory==='SEARCH_LIMIT'?'bounded search; not proof that no route exists':'evaluated route only',explanation:script.reason,diagnosis_evidence:{evidence_id:run.evidence[0]!.id}});
+ return {evidenceIds:[design.id,search.id,diagnosis.id],routeHash,constraintsHash};
+}
