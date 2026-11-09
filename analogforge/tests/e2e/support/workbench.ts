@@ -33,15 +33,14 @@ const renderedTruth=new Map<string,string>();
 const observedHooks=new Set<string>();
 const observedStatuses=new Map<string,{status:string;label:string;glyph:string;html:string}>();
 export async function inspectHooks(page: Page) {
- for (const hook of contract.testids) {
-  const elements = page.getByTestId(hook.id);
-  for (const el of await elements.all()) {
-   const inClosedDisclosure=await el.evaluate(node=>{for(let parent=node.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS'&&!parent.hasAttribute('open')&&!parent.querySelector(':scope > summary')?.contains(node))return true;return false;});
-   if(inClosedDisclosure)continue;
-   await expect(el,`${hook.id} must remain visible`).toBeVisible();
-   observedHooks.add(hook.id);
-   for (const attr of hook.required_attributes) await expect(el, `${hook.id} requires ${attr}`).toHaveAttribute(attr, /.+/);
-  }
+ const hooks=await page.evaluate(specification=>specification.flatMap(hook=>[...document.querySelectorAll(`[data-testid="${hook.id}"]`)].flatMap(node=>{
+  for(let parent=node.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS'&&!parent.hasAttribute('open')&&!parent.querySelector(':scope > summary')?.contains(node))return [];
+  const bounds=node.getBoundingClientRect(),style=getComputedStyle(node);
+  return [{id:hook.id,visible:bounds.width>0&&bounds.height>0&&style.visibility!=='hidden'&&style.display!=='none',attributes:hook.required_attributes.map(name=>({name,value:node.getAttribute(name)}))}];
+ })),contract.testids);
+ for(const hook of hooks){
+  expect(hook.visible,`${hook.id} must remain visible`).toBe(true);observedHooks.add(hook.id);
+  for(const attr of hook.attributes)expect(attr.value,`${hook.id} requires ${attr.name}`).toMatch(/.+/);
  }
  const badges=await page.locator('[data-status]').evaluateAll(elements=>elements.filter(el=>el.querySelector('svg')&&el.getBoundingClientRect().width>0).map(el=>({status:el.getAttribute('data-status')!,label:el.textContent!.trim(),glyph:el.querySelector('svg')!.outerHTML,html:el.outerHTML})));
  for(const badge of badges)if(!observedStatuses.has(badge.status))observedStatuses.set(badge.status,badge);
