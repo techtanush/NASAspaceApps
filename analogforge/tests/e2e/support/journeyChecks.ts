@@ -96,7 +96,7 @@ export async function keyboardMission(page: Page) {
   await expect(page.locator('[data-testid=save-indicator][data-save-state=saved]')).toBeVisible();
   await tabTo(page, page.getByTestId('file-rover-import'));
   const choosing = page.waitForEvent('filechooser');
-  await page.keyboard.press('Enter');
+  await page.keyboard.press('Space');
   await (await choosing).setFiles(fixture('rovers/ares-1.json'));
   await expect(page.getByTestId('rover-import-preview')).toBeVisible();
   await pressControl(page, page.getByTestId('btn-rover-save'));

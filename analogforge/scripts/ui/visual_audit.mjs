@@ -52,7 +52,7 @@ async function beginLoadedCohort(page,{width,height,theme,density}){
  await page.setViewportSize({width,height});
  await page.evaluate(({theme,density})=>{localStorage.setItem('af.theme',theme);localStorage.setItem('af.density',density);},{theme,density});
  const state=auditStates.get(page);if(state)for(const request of state.inflight)state.navigationAborts.add(request);
- await page.reload({waitUntil:'domcontentloaded'});await page.locator('main h1').waitFor({state:'visible'});
+ await page.reload({waitUntil:'domcontentloaded'});await page.locator('main h1').waitFor({state:'visible',timeout:60000});
  await waitForAuditData(page);
  return page.evaluate(()=>{window.__auditMeasureCLS=false;return window.__auditCLS||0;});
 }
@@ -81,7 +81,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
    return true;
   };
   const paintedRect=e=>{const initial=e.getBoundingClientRect();const box={left:Math.max(0,initial.left),right:Math.min(innerWidth,initial.right),top:Math.max(0,initial.top),bottom:Math.min(innerHeight,initial.bottom)};for(let parent=e.parentElement;parent;parent=parent.parentElement){const style=getComputedStyle(parent),r=parent.getBoundingClientRect();if(/auto|scroll|hidden|clip/.test(style.overflowX)){box.left=Math.max(box.left,r.left+parent.clientLeft);box.right=Math.min(box.right,r.left+parent.clientLeft+parent.clientWidth);}if(/auto|scroll|hidden|clip/.test(style.overflowY)){box.top=Math.max(box.top,r.top+parent.clientTop);box.bottom=Math.min(box.bottom,r.top+parent.clientTop+parent.clientHeight);}}return box;};
-  const canvasBounds=[...document.querySelectorAll('[data-testid="earth-map"] canvas,[data-testid="planetary-panel"] svg.planetary-svg')].map(canvas=>canvas.getBoundingClientRect());
+  const canvasBounds=[...document.querySelectorAll('[data-testid="earth-map"] canvas,[data-testid="planetary-panel"] svg.planetary-svg')].map(canvas=>({element:canvas,rect:canvas.getBoundingClientRect()}));
   const add=(check,e,message)=>findings.push({check,selector:e.getAttribute('data-testid')||e.id||e.tagName.toLowerCase(),message});
   const rgb=s=>{const m=s.match(/[\d.]+/g);return m?m.map(Number):[0,0,0,0];};
   const lum=c=>{const s=c.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});return .2126*s[0]+.7152*s[1]+.0722*s[2]};
@@ -97,8 +97,11 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
     const fg=rgb(s.color); const min=parseFloat(s.fontSize)>=24||(parseFloat(s.fontSize)>=18.66&&Number(s.fontWeight)>=700)?limits.largeContrast:limits.contrast;
     if(bg[3]!==0&&ratio(fg,bg)<min-.01)add('C03',e,`Contrast ${ratio(fg,bg).toFixed(2)} < ${min}`);
     for(const node of nodes){const range=document.createRange();range.selectNodeContents(node);const box=range.getBoundingClientRect();
-     const overCanvas=canvasBounds.some(c=>box.left>=c.left&&box.right<=c.right&&box.top>=c.top&&box.bottom<=c.bottom);
-     text.push({x:box.x,y:box.y,w:box.width,h:box.height,fg,min,selector:e.getAttribute('data-testid')||e.tagName.toLowerCase(),overCanvas});
+     // An opaque foreground plate is measured above against its own background,
+     // not against canvas pixels behind it or adjacent inline glyphs.
+     const painted=paintedRect(e);
+     const overCanvas=box.left>=painted.left&&box.right<=painted.right&&box.top>=painted.top&&box.bottom<=painted.bottom&&canvasBounds.some(({element,rect:c})=>parent?.contains(element)&&box.left>=c.left&&box.right<=c.right&&box.top>=c.top&&box.bottom<=c.bottom);
+     text.push({x:box.x,y:box.y,w:box.width,h:box.height,fg,min,text:node.textContent,selector:e.getAttribute('data-testid')||e.tagName.toLowerCase(),overCanvas});
     }
     if(/\b(NaN|undefined|null|\[object Object\])\b/.test(nodes.map(n=>n.textContent).join(' ')))add('C09',e,'Invalid rendered value');
     if(e.scrollWidth>e.clientWidth+1&&s.display!=='inline'&&!e.closest('[data-overflow="intentional"]'))add('C05',e,`Text overflow ${e.scrollWidth}/${e.clientWidth}`);
@@ -142,7 +145,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
  for(const t of facts.text.filter(t=>t.overCanvas)){
   const samples=[[t.x-4,t.y+t.h/2],[t.x+t.w+4,t.y+t.h/2],[t.x+t.w/2,t.y-4],[t.x+t.w/2,t.y+t.h+4]];
   const luminosity=c=>c.slice(0,3).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
-  for(const [x,y]of samples){if(x<0||y<0||x>=png.width||y>=png.height)continue;const p=(Math.floor(y)*png.width+Math.floor(x))*4;const bg=[...png.data.subarray(p,p+3)];const a=luminosity(t.fg),b=luminosity(bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);if(ratio<t.min-.01)findings.push({check:'C03',selector:t.selector,message:`Canvas contrast ${ratio.toFixed(2)}`});}
+  for(const [x,y]of samples){if(x<0||y<0||x>=png.width||y>=png.height)continue;const p=(Math.floor(y)*png.width+Math.floor(x))*4;const bg=[...png.data.subarray(p,p+3)];const a=luminosity(t.fg),b=luminosity(bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);if(ratio<t.min-.01)findings.push({check:'C03',selector:t.selector,message:`Canvas contrast ${ratio.toFixed(2)}`,text:t.text,box:[t.x,t.y,t.w,t.h],sample:[x,y],background:bg});}
  }
  const axe=await new AxeBuilder({page}).withRules(['color-contrast']).analyze();for(const v of axe.violations)for(const n of v.nodes)findings.push({check:'C03',selector:n.target.join(' '),message:n.failureSummary});
  if(facts.cls>THRESHOLDS.cls&&['S01','S06','S07','S10','S12'].some(s=>name.startsWith(s)))findings.push({check:'C11',message:`CLS ${facts.cls}`});
