@@ -48,6 +48,6 @@ The same journeys run against the merged backend with `E2E_TARGET=real` and `E2E
 
 ## Design and test tools
 
-`/__styleguide` is available only in development. It shows all components in both themes and three densities. The full visual audit checks every screen across six viewports, both themes, and the required density variants. Its reports, screenshot catalog, production resource audit, and mutation logs are generated under `out/` and are not committed. The workspace postinstall adds only `/analogforge/out/` to the clone’s local Git exclude file; the frozen kit ignore file stays unchanged.
+`/__styleguide` is available only in development. It shows all components in both themes and three densities. Use `pnpm run audit:visual --all` to run the production checks and complete browser suite together, including the full visual audit. The full visual audit checks every screen across six viewports, both themes, and the required density variants. Its reports, screenshot catalog, production resource audit, and mutation logs are generated under `out/` and are not committed. The workspace postinstall adds only `/analogforge/out/` to the clone’s local Git exclude file; the frozen kit ignore file stays unchanged.
 
 Explicit development fixtures `?mockScenario=review-proxy` and `?mockScenario=blocked-worker` exercise scoped human review and dependency recovery. `?mockLatency=300` adds the visual audit’s network latency; ordinary preview sessions have no artificial latency. These switches do not exist in production builds.

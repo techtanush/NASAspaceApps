@@ -183,5 +183,6 @@ if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  const scan=spawnSync('python3',['scripts/ui/forbidden_scan.py'],{cwd:root,encoding:'utf8'});if(scan.status!==0){console.error(scan.stdout);process.exit(scan.status||1);}
  const build=spawnSync('pnpm',['run','build'],{cwd:root,stdio:'inherit'});if(build.status!==0)process.exit(build.status||1);
  const production=auditProduction();if(production.length){console.error(JSON.stringify(production));process.exit(1);}
- const result=spawnSync('pnpm',['--filter','@analogforge/web','exec','playwright','test','visual-audit.spec.ts'],{cwd:root,env:{...process.env,E2E_TARGET:'mock'},stdio:'inherit'});process.exit(result.status||0);
+ const suites=process.argv.includes('--all')?[]:['visual-audit.spec.ts'];
+ const result=spawnSync('pnpm',['--filter','@analogforge/web','exec','playwright','test',...suites],{cwd:root,env:{...process.env,E2E_TARGET:'mock'},stdio:'inherit'});process.exit(typeof result.status==='number'?result.status:1);
 }
