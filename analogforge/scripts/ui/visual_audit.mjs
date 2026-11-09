@@ -16,7 +16,10 @@ export async function installAuditInstrumentation(page){
  if(auditStates.has(page))return;
  const state={inflight:new Set(),navigationAborts:new WeakSet(),signals:new Map(),failures:[],cancellations:[]};auditStates.set(page,state);
  await page.exposeBinding('__analogForgeAuditAbort',(_source,url,method)=>{const key=method+' '+url;state.signals.set(key,(state.signals.get(key)||0)+1);});
- page.on('request',request=>state.inflight.add(request));page.on('requestfinished',request=>state.inflight.delete(request));
+ page.on('request',request=>{
+  if(request.isNavigationRequest()&&request.frame()===page.mainFrame())for(const pending of state.inflight)state.navigationAborts.add(pending);
+  state.inflight.add(request);
+ });page.on('requestfinished',request=>state.inflight.delete(request));
  page.on('requestfailed',async request=>{
   state.inflight.delete(request);await new Promise(resolve=>setTimeout(resolve,40));
   const error=request.failure()?.errorText||'Transport failed';const key=request.method()+' '+request.url();const signalled=(state.signals.get(key)||0)>0;

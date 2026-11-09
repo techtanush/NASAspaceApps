@@ -29,6 +29,7 @@ test.beforeEach(async({page})=>{
 test.afterEach(async({page})=>{expect(requestErrors.get(page)||[],'UI mutations must satisfy frozen OpenAPI request schemas').toEqual([]);});
 export const fixture = (name: string) => resolve(root, 'tests/fixtures/kit', name);
 export const contract = JSON.parse(readFileSync(resolve(root, 'contracts/ui-testids.json'), 'utf8')) as { testids: { id: string; required_attributes: string[] }[] };
+const renderedTruth=new Map<string,string>();
 const observedHooks=new Set<string>();
 const observedStatuses=new Map<string,{status:string;label:string;glyph:string;html:string}>();
 export async function inspectHooks(page: Page) {
@@ -45,6 +46,8 @@ export async function inspectHooks(page: Page) {
  const badges=await page.locator('[data-status]').evaluateAll(elements=>elements.filter(el=>el.querySelector('svg')&&el.getBoundingClientRect().width>0).map(el=>({status:el.getAttribute('data-status')!,label:el.textContent!.trim(),glyph:el.querySelector('svg')!.outerHTML,html:el.outerHTML})));
  for(const badge of badges)if(!observedStatuses.has(badge.status))observedStatuses.set(badge.status,badge);
  mkdirSync(resolve(root,'out'),{recursive:true});
+ renderedTruth.set(page.url(),await page.locator('main').innerText());
+ writeFileSync(resolve(root,`out/truth-rendered-${process.env.E2E_RUN_NAME||'default'}-${process.env.TEST_WORKER_INDEX||'0'}.json`),JSON.stringify([...renderedTruth].map(([url,text])=>({url,text})),null,2));
  writeFileSync(resolve(root,`out/truth-statuses-${process.env.E2E_RUN_NAME||'default'}-${process.env.TEST_WORKER_INDEX||'0'}.json`),JSON.stringify([...observedStatuses.values()],null,2));
  writeFileSync(resolve(root,`out/hooks-${process.env.E2E_RUN_NAME||'default'}-${process.env.TEST_WORKER_INDEX||'0'}.json`),JSON.stringify([...observedHooks].sort(),null,2));
 }
