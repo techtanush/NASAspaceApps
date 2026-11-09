@@ -35,6 +35,9 @@ export async function inspectHooks(page: Page) {
  for (const hook of contract.testids) {
   const elements = page.getByTestId(hook.id);
   for (const el of await elements.all()) {
+   const inClosedDisclosure=await el.evaluate(node=>{for(let parent=node.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS'&&!parent.hasAttribute('open')&&!parent.querySelector(':scope > summary')?.contains(node))return true;return false;});
+   if(inClosedDisclosure)continue;
+   await expect(el,`${hook.id} must remain visible`).toBeVisible();
    observedHooks.add(hook.id);
    for (const attr of hook.required_attributes) await expect(el, `${hook.id} requires ${attr}`).toHaveAttribute(attr, /.+/);
   }

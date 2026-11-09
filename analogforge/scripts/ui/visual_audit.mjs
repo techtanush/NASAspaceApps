@@ -10,6 +10,7 @@ const { PNG }=require('pngjs');
 const AxeBuilder=require('@axe-core/playwright').default;
 export const THRESHOLDS=Object.freeze({minText:12,bodyText:13,contrast:4.5,largeContrast:3,grid:4,cls:0.02,target:24,touchTarget:44,radius:6,glyphIoU:0.85,viewports:[[1920,1080],[1440,900],[1280,800],[1024,768],[768,1024],[390,844]]});
 export const COMPONENTS=['AppShell','AppHeader','ModeBadge','ConnectionIndicator','RevisionBadge','StatusBadge','StatusGlyph','Button','IconButton','Input','NumberInput','Select','Segmented','FileDrop','FormField','Table','MatrixCell','SortHeader','Tabs','Banner','MockBanner','EmptyState','ErrorPanel','Skeleton','Dialog','Drawer','Tooltip','Toast','Popover','CopyHash','Mono','Quantity','Timestamp','Hash','Stepper','Timeline','Histogram','Line','Bar','DataTableToggle','LayerPanel','Legend','ScaleBar','CoordinateReadout','Attribution','KbdHint','VisuallyHidden'];
+const requiredHooks=JSON.parse(readFileSync(resolve(root,'contracts/ui-testids.json'),'utf8')).testids;
 const auditStates=new WeakMap();
 export async function installAuditInstrumentation(page){
  if(auditStates.has(page))return;
@@ -72,7 +73,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
  const spacingStyle=spacing?await page.addStyleTag({content:'*{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}p{margin-bottom:2em!important}'}):null;
  const screenshot=await page.screenshot();
  const png=PNG.sync.read(screenshot);
- const facts=await page.evaluate(({limits,spacing,width})=>{
+ const facts=await page.evaluate(({limits,spacing,width,requiredHooks})=>{
   const findings=[]; const text=[]; const all=[...document.querySelectorAll('body *')];
   const visible=e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();
    if(s.display==='none'||s.visibility==='hidden'||s.clipPath==='inset(50%)'||r.width<=0||r.height<=0)return false;
@@ -118,6 +119,12 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
    if(/[\u{1f300}-\u{1faff}]/u.test((nodes.map(n=>n.textContent).join(' '))+['alt','title','aria-label'].map(a=>e.getAttribute(a)||'').join(' ')))add('C10',e,'Emoji');
    if(/lorem ipsum|todo|coming soon|!+\s*$/i.test(nodes.map(n=>n.textContent).join(' ')))add('C10',e,'Unfinished or promotional copy');
   }
+  for(const hook of requiredHooks)for(const element of document.querySelectorAll(`[data-testid="${hook.id}"]`)){
+   let closed=false;for(let parent=element.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS'&&!parent.open&&!parent.querySelector(':scope > summary')?.contains(element)){closed=true;break;}
+   if(closed)continue;
+   if(!visible(element))add('C05',element,'Required hook is hidden or zero-sized');
+   for(const attr of hook.required_attributes)if(!element.getAttribute(attr))add('C05',element,'Required hook attribute missing: '+attr);
+  }
   if(document.documentElement.scrollWidth>innerWidth)add('C05',document.documentElement,'Page overflow');
   const interactive=all.filter(e=>visible(e)&&e.matches('button,input:not([type=hidden]),select,textarea,a[href],[role=button],[role=tab],[role=combobox]'));
   for(let i=0;i<interactive.length;i++)for(let j=i+1;j<interactive.length;j++){const a=interactive[i],b=interactive[j];if(a.contains(b)||b.contains(a)||a.closest('[role=dialog]')!==b.closest('[role=dialog]'))continue;const x=paintedRect(a),y=paintedRect(b);if(x.right<=x.left||y.right<=y.left||x.bottom<=x.top||y.bottom<=y.top)continue;if(Math.min(x.right,y.right)-Math.max(x.left,y.left)>2&&Math.min(x.bottom,y.bottom)-Math.max(x.top,y.top)>2)add('C05',a,'Interactive overlap '+(b.id||b.tagName));}
@@ -127,7 +134,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
   for(const large of document.querySelectorAll('[data-size=xl]'))if(large.getAttribute('data-testid')!=='btn-prove-it')add('C13',large,'Only PROVE IT may be xl');
   const faces=[...document.fonts].filter(f=>f.status==='loaded').map(f=>f.family);if(!faces.some(f=>f.includes('Inter'))||!faces.some(f=>f.includes('Plex')))add('C01',document.body,'Self-hosted fonts not loaded');
   return {findings,text,spacing,cls:window.__auditCLS||0,layoutShifts:window.__auditShifts||[]};
- },{limits:THRESHOLDS,spacing,width});
+ },{limits:THRESHOLDS,spacing,width,requiredHooks});
  const findings=[...facts.findings];
  // Canvas-overlay contrast uses screenshot pixels in a four-pixel ring around the text box.
  for(const t of facts.text.filter(t=>t.overCanvas)){
