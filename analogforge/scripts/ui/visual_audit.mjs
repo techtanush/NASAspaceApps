@@ -39,16 +39,20 @@ export async function installAuditInstrumentation(page){
 }
 export function auditFailures(page){return auditStates.get(page)?.failures||[];}
 export function auditCancellations(page){return auditStates.get(page)?.cancellations||[];}
+export async function waitForAuditData(page){
+ for(let pass=0;pass<12;pass++){
+  await page.waitForFunction(()=>!(window.__auditPending||0)&&document.fonts.status==='loaded');
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  if(await page.evaluate(()=>!(window.__auditPending||0)))return;
+ }
+ throw new Error('Scientific display requests did not settle');
+}
 async function beginLoadedCohort(page,{width,height,theme,density}){
  await page.setViewportSize({width,height});
  await page.evaluate(({theme,density})=>{localStorage.setItem('af.theme',theme);localStorage.setItem('af.density',density);},{theme,density});
  const state=auditStates.get(page);if(state)for(const request of state.inflight)state.navigationAborts.add(request);
  await page.reload({waitUntil:'domcontentloaded'});await page.locator('main h1').waitFor({state:'visible'});
- for(let pass=0;pass<12;pass++){
-  await page.waitForFunction(()=>!(window.__auditPending||0)&&document.fonts.status==='loaded');
-  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-  if(await page.evaluate(()=>!(window.__auditPending||0)))break;
- }
+ await waitForAuditData(page);
  return page.evaluate(()=>{window.__auditMeasureCLS=false;return window.__auditCLS||0;});
 }
 export const reports=[];

@@ -164,6 +164,7 @@ def prepare(target: Path) -> None:
         "scripts/ui",
     ]:
         shutil.copytree(ROOT / folder, target / folder, ignore=shutil.ignore_patterns("__pycache__", ".cache"))
+    shutil.copy2(ROOT / "scripts/build_mock_exports.py", target / "scripts/build_mock_exports.py")
     web = target / "apps/web"
     for filename in [
         "package.json",
@@ -175,6 +176,15 @@ def prepare(target: Path) -> None:
         "eslint.config.js",
     ]:
         shutil.copy2(ROOT / "apps/web" / filename, web / filename)
+    # Dependencies are symlinked to the owning checkout, so Vite must serve their local font assets.
+    config = web / "vite.config.ts"
+    configuration = config.read_text()
+    configuration = configuration.replace(
+        "server: { strictPort:",
+        "server: { fs: {allow: " + json.dumps([str(target), str(ROOT)]) + "}, strictPort:",
+        1,
+    )
+    config.write_text(configuration)
     for filename in ["package.json", "pnpm-workspace.yaml", "pyproject.toml"]:
         shutil.copy2(ROOT / filename, target / filename)
     for source, destination in [
@@ -268,6 +278,8 @@ def run_frontend_mutations(only: set[str] | None = None) -> list[dict[str, Any]]
                 output = result.stdout + result.stderr
                 log = logs / f"frontend-{identifier}.log"
                 log.write_text(output)
+                for context in (target / "out").rglob("error-context.md"):
+                    shutil.copy2(context, logs / f"frontend-{identifier}-context.md")
                 invalid = bool(
                     re.search(
                         (
@@ -299,6 +311,14 @@ def run_frontend_mutations(only: set[str] | None = None) -> list[dict[str, Any]]
                         )
                         and not invalid
                     )
+                if kind in {"browser", "design", "external"}:
+                    # An unrelated startup failure is not evidence that the intended regression was caught.
+                    expected_failure = {
+                        "M6": "mock-banner", "M24": "candidate-list",
+                        "M26": "C10", "M27": "C02", "M28": "C09",
+                        "M32": "C07", "M33": "C05", "M35": "C13", "M36": "C01 external requests",
+                    }[identifier]
+                    killed = killed and expected_failure in output
                 records.append(
                     dict(
                         id=identifier,

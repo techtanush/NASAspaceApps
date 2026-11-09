@@ -3,6 +3,8 @@ import AxeBuilder from '@axe-core/playwright';
 import { newMission, startRun, tab, prove, isMock, inspectHooks } from './support/workbench';
 
 async function assertAccessible(page: Page, screen: string) {
+  const headings:Record<string,string>={S01:'Missions and runs',S02:'Mission authoring',S03:'Rover library',S04:'Mission authoring',S05:'Target evidence',S06:'Earth analog candidates',S07:'Qualification',S08:'Rover compatibility',S09:'Composite portfolio',S10:'Test lab',S11:'Test lab',S12:'Analog Passport'};
+  await expect(page.locator('main h1')).toHaveText(headings[screen]!);
   const result = await new AxeBuilder({ page }).analyze();
   expect(result.violations.filter(row => ['critical', 'serious'].includes(row.impact || '')), screen).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${screen}: no page overflow`).toBe(true);
@@ -22,9 +24,10 @@ for (const width of [1440, 900, 390]) test(`UIX-07 S01–S12 accessible at ${wid
     if (name === 'compatibility') await expect(page.getByTestId('compat-row').first()).toBeVisible();
     await inspectHooks(page);
     await assertAccessible(page, screen);
+    if(name==='analogs'){const candidate=page.getByTestId('candidate-row').first();await candidate.getByTestId('btn-select-candidate').click();await expect(candidate).toHaveAttribute('data-selected','true');}
   }
-  await prove(page); await assertAccessible(page, 'S11');
-  await tab(page, 'passport'); await assertAccessible(page, 'S12');
+  await prove(page); await expect(page.getByTestId('attempt-row')).toHaveCount(3);await assertAccessible(page, 'S11');
+  await tab(page, 'passport');await expect(page.getByTestId('manifest-digest')).toBeVisible();await assertAccessible(page, 'S12');
 });
 
 test('UIX-07 keyboard focus, help, reduced motion and text spacing', async ({ page }) => {
