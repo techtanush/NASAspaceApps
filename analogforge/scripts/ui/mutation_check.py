@@ -84,8 +84,8 @@ MUTATIONS = [
     (
         "M24",
         "src/features/analogs/AnalogsView.tsx",
-        '<div data-testid="candidate-list">',
-        '<div data-testid="candidate-list" hidden={!document.createElement("canvas").getContext("webgl")}>',
+        '<div className="analogs-list-pane" data-testid="candidate-list">',
+        '<div className="analogs-list-pane" data-testid="candidate-list" hidden={!document.createElement("canvas").getContext("webgl")}>',
         "browser",
         "webgl-fallback.spec.ts",
     ),

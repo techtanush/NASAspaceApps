@@ -9,12 +9,14 @@ test('J01 full Mars investigation, immutable fail/replan/pass and independently 
  const external: string[] = []; page.on('request', r => { if (/^https?:/.test(r.url()) && !['localhost','127.0.0.1'].includes(new URL(r.url()).hostname)) external.push(r.url()); });
  const runId = await startRun(page);
  await expect(page.getByTestId('mode-badge')).toHaveAttribute('data-mode','synthetic');
+ const pinnedRun=await api<{rover_revision_id:string}>(page,`/runs/${runId}`);const pinnedRover=await api<{name:string;revision:number}>(page,`/rover-revisions/${pinnedRun.body.rover_revision_id}`);await expect(page.getByTestId('run-state-banner')).toContainText(`Rover ${pinnedRover.body.name} rev ${pinnedRover.body.revision}`);
  await tab(page,'target');
  await expect(page.locator('[data-testid=planetary-panel][data-body=MARS]')).toBeVisible();
  await expect(page.getByTestId('earth-map')).toHaveCount(0);
  await tab(page,'analogs');
  await expect(page.getByTestId('candidate-row')).toHaveCount(6);
  await expect(page.locator('[data-testid=candidate-row][data-origin=KNOWN_CONTROL]')).toHaveCount(1);
+ await page.locator('summary').filter({hasText:'Excluded and not detailed'}).click();
  await expect(page.locator('[data-testid=excluded-window][data-reason=WATER_ONLY]')).toBeVisible();
  await expect(page.locator('[data-testid=excluded-window][data-reason=INSUFFICIENT_VALID_DATA]')).toBeVisible();
  await expect(page.getByTestId('earth-map')).toBeVisible();

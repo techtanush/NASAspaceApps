@@ -81,6 +81,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
    return true;
   };
   const paintedRect=e=>{const initial=e.getBoundingClientRect();const box={left:Math.max(0,initial.left),right:Math.min(innerWidth,initial.right),top:Math.max(0,initial.top),bottom:Math.min(innerHeight,initial.bottom)};for(let parent=e.parentElement;parent;parent=parent.parentElement){const style=getComputedStyle(parent),r=parent.getBoundingClientRect();if(/auto|scroll|hidden|clip/.test(style.overflowX)){box.left=Math.max(box.left,r.left+parent.clientLeft);box.right=Math.min(box.right,r.left+parent.clientLeft+parent.clientWidth);}if(/auto|scroll|hidden|clip/.test(style.overflowY)){box.top=Math.max(box.top,r.top+parent.clientTop);box.bottom=Math.min(box.bottom,r.top+parent.clientTop+parent.clientHeight);}}return box;};
+  const canvasBounds=[...document.querySelectorAll('[data-testid="earth-map"] canvas,[data-testid="planetary-panel"] svg.planetary-svg')].map(canvas=>canvas.getBoundingClientRect());
   const add=(check,e,message)=>findings.push({check,selector:e.getAttribute('data-testid')||e.id||e.tagName.toLowerCase(),message});
   const rgb=s=>{const m=s.match(/[\d.]+/g);return m?m.map(Number):[0,0,0,0];};
   const lum=c=>{const s=c.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});return .2126*s[0]+.7152*s[1]+.0722*s[2]};
@@ -96,7 +97,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
     const fg=rgb(s.color); const min=parseFloat(s.fontSize)>=24||(parseFloat(s.fontSize)>=18.66&&Number(s.fontWeight)>=700)?limits.largeContrast:limits.contrast;
     if(bg[3]!==0&&ratio(fg,bg)<min-.01)add('C03',e,`Contrast ${ratio(fg,bg).toFixed(2)} < ${min}`);
     for(const node of nodes){const range=document.createRange();range.selectNodeContents(node);const box=range.getBoundingClientRect();
-     const overCanvas=[...document.querySelectorAll('[data-testid="earth-map"] canvas,[data-testid="planetary-panel"] svg.planetary-svg')].some(canvas=>{const c=canvas.getBoundingClientRect();return box.left>=c.left&&box.right<=c.right&&box.top>=c.top&&box.bottom<=c.bottom;});
+     const overCanvas=canvasBounds.some(c=>box.left>=c.left&&box.right<=c.right&&box.top>=c.top&&box.bottom<=c.bottom);
      text.push({x:box.x,y:box.y,w:box.width,h:box.height,fg,min,selector:e.getAttribute('data-testid')||e.tagName.toLowerCase(),overCanvas});
     }
     if(/\b(NaN|undefined|null|\[object Object\])\b/.test(nodes.map(n=>n.textContent).join(' ')))add('C09',e,'Invalid rendered value');
@@ -127,7 +128,8 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
   }
   if(document.documentElement.scrollWidth>innerWidth)add('C05',document.documentElement,'Page overflow');
   const interactive=all.filter(e=>visible(e)&&e.matches('button,input:not([type=hidden]),select,textarea,a[href],[role=button],[role=tab],[role=combobox]'));
-  for(let i=0;i<interactive.length;i++)for(let j=i+1;j<interactive.length;j++){const a=interactive[i],b=interactive[j];if(a.contains(b)||b.contains(a)||a.closest('[role=dialog]')!==b.closest('[role=dialog]'))continue;const x=paintedRect(a),y=paintedRect(b);if(x.right<=x.left||y.right<=y.left||x.bottom<=x.top||y.bottom<=y.top)continue;if(Math.min(x.right,y.right)-Math.max(x.left,y.left)>2&&Math.min(x.bottom,y.bottom)-Math.max(x.top,y.top)>2)add('C05',a,'Interactive overlap '+(b.id||b.tagName));}
+  const interactiveBoxes=interactive.map(element=>paintedRect(element));
+  for(let i=0;i<interactive.length;i++)for(let j=i+1;j<interactive.length;j++){const a=interactive[i],b=interactive[j];if(a.contains(b)||b.contains(a)||a.closest('[role=dialog]')!==b.closest('[role=dialog]'))continue;const x=interactiveBoxes[i],y=interactiveBoxes[j];if(x.right<=x.left||y.right<=y.left||x.bottom<=x.top||y.bottom<=y.top)continue;if(Math.min(x.right,y.right)-Math.max(x.left,y.left)>2&&Math.min(x.bottom,y.bottom)-Math.max(x.top,y.top)>2)add('C05',a,'Interactive overlap '+(b.id||b.tagName));}
   if(document.querySelectorAll('main h1').length!==1)add('C13',document.body,'Exactly one h1 required');
   let previous=0;for(const h of all.filter(e=>visible(e)&&/^H[1-6]$/.test(e.tagName))){const level=Number(h.tagName[1]);if(previous&&level>previous+1)add('C13',h,'Heading level skipped');previous=level;}
   for(const region of document.querySelectorAll('[data-region]'))if([...region.querySelectorAll('[data-variant=primary]')].filter(visible).length>1)add('C13',region,'Multiple primary actions');

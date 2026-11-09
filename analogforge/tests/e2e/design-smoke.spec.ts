@@ -4,6 +4,8 @@ import {auditPage,auditGlyphs,finishAudit,installAuditInstrumentation,auditFailu
 test('design rules reject visual regressions on the shell and full component kit',async({page})=>{
  test.setTimeout(180000);await installAuditInstrumentation(page);
  const external:string[]=[];const browserErrors:string[]=[];
+ // Record attempted foreign resources without depending on their availability.
+ await page.route(url=>/^https?:$/.test(url.protocol)&&url.origin!==(process.env.E2E_BASE_URL||'http://127.0.0.1:5176'),route=>route.fulfill({status:200,contentType:'text/css',body:''}));
  page.on('request',request=>{if(/^https?:/.test(request.url())&&new URL(request.url()).origin!==(process.env.E2E_BASE_URL||'http://127.0.0.1:5176'))external.push(request.url());});
  page.on('pageerror',error=>browserErrors.push(error.message));
  for(const path of ['/','/__styleguide']){

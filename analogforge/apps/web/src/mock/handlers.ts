@@ -93,7 +93,7 @@ export function advanceRun(run:MockRun):void {
  (run.reviews ||= []).push(run.snapshot.pending_review);
  if(run.snapshot.mode==='synthetic'&&db.settings.previewScenario==='blocked-worker'&&!run.previewBlockedInjected){run.previewBlockedInjected=true;run.snapshot.pending_review=null;run.snapshot.state='BLOCKED';run.snapshot.blocked_dependencies=['worker'];emit(run,'run.blocked','Worker unavailable. Retry the recorded dependency with unchanged accepted inputs.');}
  }
-  emit(run,'run.state_changed',`${run.snapshot.state}: synthetic practice replay`);run.stage++;
+  run.stage++;emit(run,'run.state_changed',`${run.snapshot.state}: synthetic practice replay`);
   if(run.stage===6&&!run.snapshot.rover_revision_id&&run.snapshot.state!=='BLOCKED')void finishPassport(run);
  }
 }

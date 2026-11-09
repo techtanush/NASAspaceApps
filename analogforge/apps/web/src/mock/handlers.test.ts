@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { setupServer } from 'msw/node';
 import { handlers,dispatch,advanceRun } from './handlers';
 import { db,seed,resetDatabase,type MockRun } from './state';
+import * as persistedState from './state';
 import * as rendererBridge from '../api/mockBridge';
 import { SSEParser } from '../api/runStream';
 import type { components } from '../generated/schema';
@@ -118,4 +119,14 @@ it('run-scoped lists never match an unrelated completed run with no pending revi
   expect(rows.every(row=>row.run_id===second.snapshot.run_id)).toBe(true);
  }
  expect(dispatch('GET','/candidates?run_id=ffffffff-ffff-4fff-8fff-ffffffffffff',null).status).toBe(404);
+});
+
+it('persisted awaiting-review state cannot replay preparation or replace its review after reload',()=>{
+ let persisted:typeof db|undefined;
+ const emit=persistedState.emit;vi.spyOn(persistedState,'emit').mockImplementation((...args)=>{emit(...args);persisted=structuredClone(db);});
+ const run=boot();expect(persisted).toBeDefined();
+ const saved=persisted!.runs[run.snapshot.run_id]!;expect(saved.stage).toBe(6);
+ const review=saved.snapshot.pending_review?.review_id,sequence=saved.snapshot.last_event_seq;
+ Object.assign(db,structuredClone(persisted!));const restored=db.runs[run.snapshot.run_id]!;advanceRun(restored);
+ expect(restored.snapshot.pending_review?.review_id).toBe(review);expect(restored.snapshot.last_event_seq).toBe(sequence);expect(restored.reviews).toHaveLength(1);
 });

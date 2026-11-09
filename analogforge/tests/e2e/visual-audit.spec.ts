@@ -27,6 +27,8 @@ test('UIX-13 complete visual audit C01–C20',async({page})=>{
    await page.setViewportSize({width,height});await open();await expect(page.getByRole('dialog',{name:title,exact:true})).toBeVisible();
    await auditPage(page,name,{width,height,theme,density:'default',focus:true});
    if(await page.getByRole('dialog',{name:title,exact:true}).isVisible())await page.keyboard.press('Escape');
+   await expect(page.getByRole('dialog',{name:title,exact:true})).toBeHidden();
+   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   }
  };
  let crawlError:unknown=null;
