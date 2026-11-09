@@ -149,6 +149,10 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
  const filename=`${name}-${width}-${theme}-${density}${spacing?'-spacing':''}.png`;mkdirSync(resolve(root,'out/visual'),{recursive:true});writeFileSync(resolve(root,'out/visual',filename),screenshot);manifest.push({file:filename,screen:name,theme,density,width,height,sha256:hash(screenshot)});
  reports.push({screen:name,width,height,theme,density,findings,layoutShifts:facts.layoutShifts});if(spacingStyle)await spacingStyle.evaluate(node=>node.remove());return findings;
 }
+export async function auditStyleguide(page){
+ const result=await new AxeBuilder({page}).analyze();const findings=result.violations.filter(row=>['critical','serious'].includes(row.impact||'')).flatMap(row=>row.nodes.map(node=>({check:'C18',selector:node.target.join(' '),message:row.id+': '+node.failureSummary})));
+ reports.push({screen:'styleguide-accessibility',findings});return findings;
+}
 export async function auditGlyphs(page){
  const result=await page.evaluate(async()=>{
   const states=['PASS','PARTIAL','FAIL','GAP','UNKNOWN','PENDING'];const findings=[],masks=[];
