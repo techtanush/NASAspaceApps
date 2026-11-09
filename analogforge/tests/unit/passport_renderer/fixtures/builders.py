@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID
 
+from analogforge.ports.common import RuntimeMode
 from analogforge.ports.hashing import canonical_json_bytes, canonical_sha256
 from analogforge.ports.passport_renderer import PassportExportBundle
 
@@ -47,11 +48,11 @@ def metric(name: str, value: float | None, unit: str = "m", support: float = 60)
     )
 
 
-def build_bundle(name: str = "failed-with-replan") -> PassportExportBundle:
+def build_bundle(name: str = "failed-with-replan", *, mode_override: RuntimeMode | None = None) -> PassportExportBundle:
     """Author presentation data from S-RASTER-1, with explicit unknowns and gaps."""
     if name not in FIXTURE_NAMES:
         raise ValueError(f"Unknown fixture {name}")
-    mode = "replay" if name == "replay" else "synthetic"
+    mode = mode_override or ("replay" if name == "replay" else "synthetic")
     common: dict[str, Any] = dict(schema_version="1.0", workspace_id=uid(1), run_id=uid(2), mode=mode, created_at=TIME)
     preset = read_kit("missions/mission-mars-mobility.json")
     mission = dict(

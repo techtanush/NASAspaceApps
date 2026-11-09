@@ -107,3 +107,15 @@ it('passport publication is singleflight and the frozen passport identity cannot
  complete(Response.json({manifest_sha256:'b'.repeat(64)}));await vi.advanceTimersByTimeAsync(1);expect(run.snapshot.state).toBe('COMPLETED');expect(run.snapshot.passport_id).toBe(frozenId);for(let n=0;n<5;n++)advanceRun(run);expect(render).toHaveBeenCalledTimes(1);expect(run.snapshot.passport_id).toBe(frozenId);
  }finally{delete (window as Window&{__MSW__?:boolean}).__MSW__;render.mockRestore();}
 });
+
+it('run-scoped lists never match an unrelated completed run with no pending review',()=>{
+ const first=boot();first.snapshot.pending_review=null;first.snapshot.state='COMPLETED';
+ const second=boot();
+ for(const resource of ['candidates','qualifications','tests','agent-actions']){
+  const result=dispatch('GET',`/${resource}?run_id=${second.snapshot.run_id}`,null);
+  expect(result.status).toBe(200);
+  const rows=(result.body as {items:{run_id:string}[]}).items;
+  expect(rows.every(row=>row.run_id===second.snapshot.run_id)).toBe(true);
+ }
+ expect(dispatch('GET','/candidates?run_id=ffffffff-ffff-4fff-8fff-ffffffffffff',null).status).toBe(404);
+});
