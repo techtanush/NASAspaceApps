@@ -1,5 +1,7 @@
 import { afterEach,beforeEach,expect,it,vi } from 'vitest';
 import { writeFileSync } from 'node:fs';
+import Ajv2020 from 'ajv/dist/2020';
+import spec from '../../../../contracts/openapi.bundled.json';
 import { createHash } from 'node:crypto';
 import { setupServer } from 'msw/node';
 import { handlers,dispatch,advanceRun } from './handlers';
@@ -9,6 +11,7 @@ import { SSEParser } from '../api/runStream';
 import type { components } from '../generated/schema';
 type S=components['schemas'];
 const scenarioArtifacts:Record<string,Record<string,unknown>>={};
+const validateEvent=new Ajv2020({strict:false,validateFormats:false}).compile({components:spec.components,$ref:'#/components/schemas/RunEvent'});
 const post=(path:string,body:unknown)=>dispatch('POST',path,body,new Headers({'Idempotency-Key':crypto.randomUUID()}));
 function boot(body:'MARS'|'MOON'='MARS',roverName:string|null='ARES-1',scenario='synthetic-mars-mobility-v1'):MockRun {
  const preset=seed.missionPresets[body];const {forbidden_actions:_actions,...draft}=preset;void _actions;
@@ -20,13 +23,13 @@ function boot(body:'MARS'|'MOON'='MARS',roverName:string|null='ARES-1',scenario=
  const created=post('/runs',{mission_revision_id:revisionId,rover_revision_id:rover?.id||null,mode:'synthetic',dataset_lock_id:'practice-lock-v1',scenario_config_id:scenario}).body as S['CommandAccepted'];
  const run=db.runs[created.run_id]!;for(let i=0;i<6;i++)advanceRun(run);return run;
 }
-beforeEach(()=>resetDatabase());
-afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();});
+beforeEach(()=>{let identifier=4096;vi.spyOn(crypto,'randomUUID').mockImplementation(()=>`00000000-0000-4000-8000-${(++identifier).toString(16).padStart(12,'0')}`);resetDatabase();});
+afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();vi.restoreAllMocks();});
 it('all43: real MSW GET events streams ordered replay and larger Last-Event-ID cursor with terminal close',async()=>{
  const run=boot();run.snapshot.state='COMPLETED';const server=setupServer(...handlers);server.listen({onUnhandledRequest:'error'});
  try{
   const response=await fetch(`http://localhost/api/v1/runs/${run.snapshot.run_id}/events?after=0`,{headers:{'Last-Event-ID':'2'}});expect(response.status).toBe(200);expect(response.headers.get('Content-Type')).toBe('text/event-stream');
-  const received:S['RunEvent'][]=[];const parser=new SSEParser(message=>received.push(JSON.parse(message.data) as S['RunEvent']));parser.feed(await response.text());expect(received.length).toBeGreaterThan(0);expect(received[0]!.seq).toBe(3);expect(received.map(e=>e.seq)).toEqual(run.events.filter(e=>e.seq>2).map(e=>e.seq));expect(received.every(e=>e.run_id===run.snapshot.run_id)).toBe(true);
+  const received:S['RunEvent'][]=[];const parser=new SSEParser(message=>received.push(JSON.parse(message.data) as S['RunEvent']));parser.feed(await response.text());expect(received.length).toBeGreaterThan(0);expect(received[0]!.seq).toBe(3);expect(received.map(e=>e.seq)).toEqual(run.events.filter(e=>e.seq>2).map(e=>e.seq));expect(received.every(e=>e.run_id===run.snapshot.run_id)).toBe(true);for(const event of received)expect(validateEvent(event),JSON.stringify(validateEvent.errors)).toBe(true);
   const expired=await fetch(`http://localhost/api/v1/runs/${run.snapshot.run_id}/events?after=-1`);expect(expired.status).toBe(410);expect(await expired.json()).toMatchObject({error:{code:'EVENT_CURSOR_EXPIRED'}});
  }finally{server.close();}
 });

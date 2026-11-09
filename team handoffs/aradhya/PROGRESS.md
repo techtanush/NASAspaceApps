@@ -1,17 +1,24 @@
-# Aradhya build progress
+# Aradhya frontend handoff
 
-Repo branch aradhya/frontend-experience. Base36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0. Kitmaterialized/read-only; correctownedpaths. No commits/push yet. Gitpushdryrun succeeds.
+Implementation checkpoint: `106c91d` on `aradhya/frontend-experience`, based on `36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0`.
 
-Environment pinned Node22.21.1/pnpm10.22.0 via PATH /Users/aradhyamishra/.npm/_npx/35c91942bfecc55d/node_modules/.bin, Python3.12.13 in analogforge/.venv. Chrome installed app headless executable configured. Kit20 tests+token150 pass.
+The branch implements S01–S12, the component styleguide, typed API/session transport, revision-safe commands, SSE recovery, a persistent synthetic preview, planetary and Earth display panels, and the pure Python passport renderer. Development exports call the real renderer. The production build rejects mock mode and excludes the worker and styleguide.
 
-All UI/API/mock/renderer built, productionbuild passes, type/lintpass. Renderer independentattacks fixed: canonicalJSON, staleauditinputbinding, all evidence references, SVGprocessinginstructions. Renderer+contract105pass beforeadditionalCSVheaderregression; CSVheader nowplainfrozencolumns.9bundlesx3realexports. Mockdynamicexports use devonlyVitePythonbridge, exactruntimebundle/fileshashes andPythoncanonicalmanifest. ActualpreparedPNGdisplayfixtures andallscienceartifactmodels nowimplemented+validated.
+Observed checks at this checkpoint:
 
-Independent reviewers: renderer4findingsfixed; state6findingsfixed (externalwrongrunprobeexpectsresolutionbutnowcorrectlyrejects; actualbrowserreloadpendingtest underway); truth5attacktestsnowpass; accessibility4findingsfixedinclasyncrunheadingfocus anddisabledreasons. Needfinalfollow-upvalidation.
+- 128 Python kit/renderer/contract tests pass.
+- 71 frontend unit tests and the dedicated 3-test client/mock contract suite pass.
+- TypeScript, ESLint, Ruff and strict mypy pass.
+- Production build and production resource audit pass.
+- Frozen kit verification and branch ownership pass.
+- Tokens pass 150/150; generated CSS and API client regenerate identically.
+- Export self-test verifies 27 files and rejects 27 tampered files.
+- A fresh clone with no node_modules/dist/out installs with the frozen lockfile. Its Python suite passes 128 tests; remaining clean-clone results are recorded in STATUS when complete.
 
-Initial13journeys10pass; J01CSVfixed, J02graphandJ08offlinefixed. ParentJ01rerunsinterruptedHMR whileUIbeingedited; needsstablefinalrerun. Parentcontractedges4/4pass (approve/reject/retry/portfolio). Journey_checks agentownsJ02-J13,a11y,webgltests strengtheningrealmode/keyboard/zoom/reload. UIagentownsfullvisualtest+screens+allUI; APIagentfinishespublication-singleflightbug andsame-sourceassertions. ParentownsJ01/support/config/mutation/audittools/status.
+Independent adversarial reviews found and prompted fixes for canonical JSON validation, dangling evidence references, SVG processing instructions, stale assurance binding, event replay/reload isolation, publication single-flight, scientific mock truth, asynchronous heading focus, field labels and drawer behavior. Five independent truth attacks pass after the fixes. Renderer attacks now raise typed errors for malformed/noncanonical manifests, unresolved evidence, unsafe SVG and stale audit identity; 50 supplied attempts remain visible.
 
-DesignsmokeS01+styleguideboth themes1440/390passes0findings. FullvisualcrawlUIagentactive. Needallrequiredscreens6viewports2themes, full36mutations,3freshdesignreviewers, wholefrozengates, runtime81hookcoverage, cleanrebuild, ownership/secretchecks, finalstatus/commit/push. Mutationunit12allkilledincludingfixedM5optimismprobeandM16assertionclassification. Helpersapi6andrenderer9previouslyallkilled; fullre-runneededafterchanges.
+The final serial browser gate, full visual audit, full 36-mutant catalog and three fresh design reviews are in progress. STATUS.json remains the authoritative completion record. All reports are generated beneath analogforge/out and excluded from Git; the six permitted styleguide screenshots are committed.
 
-Diskpressure: Macswap9.6GB, availablebriefly0; onlytaskdownloadedduplicatepnpmcache anduvwheelcache pruned withCLIs, nosource/personalfiledeletion. Browserrunsmustserialize; journeyagentinitiallylaunched2commands+UIvisual. Parentedgefinishedclosed; instructedagentsserialize. StopparentpersistentVitesession46270 beforeisolatedbrowsermutants (5176). Metadataexcludesanalogforge/out soartifactsgeneratednotcommitted. STATUS.json hascontradictions/environmentdraft. Keepactualevidencehonest.
+Real backend journeys belong to the merging agent's MRG-03 gate. This branch has no real backend, dataset credentials or physical rover evidence. Synthetic success is not a claim of scientific validation or production readiness.
 
-Latest:128Python tests pass;55frontendunit tests pass; renderer9mutantsre-killed;4edgeflows pass; actualmidverificationbrowserreload mechanics nowPASS8.4s retainingfirstresultID+3uniqueattempts; strictTab-only390px and720CSS/deviceScale2zoom mechanicsPASS. ProductionpublicMSWleakfixedwithstaticemitplugin +regressionpass; productionauditliteralURLsclassifiedmetadata/docs,noforeignresources. ParentrequestAJVhook validatesallactualUImutations; RoverRevisionInput.profile mismatchfixedbyUI. Fullvisualremaining; browserrunsserialized. Needwholefinalsuiteandfull36mutationrun, hook81aggregatedandfreshdesignreview3agents.
+See DECISIONS.md for frozen-contract contradictions and audit measurement decisions. No other owner's implementation or frozen architecture/kit source was changed.

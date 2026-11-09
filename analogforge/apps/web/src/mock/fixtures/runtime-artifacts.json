@@ -1,8 +1,8 @@
 {
-  "5ca01ffcc22e07eeb96139f6991be88c682fe3040bdd6b2ff526588d71afa75a": {
+  "7474bf104317c21c339607c48bfc970aec8df851d243f451b71cf6e514a8191c": {
     "operation": "CHARACTERIZE_TARGET",
     "profile_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "metrics": [
       {
@@ -54,7 +54,7 @@
       }
     ]
   },
-  "b2ca96ff73d552c91aabd6f27f89b7bf0ed6ca4b3855543699beca4c2d47f96c": {
+  "c69911ad48bdf0de76f3b30a26f0e01d88ef59eb16dfc057b6505c710d353266": {
     "operation": "SCREEN_CANDIDATES",
     "screened_count": 9,
     "windows": [
@@ -84,7 +84,7 @@
         },
         "is_negative_control": false,
         "evidence": {
-          "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
         }
       },
       {
@@ -113,7 +113,7 @@
         },
         "is_negative_control": false,
         "evidence": {
-          "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
         }
       },
       {
@@ -142,7 +142,7 @@
         },
         "is_negative_control": false,
         "evidence": {
-          "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
         }
       },
       {
@@ -171,7 +171,7 @@
         },
         "is_negative_control": true,
         "evidence": {
-          "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
         }
       },
       {
@@ -200,7 +200,7 @@
         },
         "is_negative_control": false,
         "evidence": {
-          "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
         }
       },
       {
@@ -229,7 +229,7 @@
         },
         "is_negative_control": false,
         "evidence": {
-          "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
         }
       },
       {
@@ -334,10 +334,10 @@
       "SYNTHETIC PRACTICE DATA — not terrain of this location"
     ]
   },
-  "1fc859e636e0d140f5f1bcbc19bc771d3b43da0fcfa6fb572b3f72632676eaa8": {
+  "4e7a1400e46fbf4c56c3017252692831b14773580679c84ed1d8b929e57882a2": {
     "operation": "ANALYZE_CANDIDATE",
     "analysis_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "analysis_grid_artifact_key": null,
     "metrics": [
@@ -398,10 +398,10 @@
       "Access and permissions not assessed"
     ]
   },
-  "0bf89656a8af7f5ddc45a1789bf16ba4b9b87d6be8b73f1b38825c277cf4cc35": {
+  "8fd748d27da5442b06c9d163a2626e5560f4ef502ae0156897ea745f3e6174c3": {
     "operation": "ANALYZE_CANDIDATE",
     "analysis_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "analysis_grid_artifact_key": null,
     "metrics": [
@@ -462,10 +462,10 @@
       "Access and permissions not assessed"
     ]
   },
-  "259f3c96658d3d8f9772ba8d2b34e4eb4fd3502814ffefe0cfd95848b9e19e60": {
+  "ed94c1c61896485a9ea8c51fb868d75099ef2624eb56b4bbb3063675befcdc50": {
     "operation": "ANALYZE_CANDIDATE",
     "analysis_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "analysis_grid_artifact_key": null,
     "metrics": [
@@ -526,10 +526,10 @@
       "Access and permissions not assessed"
     ]
   },
-  "68780e959521eb8b986113bca8d22e8083d95c965bc0f467f28fb73b974bc96c": {
+  "13c9ae662f3a2a550bb3867661f3b090c9952b25eb6938465c33847c5ec5364f": {
     "operation": "ANALYZE_CANDIDATE",
     "analysis_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "analysis_grid_artifact_key": null,
     "metrics": [
@@ -590,10 +590,10 @@
       "Access and permissions not assessed"
     ]
   },
-  "5fcb5c8afe9f67d80ca6c32dd575969c22a43e6be8ba5aed1e27cf0dd4d7de4e": {
+  "fc64c510d9830e34bb75ab40269003ed0f39e57588c2070b7d3246aa54a71a98": {
     "operation": "ANALYZE_CANDIDATE",
     "analysis_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "analysis_grid_artifact_key": null,
     "metrics": [
@@ -654,10 +654,10 @@
       "Access and permissions not assessed"
     ]
   },
-  "663922ac35e4c4027b548e3e072d11579d259c957eb37b3b3a57eb2e0bc58471": {
+  "de365aedce3e6e64e6b03d9e1d18481ceae3b3f98d7b843297483536da442664": {
     "operation": "ANALYZE_CANDIDATE",
     "analysis_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "analysis_grid_artifact_key": null,
     "metrics": [
@@ -746,7 +746,7 @@
       }
     }
   },
-  "9cfc466c2e80f1f5f314ddc4cb278043517e4c09233c8656efa166d3fa01f542": {
+  "2504354bc4034e1ac8da1acc223d49118f3eb6de72bbd6649f294620c46c562d": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-SLOPE-AVAILABILITY",
     "proposed_status": "PASS",
@@ -763,7 +763,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "slope-band-area-fraction-v1",
@@ -772,7 +772,7 @@
       "validation_level": "S0"
     }
   },
-  "9069a958461497d3e265a0ac2db34937498c64b15d3bee6539c6875fc7b517c7": {
+  "399d7000cdb2e620b2783a6cda3100aadaa093ed6eb8321a65745307914729ea": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-TARGET-SLOPE-CONTEXT",
     "proposed_status": "PASS",
@@ -789,7 +789,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "slope-w1-common-support-v1",
@@ -798,7 +798,7 @@
       "validation_level": "S0"
     }
   },
-  "4893461decec5ba0081e829a75de1d3fc7b60e109693a557b65cf97356997be3": {
+  "ca31c682181ac4e36ec78ecfa88540a187f3c99e01266b4442f70a560163d4db": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-EXPOSURE",
     "proposed_status": "UNKNOWN",
@@ -815,7 +815,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -824,7 +824,7 @@
       "validation_level": "S0"
     }
   },
-  "d19d8d817126eb5b200938c36cd17066badf31bee13e7a0ae13c5aae034bf2c6": {
+  "bf1ce9330de52f27d75e9cb0a180c2de69273eb94965bb39015e7def2ac21f07": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-TASKS",
     "proposed_status": "UNKNOWN",
@@ -841,7 +841,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -850,7 +850,7 @@
       "validation_level": "S0"
     }
   },
-  "93a7d7e42d136af364cebb00eea75de0097db6bf298a6bd55f2dce5940504cf3": {
+  "7143c7040e70036c6a5f38f1470b00b737553aa0265442e5799423fa885734d3": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-RESERVE",
     "proposed_status": "UNKNOWN",
@@ -867,7 +867,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -876,7 +876,7 @@
       "validation_level": "S0"
     }
   },
-  "f4cd254c7ced4a36ac04eb8a47759a1f30beb1e3f8dfe8195733122e7e357552": {
+  "7f4a9f549af0f61679b0eb329e91064e0926463847c333dbe93a6bb8e20e0b5b": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-MINERAL",
     "proposed_status": "UNKNOWN",
@@ -893,7 +893,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "emit-mineral-presence-v1",
@@ -902,7 +902,7 @@
       "validation_level": "S0"
     }
   },
-  "d5d34d02d5f26928ddfb12ad80a48a5487de0c88a59418bda8644c2f220b7237": {
+  "522b9fd49b36bca78e134ab77cecd32b2dc533ea8877a86aafb875792e02af86": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-CLEARANCE",
     "proposed_status": "UNKNOWN",
@@ -919,7 +919,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -928,7 +928,7 @@
       "validation_level": "S0"
     }
   },
-  "b293ada89da13bf2ff79009717b859ac66d926e03029f5d96e793d2a322e7538": {
+  "64ebef33616c0db7675c36831df3ed074ba67fd2415a34c2368d3f01d24d5066": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-GRAVITY",
     "proposed_status": "GAP",
@@ -945,7 +945,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -954,7 +954,7 @@
       "validation_level": "S0"
     }
   },
-  "8902925550a188be7ead07309d250d5e2a360b3b43b6add79a2d04e58e2444ea": {
+  "ba5e7ac60ef4be9df0f084568a12435212edb03be548257758a3a1dd17fb6366": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-ATMOSPHERE",
     "proposed_status": "GAP",
@@ -971,7 +971,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -980,7 +980,7 @@
       "validation_level": "S0"
     }
   },
-  "6fc96dc8f38d1788b6714f4bb8d97e1f86b0cd64fdf737f0c42050ac969c0e1d": {
+  "1e1762c2cfc81f02ddba26a85b64c14902503138c24b4fe1d2bcf0537c85ef8d": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-SLOPE-AVAILABILITY",
     "proposed_status": "PASS",
@@ -997,7 +997,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "slope-band-area-fraction-v1",
@@ -1006,7 +1006,7 @@
       "validation_level": "S0"
     }
   },
-  "05eb6dd3463454d5fa7031f1191230e0a0583b30b6b9fe6e767e8793d40c1ce2": {
+  "e9d0bbee3ced1ece82610b46de0aa54b967cd15d18a827a7d0c2d57bfdea08d8": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-TARGET-SLOPE-CONTEXT",
     "proposed_status": "PASS",
@@ -1023,7 +1023,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "slope-w1-common-support-v1",
@@ -1032,7 +1032,7 @@
       "validation_level": "S0"
     }
   },
-  "16bce2f53ddfd42bd3219c9f40d1b1958e938a5a9c7c72e360393dbb5388359f": {
+  "d6b803ac04deefd856632c00301befc2b3c7c19cf849460da5d96a75c3f463b0": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-SLOPE-AVAILABILITY",
     "proposed_status": "PASS",
@@ -1049,7 +1049,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "slope-band-area-fraction-v1",
@@ -1058,7 +1058,7 @@
       "validation_level": "S0"
     }
   },
-  "154a207a2661e647a3170f0612b2dcb53ffc14f76b398c9e86ceeafea9bf1c68": {
+  "f9fd6cde7c68b063f6809b31f692c7408ec3f808a5ec466acb961c41fdc83705": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-TARGET-SLOPE-CONTEXT",
     "proposed_status": "PASS",
@@ -1075,7 +1075,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "slope-w1-common-support-v1",
@@ -1084,7 +1084,7 @@
       "validation_level": "S0"
     }
   },
-  "61b716f8e20ee0078762e6a7ee30bbe2d705d8f9a825fbc62e41d198808ffcfd": {
+  "940f3f8c45ff5545bd34ff160f8f8386a25654b6d54ed0ceb489403ed486d061": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-SLOPE-AVAILABILITY",
     "proposed_status": "FAIL",
@@ -1101,7 +1101,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "slope-band-area-fraction-v1",
@@ -1110,7 +1110,7 @@
       "validation_level": "S0"
     }
   },
-  "efbd0e710615c227a74a0c2a9a599a14dca3a1cfb40f60d37159775a358af449": {
+  "02a3270674d7c71c191fa2ddb03c5e1823b6c43698843325dcec1fb866871631": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-TARGET-SLOPE-CONTEXT",
     "proposed_status": "FAIL",
@@ -1127,7 +1127,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "slope-w1-common-support-v1",
@@ -1136,7 +1136,7 @@
       "validation_level": "S0"
     }
   },
-  "991c3789705ce556c08ecea37b44796fa199a4e3657d7360db778470122222a0": {
+  "ebb4e022c327475729013d40916c992527942e4e7c36a13d2d26bae55c5d4220": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-SLOPE-AVAILABILITY",
     "proposed_status": "FAIL",
@@ -1153,7 +1153,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "slope-band-area-fraction-v1",
@@ -1162,7 +1162,7 @@
       "validation_level": "S0"
     }
   },
-  "df717871ddabf42da6d3317ee7305fb275f6bfad7c0ea175f02d446a5df65c1a": {
+  "072d66db086ece0580ca701994fbe9d18be5282007ea86445a38d8cb46b7110a": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-TARGET-SLOPE-CONTEXT",
     "proposed_status": "FAIL",
@@ -1179,7 +1179,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "slope-w1-common-support-v1",
@@ -1188,7 +1188,7 @@
       "validation_level": "S0"
     }
   },
-  "ceec94bf1e482ac3ba45a583d0355174f792e99fa95ea9a29f5b90692e336f08": {
+  "c467100a668b28a5da266b19d42e6a827545ef59d8a8ed222ebffbf130ffa6c9": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-SLOPE-AVAILABILITY",
     "proposed_status": "FAIL",
@@ -1205,7 +1205,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "adequacy": {
       "observable_policy_id": "slope-band-area-fraction-v1",
@@ -1214,13 +1214,13 @@
       "validation_level": "S0"
     }
   },
-  "c8fe13e1b086234bb2fd8cfb835af8fdc01eb4f02b85cd33fcbadf73e102bb79": {
-    "issue_id": "23f866a9-91c7-48f1-aa50-d0ab81471dfe",
-    "run_id": "c6b93ede-2188-4348-b146-477544f9725b",
-    "candidate_id": "05de0d11-d4f5-4682-b8fa-e98ca1b2a438",
+  "c071397d690f4a381d313b5405be32fa1fc37cfd0eb7914258970e6c44519d20": {
+    "issue_id": "00000000-0000-4000-8000-0000000010c3",
+    "run_id": "00000000-0000-4000-8000-000000001027",
+    "candidate_id": "00000000-0000-4000-8000-00000000102a",
     "requirement_id": "R-TARGET-SLOPE-CONTEXT",
     "target_evidence_ids": [
-      "6d17c33a-0c3b-4940-a378-3bba74156b12"
+      "00000000-0000-4000-8000-000000001084"
     ],
     "reason_code": "SCALE_MISMATCH",
     "severity": "BLOCKING",
@@ -1229,13 +1229,13 @@
     "repair_request": "Cite the 480 m common-support comparison evidence",
     "resolution_evidence_ids": []
   },
-  "bbb8d8cd2e38746e5d9b134d9b6a26d5edacbb70e7e9c11c6f5ed4d7a4dc1135": {
-    "issue_id": "9c125ec7-c1d9-4123-9e04-5ef50b714290",
-    "run_id": "c6b93ede-2188-4348-b146-477544f9725b",
-    "candidate_id": "05de0d11-d4f5-4682-b8fa-e98ca1b2a438",
+  "1b9344e61d4168df8da743f2288fa2c99a53eb8b4e3c6d32c18150c72df5158b": {
+    "issue_id": "00000000-0000-4000-8000-0000000010c4",
+    "run_id": "00000000-0000-4000-8000-000000001027",
+    "candidate_id": "00000000-0000-4000-8000-00000000102a",
     "requirement_id": "R-TARGET-SLOPE-CONTEXT",
     "target_evidence_ids": [
-      "6d17c33a-0c3b-4940-a378-3bba74156b12"
+      "00000000-0000-4000-8000-000000001084"
     ],
     "reason_code": "SCALE_MISMATCH",
     "severity": "BLOCKING",
@@ -1243,23 +1243,23 @@
     "summary": "60 m evidence cannot support the accepted 480 m comparison. Correct common-support evidence required.",
     "repair_request": "Cite the 480 m common-support comparison evidence",
     "resolution_evidence_ids": [
-      "6d17c33a-0c3b-4940-a378-3bba74156b12"
+      "00000000-0000-4000-8000-000000001084"
     ]
   },
-  "f18613737bda5b386b88d1e607d649afefe5241705a12a7930fe656879a423a0": {
+  "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b": {
     "schema_version": "1.0",
     "artifact_kind": "RASTER_ROUTE_TEST",
     "mode": "synthetic",
     "resource_provider": "PHYSICAL_EARTH_MODEL",
-    "mission_revision_id": "fda816ce-7094-4600-a518-19750a1d1644",
+    "mission_revision_id": "00000000-0000-4000-8000-000000001016",
     "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
-    "rover_revision_id": "1c7796ef-9c8f-4ab1-b354-0055aac5da51",
+    "rover_revision_id": "00000000-0000-4000-8000-000000001020",
     "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
     "candidate_window_id": "grid-r0c1",
     "test_revision": 1,
     "strategy": "WAYPOINT_RETURN",
     "grid": {
-      "analysis_evidence_id": "46fe0e9d-21b0-46dd-a1f4-c73ebcff3ef2",
+      "analysis_evidence_id": "00000000-0000-4000-8000-00000000106f",
       "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
       "crs_wkt": "EPSG:32612",
       "cell_size_m": 60,
@@ -1413,22 +1413,22 @@
       }
     ]
   },
-  "899a181f71e1dea88c3a10c1c45b763e7636ee40f0a838862ee030847d6d3909": {
+  "47f919a6a3db0ddc6bba307b87a874bfc8cd13ef3044feb8a836d1f424f22c17": {
     "operation": "DESIGN_BENCHMARK",
     "constraints": {
       "schema_version": "1.0",
       "artifact_kind": "RASTER_ROUTE_TEST",
       "mode": "synthetic",
       "resource_provider": "PHYSICAL_EARTH_MODEL",
-      "mission_revision_id": "fda816ce-7094-4600-a518-19750a1d1644",
+      "mission_revision_id": "00000000-0000-4000-8000-000000001016",
       "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
-      "rover_revision_id": "1c7796ef-9c8f-4ab1-b354-0055aac5da51",
+      "rover_revision_id": "00000000-0000-4000-8000-000000001020",
       "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
       "candidate_window_id": "grid-r0c1",
       "test_revision": 1,
       "strategy": "WAYPOINT_RETURN",
       "grid": {
-        "analysis_evidence_id": "46fe0e9d-21b0-46dd-a1f4-c73ebcff3ef2",
+        "analysis_evidence_id": "00000000-0000-4000-8000-00000000106f",
         "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
         "crs_wkt": "EPSG:32612",
         "cell_size_m": 60,
@@ -1533,8 +1533,8 @@
         "An unspecified rover maximum route uses the recorded 8000 m design default"
       ]
     },
-    "constraints_artifact_key": "f18613737bda5b386b88d1e607d649afefe5241705a12a7930fe656879a423a0",
-    "constraints_sha256": "f18613737bda5b386b88d1e607d649afefe5241705a12a7930fe656879a423a0",
+    "constraints_artifact_key": "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b",
+    "constraints_sha256": "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b",
     "required_exposures": [
       {
         "requirement_id": "R-EXPOSURE",
@@ -1616,11 +1616,11 @@
     ],
     "blockers": []
   },
-  "79eb3eb0655b055c53dffea3a54a858fbdc8c9bae5d3aa0b100d50231c68636b": {
+  "3d94c59986d3c84cd0a702a6a81d395f6c3fe9df05afce3edf404f19b9736f3c": {
     "schema_version": "1.0",
     "route_key": "grid-r0c1-attempt-1",
     "mode": "synthetic",
-    "constraints_sha256": "f18613737bda5b386b88d1e607d649afefe5241705a12a7930fe656879a423a0",
+    "constraints_sha256": "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b",
     "strategy": "WAYPOINT_RETURN",
     "graph_revision": "synthetic-practice-grid-v1",
     "node_sequence": [
@@ -1671,14 +1671,14 @@
       }
     }
   },
-  "39c74826419353491b519cb14a9c60f22054302ef1bb6cb128e3090fd4f2a815": {
+  "7b2fb5515319fe22e5b2bd5248e9978a2bda444901b623f713a2c102a71e8b80": {
     "operation": "SEARCH_ROUTE",
     "search_status": "FOUND",
     "route": {
       "schema_version": "1.0",
       "route_key": "grid-r0c1-attempt-1",
       "mode": "synthetic",
-      "constraints_sha256": "f18613737bda5b386b88d1e607d649afefe5241705a12a7930fe656879a423a0",
+      "constraints_sha256": "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b",
       "strategy": "WAYPOINT_RETURN",
       "graph_revision": "synthetic-practice-grid-v1",
       "node_sequence": [
@@ -1729,8 +1729,8 @@
         }
       }
     },
-    "route_artifact_key": "79eb3eb0655b055c53dffea3a54a858fbdc8c9bae5d3aa0b100d50231c68636b",
-    "route_sha256": "79eb3eb0655b055c53dffea3a54a858fbdc8c9bae5d3aa0b100d50231c68636b",
+    "route_artifact_key": "3d94c59986d3c84cd0a702a6a81d395f6c3fe9df05afce3edf404f19b9736f3c",
+    "route_sha256": "3d94c59986d3c84cd0a702a6a81d395f6c3fe9df05afce3edf404f19b9736f3c",
     "counters": {
       "expansions": 150,
       "labels_created": 200,
@@ -1742,7 +1742,7 @@
     "optimistic_exposure_bound_m": {},
     "termination_reason": "EXPOSURE_SHORTFALL"
   },
-  "7a2ed9eeeb9b16ef613c9f0bffbb46ca6b4a19ba0633132f0feb67f6eae8d126": {
+  "83047f7f134a041c74d47e3f2d4762ae598a0301e38204d49f4d560733fe1e36": {
     "operation": "DIAGNOSE_RESULT",
     "primary_category": "ROUTE",
     "secondary_categories": [],
@@ -1757,15 +1757,15 @@
     "proof_scope": "evaluated route only",
     "explanation": "EXPOSURE_SHORTFALL",
     "diagnosis_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     }
   },
-  "29d51089aa013533b918e91bcd6a3b7484c2e7de50ec7c6505f0a6a623d8b705": {
+  "1f2837bfb68e1e0fed394aa88934c089d16ad7dde9b75680ac03d4b2533a8236": {
     "operation": "VERIFY_ROUTE",
     "outcome": "FAIL",
     "failure_category": "ROUTE",
     "search_status": "FOUND",
-    "verified_route_sha256": "79eb3eb0655b055c53dffea3a54a858fbdc8c9bae5d3aa0b100d50231c68636b",
+    "verified_route_sha256": "3d94c59986d3c84cd0a702a6a81d395f6c3fe9df05afce3edf404f19b9736f3c",
     "metrics": [
       {
         "metric_id": "route_distance_m",
@@ -1865,7 +1865,7 @@
     ],
     "telemetry_artifact_key": "telemetry",
     "verification_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "limitations": [
       "Modeled terrain-feasibility verification — not physical rover execution",
@@ -1874,10 +1874,10 @@
       "Changed elements: none"
     ]
   },
-  "74a4dc3f3babc4fe0c57ee29da884f7c1827dc2e1b32e138b438b603e9126369": {
+  "3e8a993baf3323c547aad3278586e542c0fc5dc78e77708ee527e8538a967214": {
     "schema_version": "1.0",
-    "route_sha256": "79eb3eb0655b055c53dffea3a54a858fbdc8c9bae5d3aa0b100d50231c68636b",
-    "constraints_sha256": "f18613737bda5b386b88d1e607d649afefe5241705a12a7930fe656879a423a0",
+    "route_sha256": "3d94c59986d3c84cd0a702a6a81d395f6c3fe9df05afce3edf404f19b9736f3c",
+    "constraints_sha256": "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b",
     "samples": [
       {
         "index": 0,
@@ -1922,7 +1922,7 @@
       }
     ]
   },
-  "ccf54132f820459373eb9e9654230c31aeca36527f4fdf1f54614baec5debfed": {
+  "a82c28cbd52c314f2e8195a45195a3cc8658aaeaccc1f92a1823a0d2175754d3": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-EXPOSURE",
     "proposed_status": "FAIL",
@@ -1939,7 +1939,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "c0aab4fa-0246-46a2-9133-12b3a7b54631"
+      "evidence_id": "00000000-0000-4000-8000-00000000110c"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -1948,7 +1948,7 @@
       "validation_level": "S0"
     }
   },
-  "e1bc2eee9e6d61e10789c34724510e32629fc806427eabfc78fca2b3c824fc0c": {
+  "093842748bf9b01778b552f133c1621500c1e2cec7fbb1d75f0299652432a426": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-TASKS",
     "proposed_status": "PASS",
@@ -1965,7 +1965,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "c0aab4fa-0246-46a2-9133-12b3a7b54631"
+      "evidence_id": "00000000-0000-4000-8000-00000000110c"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -1974,7 +1974,7 @@
       "validation_level": "S0"
     }
   },
-  "1db19e08097f265f42f783be68651c4ae0e0247817d4da5bfbc1d6de5fe51c25": {
+  "15f5fb0afb74bf95d27ed534eb1e66508c33d26fecd2e530f080dc9525cb69a5": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-RESERVE",
     "proposed_status": "PASS",
@@ -1991,7 +1991,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "c0aab4fa-0246-46a2-9133-12b3a7b54631"
+      "evidence_id": "00000000-0000-4000-8000-00000000110c"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -2000,20 +2000,20 @@
       "validation_level": "S0"
     }
   },
-  "e74c115d6b177f51b40cc6950820c50e56114b734b6de8ff3849f16933e14c61": {
+  "807a8e32766a39a87c6ff34f7a60aa6da7139b53186bb30cde9acba3879bd7e7": {
     "schema_version": "1.0",
     "artifact_kind": "RASTER_ROUTE_TEST",
     "mode": "synthetic",
     "resource_provider": "PHYSICAL_EARTH_MODEL",
-    "mission_revision_id": "fda816ce-7094-4600-a518-19750a1d1644",
+    "mission_revision_id": "00000000-0000-4000-8000-000000001016",
     "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
-    "rover_revision_id": "1c7796ef-9c8f-4ab1-b354-0055aac5da51",
+    "rover_revision_id": "00000000-0000-4000-8000-000000001020",
     "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
     "candidate_window_id": "grid-r0c1",
     "test_revision": 2,
     "strategy": "EXPOSURE_COVERAGE",
     "grid": {
-      "analysis_evidence_id": "46fe0e9d-21b0-46dd-a1f4-c73ebcff3ef2",
+      "analysis_evidence_id": "00000000-0000-4000-8000-00000000106f",
       "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
       "crs_wkt": "EPSG:32612",
       "cell_size_m": 60,
@@ -2118,22 +2118,22 @@
       "An unspecified rover maximum route uses the recorded 8000 m design default"
     ]
   },
-  "dc2fe5b3bcf69125c5fd8922c4c8d6ddde6c1270d97aeb513db0ed64afe4259a": {
+  "7ed4333ff7d4f29cd6001a3a8e3bfe639822f238d36f7997bcc2846f00c43524": {
     "operation": "DESIGN_BENCHMARK",
     "constraints": {
       "schema_version": "1.0",
       "artifact_kind": "RASTER_ROUTE_TEST",
       "mode": "synthetic",
       "resource_provider": "PHYSICAL_EARTH_MODEL",
-      "mission_revision_id": "fda816ce-7094-4600-a518-19750a1d1644",
+      "mission_revision_id": "00000000-0000-4000-8000-000000001016",
       "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
-      "rover_revision_id": "1c7796ef-9c8f-4ab1-b354-0055aac5da51",
+      "rover_revision_id": "00000000-0000-4000-8000-000000001020",
       "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
       "candidate_window_id": "grid-r0c1",
       "test_revision": 2,
       "strategy": "EXPOSURE_COVERAGE",
       "grid": {
-        "analysis_evidence_id": "46fe0e9d-21b0-46dd-a1f4-c73ebcff3ef2",
+        "analysis_evidence_id": "00000000-0000-4000-8000-00000000106f",
         "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
         "crs_wkt": "EPSG:32612",
         "cell_size_m": 60,
@@ -2238,8 +2238,8 @@
         "An unspecified rover maximum route uses the recorded 8000 m design default"
       ]
     },
-    "constraints_artifact_key": "e74c115d6b177f51b40cc6950820c50e56114b734b6de8ff3849f16933e14c61",
-    "constraints_sha256": "e74c115d6b177f51b40cc6950820c50e56114b734b6de8ff3849f16933e14c61",
+    "constraints_artifact_key": "807a8e32766a39a87c6ff34f7a60aa6da7139b53186bb30cde9acba3879bd7e7",
+    "constraints_sha256": "807a8e32766a39a87c6ff34f7a60aa6da7139b53186bb30cde9acba3879bd7e7",
     "required_exposures": [
       {
         "requirement_id": "R-EXPOSURE",
@@ -2340,7 +2340,7 @@
     },
     "termination_reason": "Unreachable slope band enclosed by water moat"
   },
-  "c70ed46f01f2f1e6bd5b8686f8f3e86b0bd9ed4e4cf42c4a3c679a9945eb87f9": {
+  "20e5560e70363183bda479933d7c2a61ad5801927fd7ac5435478b0c96a7346c": {
     "operation": "DIAGNOSE_RESULT",
     "primary_category": "ANALOG",
     "secondary_categories": [],
@@ -2355,10 +2355,10 @@
     "proof_scope": "discrete candidate domain under frozen constraints",
     "explanation": "Unreachable slope band enclosed by water moat",
     "diagnosis_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     }
   },
-  "44fcef3c6d4eaf7be9d14c43b454df5bd8e991745e800a31b00edfdbdf04fddc": {
+  "8c3dd731405b2cee527b23ccb4845db9c89a51d47be5f6a2f53c2d8509e3632f": {
     "operation": "VERIFY_ROUTE",
     "outcome": "FAIL",
     "failure_category": "ANALOG",
@@ -2451,7 +2451,7 @@
     ],
     "telemetry_artifact_key": "telemetry",
     "verification_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "limitations": [
       "Modeled terrain-feasibility verification — not physical rover execution",
@@ -2460,7 +2460,7 @@
       "Changed elements: strategy: WAYPOINT_RETURN → EXPOSURE_COVERAGE"
     ]
   },
-  "010dc1b5b3b78c6a148413385b32d86b68d7c4e32ba178c56edd672535b8d802": {
+  "bf8c40e60885ad9b349e8dc8fd88c830da54a262a9b3cbc6a3d045df601faa1c": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-EXPOSURE",
     "proposed_status": "FAIL",
@@ -2477,7 +2477,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "20b251f3-a4d9-4778-89e8-a9788f0d93e0"
+      "evidence_id": "00000000-0000-4000-8000-00000000111b"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -2486,7 +2486,7 @@
       "validation_level": "S0"
     }
   },
-  "ddde592da502d186c617d236f67cafb0a2ff9fc1b67bac4a15f8698e22855237": {
+  "203594b2557408d678ee59aefcabed041bc35c9f4024db6969939f8d351a7073": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-TASKS",
     "proposed_status": "PASS",
@@ -2503,7 +2503,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "20b251f3-a4d9-4778-89e8-a9788f0d93e0"
+      "evidence_id": "00000000-0000-4000-8000-00000000111b"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -2512,7 +2512,7 @@
       "validation_level": "S0"
     }
   },
-  "42eff886a5c9b6fe42e0795fa9e191325807223d458c3ee4a69f1c90f4a33b8d": {
+  "06de2a5000c9a67c5a9ee1aeff0cef41539b4448eaafb313613e27367ee7f4cb": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-RESERVE",
     "proposed_status": "PASS",
@@ -2529,7 +2529,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "20b251f3-a4d9-4778-89e8-a9788f0d93e0"
+      "evidence_id": "00000000-0000-4000-8000-00000000111b"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -2538,20 +2538,20 @@
       "validation_level": "S0"
     }
   },
-  "34b7dd34507847d892031244609b75acf66059e2efb8573f84479ff19a4d4a72": {
+  "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70": {
     "schema_version": "1.0",
     "artifact_kind": "RASTER_ROUTE_TEST",
     "mode": "synthetic",
     "resource_provider": "PHYSICAL_EARTH_MODEL",
-    "mission_revision_id": "fda816ce-7094-4600-a518-19750a1d1644",
+    "mission_revision_id": "00000000-0000-4000-8000-000000001016",
     "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
-    "rover_revision_id": "1c7796ef-9c8f-4ab1-b354-0055aac5da51",
+    "rover_revision_id": "00000000-0000-4000-8000-000000001020",
     "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
     "candidate_window_id": "grid-r0c0",
     "test_revision": 3,
     "strategy": "EXPOSURE_COVERAGE",
     "grid": {
-      "analysis_evidence_id": "aa548dfc-4211-4c9c-b2f9-4469dd0b3809",
+      "analysis_evidence_id": "00000000-0000-4000-8000-000000001070",
       "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
       "crs_wkt": "EPSG:32612",
       "cell_size_m": 60,
@@ -2656,22 +2656,22 @@
       "An unspecified rover maximum route uses the recorded 8000 m design default"
     ]
   },
-  "7dfe1a2eea6bef48e0e102a2e9b243d7a67a0a930a10a6addfb39289cb55ef01": {
+  "768b73b011c9828f498ad23d70045a8c822b2932a0f07e28b038c98c33fcaa47": {
     "operation": "DESIGN_BENCHMARK",
     "constraints": {
       "schema_version": "1.0",
       "artifact_kind": "RASTER_ROUTE_TEST",
       "mode": "synthetic",
       "resource_provider": "PHYSICAL_EARTH_MODEL",
-      "mission_revision_id": "fda816ce-7094-4600-a518-19750a1d1644",
+      "mission_revision_id": "00000000-0000-4000-8000-000000001016",
       "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
-      "rover_revision_id": "1c7796ef-9c8f-4ab1-b354-0055aac5da51",
+      "rover_revision_id": "00000000-0000-4000-8000-000000001020",
       "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
       "candidate_window_id": "grid-r0c0",
       "test_revision": 3,
       "strategy": "EXPOSURE_COVERAGE",
       "grid": {
-        "analysis_evidence_id": "aa548dfc-4211-4c9c-b2f9-4469dd0b3809",
+        "analysis_evidence_id": "00000000-0000-4000-8000-000000001070",
         "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
         "crs_wkt": "EPSG:32612",
         "cell_size_m": 60,
@@ -2776,8 +2776,8 @@
         "An unspecified rover maximum route uses the recorded 8000 m design default"
       ]
     },
-    "constraints_artifact_key": "34b7dd34507847d892031244609b75acf66059e2efb8573f84479ff19a4d4a72",
-    "constraints_sha256": "34b7dd34507847d892031244609b75acf66059e2efb8573f84479ff19a4d4a72",
+    "constraints_artifact_key": "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70",
+    "constraints_sha256": "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70",
     "required_exposures": [
       {
         "requirement_id": "R-EXPOSURE",
@@ -2859,11 +2859,11 @@
     ],
     "blockers": []
   },
-  "6449c8e057c8ad92da5f848414358bcf5067be2b1f68398fc7edcd01513a59b0": {
+  "daa4ff76e7951900a6f85380c295a9b0cf4a4c8225a2794fe4247c16063f5932": {
     "schema_version": "1.0",
     "route_key": "grid-r0c0-attempt-3",
     "mode": "synthetic",
-    "constraints_sha256": "34b7dd34507847d892031244609b75acf66059e2efb8573f84479ff19a4d4a72",
+    "constraints_sha256": "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70",
     "strategy": "EXPOSURE_COVERAGE",
     "graph_revision": "synthetic-practice-grid-v1",
     "node_sequence": [
@@ -2915,14 +2915,14 @@
       }
     }
   },
-  "757311ea47702487449779f95acf9dfdf52ca479dc9e048c5e624d579121701a": {
+  "cfb62ba822b5ae6423b41dcd4940be8c7b24d136feeca248a8e2452d134f49b1": {
     "operation": "SEARCH_ROUTE",
     "search_status": "FOUND",
     "route": {
       "schema_version": "1.0",
       "route_key": "grid-r0c0-attempt-3",
       "mode": "synthetic",
-      "constraints_sha256": "34b7dd34507847d892031244609b75acf66059e2efb8573f84479ff19a4d4a72",
+      "constraints_sha256": "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70",
       "strategy": "EXPOSURE_COVERAGE",
       "graph_revision": "synthetic-practice-grid-v1",
       "node_sequence": [
@@ -2974,8 +2974,8 @@
         }
       }
     },
-    "route_artifact_key": "6449c8e057c8ad92da5f848414358bcf5067be2b1f68398fc7edcd01513a59b0",
-    "route_sha256": "6449c8e057c8ad92da5f848414358bcf5067be2b1f68398fc7edcd01513a59b0",
+    "route_artifact_key": "daa4ff76e7951900a6f85380c295a9b0cf4a4c8225a2794fe4247c16063f5932",
+    "route_sha256": "daa4ff76e7951900a6f85380c295a9b0cf4a4c8225a2794fe4247c16063f5932",
     "counters": {
       "expansions": 150,
       "labels_created": 200,
@@ -2987,7 +2987,7 @@
     "optimistic_exposure_bound_m": {},
     "termination_reason": "ROUTE_VERIFIED"
   },
-  "2218c248162920db3826dc65d901ce5ed4ab97807289c29fd6451ef1242cfd83": {
+  "309880ddd78db8db710ce1700c09e9dabb7974c85b68af656958e9515a4fea1d": {
     "operation": "DIAGNOSE_RESULT",
     "primary_category": null,
     "secondary_categories": [],
@@ -2998,15 +2998,15 @@
     "proof_scope": "evaluated route only",
     "explanation": "ROUTE_VERIFIED",
     "diagnosis_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     }
   },
-  "01a66a0f39d3394c71b7e0584dec09fe029609a409b16c071ab0616521a154a0": {
+  "16a5941b211e5fbbc65bd68b9ff148bf96ee196de5447f224204f70e2397093f": {
     "operation": "VERIFY_ROUTE",
     "outcome": "PASS",
     "failure_category": null,
     "search_status": "FOUND",
-    "verified_route_sha256": "6449c8e057c8ad92da5f848414358bcf5067be2b1f68398fc7edcd01513a59b0",
+    "verified_route_sha256": "daa4ff76e7951900a6f85380c295a9b0cf4a4c8225a2794fe4247c16063f5932",
     "metrics": [
       {
         "metric_id": "route_distance_m",
@@ -3094,7 +3094,7 @@
     ],
     "telemetry_artifact_key": "telemetry",
     "verification_evidence": {
-      "evidence_id": "92c46af3-15dc-46b8-a815-eb657c47d861"
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
     },
     "limitations": [
       "Modeled terrain-feasibility verification — not physical rover execution",
@@ -3103,10 +3103,10 @@
       "Changed elements: candidate: Practice grid-r0c1 → Practice grid-r0c0"
     ]
   },
-  "3dc056c1bdd461e3cd42cf1ae56aaf2d25c8940b06e76e00f1788e2cf98a74cd": {
+  "b5e77b244c1dc7789737712b66e563eacbce387f28c258deeca9df2a07f27b64": {
     "schema_version": "1.0",
-    "route_sha256": "6449c8e057c8ad92da5f848414358bcf5067be2b1f68398fc7edcd01513a59b0",
-    "constraints_sha256": "34b7dd34507847d892031244609b75acf66059e2efb8573f84479ff19a4d4a72",
+    "route_sha256": "daa4ff76e7951900a6f85380c295a9b0cf4a4c8225a2794fe4247c16063f5932",
+    "constraints_sha256": "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70",
     "samples": [
       {
         "index": 0,
@@ -3151,7 +3151,7 @@
       }
     ]
   },
-  "618e9888219faa57559d348c6954c4697f5dfd1399e7547bec99c76512aef06e": {
+  "d164ab1e04a861b76fff991e837e634fffc39eef85ec6f6a8dea25ecdd970a31": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-EXPOSURE",
     "proposed_status": "PASS",
@@ -3168,7 +3168,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "850ef022-ef25-42a7-9643-f03677ecf5bd"
+      "evidence_id": "00000000-0000-4000-8000-000000001129"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -3177,7 +3177,7 @@
       "validation_level": "S0"
     }
   },
-  "d0305dd68bcb90794e377e8a9a5a6200c4bd7685e719d472885e40e69ecda52d": {
+  "ba48a43a52657e630073bdbf3b40ed296428fe831cad758a41e5f84a12ae6ed9": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-TASKS",
     "proposed_status": "PASS",
@@ -3194,7 +3194,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "850ef022-ef25-42a7-9643-f03677ecf5bd"
+      "evidence_id": "00000000-0000-4000-8000-000000001129"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -3203,7 +3203,7 @@
       "validation_level": "S0"
     }
   },
-  "15a9e49f0d36968b5d31c05a43104e0fc713b99427efda2850be1cdc16b688f0": {
+  "3a0cdf45a15302dd122ade776a2707295e863eb161bfd9ba4ededf04b865e084": {
     "operation": "COMPARE_REQUIREMENT",
     "requirement_id": "R-RESERVE",
     "proposed_status": "PASS",
@@ -3220,7 +3220,7 @@
       "Synthetic preview; not an empirical science result"
     ],
     "comparison_evidence": {
-      "evidence_id": "850ef022-ef25-42a7-9643-f03677ecf5bd"
+      "evidence_id": "00000000-0000-4000-8000-000000001129"
     },
     "adequacy": {
       "observable_policy_id": "synthetic-display-fixture",
@@ -3229,7 +3229,7 @@
       "validation_level": "S0"
     }
   },
-  "575d0042e368eed8dbe272b3f941fb58d9e60fd573f898413aedf67ca8db9c33": {
+  "c31caf41e639528616e62cbb03a8d5e846bcbfa382176dee64bd965804f658ad": {
     "acquired_manifest_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
     "algorithm_lock_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
     "assurance_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
@@ -3239,23 +3239,23 @@
       {
         "assumption_evidence_ids": [],
         "candidate_ids": [
-          "05de0d11-d4f5-4682-b8fa-e98ca1b2a438",
-          "209c89e4-ff88-4a49-a53a-77436587ee36",
-          "ce4c6ec5-1c5e-4c58-a996-e99f8ca627c7",
-          "51c59b66-50bf-480b-a6d8-91abccd7504b",
-          "d48d4be4-7063-47a8-98c6-e95a54c7dea4",
-          "ce5b0970-39bd-4a77-b1e7-9d72abef7339"
+          "00000000-0000-4000-8000-00000000102a",
+          "00000000-0000-4000-8000-00000000102b",
+          "00000000-0000-4000-8000-00000000102c",
+          "00000000-0000-4000-8000-00000000102d",
+          "00000000-0000-4000-8000-00000000102e",
+          "00000000-0000-4000-8000-00000000102f"
         ],
         "claim_id": "clearance-unknown",
         "claim_type": "QUALIFICATION",
         "disposition": "UNKNOWN",
         "evidence_ids": [
-          "92c46af3-15dc-46b8-a815-eb657c47d861"
+          "00000000-0000-4000-8000-000000001030"
         ],
         "gates": [
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-01",
             "outcome": "SATISFIED",
@@ -3263,7 +3263,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-02",
             "outcome": "SATISFIED",
@@ -3271,7 +3271,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-03",
             "outcome": "NOT_APPLICABLE",
@@ -3279,7 +3279,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-04",
             "outcome": "UNSATISFIED",
@@ -3287,7 +3287,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-05",
             "outcome": "NOT_APPLICABLE",
@@ -3295,7 +3295,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-06",
             "outcome": "NOT_APPLICABLE",
@@ -3303,7 +3303,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-07",
             "outcome": "SATISFIED",
@@ -3311,7 +3311,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-08",
             "outcome": "SATISFIED",
@@ -3319,7 +3319,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-09",
             "outcome": "SATISFIED",
@@ -3327,7 +3327,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-10",
             "outcome": "NOT_APPLICABLE",
@@ -3335,7 +3335,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-11",
             "outcome": "NOT_APPLICABLE",
@@ -3343,7 +3343,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-12",
             "outcome": "SATISFIED",
@@ -3351,7 +3351,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-13",
             "outcome": "NOT_APPLICABLE",
@@ -3359,7 +3359,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-14",
             "outcome": "SATISFIED",
@@ -3367,7 +3367,7 @@
           },
           {
             "evidence_ids": [
-              "92c46af3-15dc-46b8-a815-eb657c47d861"
+              "00000000-0000-4000-8000-000000001030"
             ],
             "gate_id": "SC-15",
             "outcome": "SATISFIED",
@@ -3396,7 +3396,7 @@
     "mode": "synthetic",
     "publication": "LIMITED",
     "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
-    "run_id": "c6b93ede-2188-4348-b146-477544f9725b",
+    "run_id": "00000000-0000-4000-8000-000000001027",
     "schema_version": "1.0",
     "snapshot_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
     "workspace_id": "00000000-0000-4000-8000-000000000001"

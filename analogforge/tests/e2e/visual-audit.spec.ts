@@ -46,6 +46,26 @@ test('UIX-13 complete visual audit C01–C20',async({page})=>{
   await page.goto('/__styleguide');await expect(page.locator('main h1')).toHaveText('Component styleguide');await auditGlyphs(page);
   const text=await page.locator('main').innerText();reports.push({screen:'styleguide',findings:COMPONENTS.filter((name:string)=>!text.includes(name)).map((name:string)=>({check:'C18',message:'Missing '+name}))});await capture('styleguide');
   for(const theme of ['dark','light'])for(const density of ['compact','default','comfortable']){await page.goto(`/__styleguide?captureTheme=${theme}&captureDensity=${density}`);await expect(page.locator('main h1')).toHaveText('Component styleguide');await page.evaluate(({theme,density})=>{document.documentElement.dataset.theme=theme;document.documentElement.dataset.density=density;},{theme,density});await page.setViewportSize({width:1440,height:900});await page.evaluate(()=>document.fonts.ready);await page.screenshot({path:`docs/design-review/styleguide-${theme}-${density}.png`,fullPage:true});}
+  // Hold the real mission request: the screenshot records an actual pending query.
+  await page.addInitScript(()=>{
+   if(!new URLSearchParams(location.search).has('holdMissions'))return;
+   const original=window.fetch.bind(window);let release:()=>void=()=>undefined;
+   const pending=new Promise<void>(resolve=>{release=resolve;});
+   (window as unknown as {__releaseAuditMissions:()=>void}).__releaseAuditMissions=release;
+   window.fetch=async(input,init)=>{const url=new URL(input instanceof Request?input.url:String(input),location.href);if(url.pathname==='/api/v1/missions'&&(init?.method??(input instanceof Request?input.method:'GET')).toUpperCase()==='GET')await pending;return original(input,init);};
+  });
+  for(const width of [1440,390])for(const theme of ['dark','light']){
+   await page.setViewportSize({width,height:900});
+   await page.goto('/?holdMissions=1&mockLatency=300');await expect(page.locator('main h1')).toHaveText('Missions and runs');
+   await expect(page.getByRole('status',{name:'Retrieving saved missions'})).toBeVisible();
+   await auditPage(page,'loading-missions',{width,height:900,theme,density:'default',focus:true});
+   await page.evaluate(()=>(window as unknown as {__releaseAuditMissions:()=>void}).__releaseAuditMissions());
+   await expect(page.getByRole('status',{name:'Retrieving saved missions'})).toBeHidden();
+   await page.goto('/rovers');await expect(page.locator('main h1')).toHaveText('Rover library');
+   await page.getByTestId('file-rover-import').setInputFiles({name:'invalid-rover.json',mimeType:'application/json',buffer:Buffer.from('{')});
+   await expect(page.locator('[data-testid=error-panel][data-error-code=VALIDATION_ERROR]')).toBeVisible();
+   await auditPage(page,'error-rover-import',{width,height:900,theme,density:'default',focus:true});
+  }
  }catch(error){crawlError=error;}finally{
   reports.push({screen:'crawl',findings:crawlError?[{check:'C12',message:String(crawlError)}]:[]});
   await page.waitForTimeout(60);reports.push({screen:'intentional-cancellations',findings:[],observed:auditCancellations(page)});

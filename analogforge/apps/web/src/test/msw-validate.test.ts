@@ -1,4 +1,4 @@
-import { beforeEach,expect,it,vi } from 'vitest';
+import { afterEach,beforeEach,expect,it,vi } from 'vitest';
 import Ajv2020 from 'ajv/dist/2020';
 import { writeFileSync,mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -17,7 +17,8 @@ function check(method:string,template:string,path:string,body?:unknown):MockResp
  if(schema && typeof result.body!=='string'){const validate=ajv.compile({$ref:'contract#/paths/'+template.replace(/~/g,'~0').replace(/\//g,'~1')+'/'+method.toLowerCase()+'/responses/'+result.status+'/content/application~1json/schema'});expect(validate(result.body),JSON.stringify(validate.errors)).toBe(true);}
  responses.push({method,path:template,status:result.status,body:result.body});return result;
 }
-beforeEach(()=>{resetDatabase();responses.length=0;});
+beforeEach(()=>{let identifier=4096;vi.spyOn(crypto,'randomUUID').mockImplementation(()=>`00000000-0000-4000-8000-${(++identifier).toString(16).padStart(12,'0')}`);resetDatabase();responses.length=0;});
+afterEach(()=>{vi.useRealTimers();vi.restoreAllMocks();});
 it('UIX-03 every JSON operation response satisfies the frozen bundled OpenAPI',async()=>{
  vi.useFakeTimers();
  check('GET','/health/live','/health/live');check('GET','/health/ready','/health/ready');check('GET','/capabilities','/capabilities');check('GET','/configuration/scenarios/{id}','/configuration/scenarios/synthetic-mars-mobility-v1');

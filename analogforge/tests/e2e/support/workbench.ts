@@ -30,6 +30,7 @@ test.afterEach(async({page})=>{expect(requestErrors.get(page)||[],'UI mutations 
 export const fixture = (name: string) => resolve(root, 'tests/fixtures/kit', name);
 export const contract = JSON.parse(readFileSync(resolve(root, 'contracts/ui-testids.json'), 'utf8')) as { testids: { id: string; required_attributes: string[] }[] };
 const observedHooks=new Set<string>();
+const observedStatuses=new Map<string,{status:string;label:string;glyph:string;html:string}>();
 export async function inspectHooks(page: Page) {
  for (const hook of contract.testids) {
   const elements = page.getByTestId(hook.id);
@@ -38,7 +39,10 @@ export async function inspectHooks(page: Page) {
    for (const attr of hook.required_attributes) await expect(el, `${hook.id} requires ${attr}`).toHaveAttribute(attr, /.+/);
   }
  }
+ const badges=await page.locator('[data-status]').evaluateAll(elements=>elements.filter(el=>el.querySelector('svg')&&el.getBoundingClientRect().width>0).map(el=>({status:el.getAttribute('data-status')!,label:el.textContent!.trim(),glyph:el.querySelector('svg')!.outerHTML,html:el.outerHTML})));
+ for(const badge of badges)if(!observedStatuses.has(badge.status))observedStatuses.set(badge.status,badge);
  mkdirSync(resolve(root,'out'),{recursive:true});
+ writeFileSync(resolve(root,`out/truth-statuses-${process.env.E2E_RUN_NAME||'default'}-${process.env.TEST_WORKER_INDEX||'0'}.json`),JSON.stringify([...observedStatuses.values()],null,2));
  writeFileSync(resolve(root,`out/hooks-${process.env.E2E_RUN_NAME||'default'}-${process.env.TEST_WORKER_INDEX||'0'}.json`),JSON.stringify([...observedHooks].sort(),null,2));
 }
 export async function choose(page: Page, id: string, value: string) {

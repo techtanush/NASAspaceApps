@@ -1,5 +1,5 @@
 import { beforeEach,describe,expect,it,vi } from 'vitest';
-import { render,screen,within } from '@testing-library/react';
+import { render,screen,within,waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient,QueryClientProvider } from '@tanstack/react-query';
@@ -10,6 +10,7 @@ import { RunContext,type RunContextValue } from './RunContext';
 import { QualificationView } from '../qualification/QualificationView';
 import { AnalogsView } from '../analogs/AnalogsView';
 import { PassportView } from '../passport/PassportView';
+import { api } from '../../api/client';
 type S=components['schemas'];
 vi.mock('../../maps/EarthMap',()=>({EarthMap:()=> <div data-testid="earth-map">Map context</div>}));
 vi.mock('../../api/artifacts',async importOriginal=>{const actual=await importOriginal<Record<string,unknown>>();return {...actual,findEvidenceByAlgorithm:async()=>undefined};});
@@ -22,5 +23,7 @@ describe('FE scientific state and acknowledgement boundaries',()=>{
  it('FE-006 does not select a candidate before the server acknowledges it',async()=>{const value=context();let acknowledge:(result:boolean)=>void=()=>undefined;value.action=vi.fn(()=>new Promise<boolean>(resolve=>{acknowledge=resolve;}));render(wrapper(value,<AnalogsView/>));const row=screen.getAllByTestId('candidate-row')[0]!;await userEvent.click(within(row).getByRole('button',{name:'Select candidate'}));expect(value.action).toHaveBeenCalledOnce();expect(row).toHaveAttribute('data-selected','false');acknowledge(true);expect(row).toHaveAttribute('data-selected','false');});
  it('FE-006 retains the selection after a rejected semantic action',async()=>{const value=context();value.action=vi.fn(async()=>false);render(wrapper(value,<AnalogsView/>));await userEvent.click(screen.getAllByTestId('btn-select-candidate')[0]!);expect(screen.getAllByTestId('candidate-row')[0]).toHaveAttribute('data-selected','false');});
  it('FE-002 / UX-004 shows optional unknowns and physical gaps until explicitly filtered',async()=>{const value=context();render(wrapper(value,<QualificationView/>));const mineral=screen.getAllByTestId('qual-cell').filter(cell=>cell.getAttribute('data-requirement-id')==='R-MINERAL');expect(mineral).toHaveLength(6);expect(mineral.every(cell=>cell.getAttribute('data-status')==='UNKNOWN')).toBe(true);expect(screen.getAllByTestId('qual-cell').some(cell=>cell.getAttribute('data-status')==='GAP')).toBe(true);await userEvent.click(screen.getByRole('checkbox'));expect(screen.getByText(/of 9 hidden/)).toBeVisible();});
+ it('FE-010 final passport remains explicitly incomplete while its audit is unavailable',async()=>{const value=context();value.snapshot={...value.snapshot,passport_id:'frozen-passport'};render(wrapper(value,<PassportView/>));expect(screen.getByTestId('assurance-badge')).toHaveAttribute('data-publication','INCOMPLETE');expect(screen.queryByText('Qualified for these tests under these assumptions:')).not.toBeInTheDocument();});
+ it('FE-010 unreadable frozen passport audit stays incomplete with a recoverable error',async()=>{vi.mocked(api.get).mockRejectedValueOnce({code:'ARTIFACT_UNAVAILABLE',message:'Audit is unreadable.'});const value=context();value.snapshot={...value.snapshot,passport_id:'unreadable-passport'};render(wrapper(value,<PassportView/>));await waitFor(()=>expect(screen.getByTestId('error-panel')).toBeVisible());expect(screen.getByTestId('assurance-badge')).toHaveAttribute('data-publication','INCOMPLETE');expect(screen.queryByText('Qualified for these tests under these assumptions:')).not.toBeInTheDocument();});
  it('FE-010 missing assurance stays incomplete and synthetic mode persists in draft',()=>{render(wrapper(context(),<PassportView/>));expect(screen.getByTestId('assurance-badge')).toHaveAttribute('data-publication','INCOMPLETE');expect(screen.getByTestId('assurance-badge')).not.toHaveTextContent('ALLOWED');expect(screen.getByTestId('mode-badge')).toHaveAttribute('data-mode','synthetic');expect(screen.getByTestId('passport-view')).toHaveAttribute('data-draft','true');expect(screen.getByText('DRAFT — INCOMPLETE')).toBeVisible();});
 });

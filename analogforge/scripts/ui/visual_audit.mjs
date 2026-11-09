@@ -25,7 +25,7 @@ export async function installAuditInstrumentation(page){
   }else state.failures.push({check:'C12',message:request.method()+' '+new URL(request.url()).pathname+': '+error});
  });
  await page.addInitScript(()=>{
-  window.__auditCLS=0;window.__auditMeasureCLS=true;window.__auditPending=0;
+  window.__auditCLS=0;window.__auditShifts=[];window.__auditMeasureCLS=true;window.__auditPending=0;
   const original=window.fetch.bind(window);
   window.fetch=(input,init)=>{
    const request=input instanceof Request?input:null;const url=new URL(request?request.url:String(input),location.href).href;const method=init?.method||request?.method||'GET';const signal=init?.signal||request?.signal;
@@ -33,8 +33,8 @@ export async function installAuditInstrumentation(page){
    const observed=/\/(?:api\/v1|auth|artifacts)\//.test(new URL(url).pathname);if(observed)window.__auditPending++;
    return original(input,init).finally(()=>{if(observed)window.__auditPending--;});
   };
-  const observer=new PerformanceObserver(list=>{if(window.__auditMeasureCLS)for(const entry of list.getEntries())if(!entry.hadRecentInput)window.__auditCLS+=entry.value;});observer.observe({type:'layout-shift',buffered:true});
-  for(const name of ['pushState','replaceState']){const method=history[name].bind(history);history[name]=(...args)=>{observer.takeRecords();window.__auditCLS=0;window.__auditMeasureCLS=true;method(...args);};}
+  const observer=new PerformanceObserver(list=>{if(window.__auditMeasureCLS)for(const entry of list.getEntries())if(!entry.hadRecentInput){window.__auditCLS+=entry.value;window.__auditShifts.push({value:entry.value,sources:(entry.sources||[]).map(source=>({node:source.node?.outerHTML?.slice(0,300),before:source.previousRect,after:source.currentRect}))});}});observer.observe({type:'layout-shift',buffered:true});
+  for(const name of ['pushState','replaceState']){const method=history[name].bind(history);history[name]=(...args)=>{observer.takeRecords();window.__auditCLS=0;window.__auditShifts=[];window.__auditMeasureCLS=true;method(...args);};}
  });
 }
 export function auditFailures(page){return auditStates.get(page)?.failures||[];}
@@ -58,6 +58,11 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
  const measureLoad=['S01','S06','S07','S10','S12'].some(prefix=>name.startsWith(prefix));
  if(measureLoad)await beginLoadedCohort(page,{width,height,theme,density});else{await page.evaluate(()=>{window.__auditMeasureCLS=false;});await page.setViewportSize({width,height});}
  await page.evaluate(()=>{if(!document.querySelector('[role=dialog]')&&document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo(0,0);for(const element of document.querySelectorAll('*')){const style=getComputedStyle(element);if(/auto|scroll/.test(style.overflow+style.overflowX+style.overflowY)){element.scrollTop=0;element.scrollLeft=0;}}});
+ // Use the application's preference controls so header labels and effective styles agree.
+ // DOM click preserves the focus of an already open nonmodal evidence drawer.
+ for(const [id,attribute,value]of [['theme-toggle','data-theme-choice',theme],['density-toggle','data-density',density]]){
+  const control=page.getByTestId(id);for(let attempt=0;attempt<3&&await control.getAttribute(attribute)!==value;attempt++){await control.evaluate(node=>node.click());await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(resolve)));}
+ }
  await page.evaluate(({theme,density})=>{document.documentElement.dataset.theme=theme; document.documentElement.dataset.density=density;},{theme,density});
  await page.evaluate(()=>document.fonts.ready);
  const spacingStyle=spacing?await page.addStyleTag({content:'*{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}p{margin-bottom:2em!important}'}):null;
@@ -117,7 +122,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
   for(const region of document.querySelectorAll('[data-region]'))if([...region.querySelectorAll('[data-variant=primary]')].filter(visible).length>1)add('C13',region,'Multiple primary actions');
   for(const large of document.querySelectorAll('[data-size=xl]'))if(large.getAttribute('data-testid')!=='btn-prove-it')add('C13',large,'Only PROVE IT may be xl');
   const faces=[...document.fonts].filter(f=>f.status==='loaded').map(f=>f.family);if(!faces.some(f=>f.includes('Inter'))||!faces.some(f=>f.includes('Plex')))add('C01',document.body,'Self-hosted fonts not loaded');
-  return {findings,text,spacing,cls:window.__auditCLS||0};
+  return {findings,text,spacing,cls:window.__auditCLS||0,layoutShifts:window.__auditShifts||[]};
  },{limits:THRESHOLDS,spacing,width});
  const findings=[...facts.findings];
  // Canvas-overlay contrast uses screenshot pixels in a four-pixel ring around the text box.
@@ -138,7 +143,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
   }
  }
  const filename=`${name}-${width}-${theme}-${density}${spacing?'-spacing':''}.png`;mkdirSync(resolve(root,'out/visual'),{recursive:true});writeFileSync(resolve(root,'out/visual',filename),screenshot);manifest.push({file:filename,screen:name,theme,density,width,height,sha256:hash(screenshot)});
- reports.push({screen:name,width,height,theme,density,findings});if(spacingStyle)await spacingStyle.evaluate(node=>node.remove());return findings;
+ reports.push({screen:name,width,height,theme,density,findings,layoutShifts:facts.layoutShifts});if(spacingStyle)await spacingStyle.evaluate(node=>node.remove());return findings;
 }
 export async function auditGlyphs(page){
  const result=await page.evaluate(async()=>{

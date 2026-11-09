@@ -15,3 +15,7 @@
 - Layout-shift cohorts measure real reload/data-arrival at each required viewport/theme/density before audit-induced focus, resize, theme, or text-spacing changes. C12 records cancellations separately only when the test observes the actual AbortSignal or explicitly initiates a navigation; other failed requests remain failures. This reconciles required request-abort cleanup with the audit’s no-transport-failures rule.
 
 - Overlay audit states (`Evidence-open-*`, `Operations-open-*`, `Shortcuts-open-*`) preserve the open dialog and measure its controls. C05 compares controls within the same overlay layer, since an intentionally layered drawer necessarily covers the underlying workspace; C07 walks the open overlay until focus leaves it. Ordinary screen cohorts still inspect the entire workspace. Drawer focus-out and Escape behavior are tested separately. Text and contrast checks continue across the visible document.
+
+- The forbidden scanner includes authored audit/export scripts. It excludes only its own detection-pattern definitions and the three mutation catalogs, which necessarily contain intentionally prohibited source strings; the unmodified acceptance tests still execute against every injected mutant.
+
+- Contract fixture exporters use a deterministic UUID sequence scoped to their Vitest tests. They still invoke the actual mock handlers and validate actual responses, but repeated test runs no longer rewrite tracked fixtures with random identifiers. Two consecutive exports were byte-identical; browser command IDs retain real random UUIDs.

@@ -2,14 +2,14 @@
   "schema_version": "2.0",
   "person": "Aradhya",
   "branch": "aradhya/frontend-experience",
-  "template_note": "Copy to team handoffs/aradhya/STATUS.json. Replace every null with an observed value or leave null with a reason. Never invent results.",
+  "template_note": "Observed frontend branch evidence. Generated reports are under analogforge/out; real-backend integration is a separate merging-agent gate.",
   "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
   "tested_commit_sha": null,
   "kit_version": "1.0.0",
   "kit_verify": {
-    "status": "NOT_RUN",
+    "status": "PASSED",
     "command": "python3 \"architecture files/contracts/kit/materialize.py\" --verify",
-    "exit_code": null
+    "exit_code": 0
   },
   "environment": {
     "node": "22.21.1",
@@ -21,63 +21,74 @@
     ]
   },
   "ownership_check": {
-    "status": "NOT_RUN",
-    "exit_code": null
+    "status": "PASSED",
+    "exit_code": 0,
+    "base": "origin/main",
+    "output_file": "analogforge/out/ownership-final.log"
   },
   "catalog": {
     "KIT-01": {
-      "status": "NOT_RUN",
-      "command": null,
-      "exit_code": null,
+      "status": "PASSED",
+      "command": "python3 ../architecture\\ files/contracts/kit/materialize.py --verify",
+      "exit_code": 0,
       "tests_passed": null,
-      "tests_failed": null,
-      "tests_skipped": null,
-      "output_file": null
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "out/kit-final.log"
     },
     "KIT-02": {
-      "status": "NOT_RUN",
-      "command": null,
-      "exit_code": null,
-      "tests_passed": null,
-      "tests_failed": null,
-      "tests_skipped": null,
-      "output_file": null
+      "status": "PASSED",
+      "command": ".venv/bin/pytest tests/contracts/kit -q",
+      "exit_code": 0,
+      "tests_passed": 20,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": "out/python-final.log"
     },
     "UIX-01": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "Strict TypeScript, ESLint and production build; clean clone also passes."
     },
     "UIX-02": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "Bundled OpenAPI regeneration retains identical schema.d.ts SHA256."
     },
     "UIX-03": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "AJV validates every operation/script; independent Python jsonschema validates exported observed responses and scientific artifact schemas."
     },
     "UIX-04": {
       "status": "NOT_RUN"
     },
     "UIX-05": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "71 executed frontend tests include immutability, status semantics, no optimistic science, request retries, revision conflict, source display, playback and component keyboard behavior."
     },
     "UIX-06": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "8 stream tests plus hook isolation/reconciliation tests."
     },
     "UIX-07": {
       "status": "NOT_RUN"
     },
     "UIX-08": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "9 fixtures \u00d7 3 formats, deterministic under three hash seeds; hostile strings, CSV safety and all renderer errors."
     },
     "UIX-09": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "Subprocess renderer purity against frozen-kit baseline; no additional forbidden imports, environment access or writes."
     },
     "UIX-10": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "Production mock builds fail with MOCK_BUILD_FORBIDDEN; normal build excludes worker, preview banner and styleguide."
     },
     "UIX-11": {
       "status": "NOT_RUN"
     },
     "UIX-12": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "150/150 token checks; supplied files and generated CSS identical."
     },
     "UIX-13": {
       "status": "NOT_RUN"
@@ -122,10 +133,12 @@
     "asserted_by_playwright": null
   },
   "renderer": {
-    "fixtures": 0,
-    "formats_deterministic": null,
-    "hostile_string_suite": "NOT_RUN",
-    "purity_subprocess_test": "NOT_RUN"
+    "fixtures": 9,
+    "formats_deterministic": true,
+    "hostile_string_suite": "PASSED",
+    "purity_subprocess_test": "PASSED",
+    "exports_verified": 27,
+    "tamper_cases_rejected": 27
   },
   "accessibility": {
     "axe_critical_serious": null,
@@ -139,7 +152,7 @@
   },
   "self_audit": {
     "forbidden_scan": {
-      "status": "NOT_RUN",
+      "status": "PASSED",
       "findings": 0
     },
     "mutation_check": {
@@ -148,25 +161,75 @@
       "killed": null
     },
     "truthfulness_proof": {},
-    "adversarial_reviewers": [],
-    "final_truth_checks": {}
+    "adversarial_reviewers": [
+      {
+        "role": "renderer attacker",
+        "findings_fixed": [
+          "noncanonical/malformed manifest validation",
+          "dangling qualification evidence",
+          "SVG external stylesheet processing instruction",
+          "stale assurance identity and frozen-input binding"
+        ],
+        "evidence": "out/review-renderer-final.log; regression tests in tests/unit/passport_renderer"
+      },
+      {
+        "role": "truth auditor",
+        "findings_fixed": [
+          "no-energy modeled exposure/tasks vs reserve distinction",
+          "null energy telemetry",
+          "lite rover compatibility slope status",
+          "missing local mineral reason",
+          "per-benchmark status/margin display"
+        ],
+        "evidence": "independent attack.test.ts 5/5 passed; out/review-truth-final.log"
+      },
+      {
+        "role": "state-machine breaker",
+        "findings_fixed": [
+          "identity/revision guards",
+          "persisted event replay and cursor",
+          "reload resumes pending attempts",
+          "server publication single-flight"
+        ],
+        "evidence": "frontend stream/handler/hook tests; final browser J08 evidence pending"
+      },
+      {
+        "role": "accessibility/responsive auditor",
+        "findings_fixed": [
+          "explicit form labels",
+          "heading hierarchy and nested main",
+          "asynchronous route heading focus",
+          "drawer focus return/outside focus",
+          "disabled reasons"
+        ],
+        "evidence": "component tests; final browser a11y evidence pending"
+      }
+    ],
+    "final_truth_checks": {
+      "clean_rebuild": {
+        "status": "PASSED",
+        "commit": "106c91d",
+        "method": "fresh local clone with no node_modules/dist/out; offline frozen-lockfile install, tsc, ESLint,71 frontend tests,128 Python tests, production build",
+        "browser_gate": "NOT_RUN"
+      }
+    }
   },
   "lint": {
     "eslint": {
-      "status": "NOT_RUN",
-      "exit_code": null
+      "status": "PASSED",
+      "exit_code": 0
     },
     "tsc": {
-      "status": "NOT_RUN",
-      "exit_code": null
+      "status": "PASSED",
+      "exit_code": 0
     },
     "ruff": {
-      "status": "NOT_RUN",
-      "exit_code": null
+      "status": "PASSED",
+      "exit_code": 0
     },
     "mypy": {
-      "status": "NOT_RUN",
-      "exit_code": null
+      "status": "PASSED",
+      "exit_code": 0
     }
   },
   "contradictions_found": [
@@ -198,19 +261,23 @@
   "defects_in_other_areas": [],
   "change_requests": [],
   "external_blockers": [],
-  "known_limitations": [],
+  "known_limitations": [
+    "Real-backend MRG-03 journeys and live dataset/model credentials are unavailable in this frontend-only environment.",
+    "Synthetic preview and fixture results establish presentation/contract behavior only, not real mission or physical rover validation.",
+    "Vite reports a large application chunk; no deployment or production traffic performance claim is made."
+  ],
   "decisions": "see team handoffs/aradhya/DECISIONS.md",
   "ready_to_merge": false,
   "ready_to_merge_rule": "true only if every UIX row (UIX-01..13) and DR-01..04 is PASSED, J01-J13 pass in mock mode with 0 skipped, kit_verify and ownership_check PASS, lint/typecheck clean, self_audit complete, no hidden skips",
   "pushed_sha": null,
-  "secrets_not_committed": null,
-  "build_output_not_committed": null,
+  "secrets_not_committed": true,
+  "build_output_not_committed": true,
   "design": {
     "tokens_verify": {
-      "status": "NOT_RUN",
-      "checks_passed": null
+      "status": "PASSED",
+      "checks_passed": 150
     },
-    "tokens_css_identical": "NOT_RUN",
+    "tokens_css_identical": "PASSED",
     "visual_audit": {
       "status": "NOT_RUN",
       "screens": null,
@@ -240,8 +307,8 @@
       "review_file": "team handoffs/aradhya/DESIGN-REVIEW.md"
     },
     "slop_findings_open": null,
-    "fonts_self_hosted": null,
+    "fonts_self_hosted": true,
     "external_requests_seen": null,
-    "third_party_licences_recorded": null
+    "third_party_licences_recorded": true
   }
 }

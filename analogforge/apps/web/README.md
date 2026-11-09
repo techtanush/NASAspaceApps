@@ -44,7 +44,7 @@ corepack pnpm run audit:visual
 
 Browser checks use `PLAYWRIGHT_CHROMIUM_EXECUTABLE` when set, an installed macOS Chrome when available, or Playwright Chromium. Install the latter with `corepack pnpm --filter @analogforge/web exec playwright install chromium` if needed. Run browser suites serially on memory-constrained machines.
 
-The same journeys run against the merged backend with `E2E_TARGET=real`, `E2E_BASE_URL`, and `E2E_API_URL`; they retain API identity, receipt, evidence, and digest assertions. See `team handoffs/aradhya/STATUS.json` for the checks actually executed and remaining integration boundaries.
+The same journeys run against the merged backend with `E2E_TARGET=real` and `E2E_BASE_URL` pointing to the merged workbench origin; they retain API identity, receipt, evidence, and digest assertions. See `team handoffs/aradhya/STATUS.json` for the checks actually executed and remaining integration boundaries.
 
 ## Design and test tools
 

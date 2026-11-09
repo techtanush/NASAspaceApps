@@ -54,12 +54,17 @@ def scan(root: Path = ROOT) -> list[dict[str, object]]:
         list((root / "apps/web/src").rglob("*"))
         + list((root / "src/analogforge/rendering/passport").rglob("*"))
         + list((root / "tests/e2e").rglob("*"))
+        + list((root / "scripts/ui").rglob("*"))
+        + [root / "scripts/build_mock_exports.py"]
     )
     for path in paths:
-        if path.suffix not in {".ts", ".tsx", ".css", ".py", ".j2"} or "generated" in path.parts:
+        if path.suffix not in {".ts", ".tsx", ".css", ".py", ".mjs", ".j2"} or "generated" in path.parts:
             continue
         relative = path.relative_to(root).as_posix()
         content = path.read_text()
+        # The scanner contains the patterns it detects; mutation catalogs deliberately inject violations.
+        if path.name in {"forbidden_scan.py", "mutation_check.py", "api_mutations.py", "renderer_mutations.py"}:
+            continue
         testing = ".test." in path.name or ".spec." in path.name
         for rule, expression in SCANS:
             if testing and rule not in {"unsafe-test-selection"}:

@@ -106,7 +106,7 @@ export function VisuallyHidden({children}:{children:ReactNode}) { return <span c
 export function ScaleBar({text}:{text:string}) { return <div className="scale-bar mono">{text}</div>; }
 export function CoordinateReadout({text}:{text:string}) { return <div className="coordinate-readout mono">{text}</div>; }
 export function Attribution({children}:{children:ReactNode}) { return <small className="attribution">{children}</small>; }
-export function Legend({items}:{items:{label:string}[]}) { return <ul className="legend" aria-label="Layer legend">{items.map(item=><li key={item.label}>{item.label}</li>)}</ul>; }
+export function Legend({items,unit}:{items:{label:string;color?:string;lower?:number|null;upper?:number|null}[];unit?:string}) { return <ul className="legend" aria-label="Layer legend">{items.map(item=><li key={item.label}>{item.color&&<span className="legend-swatch" style={{backgroundColor:item.color}} aria-hidden="true"/>}{item.label}{('lower'in item||'upper'in item)&&<> · <Quantity value={item.lower} unit={unit}/>–<Quantity value={item.upper} unit={unit}/></>}</li>)}</ul>; }
 export function LayerPanel({layers,onChange}:{layers:{id:string;name:string;visible:boolean}[];onChange:(id:string,visible:boolean)=>void}) { return <fieldset className="layer-panel"><legend>Display layers</legend>{layers.map(layer=><label key={layer.id}><input type="checkbox" checked={layer.visible} onChange={event=>onChange(layer.id,event.target.checked)}/>{layer.name}</label>)}</fieldset>; }
 export function Chart({title,values,unit,kind='histogram'}:{title:string;values:{label:string;value:number|null}[];unit:string;kind?:'histogram'|'line'|'bar'}) {
   const [view,setView]=useState('Chart');
