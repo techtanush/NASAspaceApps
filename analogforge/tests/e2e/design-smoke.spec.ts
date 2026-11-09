@@ -8,7 +8,7 @@ test('design rules reject visual regressions on the shell and full component kit
  page.on('pageerror',error=>browserErrors.push(error.message));
  for(const path of ['/','/__styleguide']){
   await page.goto(path);await expect(page.locator('main h1')).toBeVisible();
-  for(const theme of ['dark','light'])for(const width of [1440,390])await auditPage(page,path==='/'?'S01-smoke':'styleguide-smoke',{theme,width,height:900,focus:true});
+  for(const theme of ['dark','light'])for(const width of [1440,390]){const findings=await auditPage(page,path==='/'?'S01-smoke':'styleguide-smoke',{theme,width,height:900,focus:true});expect(findings,JSON.stringify(findings.slice(0,12))).toEqual([]);}
   if(path==='/__styleguide')await auditGlyphs(page);
  }
  expect(auditFailures(page),'C12 unexpected transport failures').toEqual([]);
