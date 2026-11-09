@@ -55,16 +55,16 @@ test('UIX-13 complete visual audit C01–C20',async({page})=>{
    window.fetch=async(input,init)=>{const url=new URL(input instanceof Request?input.url:String(input),location.href);if(url.pathname==='/api/v1/missions'&&(init?.method??(input instanceof Request?input.method:'GET')).toUpperCase()==='GET')await pending;return original(input,init);};
   });
   for(const width of [1440,390])for(const theme of ['dark','light']){
-   await page.setViewportSize({width,height:900});
+   const height=width===390?844:900;await page.setViewportSize({width,height});
    await page.goto('/?holdMissions=1&mockLatency=300');await expect(page.locator('main h1')).toHaveText('Missions and runs');
    await expect(page.getByRole('status',{name:'Retrieving saved missions'})).toBeVisible();
-   await auditPage(page,'loading-missions',{width,height:900,theme,density:'default',focus:true});
+   await auditPage(page,'loading-missions',{width,height,theme,density:'default',focus:true});
    await page.evaluate(()=>(window as unknown as {__releaseAuditMissions:()=>void}).__releaseAuditMissions());
    await expect(page.getByRole('status',{name:'Retrieving saved missions'})).toBeHidden();
    await page.goto('/rovers');await expect(page.locator('main h1')).toHaveText('Rover library');
    await page.getByTestId('file-rover-import').setInputFiles({name:'invalid-rover.json',mimeType:'application/json',buffer:Buffer.from('{')});
    await expect(page.locator('[data-testid=error-panel][data-error-code=VALIDATION_ERROR]')).toBeVisible();
-   await auditPage(page,'error-rover-import',{width,height:900,theme,density:'default',focus:true});
+   await auditPage(page,'error-rover-import',{width,height,theme,density:'default',focus:true});
   }
  }catch(error){crawlError=error;}finally{
   reports.push({screen:'crawl',findings:crawlError?[{check:'C12',message:String(crawlError)}]:[]});
