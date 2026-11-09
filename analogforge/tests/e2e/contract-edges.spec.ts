@@ -41,3 +41,41 @@ test('editing an existing rover creates a new immutable revision with the frozen
  const unchanged=await api(page,`/rover-revisions/${prior.id}`);expect(unchanged.body).toEqual(frozen.body);
  const latest=await api<{items:{id:string;rover_id:string;name:string;revision:number}[]}>(page,'/rovers');expect(latest.body.items.some(r=>r.rover_id===prior.rover_id&&r.revision===prior.revision+1&&r.name==='ARES-1 field revision')).toBe(true);await inspectHooks(page);
 });
+
+test('job success keeps run settings locked until the proposed contract arrives',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.addInitScript(()=>{
+  localStorage.setItem('af.theme','light');
+  const state={requested:false,release:()=>{}};
+  const pending=new Promise<void>(resolve=>{state.release=resolve;});
+  Object.assign(window,{__proposalGate:state});
+  const original=window.fetch.bind(window);
+  window.fetch=async(input,init)=>{
+   const path=new URL(input instanceof Request?input.url:String(input),location.href).pathname;
+   if(path.startsWith('/api/v1/mission-revisions/')&&(init?.method??(input instanceof Request?input.method:'GET'))==='GET'){
+    state.requested=true;await pending;
+   }
+   return original(input,init);
+  };
+ });
+ await page.goto(isMock()?'/?mockLatency=300':'/');
+ const authoring=newMission(page);
+ await page.waitForFunction(()=>(window as unknown as {__proposalGate:{requested:boolean}}).__proposalGate.requested);
+ try{
+  await expect(page.locator('[data-testid=preparation-status][data-job-state=SUCCEEDED]')).toBeVisible();
+  await expect(page.getByTestId('select-scenario')).toBeDisabled();
+  await expect(page.getByTestId('select-mode')).toBeDisabled();
+  await expect(page.getByTestId('btn-accept-contract')).toBeDisabled();
+  await expect(page.getByRole('listbox')).toHaveCount(0);
+ }finally{
+  await page.evaluate(()=>(window as unknown as {__proposalGate:{release:()=>void}}).__proposalGate.release());
+ }
+ await authoring;
+ await expect(page.getByTestId('select-scenario')).toBeEnabled();
+ await page.keyboard.press('Tab');await page.evaluate(()=>scrollTo(0,0));
+ await page.getByTestId('select-scenario').click();
+ const selected=page.locator('[role=option][data-value=synthetic-mars-mobility-v1]');
+ await expect(selected).toBeVisible();const bounds=await selected.boundingBox();
+ expect(bounds).not.toBeNull();expect(bounds!.y).toBeGreaterThanOrEqual(0);expect(bounds!.y+bounds!.height).toBeLessThanOrEqual(844);
+ await selected.click();await expect(page.getByRole('listbox')).toHaveCount(0);
+});
