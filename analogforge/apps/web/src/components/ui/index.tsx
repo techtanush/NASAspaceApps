@@ -50,7 +50,7 @@ export function Segmented<T extends string>({label, options, value, onChange}:{l
 }
 export function Table({caption, children, className=''}:{caption:string;children:ReactNode;className?:string}) {
   const region=useRef<HTMLDivElement>(null);const [overflow,setOverflow]=useState(false);const hint=useId();const captionId=useId();
-  useEffect(()=>{const node=region.current;if(!node)return;const measure=()=>setOverflow(node.scrollWidth>node.clientWidth+1);measure();if(typeof ResizeObserver==='undefined')return;const observer=new ResizeObserver(measure);observer.observe(node);if(node.querySelector('table'))observer.observe(node.querySelector('table')!);return()=>observer.disconnect();},[children]);
+  useEffect(()=>{const node=region.current;if(!node)return;const measure=()=>setOverflow(!!node.querySelector('tbody tr:not([aria-hidden="true"])')&&node.scrollWidth>node.clientWidth+1);measure();if(typeof ResizeObserver==='undefined')return;const observer=new ResizeObserver(measure);observer.observe(node);if(node.querySelector('table'))observer.observe(node.querySelector('table')!);return()=>observer.disconnect();},[children]);
   return <div className="table-frame"><div className="table-caption" id={captionId}>{caption}</div>{overflow&&<div id={hint} className="table-overflow-hint">Scroll horizontally for all columns · use arrow keys when focused</div>}<div ref={region} className={`table-scroll ${className}`} tabIndex={0} role="region" aria-labelledby={captionId} aria-describedby={overflow?hint:undefined}><table><caption className="sr-only">{caption}</caption>{children}</table></div></div>;
 }
 export function Banner({title,children,status='PENDING'}:{title:string;children?:ReactNode;status?:Status}) {
