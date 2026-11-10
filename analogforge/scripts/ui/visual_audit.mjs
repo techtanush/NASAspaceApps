@@ -55,7 +55,10 @@ async function beginLoadedCohort(page,{width,height,theme,density}){
  await page.setViewportSize({width,height});
  await page.evaluate(({theme,density})=>{localStorage.setItem('af.theme',theme);localStorage.setItem('af.density',density);},{theme,density});
  const state=auditStates.get(page);if(state)for(const request of state.inflight)state.navigationAborts.add(request);
- await page.reload({waitUntil:'domcontentloaded'});await page.locator('main h1').waitFor({state:'visible',timeout:60000});
+ // Use a fresh document navigation: Chromium's hard reload can temporarily bypass
+ // the preview service worker, whose startup then schedules a second reload.
+ // A new document still records all initial layout shifts without that race.
+ await page.goto(page.url(),{waitUntil:'load'});await page.locator('main h1').waitFor({state:'visible',timeout:60000});
  await waitForAuditData(page);
  return page.evaluate(()=>{window.__auditMeasureCLS=false;return window.__auditCLS||0;});
 }
