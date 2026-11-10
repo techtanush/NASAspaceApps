@@ -3,7 +3,7 @@
   "person": "Ayan",
   "branch": "ayan/science-data-verification",
   "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
-  "tested_commit_sha": null,
+  "tested_commit_sha": "12e5e105210564b41d2830b3ef66fbb243ac2861",
   "kit_version": "1.0.0",
   "kit_verify": {
     "status": "PASS",
