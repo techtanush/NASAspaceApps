@@ -23,3 +23,7 @@
 .analogs-workspace .map-region{height:320px}
 
 .coordinate-pair{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px;white-space:normal;overflow-wrap:normal;word-break:normal}
+
+/* Initial scan exposes rank, candidate, status and selection; provenance follows. */
+.analogs-list-pane .candidate-table table{width:744px;min-width:744px;table-layout:fixed}.analogs-list-pane .candidate-table th:nth-child(1){width:56px}.analogs-list-pane .candidate-table th:nth-child(2){width:144px}.analogs-list-pane .candidate-table th:nth-child(3){width:104px}.analogs-list-pane .candidate-table th:nth-child(4){width:112px;min-width:112px}.analogs-list-pane .candidate-table th:nth-child(5){width:128px}.analogs-list-pane .candidate-table th:nth-child(6){width:200px}.analogs-list-pane .candidate-table td{overflow-wrap:normal;word-break:normal}
+.candidate-details{margin-top:4px}.candidate-details>summary{font-size:12px}.candidate-details[open]{display:flex;flex-direction:column;gap:8px}

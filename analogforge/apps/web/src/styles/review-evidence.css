@@ -28,3 +28,20 @@
 
 .qualification-tools{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.matrix-label-narrow{display:none}
 @media(max-width:767px){.qualification-tools{gap:8px;flex-wrap:nowrap}.qualification-tools>.segmented{gap:4px;flex-shrink:0}.qualification-tools .button{padding-left:8px;padding-right:8px;font-size:13px}.qualification-tools>.inline-fields{gap:4px;flex-wrap:nowrap;font-size:12px}.matrix-label-wide{display:none}.matrix-label-narrow{display:inline}}
+
+/* Review: preserve a compact, stable loading viewport without empty panel gaps. */
+.workspace-table-slot{height:176px}.workspace-table-slot .empty-state{padding:12px}.practice-presets{min-height:0}
+.run-id-link{white-space:nowrap;overflow-wrap:normal;font-family:var(--font-mono);font-variant-numeric:tabular-nums;min-width:80px}
+.workspace-table-slot a,.practice-presets a{color:var(--text-primary);text-decoration:none;border-bottom:1px solid var(--border-strong)}.workspace-table-slot a:hover,.practice-presets a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.shortcut-list{display:flex;flex-direction:column;gap:12px;margin:0}.shortcut-row{display:grid;grid-template-columns:56px minmax(0,1fr);align-items:center;gap:16px}.shortcut-row dd{margin:0}.shortcut-row dt{min-height:32px;display:flex;align-items:center}
+.error-panel .section-heading{justify-content:flex-start;gap:8px}.error-panel .section-heading>svg{color:var(--state-fail);flex-shrink:0}
+.file-choose{position:relative;display:flex;align-items:center;justify-content:center;min-height:32px;padding:8px 12px;border-radius:var(--radius-2);background:var(--surface-2);font-size:14px}
+.file-choose input[type=file]{position:absolute;inset:0;width:100%;height:100%;padding:0;color:transparent;background:transparent;cursor:pointer;border:1px solid var(--border-strong)}
+.file-choose input[type=file]::file-selector-button{width:100%;height:100%;margin:0;padding:0;border:0;background:transparent;color:transparent;cursor:pointer}
+.file-choose:focus-within{outline:2px solid var(--focus-ring);outline-offset:2px}.file-choose input[type=file]:focus-visible{outline:2px solid var(--focus-ring)}
+[data-testid=evidence-drawer] .evidence-receipt-body th{overflow-wrap:normal;word-break:normal}
+[data-testid=compat-table] td[data-numeric]>.helper,[data-testid=compat-table] td[data-numeric] p{font-variant-numeric:tabular-nums}
+.styleguide-example[data-component="Chart(Histogram|Line|Bar)"]{grid-column:1/-1}
+.context-column nav a{gap:8px}.context-column nav svg{flex-shrink:0}.context-run-description{flex-basis:100%}
+@media(min-width:1024px) and (max-width:1279px){.shell-grid{grid-template-columns:48px minmax(0,1fr)}.context-column{padding:8px 4px}.context-column nav a{width:40px;min-height:40px;padding:8px;justify-content:center}.context-column nav a[aria-current=page]{padding-left:4px}.context-column .context-label,.context-column .context-nav-label{display:none}}
+@media(max-width:767px){.run-state{padding:8px;gap:4px}.run-lifecycle>.helper{font-size:12px}.run-science{gap:4px}.run-actions .button{padding:4px 8px}.run-layout>.operations-bar{padding:4px 8px;gap:4px}.run-layout>.operations-bar>.helper{font-size:12px}.file-choose{min-height:44px}.shortcut-row{grid-template-columns:56px minmax(0,1fr)}}

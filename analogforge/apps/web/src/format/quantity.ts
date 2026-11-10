@@ -7,7 +7,8 @@ export function quantity(value:number|null|undefined,unit='',digits?:number):str
  if(unit==='m'&&Math.abs(value)>=1000){display=value/1000;label='km';}
  if(unit==='percent')label='%';
  const precision=digits??PRECISION[label];
- const options:Intl.NumberFormatOptions=label==='fraction'?{maximumSignificantDigits:3}:precision===undefined?{maximumFractionDigits:2}:{minimumFractionDigits:precision,maximumFractionDigits:precision};
+ const preserveSmall=display!==0&&Math.abs(display)<1&&(label==='m'||(precision!==undefined&&Number(display.toFixed(precision))===0));
+ const options:Intl.NumberFormatOptions=preserveSmall?{minimumSignificantDigits:2,maximumSignificantDigits:3}:label==='fraction'?{maximumSignificantDigits:3}:precision===undefined?{maximumFractionDigits:2}:{minimumFractionDigits:precision,maximumFractionDigits:precision};
  const formatted=new Intl.NumberFormat('en-US',options).format(display).replace('-','−');
  return label?`${formatted}${NBSP}${label}`:formatted;
 }
