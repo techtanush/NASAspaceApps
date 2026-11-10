@@ -42,7 +42,7 @@ corepack pnpm run audit:visual
 .venv/bin/python scripts/ui/mutation_check.py --json out/mutations.json
 ```
 
-Browser checks use `PLAYWRIGHT_CHROMIUM_EXECUTABLE` when set, an installed macOS Chrome when available, or Playwright Chromium. Install the latter with `corepack pnpm --filter @analogforge/web exec playwright install chromium` if needed. Run browser suites serially on memory-constrained machines.
+Browser checks use `PLAYWRIGHT_CHROMIUM_EXECUTABLE` when set, the matching Playwright Chromium when installed, or an installed macOS Chrome as fallback. Install the latter with `corepack pnpm --filter @analogforge/web exec playwright install chromium` if needed. Run browser suites serially on memory-constrained machines.
 
 The same journeys run against the merged backend with `E2E_TARGET=real` and `E2E_BASE_URL` pointing to the merged workbench origin; they retain API identity, receipt, evidence, and digest assertions. See `team handoffs/aradhya/STATUS.json` for the checks actually executed and remaining integration boundaries.
 

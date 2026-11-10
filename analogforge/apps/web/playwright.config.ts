@@ -1,7 +1,8 @@
-import { defineConfig } from '@playwright/test';
+import { chromium, defineConfig } from '@playwright/test';
 import { existsSync } from 'node:fs';
 const chromePath='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const executable=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || (existsSync(chromePath)?chromePath:undefined);
+const bundled=chromium.executablePath();
+const executable=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || (existsSync(bundled)?bundled:existsSync(chromePath)?chromePath:undefined);
 const mock = process.env.E2E_TARGET === 'mock';
 export default defineConfig({
  testDir: '../../tests/e2e', timeout: 90000, expect: { timeout: 15000 }, fullyParallel: false, workers: 1,
