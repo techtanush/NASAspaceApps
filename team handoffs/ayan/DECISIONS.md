@@ -238,3 +238,110 @@
   ownership check) does not see it. Scripts keep writing to `analogforge/out/`.
 * O-03 D-01 (aspect == 360.0) fixed in `features/slope.py`; the facade workaround `clean_aspect` was removed.
 * O-04 New: `tests/property/science/test_properties.py` (cross-cutting properties) and `scripts/science/validate_sources.py` (+ `tests/integration/science/test_validate_sources.py`).
+
+## Route-engine adversarial-review fixes (routing)
+* R-01 Task satisfaction is the SET of traversable nodes within the task tolerance (`Problem.task_sets`; `task_nodes` stays as the nearest
+  representative). Solver, certificate (reachable iff any member is in the start component; distance/energy bounds use the cheapest member)
+  and heuristics (multi-source Dijkstra, `min` over members for the return leg) use the same rule as the verifier, which accepts any in-tolerance
+  route node. The first in-tolerance arrival completes the task, so FOUND routes stay minimal under the shared semantics.
+* R-02 Corner-touch geometry uses `routing.tie_slack_cells` (1e-12 + 8 eps_mach * max|coordinate| / cell_size, in cells) instead of a fixed 1e-12 in
+  BOTH algorithms; the algorithms stay different (DDA tie test scaled by the larger direction component; slab clipping tests inclusion against
+  squares expanded by the slack and measures lengths on the exact square, lengths <= slack are 0). Over-detecting a touch is the conservative direction.
+* R-03 Node-id aliasing: REJECT, not canonicalise. `parse_raster_node_id` accepts only `r<0|[1-9][0-9]*>c<...>` (ASCII, full match), so `r05c13`,
+  `r5c013`, fullwidth/Arabic digits and trailing newlines are not node ids; the verifier reports them as `DISCONTINUOUS_ROUTE` with a "non-canonical node
+  id" message (the closed `RouteViolation.code` set has no dedicated code). Waypoints with such ids raise `WAYPOINT_UNRESOLVED`.
+* R-04/R-05 Pareto dominance has two modes. RELAXED (limit >= 2 and no TOTAL requirement) keeps the "remove two copies of a third traversal" argument.
+  STRICT (limit == 1, or any TOTAL_TRAVERSED_DISTANCE requirement, where removing copies lowers counted exposure) additionally requires pointwise
+  usage `A <= B`; ties on all costs with different usage keep both labels so the lexicographic tie-break stays exact. No STRICT prune is lossy, so the
+  asymmetric-energy "withhold EXHAUSTIVE_INFEASIBLE" rule applies to RELAXED mode only. Cost: weaker pruning for those two cases (budgets still bound it).
+* R-06 A root label that already satisfies everything is not a solution (a route has >= 1 edge) and is therefore kept out of the Pareto table and the
+  label-cap counters, so it cannot dominate the labels that leave and return (`S,A,S` is found when every task is at the start).
+* R-07 The wall-clock budget is read on the first pop and every 8 pops (was every 256).
+* R-08 Non-finite terrain: a VALID cell with NaN/inf slope or elevation is impassable for the solver (never a node, never crossed) and, if a route
+  touches one, the verifier emits `UNKNOWN_TERRAIN` ("not finite") and returns `INCONCLUSIVE / DATA` (terrain-mask row INCONCLUSIVE, issue
+  `INPUT_INVALID/NONFINITE_TERRAIN`) unless a genuine violation also exists (then FAIL). It never PASSes and never raises `ModelError`.
+
+## Review wave: datasets / adapters / coverage hardening (D1-D16)
+* DH-01 Nodata (D2): a declared nodata no longer exempts the data from the sentinel scan. Known void sentinels (-32768, -9999) present in the raw
+  values but not named by the manifest or file declaration FAIL `nodata_declared`; the all-zero-border heuristic still runs only when nothing is declared.
+* DH-02 Source URL (D5): `lineage_fields` also inspects the fragment and a wider credential-key list (pass/pwd/secret/session/bearer/jwt/x-goog,
+  exact SAS keys sv/se/sp/sr/st/sas). Evidence `source_uri` is now scheme+host[:port]+path only (`checks.sanitized_source_url`): userinfo, query and fragment
+  are dropped, because the registrar already refuses a query and a token may sit in any of them.
+* DH-03 Latitude (D6): `check_transform_sane(gt, registration, bbox)` FAILs when the extent (cell edges included) leaves +-90 (1e-6 tolerance) or is non-finite.
+  `ingest` publishes a non-finite/<=0 native resolution as `None` and an off-globe bbox as `None` (never NaN into the payload model).
+* DH-04 Longitude (cheap items): a raster start must lie in the half-open domain [lo, hi) (360 / 180 rejected); `longitude_direction` must match the
+  longitude axis of the geographic CRS (POSITIVE_WEST declared over a positive-east raster FAILs; the pipeline never mirrors longitudes).
+* DH-05 `reference_radius_m` (D7): separate `REFERENCE_RADIUS_TOLERANCE = 0.1 %` of the body mean radius (Moon 1737 m, Mars 3396 m). CRS ellipsoid checks keep
+  the 1 % `BODY_RADIUS_TOLERANCE` (WGS84 a is 0.11 % above the Earth mean radius, so a 0.1 % rule there would reject Earth). Consequence: an Earth RADIUS product with a
+  WGS84 semi-major reference (6378137) fails; use the mean radius.
+* DH-06 HTML sniff (D8): one helper `adapters/source_http/sniff.looks_like_html` (BOM, whitespace/NUL, any number of comments and `<? ?>` prologs, UTF-16/32,
+  first 4096 bytes). `datasets.checks` delegates to it (datasets -> adapters already exists via the archive helper; adapters never import datasets). `download`
+  buffers the first 4096 bytes before sniffing. PDS4 `.xml` label downloads pass `expected_magic=("<?xml", BOM+"<?xml")`; PDS3 labels, raw images and Diviner
+  tables have no single signature, so none is passed for them (documented gap). `expected_magic` may be a tuple.
+* DH-07 Transport (D9/D10/D16): credential-like request headers (policy `sensitive_headers` + names containing auth/token/secret/key/cookie/credential/password/signature)
+  are stripped on every hop to a non-credential host. Allow-list is port-aware: `HttpPolicy.allowed_ports` (default {443}; 80 added with `allow_insecure`),
+  `PORT_NOT_ALLOWED`. Unparseable URL / invalid port -> `INVALID_URL`; `redact_url` never raises; `Retry-After` accepts ASCII digits only.
+* DH-08 Coverage policy (D3/D4): `coverage.enforce_source_policy` runs before any request for RESOLVE_COVERAGE and FETCH_SOURCE. Network adapters need
+  `allow_network` AND an explicit `allowed_adapter_ids` entry; a non-empty `allowed_adapter_ids` also restricts local adapters (empty = no restriction for local sources,
+  which are authorized by `local_dataset_ids`/`synthetic_fixture_ids`). `allowed_extents` (same body, planar union, ExtentBox convention inferred: any lon > 180 = ZERO_360)
+  must contain the whole AOI. `synthetic_practice` outside synthetic mode -> BLOCKED `MODE_MISMATCH`. Zero-width / off-globe AOI -> BLOCKED `AOI_INVALID`.
+  Network adapters outside live mode keep their previous block (`NETWORK_UNAVAILABLE`/`FETCH_NOT_AVAILABLE`), evaluated first.
+* DH-09 Geometry (D13): `coverage_fraction` splits product boxes with west > east at the seam of their domain (0/360 when any longitude > 180, else -180/180).
+  `validate_bbox` rejects west == east (a full circle is west+360).
+* DH-10 Locks (D14): `verify_lock_integrity` also re-validates `manifest.yaml` and compares its canonical hash with `manifest_sha256` (MISSING / SOURCE_CHECKSUM_MISMATCH) and
+  reports `SYMLINK` for a symlinked dataset directory, manifest or file. The existing lock test now writes `manifest.yaml` next to the data (a locked dataset always has one).
+* DH-11 XML (D15): `xml_safe` decodes UTF-16/32 (BOM or NUL-pattern) before scanning for DOCTYPE/ENTITY and parses the decoded text; ASCII-incompatible declared
+  encodings (anything other than UTF-8/ASCII/Latin-1/cp1252) are rejected.
+* DH-12 NASADEM (D11/D12/D16): tile corner must be in lat -90..89, lon -180..179. `mosaic(max_cells=DEFAULT_MOSAIC_MAX_CELLS=64e6)` refuses before allocation
+  (`MOSAIC_TOO_LARGE`). `decode` of a zip extracts to a temp dir (or `work_dir`) and never writes next to the source. Expansion rule: the 20x ratio cap is waived only for members
+  whose declared size is exactly N*N or 2*N*N (N in {1201, 3601} or `expected_samples`); a constant ocean/flat tile compresses ~1000:1. Such a member still counts toward
+  `max_total_bytes` and cannot grow past its declared size while copying.
+* DH-13 Archives (D16): a name used both as a file and as a directory prefix (`x.hgt` + `x.hgt/y.hgt`) -> `ARCHIVE_DUPLICATE_MEMBER`; any failure while extracting removes the files (or the
+  whole destination if it was created) written so far; OS write errors map to `ARCHIVE_WRITE_FAILED`. `asset_directory` rejects dot-only or >200 character granule names and requires
+  the result to sit directly under `source_bytes/<adapter>`. `pds.index.validate_relative` uses `fullmatch` and rejects '.', empty segments and a trailing '/'.
+* DH-14 User survey (D1): GDAL scale/offset from the file are applied once (`raw*scale+offset`, before unit conversion; nodata matched on raw values); `scale_applied`,
+  `source_scale`, `source_offset` report it; a zero/non-finite scale is `METADATA_INCOMPLETE`.
+
+## Review fixes (science worker, adversarial-review round)
+
+* RV-01 Compare W1 (HIGH): the stored ANALYSIS_GRID zeroed `elevation_m` on every cell with `valid=false`, including land cells that merely lack a full
+  3x3 neighbourhood (quality NO_FULL_SUPPORT, e.g. the raster border), and `histogram_at_support` area-averaged those zeros as data (flat control `grid-r0c2`
+  W1 3.595 PASS vs the true 6.806). Fix at the source: `raster.store.build_analysis_grid` now keeps the real elevation for quality OK **and** NO_FULL_SUPPORT land
+  cells and zeroes only cells without usable elevation (nodata, water, outside); the invariant check and docstring say so (guide 08 section 3 wording "invalid cells
+  hold 0" is narrowed to "cells without usable elevation hold 0"; the member set and bytes layout are unchanged). The aggregation uses only `land & quality in (OK, NO_FULL_SUPPORT)`.
+  Coverage of the re-derived histogram is the share of *eligible* coarse cells (the window's outer coarse ring cannot have a 3x3 neighbourhood in a window-only grid)
+  that obtained a slope; the W1 policy gates on that (`SideEvidence.coverage`), not on the 60 m `valid_fraction` metric (0.969 passed while 0.56 of coarse cells were used).
+  The target histogram's `valid_fraction` metric is gated as well (DECISION RV-05).
+  Independent re-derivation (truth table `independent_w1`, now from the RAW GeoTIFF + water mask, only the window origin/size come from `meta.json`): W1 at 480 m
+  A = coverage < 0.8 (UNKNOWN `INSUFFICIENT_VALID_DATA`), B (`grid-r0c0`) 4.3898 PASS, C (`grid-r0c2`) 6.8065 **FAIL `DISTRIBUTION_MISMATCH`** (was PASS 3.595), `grid-r1c0` 4.8065 PASS.
+  Expected-row changes: (1) C's context row is FAIL (arch 40 section 5 says "per oracle", so the oracle decides; flat slope is all in bin [0,2) -> W1 = 6.806 > 6);
+  (2) A's context row is UNKNOWN: the island window's moat leaves too few full-support 480 m cells (the old PASS used 0 m water cells as terrain). `test_pert_05` now asserts
+  B PASS->FAIL under the shifted target and A UNKNOWN in both runs, each checked against the raw-raster oracle. Screening (halo-based, 6.8065 for C) agrees with the
+  compare value for C; B/rolling differ slightly because screening has real halo data outside the window (4.454 vs 4.390) - the window-only value is what compare reports.
+* RV-02 `CHARACTERIZE_TARGET` `valid_fraction` has the whole AOI as denominator (cells whose centre is in the AOI, counted over the unclipped range, in row chunks), so an AOI
+  mostly outside the dataset is no longer "fully valid"; `< hard_block_valid_fraction` (0.05) blocks `INSUFFICIENT_VALID_DATA`.
+* RV-03 Route rows (`route_dependent`): INCONCLUSIVE (any category) credits nothing (reserve + DATA + no value -> `ENERGY_MODEL_MISSING`); PASS/ROUTE_VERIFIED needs a
+  `kind == VERIFICATION` handle (otherwise UNKNOWN `ROUTE_NOT_VERIFIED`, SC-11 NOT_ASSESSED); an `UNKNOWN_TERRAIN` violation -> UNKNOWN; any violation outside the row-scoped set
+  {EXPOSURE_SHORTFALL, WAYPOINT_MISSED, TASK_CAPABILITY_MISSING, RETURN_NOT_COMPLETED, ENERGY_RESERVE_SHORTFALL, CLASS_DIVERSITY_SHORTFALL} (slope, forbidden terrain,
+  discontinuity, stale hash, distance/duration/traversal budget) invalidates the route -> FAIL `ROUTE_FAILED` for every route row. Credit after an overall FAIL therefore survives only
+  when all violations are row-scoped (arch 40 section 5: A after PROVE IT keeps R-TASKS/R-RESERVE PASS when only EXPOSURE_SHORTFALL fired). Tension recorded: arch 40 S-NO-ENERGY says
+  "exposure/tasks PASS" for an INCONCLUSIVE/DATA verification; the review requirement (no PASS on INCONCLUSIVE) wins - those rows are UNKNOWN until the energy model exists. The existing
+  test that expected a search-only (non-VERIFICATION) handle to PASS at S3 now expects UNKNOWN at S2.
+* RV-04 `verified_route_supplied` needs outcome PASS/FAIL and no `UNKNOWN_TERRAIN`; energy/route-length dimensions read verifier metrics only from such a verification.
+  A clearance requirement without `lower` is UNKNOWN (previously an `assert`).
+* RV-05 W1 gates the target's `valid_fraction` metric (or `SideEvidence.coverage`) against `min_valid_fraction` when stated (missing -> not assessed, as before; the histogram's
+  `valid_area_m2 > 0` check stays). Equality passes, below -> `INSUFFICIENT_VALID_DATA` ("Target valid coverage ...").
+* RV-06 `COMPARE_REQUIREMENT` blocks (`INPUT_INVALID`, detail `EVIDENCE_WINDOW_MISMATCH`) when an `analyze-candidate` grid among the candidate evidence does not contain the candidate AOI
+  (grid centre vs lon/lat box), including mixed evidence. Limit: summary/route handles carry no geometry, so only grid evidence is bound.
+* RV-07 Compare gates SC-07/08/09 are evaluated: SC-07 from the quantity kinds of consulted + decisive verifier metrics (PROXY -> UNSATISFIED; ASSUMED without ASSUMPTION evidence -> NOT_ASSESSED);
+  SC-08 needs a non-empty uncertainty note on every decisive metric; SC-09 checks version presence and the algorithm lock. Audit: `search_extent_recorded` is derived from the screening payload
+  (screened_count > 0, finite non-degenerate box); mission sensitivity needs >= 2 COMPARISON evidences with distinct parameter hashes (one verdict is not a sensitivity analysis); an accepted
+  ASSUMED metric still needs an uncertainty statement for SC-07 SATISFIED.
+* RV-08 SC-10 matches source products as whole words (`[A-Z0-9]+` tokens) against the family table (added SRTMGL1/3, ASTGTM, MEGDR aliases); "raster" no longer matches ASTER.
+* RV-09 Portfolio `NONE`/`GAP` coverage needs a matching row in every candidate window; any window without a row keeps the requirement `UNKNOWN`.
+* RV-10 Config wiring: `thresholds.numeric_tolerance` (support-window bounds, W1 sum and support equality, compatibility comparisons), `energy_tolerance_wh` (`meets_reserve` default) and
+  `grid.target_support_m.earth_default_m` (validated equal to the Earth measurement spec default, so the two copies cannot drift) are read from `algorithms.yaml` via the cached
+  `config.default_thresholds()`. Routing-owned keys are listed in DEFECTS-FOUND.md (R-CFG-01).
+* RV-11 `assert_crs_matches_body` also compares the semi-minor axis: an oblate Mars CRS (a=3396190, b=3376200) is rejected `BODY_MISMATCH` instead of being silently treated as the Mars sphere.
+* RV-12 Connected zones of `ANALYZE_CANDIDATE` keep the default 18 deg cap: the kit input carries no rover, so honouring the rover cap (PRACTICE-LITE 12 deg) is impossible without a kit change
+  (`CHANGE-REQUEST-analyze-rover-cap.json`). The payload now states the cap used and that reachability for a rover comes from route search.

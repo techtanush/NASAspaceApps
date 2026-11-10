@@ -14,9 +14,10 @@ from pathlib import Path
 from typing import Any, Final, Literal
 
 import yaml
-from pydantic import Field
+from pydantic import Field, ValidationError
 
 from analogforge.ports.common import PortModel
+from analogforge.ports.datasets import DatasetManifest
 from analogforge.ports.hashing import canonical_json_bytes, canonical_sha256, file_sha256
 from analogforge.science.datasets.checks import TODO_MARKER
 from analogforge.science.datasets.ingest import DatasetUnreadableError, IngestResult
@@ -182,17 +183,55 @@ def lock_to_bytes(lock: SourcePolicyLock) -> bytes:
 class LockMismatch:
     dataset_id: str
     path: str
-    reason: str  # SOURCE_CHECKSUM_MISMATCH | MISSING
+    reason: str  # SOURCE_CHECKSUM_MISMATCH | MISSING | SYMLINK
+
+
+def _symlinked(base: Path, relative: str) -> bool:
+    """True when ``base`` or any component of ``relative`` below it is a symbolic link."""
+    if base.is_symlink():
+        return True
+    current = base
+    for part in Path(relative).parts:
+        current = current / part
+        if current.is_symlink():
+            return True
+    return False
+
+
+def _manifest_digest(dataset_dir: Path) -> str | None:
+    """``canonical_sha256`` of the parsed manifest as :func:`ingest_local_dataset` hashes it (None: unusable)."""
+    try:
+        parsed = DatasetManifest.model_validate(load_manifest_file(dataset_dir))
+    except (DatasetUnreadableError, ValidationError):
+        return None
+    return canonical_sha256(parsed.model_dump(mode="json"))
 
 
 def verify_lock_integrity(lock: SourcePolicyLock, incoming_root: Path) -> list[LockMismatch]:
-    """Re-hash every locked file (architecture 36 section 7); a non-empty result means SOURCE_CHECKSUM_MISMATCH."""
+    """Re-check every locked dataset (architecture 36 section 7); a non-empty result means the lock no longer holds.
+
+    Each dataset's ``manifest.yaml`` is re-validated and its canonical hash compared with ``manifest_sha256`` (a changed
+    scale, unit or nodata is as invalid as a changed byte), every locked file is re-hashed, and a symlinked dataset
+    directory or file is refused (``SYMLINK``) because its bytes could be swapped without changing the path.
+    """
     problems: list[LockMismatch] = []
     for entry in lock.datasets:
         base = incoming_root / entry.dataset_id
+        if base.is_symlink():
+            problems.append(LockMismatch(entry.dataset_id, ".", "SYMLINK"))
+            continue
+        manifest_path = base / MANIFEST_NAME
+        if _symlinked(base, MANIFEST_NAME):
+            problems.append(LockMismatch(entry.dataset_id, MANIFEST_NAME, "SYMLINK"))
+        elif not manifest_path.is_file():
+            problems.append(LockMismatch(entry.dataset_id, MANIFEST_NAME, "MISSING"))
+        elif _manifest_digest(base) != entry.manifest_sha256:
+            problems.append(LockMismatch(entry.dataset_id, MANIFEST_NAME, "SOURCE_CHECKSUM_MISMATCH"))
         for f in entry.files:
             target = base / f.path
-            if not target.is_file():
+            if _symlinked(base, f.path):
+                problems.append(LockMismatch(entry.dataset_id, f.path, "SYMLINK"))
+            elif not target.is_file():
                 problems.append(LockMismatch(entry.dataset_id, f.path, "MISSING"))
             elif file_sha256(target) != f.sha256:
                 problems.append(LockMismatch(entry.dataset_id, f.path, "SOURCE_CHECKSUM_MISMATCH"))

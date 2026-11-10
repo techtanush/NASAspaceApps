@@ -27,6 +27,7 @@ CMR_GRANULES_URL = "https://cmr.earthdata.nasa.gov/search/granules.umm_json"
 DEFAULT_PAGE_SIZE = 50
 DEFAULT_MAX_PAGES = 4
 _SAFE_NAME = re.compile(r"[^A-Za-z0-9._-]+")
+_MAX_NAME_LENGTH = 200
 
 
 @dataclass(frozen=True)
@@ -187,9 +188,12 @@ def lookup_granule(http: SafeHttp, concept_id: str, base_url: str = CMR_GRANULES
 
 def asset_directory(scratch: Path, adapter_id: str, granule_ur: str) -> Path:
     """Deterministic, traversal-free location of one granule's bytes under ``scratch``."""
-    path = scratch / "source_bytes" / adapter_id / _SAFE_NAME.sub("_", granule_ur)
+    name = _SAFE_NAME.sub("_", granule_ur)
+    if not name.strip(".") or len(name) > _MAX_NAME_LENGTH:  # "", ".", "..", "..." or an unusable length
+        raise AdapterError("SOURCE_CONTENT_INVALID", "unusable granule name", detail_code="PATH_ESCAPE")
+    path = scratch / "source_bytes" / adapter_id / name
     resolved = path.resolve()
-    if scratch.resolve() not in resolved.parents:
+    if (scratch / "source_bytes" / adapter_id).resolve() != resolved.parent:
         raise AdapterError("SOURCE_CONTENT_INVALID", "scratch path escape", detail_code="PATH_ESCAPE")
     return path
 

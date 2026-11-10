@@ -15,6 +15,7 @@ from pathlib import Path
 import httpx
 import numpy as np
 import pytest
+import rasterio
 from adapter_synth import (
     HGT_VOID,
     GranuleSpec,
@@ -32,6 +33,7 @@ from adapter_synth import (
     zip_with_members,
     zip_with_symlink,
 )
+from rasterio.transform import from_origin
 
 from analogforge.adapters import diviner, earthdata, emit, pds, user_survey
 from analogforge.adapters.source_http import (
@@ -1649,3 +1651,460 @@ class TestPurity:
         with pytest.raises(AdapterError) as err:
             http.get_bytes("https://a.example/f?X-Amz-Signature=SIGSECRET")
         assert "SIGSECRET" not in str(err.value) and "SUPER-SECRET" not in str(err.value)
+
+
+# ======================================== review-wave hardening
+class TestTransportHardening:
+    def http(self, world, policy_for, hosts=("a.example",), **kw):  # type: ignore[no-untyped-def]
+        return SafeHttp(world.client(), policy_for(set(hosts), **kw))
+
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            b"\xef\xbb\xbf<!DOCTYPE html><html>",
+            b"<!-- c --><html><body>",
+            b"<!-- a -->\n<!-- b --> <html>",
+            b'<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml">',
+            "<html><body>login".encode("utf-16"),
+            b" " * 1500 + b"<html>",
+        ],
+        ids=["bom", "comment", "two-comments", "xml-prolog", "utf16", "late"],
+    )
+    def test_disguised_html_is_rejected_by_download_and_get_bytes(self, world, policy_for, tmp_path, payload):  # type: ignore[no-untyped-def]
+        world.routes[("a.example", "/f")] = lambda r: httpx.Response(
+            200, content=payload, headers={"content-type": "application/octet-stream"}
+        )
+        http = self.http(world, policy_for)
+        with fails("SOURCE_CONTENT_INVALID", "HTML_LOGIN_PAGE"):
+            http.download("https://a.example/f", tmp_path / "f")
+        assert not list(tmp_path.iterdir())
+        with fails("SOURCE_CONTENT_INVALID", "HTML_LOGIN_PAGE"):
+            http.get_bytes("https://a.example/f")
+
+    def test_binary_and_xml_labels_are_not_mistaken_for_html(self, world, policy_for, tmp_path):  # type: ignore[no-untyped-def]
+        world.routes[("a.example", "/b")] = lambda r: httpx.Response(200, content=b"II*\x00" + bytes(100))
+        world.routes[("a.example", "/x")] = lambda r: httpx.Response(
+            200, content=b'<?xml version="1.0"?><!-- c --><Product_Observational/>'
+        )
+        http = self.http(world, policy_for)
+        assert http.download("https://a.example/b", tmp_path / "b").size_bytes == 104
+        assert http.download("https://a.example/x", tmp_path / "x").size_bytes > 10
+
+    def test_every_credential_like_header_is_stripped_on_a_foreign_hop(self, world, policy_for, tmp_path):  # type: ignore[no-untyped-def]
+        world.routes[("a.example", "/f")] = lambda r: httpx.Response(302, headers={"location": "https://b.example/x"})
+        world.routes[("b.example", "/x")] = lambda r: httpx.Response(200, content=b"ok")
+        client = httpx.Client(
+            transport=httpx.MockTransport(world.handle),
+            headers={
+                "Authorization": "Bearer S1", "X-Api-Key": "S2", "X-Custom-Token": "S3", "Cookie": "s=S4",
+                "Accept": "*/*",
+            },
+        )  # fmt: skip
+        policy = policy_for({"a.example", "b.example"}, sensitive_headers=frozenset({"x-corp-id"}))
+        SafeHttp(client, policy).download(
+            "https://a.example/f", tmp_path / "f", headers={"X-Corp-Id": "S5", "Api-Key": "S6"}
+        )
+        first, second = world.calls
+        assert first.headers["x-api-key"] == "S2" and first.headers["x-corp-id"] == "S5"
+        assert second.headers.get("accept") == "*/*"
+        leaked = {
+            k: v for k, v in second.headers.items() if "S" in v and v[-2:] in {"S1", "S2", "S3", "S4", "S5", "S6"}
+        }
+        assert leaked == {}, leaked
+        for name in ("authorization", "x-api-key", "x-custom-token", "cookie", "x-corp-id", "api-key"):
+            assert name not in second.headers
+
+    def test_allow_list_is_port_aware(self, world, policy_for, tmp_path):  # type: ignore[no-untyped-def]
+        world.routes[("a.example", "/f")] = lambda r: httpx.Response(200, content=b"ok")
+        http = self.http(world, policy_for)
+        with fails("SOURCE_CONTENT_INVALID", "PORT_NOT_ALLOWED"):
+            http.get_bytes("https://a.example:8443/f")
+        assert world.calls == []
+        assert http.get_bytes("https://a.example:443/f").content == b"ok"
+        explicit = self.http(world, policy_for, allowed_ports=frozenset({443, 8443}))
+        assert explicit.get_bytes("https://a.example:8443/f").content == b"ok"
+
+    def test_redirect_to_another_port_of_an_allowed_host_is_refused(self, world, policy_for):  # type: ignore[no-untyped-def]
+        world.routes[("a.example", "/f")] = lambda r: httpx.Response(
+            302, headers={"location": "https://b.example:8443/x"}
+        )
+        with fails("SOURCE_CONTENT_INVALID", "PORT_NOT_ALLOWED"):
+            self.http(world, policy_for, hosts=("a.example", "b.example")).get_bytes("https://a.example/f")
+        assert "b.example" not in world.hosts_called()
+
+    @pytest.mark.parametrize("value", ["²", "٣", "1e3", "nan", "-1", "", "9" * 400])
+    def test_retry_after_with_odd_digits_never_crashes(self, world, policy_for, value):  # type: ignore[no-untyped-def]
+        world.routes[("a.example", "/x")] = lambda r: httpx.Response(
+            429, headers=[(b"Retry-After", value.encode("utf-8"))]
+        )
+        with fails("PROVIDER_RATE_LIMITED"):
+            self.http(world, policy_for).get_json("https://a.example/x")
+
+    @pytest.mark.parametrize("url", ["https://a.example:99999/x", "https://a.example:abc/x", "https://[::1/x"])
+    def test_invalid_port_or_url_is_an_adapter_error(self, world, policy_for, tmp_path, url):  # type: ignore[no-untyped-def]
+        http = self.http(world, policy_for)
+        with fails("SOURCE_CONTENT_INVALID", "INVALID_URL"):
+            http.get_bytes(url)
+        with fails("SOURCE_CONTENT_INVALID", "INVALID_URL"):
+            http.download(url, tmp_path / "o.zip")
+        assert world.calls == []
+
+    def test_redact_url_tolerates_an_invalid_port(self):
+        from analogforge.adapters.source_http import redact_url
+
+        assert "token" not in redact_url("https://a.example:99999999/x?token=1")
+
+
+class TestGeoHardening:
+    def test_coverage_fraction_handles_antimeridian_wrapping_product_boxes(self):
+        aoi = split_bbox([175, 0, -175, 5], "NEG180_180", "NEG180_180")
+        wrapped = coverage_fraction(aoi, [(170, 0, -170, 10)])  # west > east: crosses the seam
+        split = coverage_fraction(aoi, [(170, 0, 180, 10), (-180, 0, -170, 10)])
+        assert wrapped == pytest.approx(1.0) and split == pytest.approx(1.0)
+        half = coverage_fraction(aoi, [(178, 0, -178, 5)])  # covers 4 of the 10 degrees
+        assert half == pytest.approx(0.4)
+        zero360 = split_bbox([355, 0, 5, 5], "ZERO_360", "ZERO_360")
+        assert coverage_fraction(zero360, [(350, 0, 10, 5)]) == pytest.approx(1.0)
+        assert coverage_fraction(zero360, [(358, 0, 2, 5)]) == pytest.approx(0.4)
+
+    def test_zero_width_bbox_is_rejected(self):
+        with fails("NO_COVERAGE", "INPUT_INVALID"):
+            split_bbox([10, 0, 10, 5], "NEG180_180", "NEG180_180")
+
+
+class TestArchiveHardening:
+    def test_file_then_directory_collision_is_rejected_and_leaves_nothing(self, tmp_path):
+        z = zip_with_members(tmp_path / "c.zip", {"x.hgt": b"a" * 100, "x.hgt/y.hgt": b"b" * 100})
+        with fails("SOURCE_CONTENT_INVALID", "ARCHIVE_DUPLICATE_MEMBER"):
+            safe_extract_zip(z, tmp_path / "out", ArchiveLimits())
+        assert not (tmp_path / "out").exists() or not list((tmp_path / "out").rglob("*"))
+
+    def test_partial_files_are_cleaned_when_a_later_member_fails(self, tmp_path):
+        z = tmp_path / "p.zip"
+        with zipfile.ZipFile(z, "w", zipfile.ZIP_STORED) as zf:
+            zf.writestr("a.hgt", np.random.default_rng(1).bytes(2000))
+            zf.writestr("b.hgt", np.random.default_rng(2).bytes(2000))
+        raw = bytearray(z.read_bytes())
+        raw[raw.index(b"b.hgt") + 60] ^= (
+            0xFF  # corrupt the second member's payload (CRC failure after a.hgt is written)
+        )
+        z.write_bytes(bytes(raw))
+        with fails("SOURCE_CONTENT_INVALID", "BAD_ARCHIVE"):
+            safe_extract_zip(z, tmp_path / "out", ArchiveLimits())
+        assert not list((tmp_path / "out").rglob("*.hgt")) if (tmp_path / "out").exists() else True
+
+    def test_constant_nasadem_tiles_are_not_mistaken_for_bombs(self, tmp_path):
+        flat = np.full((1201, 1201), 5, dtype=np.int16)  # a legitimate all-sea / all-flat tile compresses ~500x
+        z = nasadem_zip(tmp_path / "n00e000.zip", "n00e000", flat, num=False)
+        assert z.stat().st_size * 20 < 1201 * 1201 * 2
+        out = earthdata.decode(z, earthdata.NasademParams(work_dir=tmp_path / "w"))
+        assert out.data.shape == (1201, 1201) and float(out.data[0, 0]) == 5.0
+        # the same ratio is still refused for any other member type
+        bomb = zip_with_members(tmp_path / "bomb.zip", {"zeros.hgt": b"\x00" * 2_000_000})
+        with fails("RESOURCE_LIMIT", "ARCHIVE_EXPANSION_LIMIT"):
+            safe_extract_zip(bomb, tmp_path / "o", ArchiveLimits())
+
+
+class TestNasademHardening:
+    @pytest.mark.parametrize("name", ["n95e010", "s91w010", "n10e181", "n10w181", "n90e010"])
+    def test_tile_corner_out_of_range_is_an_adapter_error(self, name):
+        with fails("SOURCE_CONTENT_INVALID", "METADATA_INCOMPLETE"):
+            earthdata.nasadem.parse_tile_name(name)
+
+    def test_tile_corner_in_range_parses(self):
+        assert earthdata.nasadem.parse_tile_name("n89w180") == (89, -180)
+        assert earthdata.nasadem.parse_tile_name("s90e179") == (-90, 179)
+
+    def test_decode_of_a_zip_writes_nothing_next_to_the_source(self, tmp_path):
+        src = tmp_path / "in"
+        src.mkdir()
+        arr = global_heights(11, 11, seed=4)
+        z = nasadem_zip(src / "n30w100.zip", "n30w100", arr)
+        before = sorted(p.name for p in src.iterdir())
+        out = earthdata.decode(z, earthdata.NasademParams(expected_samples=11))
+        assert sorted(p.name for p in src.iterdir()) == before and out.data.shape == (11, 11)
+
+    def test_mosaic_over_the_cell_budget_is_refused_before_allocation(self, tmp_path):
+        def tile(name: str) -> object:
+            z = nasadem_zip(tmp_path / f"{name}.zip", name, global_heights(11, 11, seed=5))
+            return earthdata.decode(z, earthdata.NasademParams(expected_samples=11, work_dir=tmp_path / name))
+
+        far = [tile("n00w179"), tile("n00e178")]  # 358 degrees apart: ~(359 x 10) cells at N=11
+        with fails("RESOURCE_LIMIT", "MOSAIC_TOO_LARGE"):
+            earthdata.mosaic(far, max_cells=1000)
+        assert earthdata.mosaic(far, max_cells=1_000_000).data.shape[1] == 358 * 10 + 1
+
+    def test_default_budget_refuses_a_world_strip_of_standard_tiles(self, tmp_path):
+        paths = []
+        for name in ("n00w179", "n00e178"):
+            (tmp_path / f"{name}.hgt").write_bytes(hgt_bytes(global_heights(1201, 1201, seed=6)))
+            paths.append(earthdata.decode(tmp_path / f"{name}.hgt"))
+        with fails("RESOURCE_LIMIT", "MOSAIC_TOO_LARGE"):
+            earthdata.mosaic(paths)
+
+
+class TestPdsAndCmrHardening:
+    @pytest.mark.parametrize(
+        "path",
+        ["a/b.lbl\n", "a/./b.lbl", "./a/b.lbl", "a/b.lbl/", "a//b.lbl", "../a.lbl", "a/../b.lbl", "a/b.lbl\x00", ""],
+    )
+    def test_validate_relative_rejects_ambiguous_paths(self, path):
+        from analogforge.adapters.pds.index import validate_relative
+
+        with fails("SOURCE_CONTENT_INVALID", "ARCHIVE_PATH_TRAVERSAL"):
+            validate_relative(path)
+
+    def test_validate_relative_accepts_plain_paths(self):
+        from analogforge.adapters.pds.index import validate_relative
+
+        assert validate_relative("data/mola_001.lbl") == "data/mola_001.lbl"
+
+    @pytest.mark.parametrize("granule_ur", ["..", ".", "", "...", "x" * 5000])
+    def test_asset_directory_rejects_traversal_and_empty_names(self, tmp_path, granule_ur):
+        from analogforge.adapters.source_http.cmr import asset_directory
+
+        with fails("SOURCE_CONTENT_INVALID", "PATH_ESCAPE"):
+            asset_directory(tmp_path, "adapter", granule_ur)
+
+    def test_asset_directory_normal_name_stays_below_the_adapter_directory(self, tmp_path):
+        from analogforge.adapters.source_http.cmr import asset_directory
+
+        d = asset_directory(tmp_path, "adapter", "NASADEM_HGT_n30w100")
+        assert d.parent == tmp_path / "source_bytes" / "adapter"
+        flat = asset_directory(tmp_path, "adapter", "a/../..")  # separators are flattened, never followed
+        assert flat.parent == tmp_path / "source_bytes" / "adapter" and "/" not in flat.name
+
+    def test_pds4_label_downloads_must_start_like_xml(self, world, policy_for, tmp_path):
+        src = pds.DEFAULT_SOURCES[pds.MOLA_ADAPTER_ID]
+        rel = "data/m.xml"
+        world.routes[(PDS_HOST, f"/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/{rel}")] = lambda r: httpx.Response(
+            200, content=b"\x00\x01binary-not-a-label" * 8
+        )
+        from analogforge.ports.science_payloads import CoverageSelection
+
+        selection = CoverageSelection(
+            selection_key="k", adapter_id=src.adapter_id, product_id=src.product_id, version=None,
+            granule_ids=[rel], access_state="AVAILABLE", coverage_fraction=1.0,
+        )  # fmt: skip
+        http = SafeHttp(world.client(bearer=None), policy_for({PDS_HOST}))
+        with fails("SOURCE_CONTENT_INVALID", "MAGIC_MISMATCH"):
+            pds.adapter.fetch_pds_products(http, src, selection, tmp_path / "s")
+
+
+class TestXmlSafeHardening:
+    @pytest.mark.parametrize("encoding", ["utf-16", "utf-16-le", "utf-16-be", "utf-32"])
+    def test_doctype_and_entities_are_refused_in_wide_encodings(self, tmp_path, encoding):
+        body = '<?xml version="1.0"?><!DOCTYPE r [<!ENTITY a "aaaa"><!ENTITY b "&a;&a;">]><r>&b;</r>'
+        path = tmp_path / "x.xml"
+        path.write_bytes(body.encode(encoding))
+        with fails("SOURCE_CONTENT_INVALID", "XML_DTD_FORBIDDEN"):
+            pds.xml_safe.parse_xml_file(path)
+
+    def test_declared_non_ascii_compatible_encoding_without_a_bom_is_refused(self, tmp_path):
+        body = '<?xml version="1.0" encoding="UTF-16"?><!DOCTYPE r [<!ENTITY a "x">]><r>&a;</r>'
+        path = tmp_path / "x.xml"
+        path.write_bytes(body.encode("utf-16-le"))  # no BOM at all
+        with pytest.raises(AdapterError) as err:
+            pds.xml_safe.parse_xml_file(path)
+        assert err.value.detail_code in {"XML_DTD_FORBIDDEN", "LABEL_PARSE_ERROR"}
+
+    def test_plain_utf8_and_utf16_labels_without_dtd_still_parse(self, tmp_path):
+        path = tmp_path / "ok.xml"
+        path.write_bytes(b'<?xml version="1.0" encoding="UTF-8"?><r><a>1</a></r>')
+        assert pds.xml_safe.parse_xml_file(path).tag == "r"
+        path.write_bytes('<?xml version="1.0" encoding="UTF-16"?><r><a>1</a></r>'.encode("utf-16"))
+        assert pds.xml_safe.parse_xml_file(path).tag == "r"
+
+
+class TestUserSurveyHardening:
+    MD = TestUserSurvey.FULL
+
+    def _scaled(self, tmp_path, scale, offset):  # type: ignore[no-untyped-def]
+        raw = (np.arange(36).reshape(6, 6) + 10).astype("int16")
+        raw[2, 2] = -9999
+        path = tmp_path / "s.tif"
+        with rasterio.open(
+            path, "w", driver="GTiff", width=6, height=6, count=1, dtype="int16", crs="EPSG:32612",
+            transform=from_origin(500000, 3900000, 10, 10), nodata=-9999,
+        ) as dst:  # fmt: skip
+            dst.write(raw, 1)
+            if (scale, offset) != (1.0, 0.0):
+                dst.scales = (scale,)
+                dst.offsets = (offset,)
+        return path, raw
+
+    def test_gdal_scale_and_offset_are_applied_once_and_reported(self, tmp_path):
+        path, raw = self._scaled(tmp_path, 0.1, 100.0)
+        out = user_survey.decode(path, user_survey.SurveyDecodeParams(user_survey.SurveyMetadata(**self.MD)))
+        assert out.data[0, 0] == pytest.approx(101.0) and out.data[1, 1] == pytest.approx(raw[1, 1] * 0.1 + 100.0)
+        assert not out.valid[2, 2] and np.isnan(out.data[2, 2])  # nodata matched on the RAW value
+        assert out.metadata.scale_applied is True
+        assert (out.metadata.source_scale, out.metadata.source_offset) == (pytest.approx(0.1), pytest.approx(100.0))
+
+    def test_scale_is_applied_before_the_feet_conversion(self, tmp_path):
+        path, raw = self._scaled(tmp_path, 2.0, 5.0)
+        md = user_survey.SurveyMetadata(**{**self.MD, "vertical_units": "ft"})
+        out = user_survey.decode(path, user_survey.SurveyDecodeParams(md))
+        assert out.data[0, 0] == pytest.approx((raw[0, 0] * 2.0 + 5.0) * 0.3048)
+
+    def test_without_file_scale_nothing_is_applied_and_it_says_so(self, tmp_path):
+        path, raw = self._scaled(tmp_path, 1.0, 0.0)
+        out = user_survey.decode(path, user_survey.SurveyDecodeParams(user_survey.SurveyMetadata(**self.MD)))
+        assert out.data[0, 0] == float(raw[0, 0]) and out.metadata.scale_applied is False
+
+
+# ======================================== RESOLVE_COVERAGE / FETCH_SOURCE source-policy enforcement
+class TestSourcePolicyEnforcement:
+    @staticmethod
+    def _ctx(tmp_path, mode, calls):  # type: ignore[no-untyped-def]
+        import uuid
+
+        from analogforge.ports.science import LocalScienceContext
+
+        def handler(req: httpx.Request) -> httpx.Response:
+            calls.append(str(req.url))
+            return httpx.Response(200, json={"items": []}, headers={"CMR-Hits": "0"})
+
+        class Ctx(LocalScienceContext):
+            def http_client(self):  # type: ignore[no-untyped-def]
+                return httpx.Client(transport=httpx.MockTransport(handler), headers={"Authorization": "Bearer x"})
+
+        return Ctx(scratch=tmp_path / "s", workspace_id=uuid.uuid4(), job_id=uuid.uuid4(), mode=mode)
+
+    @staticmethod
+    def _aoi(body="EARTH", bbox=(-112.0, 36.0, -111.0, 37.0), convention="NEG180_180"):  # type: ignore[no-untyped-def]
+        return AreaOfInterest(
+            body=body, bbox=list(bbox), longitude_convention=convention,
+            latitude_type="GEODETIC" if body == "EARTH" else "PLANETOCENTRIC", crs_wkt=None, vertical_datum="u",
+        )  # fmt: skip
+
+    def _run(self, tmp_path, adapter, mode, *, allow=False, allowed=(), extents=(), aoi=None, fixtures=()):  # type: ignore[no-untyped-def]
+        import uuid
+
+        from analogforge.ports.science import ExtentBox, ScienceOperation, ScienceRequest, SourcePolicy
+        from analogforge.science.facade import create_science_service
+
+        calls: list[str] = []
+        req = ScienceRequest(
+            request_id=uuid.uuid4(), operation=ScienceOperation.RESOLVE_COVERAGE, mode=mode,
+            inputs=ResolveCoverageInput(
+                subject_kind="TARGET", aoi=aoi or self._aoi(), adapter_id=adapter, measurement_kinds=["elevation"]
+            ),
+            source_policy=SourcePolicy(
+                policy_id="p", policy_sha256="0" * 64, allow_network=allow, allowed_adapter_ids=list(allowed),
+                allowed_extents=[ExtentBox(body=b, bbox=bb) for b, bb in extents], synthetic_fixture_ids=list(fixtures),
+            ),
+        )  # fmt: skip
+        result = create_science_service().execute(req, self._ctx(tmp_path, mode, calls))
+        return result, calls
+
+    def test_network_adapter_without_allow_network_is_blocked_and_makes_no_request(self, tmp_path):
+        result, calls = self._run(tmp_path, "earth_nasadem_hgt_v001", "live", allow=False, allowed=["local_dataset"])
+        assert result.status == "BLOCKED" and calls == []
+        assert result.issues and result.issues[0].detail_code == "POLICY_DENIED"
+
+    def test_network_adapter_not_in_the_allow_list_is_blocked(self, tmp_path):
+        for allowed in ([], ["local_dataset"], ["earth_srtmgl1_v003"]):
+            result, calls = self._run(tmp_path, "earth_nasadem_hgt_v001", "live", allow=True, allowed=allowed)
+            assert result.status == "BLOCKED" and calls == [], allowed
+            assert result.issues[0].detail_code == "POLICY_DENIED"
+
+    def test_aoi_outside_the_allowed_extents_is_blocked_and_inside_is_served(self, tmp_path):
+        outside = [("EARTH", (10.0, 0.0, 20.0, 10.0))]
+        result, calls = self._run(
+            tmp_path, "earth_nasadem_hgt_v001", "live", allow=True, allowed=["earth_nasadem_hgt_v001"], extents=outside
+        )
+        assert result.status == "BLOCKED" and calls == [] and result.issues[0].detail_code == "POLICY_DENIED"
+        wrong_body = [("MARS", (-180.0, -90.0, 180.0, 90.0))]
+        result, calls = self._run(
+            tmp_path,
+            "earth_nasadem_hgt_v001",
+            "live",
+            allow=True,
+            allowed=["earth_nasadem_hgt_v001"],
+            extents=wrong_body,
+        )
+        assert result.status == "BLOCKED" and calls == []
+        straddling = [("EARTH", (-111.5, 36.0, -100.0, 37.0))]  # covers only half of the AOI
+        result, calls = self._run(
+            tmp_path,
+            "earth_nasadem_hgt_v001",
+            "live",
+            allow=True,
+            allowed=["earth_nasadem_hgt_v001"],
+            extents=straddling,
+        )
+        assert result.status == "BLOCKED" and calls == []
+        inside = [("EARTH", (-113.0, 35.0, -110.0, 38.0))]
+        result, calls = self._run(
+            tmp_path, "earth_nasadem_hgt_v001", "live", allow=True, allowed=["earth_nasadem_hgt_v001"], extents=inside
+        )
+        assert result.status != "BLOCKED" and calls  # permitted: the (mocked) provider was asked
+
+    def test_synthetic_practice_is_blocked_outside_synthetic_mode(self, tmp_path):
+        result, calls = self._run(
+            tmp_path, "synthetic_practice", "live", allow=True, allowed=["synthetic_practice"], aoi=self._aoi("MARS")
+        )
+        assert result.status == "BLOCKED" and calls == []
+        assert result.issues[0].detail_code == "MODE_MISMATCH"
+        assert result.payload is None and not result.evidence_drafts
+        replay, _ = self._run(tmp_path, "synthetic_practice", "replay", aoi=self._aoi("MARS"))
+        assert replay.status == "BLOCKED" and replay.issues[0].detail_code == "MODE_MISMATCH"
+
+    def test_synthetic_practice_still_works_in_synthetic_mode(self, tmp_path):
+        result, _ = self._run(
+            tmp_path, "synthetic_practice", "synthetic", aoi=self._aoi("MARS", (0.0, 0.0, 4.0, 4.0), "ZERO_360")
+        )
+        assert result.status != "BLOCKED" or result.issues[0].detail_code != "MODE_MISMATCH"
+
+    def test_adapter_outside_a_non_empty_allow_list_is_blocked_for_local_sources_too(self, tmp_path):
+        result, _ = self._run(
+            tmp_path, "synthetic_practice", "synthetic", allowed=["local_dataset"], aoi=self._aoi("MARS")
+        )
+        assert result.status == "BLOCKED" and result.issues[0].detail_code == "POLICY_DENIED"
+
+    @pytest.mark.parametrize(
+        "bbox", [(10.0, 0.0, 10.0, 5.0), (0.0, 5.0, 5.0, 5.0), (0.0, -91.0, 5.0, 5.0), (0.0, 0.0, 5.0, 95.0)]
+    )
+    def test_degenerate_or_off_globe_aoi_is_blocked(self, tmp_path, bbox):
+        result, calls = self._run(
+            tmp_path, "earth_nasadem_hgt_v001", "live", allow=True, allowed=["earth_nasadem_hgt_v001"],
+            aoi=self._aoi(bbox=bbox, convention="ZERO_360"),
+        )  # fmt: skip
+        assert result.status == "BLOCKED" and calls == []
+
+    def test_fetch_source_enforces_the_same_policy(self, tmp_path):
+        import uuid
+
+        from analogforge.ports.science import ScienceOperation, ScienceRequest, SourcePolicy
+        from analogforge.ports.science_payloads import CoverageSelection, FetchSourceInput
+        from analogforge.science.facade import create_science_service
+
+        selection = CoverageSelection(
+            selection_key="k", adapter_id="earth_nasadem_hgt_v001", product_id="NASADEM_HGT", version="001",
+            granule_ids=["G1-LPCLOUD"], access_state="AVAILABLE", coverage_fraction=1.0,
+        )  # fmt: skip
+
+        def go(allow, allowed, extents):  # type: ignore[no-untyped-def]
+            from analogforge.ports.science import ExtentBox
+
+            calls: list[str] = []
+            req = ScienceRequest(
+                request_id=uuid.uuid4(), operation=ScienceOperation.FETCH_SOURCE, mode="live",
+                inputs=FetchSourceInput(selection=selection, aoi=self._aoi()),
+                source_policy=SourcePolicy(
+                    policy_id="p", policy_sha256="0" * 64, allow_network=allow, allowed_adapter_ids=list(allowed),
+                    allowed_extents=[ExtentBox(body=b, bbox=bb) for b, bb in extents],
+                ),
+            )  # fmt: skip
+            return create_science_service().execute(req, self._ctx(tmp_path, "live", calls)), calls
+
+        for allow, allowed, extents in [
+            (False, ["earth_nasadem_hgt_v001"], []),
+            (True, [], []),
+            (True, ["earth_srtmgl1_v003"], []),
+            (True, ["earth_nasadem_hgt_v001"], [("EARTH", (10.0, 0.0, 20.0, 10.0))]),
+        ]:
+            result, calls = go(allow, allowed, extents)
+            assert result.status == "BLOCKED" and calls == [], (allow, allowed, extents)
+            assert result.issues[0].detail_code == "POLICY_DENIED"

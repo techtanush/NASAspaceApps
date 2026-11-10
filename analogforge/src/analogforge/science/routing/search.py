@@ -13,15 +13,31 @@ popped solution is therefore the minimum-distance route, then minimum conservati
 smallest ``node_sequence`` (ranks are computed from plain string order of the node ids).  ``MINIMUM_FEASIBLE_ROUTE``
 orders by conservative energy first instead.
 
+Task semantics (shared with the verifier): a task is completed on arrival at ANY traversable node whose centre lies
+within the task tolerance of the task location (``Problem.task_sets``); it is reachable iff one of them is in the start
+component, the heuristics use the nearest such node, and the route reports the first arrival.
+
 Pruning that is *lossless*: hard-constraint violations (traversal limit, max distance/duration/energy by admissible
 bounds) and Pareto dominance between labels with the same (node, task set, saturation pattern): ``A`` dominates ``B``
 if ``A`` has no more distance/energy/time, covers a superset of ``B``'s in-band edges (and at least ``B``'s TOTAL
-traversed exposure).  Equal labels keep the lexicographically smaller ``node_sequence``.  Dominance ignores the
-per-edge traversal counts: if ``A``'s continuation of ``B``'s suffix would traverse an edge a third time, the closed
-walk can be shortened by removing two copies of that edge (the remaining multigraph keeps its Euler circuit, task
-visits and unique exposure), contradicting minimality of the distance; this argument is exact for distance/time bounds
-and for symmetric energies.  When the energy bound is active on a surface with elevation changes (asymmetric energies)
-dominance prunes are therefore counted as *lossy*.  *Lossy*: the per-(node, task-set, exposure-level) label cap
+traversed exposure).  Equal labels keep the lexicographically smaller ``node_sequence``.
+
+Two dominance modes (``strict_dominance``):
+
+* RELAXED (``max_undirected_edge_traversals >= 2`` and no TOTAL_TRAVERSED_DISTANCE requirement): dominance ignores the
+  per-edge traversal counts: if ``A``'s continuation of ``B``'s suffix would traverse an edge a third time, the closed
+  walk can be shortened by removing two copies of that edge (at least one copy remains because the count exceeded
+  ``max >= 2``; the remaining multigraph keeps its Euler circuit, task visits and unique exposure), contradicting
+  minimality of the distance; this argument is exact for distance/time bounds and for symmetric energies.  When the
+  energy bound is active on a surface with elevation changes (asymmetric energies) dominance prunes are therefore
+  counted as *lossy*.
+* STRICT (``max_undirected_edge_traversals == 1`` or any TOTAL requirement): removing two copies is impossible
+  (with a limit of 1 the second copy leaves zero edges, so the walk disconnects) or changes the counted exposure
+  (TOTAL counting).  ``A`` then dominates ``B`` only if, in addition, ``A`` has used every edge no more often than
+  ``B`` (pointwise), which makes every continuation of ``B`` valid from ``A``; labels that tie on all costs but
+  differ in usage are both kept so the lexicographic tie-break stays exact.  No prune in this mode is lossy.
+
+*Lossy*: the per-(node, task-set, exposure-level) label cap
 ``max_labels_per_node``; any lossy pruning is counted, flagged in ``approximation_flags`` and forbids
 ``EXHAUSTIVE_INFEASIBLE`` (an empty queue then maps to ``BUDGET_EXHAUSTED``).
 """
@@ -90,13 +106,17 @@ class Problem:
     provider: EnergyProvider
     costs: EdgeCosts
     start: int | None
-    task_nodes: dict[str, int | None]
+    task_nodes: dict[str, int | None]  # nearest in-tolerance node (representative; ties by node id)
+    task_sets: dict[str, frozenset[int]]  # ALL traversable nodes within the task tolerance (empty: unresolved)
 
 
-def resolve_waypoint(graph: RouteGraph, grid: GridArrays | None, waypoint: Waypoint, tolerance_m: float) -> int | None:
-    """Graph node for a waypoint: exact node id/cell, else the nearest traversable node within ``tolerance_m``."""
+def resolve_waypoint_set(
+    graph: RouteGraph, grid: GridArrays | None, waypoint: Waypoint, tolerance_m: float
+) -> list[tuple[float, str, int]]:
+    """Every traversable node within ``tolerance_m`` of the waypoint, as ``(distance, id, index)``, nearest first."""
     if graph.kind == "ABSTRACT":
-        return graph.index_of.get(waypoint.node_id) if waypoint.node_id is not None else None
+        idx = graph.index_of.get(waypoint.node_id) if waypoint.node_id is not None else None
+        return [] if idx is None else [(0.0, graph.node_ids[idx], idx)]
     if grid is None:
         raise RouteInputError("raster waypoint resolution needs the analysis grid", detail_code="ANALYSIS_GRID_MISSING")
     xy = waypoint_xy(waypoint)
@@ -109,16 +129,8 @@ def resolve_waypoint(graph: RouteGraph, grid: GridArrays | None, waypoint: Waypo
             "raster waypoints need projected x_m/y_m (or an r{row}c{col} node id)", detail_code="WAYPOINT_UNRESOLVED"
         )
     row, col = grid.cell_of(*xy)
-    exact = graph.index_of.get(raster_node_id(row, col))
-    if (
-        exact is not None
-        and math.hypot(graph.xy(exact)[0] - xy[0], graph.xy(exact)[1] - xy[1]) <= tolerance_m + EPS_VALUE
-    ):
-        return exact
-    if tolerance_m <= 0.0:
-        return None
-    reach = int(math.ceil(tolerance_m / grid.cell_size_m)) + 1
-    best: tuple[float, str, int] | None = None
+    reach = int(math.ceil(max(tolerance_m, 0.0) / grid.cell_size_m)) + 1
+    found: list[tuple[float, str, int]] = []
     for r in range(row - reach, row + reach + 1):
         for c in range(col - reach, col + reach + 1):
             idx = graph.index_of.get(raster_node_id(r, c))
@@ -127,10 +139,15 @@ def resolve_waypoint(graph: RouteGraph, grid: GridArrays | None, waypoint: Waypo
             nx, ny = graph.xy(idx)
             d = math.hypot(nx - xy[0], ny - xy[1])
             if d <= tolerance_m + EPS_VALUE:
-                cand = (d, graph.node_ids[idx], idx)
-                if best is None or cand < best:
-                    best = cand
-    return None if best is None else best[2]
+                found.append((d, graph.node_ids[idx], idx))
+    found.sort()
+    return found
+
+
+def resolve_waypoint(graph: RouteGraph, grid: GridArrays | None, waypoint: Waypoint, tolerance_m: float) -> int | None:
+    """Graph node for a waypoint: the nearest traversable node within ``tolerance_m`` (ties by node id)."""
+    nodes = resolve_waypoint_set(graph, grid, waypoint, tolerance_m)
+    return nodes[0][2] if nodes else None
 
 
 def build_graph_for(
@@ -172,15 +189,17 @@ def prepare_problem(
     graph = build_graph_for(constraints, grid, slope_cap_deg=slope_cap_deg, check_cancelled=check_cancelled)
     costs = evaluate_costs(graph, constraints, provider)
     start = resolve_waypoint(graph, grid, constraints.start, 0.0)
-    tasks = {t.task_id: resolve_waypoint(graph, grid, t.location, t.tolerance_m) for t in constraints.tasks}
-    return Problem(constraints, graph, provider, costs, start, tasks)
+    sets = {t.task_id: resolve_waypoint_set(graph, grid, t.location, t.tolerance_m) for t in constraints.tasks}
+    tasks = {tid: (found[0][2] if found else None) for tid, found in sets.items()}
+    task_sets = {tid: frozenset(n for _d, _id, n in found) for tid, found in sets.items()}
+    return Problem(constraints, graph, provider, costs, start, tasks, task_sets)
 
 
 # ----------------------------------------------------------------------------------------------- label search
 class _Label:
     __slots__ = (
         "node", "mask", "dist", "cons", "nom", "time", "expo", "cov", "sat", "rd", "rc", "rt",
-        "parent", "edge", "seq", "dead",
+        "parent", "edge", "seq", "dead", "usage",
     )  # fmt: skip
 
     def __init__(
@@ -197,6 +216,7 @@ class _Label:
         parent: _Label | None,
         edge: int,
         seq: bytes,
+        usage: dict[int, int] | None = None,
     ) -> None:
         self.node = node
         self.mask = mask
@@ -214,6 +234,7 @@ class _Label:
         self.edge = edge
         self.seq = seq
         self.dead = False
+        self.usage = usage  # per-edge traversal counts; only kept in STRICT dominance mode
 
 
 @dataclass(frozen=True)
@@ -312,7 +333,7 @@ def search_route(
         return SearchOutput(payload, route, route_sha, issues or [], cert, problem)
 
     # ---- certificate step (lossless)
-    certificate = compute_certificate(graph, constraints, provider, costs, problem.start, problem.task_nodes)
+    certificate = compute_certificate(graph, constraints, provider, costs, problem.start, problem.task_sets)
     if certificate.infeasible:
         text = "; ".join(r.message for r in certificate.reasons)
         return finish("EXHAUSTIVE_INFEASIBLE", (0, 0, 0, 0), f"CERTIFICATE: {text}", cert=certificate)
@@ -321,30 +342,34 @@ def search_route(
 
     # ---- search tables
     task_list = list(constraints.tasks)
-    tnode: list[int] = []
+    tset: list[frozenset[int]] = []
     for t in task_list:
-        node_of_task = problem.task_nodes[t.task_id]
-        assert node_of_task is not None  # certificate guarantees resolved tasks
-        tnode.append(node_of_task)
+        nodes_of_task = problem.task_sets[t.task_id]
+        assert nodes_of_task  # certificate guarantees resolved tasks
+        tset.append(nodes_of_task)
     n_tasks = len(task_list)
     full_mask = (1 << n_tasks) - 1
     tasks_at: dict[int, list[int]] = {}
-    for k, node in enumerate(tnode):
-        tasks_at.setdefault(node, []).append(k)
+    for k, nodes_of_task in enumerate(tset):
+        for node in sorted(nodes_of_task):
+            tasks_at.setdefault(node, []).append(k)
     ret = constraints.return_required
     use_energy_objective = constraints.strategy == "MINIMUM_FEASIBLE_ROUTE" and provider.evaluable
     objective_note = "distance"
     if constraints.strategy == "MINIMUM_FEASIBLE_ROUTE":
         objective_note = "energy" if use_energy_objective else "distance (energy model missing)"
 
-    to_start_d, to_task_d = remaining_bound_tables(graph, start, tnode, costs, use_energy=False)
+    to_start_d, to_task_d = remaining_bound_tables(graph, start, tset, costs, use_energy=False)
     energy_bounded = provider.evaluable
     usable = usable_wh(provider) if energy_bounded else math.inf
     if energy_bounded:
-        to_start_e, to_task_e = remaining_bound_tables(graph, start, tnode, costs, use_energy=True)
+        to_start_e, to_task_e = remaining_bound_tables(graph, start, tset, costs, use_energy=True)
     else:
         to_start_e, to_task_e = [], []
     asymmetric_energy = energy_bounded and any(abs(rec.dz_m) > 1e-12 for rec in graph.edges)
+    # cheapest way back to the start once task k is done (it may be completed at any node of its set)
+    back_d = [min(to_start_d[n] for n in nodes) for nodes in tset]
+    back_e = [min(to_start_e[n] for n in nodes) for nodes in tset] if energy_bounded else []
     task_cons = [costs.per_task[t.task_id].conservative_wh for t in task_list]
     task_nom = [costs.per_task[t.task_id].nominal_wh for t in task_list]
     task_dur = [costs.per_task[t.task_id].duration_s for t in task_list]
@@ -368,7 +393,7 @@ def search_route(
     def h_dist(node: int, mask: int, expo: tuple[float, ...]) -> float:
         base = to_start_d[node] if ret else 0.0
         for k in remaining(mask):
-            v = to_task_d[k][node] + (to_start_d[tnode[k]] if ret else 0.0)
+            v = to_task_d[k][node] + (back_d[k] if ret else 0.0)
             if v > base:
                 base = v
         for i, e in enumerate(expo):
@@ -381,7 +406,7 @@ def search_route(
         base = to_start_e[node] if ret else 0.0
         extra = 0.0
         for k in remaining(mask):
-            v = to_task_e[k][node] + (to_start_e[tnode[k]] if ret else 0.0)
+            v = to_task_e[k][node] + (back_e[k] if ret else 0.0)
             if v > base:
                 base = v
             extra += task_cons[k]
@@ -406,9 +431,16 @@ def search_route(
         nom0 += task_nom[k]
         time0 += task_dur[k]
     expo0 = tuple(0.0 for _ in exp_specs)
+    max_trav = constraints.max_undirected_edge_traversals
+    total_reqs_present = bool(total_reqs)
+    strict = max_trav == 1 or total_reqs_present  # see the module docstring: STRICT vs RELAXED dominance
     root = _Label(
-        start, init_mask, 0.0, cons0, nom0, time0, expo0, frozenset(), sat_mask(expo0), None, -1, rank_bytes[start]
-    )
+        start, init_mask, 0.0, cons0, nom0, time0, expo0, frozenset(), sat_mask(expo0), None, -1, rank_bytes[start],
+        {} if strict else None,
+    )  # fmt: skip
+    # A root that already satisfies everything is NOT a solution (a route has at least one edge), so it must not
+    # dominate (and thereby discard) the labels that leave and return to the start.
+    root_done = init_mask == full_mask and all(e >= exp_min[i] - EPS_VALUE for i, e in enumerate(expo0))
 
     def priority(label: _Label, counter: int) -> tuple[int, int, int, bytes, int]:
         if use_energy_objective:
@@ -417,13 +449,22 @@ def search_route(
         f = label.dist + h_dist(label.node, label.mask, label.expo)
         return (round(f * _MICRO), label.rd, label.rc, label.seq, counter)
 
+    def usage_le(a: _Label, b: _Label) -> bool:
+        """STRICT mode: ``a`` used no edge more often than ``b`` (every continuation of ``b`` is legal for ``a``)."""
+        if not strict:
+            return True
+        assert a.usage is not None and b.usage is not None
+        other = b.usage
+        return all(other.get(e, 0) >= c for e, c in a.usage.items())
+
     def covers(a: _Label, b: _Label) -> bool:
         """``a`` is at least as good as ``b`` in every dimension that can matter for the future."""
         if a.rd > b.rd or a.rc > b.rc or a.rt > b.rt or not a.cov >= b.cov:
             return False
-        return all(a.expo[i] >= b.expo[i] - EPS_VALUE for i in total_reqs)
+        return all(a.expo[i] >= b.expo[i] - EPS_VALUE for i in total_reqs) and usage_le(a, b)
 
     def identical(a: _Label, b: _Label) -> bool:
+        """Equal in every COST dimension (the traversal usage may still differ in STRICT mode)."""
         return (
             a.rd == b.rd
             and a.rc == b.rc
@@ -432,17 +473,19 @@ def search_route(
             and all(abs(a.expo[i] - b.expo[i]) <= EPS_VALUE for i in total_reqs)
         )
 
+    def same_usage(a: _Label, b: _Label) -> bool:
+        return (not strict) or a.usage == b.usage
+
     heap: list[tuple[tuple[int, int, int, bytes, int], _Label]] = []
     counter = 0
     heappush(heap, (priority(root, counter), root))
     labels_created = 1
     class_counts: dict[tuple[int, int, tuple[int, ...]], int] = {}
-    pareto: dict[tuple[int, int, int], list[_Label]] = {(root.node, root.mask, root.sat): [root]}
+    pareto: dict[tuple[int, int, int], list[_Label]] = {} if root_done else {(root.node, root.mask, root.sat): [root]}
     expansions = 0
     pruned_dominated = 0
     pruned_lossy = 0
     bound_pruned = 0
-    max_trav = constraints.max_undirected_edge_traversals
     max_dist = constraints.max_distance_m if constraints.max_distance_m is not None else math.inf
     max_dur = constraints.max_duration_s if constraints.max_duration_s is not None else math.inf
     pops = 0
@@ -459,13 +502,14 @@ def search_route(
     def lossy_flags() -> list[str]:
         return [LABEL_CAP_FLAG] if pruned_lossy > 0 else []
 
-    class_counts[(root.node, root.mask, bucket(root.expo))] = 1
+    if not root_done:
+        class_counts[(root.node, root.mask, bucket(root.expo))] = 1
 
     while heap:
         pops += 1
         if pops & 7 == 0:
             cancel()
-        if pops & 255 == 0 and clock() - started > budget_seconds:
+        if (pops == 1 or pops & 7 == 0) and clock() - started > budget_seconds:
             return finish(
                 "BUDGET_EXHAUSTED",
                 counters(),
@@ -478,7 +522,7 @@ def search_route(
             continue
         done = label.mask == full_mask and all(e >= exp_min[i] - EPS_VALUE for i, e in enumerate(label.expo))
         if done and label.parent is not None and ((not ret) or label.node == start):
-            route = _make_route(label, graph, problem, claimed_hash, mode, route_key, to_lonlat, tnode)
+            route = _make_route(label, graph, problem, claimed_hash, mode, route_key, to_lonlat, tset)
             return finish(
                 "FOUND",
                 counters(),
@@ -496,7 +540,7 @@ def search_route(
                 flags=lossy_flags(),
             )
         expansions += 1
-        usage = _usage(label)
+        usage = label.usage if label.usage is not None else _usage(label)
         for nbr, ei, sign in graph.adj[label.node]:
             count = usage.get(ei, 0)
             if count >= max_trav:
@@ -538,9 +582,10 @@ def search_route(
             if energy_bounded and new_cons + energy_lb(nbr, new_mask) > usable + EPS_VALUE:
                 bound_pruned += 1
                 continue
+            child_usage = {**usage, ei: count + 1} if strict else None
             child = _Label(
                 nbr, new_mask, new_dist, new_cons, new_nom, new_time, new_expo, new_cov, new_sat, label, ei,
-                label.seq + rank_bytes[nbr],
+                label.seq + rank_bytes[nbr], child_usage,
             )  # fmt: skip
             # Pareto dominance among labels with the same (node, task set, saturation pattern)
             peers = pareto.setdefault((nbr, new_mask, new_sat), [])
@@ -549,12 +594,20 @@ def search_route(
             for other in peers:
                 if covers(other, child):
                     if identical(other, child) and child.seq < other.seq:
-                        other.dead = True  # same state, lexicographically smaller sequence wins
-                        pruned_dominated += 1
+                        if same_usage(other, child):
+                            other.dead = True  # same state, lexicographically smaller sequence wins
+                            pruned_dominated += 1
+                        else:
+                            survivors.append(
+                                other
+                            )  # STRICT: ``other`` is freer, ``child`` is lexicographically smaller
                         continue
                     dropped = True
                     break
                 if covers(child, other):
+                    if identical(other, child) and other.seq < child.seq:
+                        survivors.append(other)  # STRICT: ``child`` is freer but ``other`` is lexicographically smaller
+                        continue
                     other.dead = True
                     pruned_dominated += 1
                     continue
@@ -582,7 +635,7 @@ def search_route(
             cert=certificate,
             flags=lossy_flags(),
         )
-    if asymmetric_energy and pruned_dominated > 0:
+    if asymmetric_energy and pruned_dominated > 0 and not strict:
         return finish(
             "BUDGET_EXHAUSTED",
             counters(),
@@ -607,7 +660,7 @@ def _make_route(
     mode: RuntimeMode,
     route_key: str,
     to_lonlat: Callable[[float, float], tuple[float, float]] | None,
-    tnode: Sequence[int],
+    tset: Sequence[frozenset[int]],
 ) -> RouteArtifact:
     constraints = problem.constraints
     chain = _path(last)
@@ -615,14 +668,14 @@ def _make_route(
     events: list[TaskEvent] = []
     done: set[str] = set()
     for lab in chain:
-        for k, node in enumerate(tnode):
+        for k, nodes_of_task in enumerate(tset):
             task = constraints.tasks[k]
-            if node == lab.node and task.task_id not in done:
+            if lab.node in nodes_of_task and task.task_id not in done:
                 done.add(task.task_id)
                 events.append(
                     TaskEvent(
                         task_id=task.task_id,
-                        node_id=graph.node_ids[node],
+                        node_id=graph.node_ids[lab.node],
                         arrival_distance_m=lab.dist,
                         dwell_s=task.dwell_s,
                     )
@@ -668,5 +721,6 @@ __all__ = [
     "build_graph_for",
     "prepare_problem",
     "resolve_waypoint",
+    "resolve_waypoint_set",
     "search_route",
 ]

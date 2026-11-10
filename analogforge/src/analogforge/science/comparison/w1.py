@@ -18,10 +18,9 @@ from dataclasses import dataclass
 import numpy as np
 
 from analogforge.ports.science_payloads import Histogram
+from analogforge.science.config import default_thresholds
 from analogforge.science.errors import RasterError, ScaleError
 from analogforge.science.features.histogram import bin_centres
-
-_SUM_TOLERANCE = 1e-9
 
 
 def binned_w1(fraction_a: Sequence[float], fraction_b: Sequence[float], centres: Sequence[float]) -> float:
@@ -35,7 +34,8 @@ def binned_w1(fraction_a: Sequence[float], fraction_b: Sequence[float], centres:
         raise RasterError("non-finite value in a W1 input")
     if np.any(a < 0) or np.any(b < 0):
         raise RasterError("fractions must be non-negative")
-    if abs(float(a.sum()) - 1.0) > _SUM_TOLERANCE or abs(float(b.sum()) - 1.0) > _SUM_TOLERANCE:
+    tol = default_thresholds().numeric_tolerance
+    if abs(float(a.sum()) - 1.0) > tol or abs(float(b.sum()) - 1.0) > tol:
         raise RasterError("each distribution must sum to 1 (a missing distribution is unknown, not zero)")
     if np.any(np.diff(x) <= 0):
         raise RasterError("centres must be strictly ascending")
@@ -50,12 +50,14 @@ class W1Result:
     support_scale_m: float
 
 
-def w1_from_histograms(a: Histogram, b: Histogram, *, support_tolerance_m: float = 1e-9) -> W1Result:
+def w1_from_histograms(a: Histogram, b: Histogram, *, support_tolerance_m: float | None = None) -> W1Result:
     """W1 of two kit histograms at their common support.
 
     Raises :class:`ScaleError` when the supports differ (re-aggregate first; histograms cannot be re-binned to a
     different support) and :class:`RasterError` for mismatched edges/units or empty distributions.
     """
+    if support_tolerance_m is None:
+        support_tolerance_m = default_thresholds().numeric_tolerance
     if a.edges != b.edges:
         raise RasterError("histograms use different edges")
     if a.unit != b.unit:

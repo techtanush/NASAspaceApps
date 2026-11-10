@@ -743,6 +743,8 @@ def test_scratch_write_guard_refuses_incoming_and_outside(tmp_path: Path) -> Non
 def test_lock_build_hash_and_integrity_detection(tmp_path: Path) -> None:
     incoming = tmp_path / "incoming"
     m1, m2 = b.build_geotiff_earth(incoming), b.build_ascii_grid(incoming)
+    for m in (m1, m2):  # a locked dataset lives with its manifest.yaml; the lock covers that file too
+        (incoming / m["dataset_id"] / "manifest.yaml").write_text(yaml.safe_dump(m), encoding="utf-8")
     r1, r2 = (ingest_local_dataset(incoming / m["dataset_id"], m, tmp_path / "s") for m in (m1, m2))
     lock = build_lock(
         "local-practice-policy-v1", "2026-11-05T00:00:00Z",
@@ -778,3 +780,223 @@ def test_lock_refuses_datasets_with_failed_checks(tmp_path: Path) -> None:
     broken = {k: v for k, v in manifest.items() if k != "crs"}
     with pytest.raises(RegistryError):
         lock_entry(run(tmp_path, broken), tmp_path / manifest["dataset_id"])
+
+
+# ---------------------------------------------------------------------------------------------- hardening (review)
+def _earth_with_voids(root: Path, declared: float | None, file_nodata: float | None = None) -> Manifest:
+    manifest = build(root, "geotiff_earth")
+    d = root / manifest["dataset_id"]
+    data = b.ramp(20, 20).astype("float32")
+    data[2, 3] = -32768  # voids that the declaration does not name
+    data[10, 10] = -32768
+    _rewrite_tif(d, "dem.tif", data=data, nodata=file_nodata)
+    manifest["nodata_value"] = declared
+    return manifest
+
+
+def test_wrong_declared_nodata_with_undeclared_voids_fails(tmp_path: Path) -> None:
+    manifest = _earth_with_voids(tmp_path, declared=-9999.0)
+    r = run(tmp_path, manifest)
+    assert status(r)["nodata_declared"] == "FAIL" and not r.usable_for_quantitative_claims
+    assert "-32768" in next(c.message for c in r.checks if c.check_id == "nodata_declared")
+    wrong_file = _earth_with_voids(tmp_path / "b", declared=None, file_nodata=-9999.0)
+    r2 = run(tmp_path / "b", wrong_file)
+    assert status(r2)["nodata_declared"] == "FAIL"
+
+
+def test_correct_declared_nodata_still_passes_the_sentinel_scan(tmp_path: Path) -> None:
+    manifest = _earth_with_voids(tmp_path, declared=-32768.0, file_nodata=-32768.0)
+    assert status(run(tmp_path, manifest))["nodata_declared"] == "PASS"
+
+
+def test_nodata_check_scans_sentinels_other_than_the_declared_one() -> None:
+    raw = np.array([[1.0, -32768.0], [2.0, 3.0]])
+    assert ck.check_nodata_declared(-9999.0, None, [raw]).status == "FAIL"
+    assert ck.check_nodata_declared(-32768.0, None, [raw]).status == "PASS"
+    assert ck.check_nodata_declared(-9999.0, None, None).status == "PASS"  # declared and unreadable: nothing to scan
+
+
+def _nasa_url_manifest(url: str) -> Manifest:
+    return {
+        "provider": "NASA LP DAAC", "is_synthetic": False, "license_note": "NASA open", "citation": "c",
+        "vertical_reference": "EGM96", "product_identity": {"product_id": "NASADEM_HGT", "source_url": url},
+    }  # fmt: skip
+
+
+SECRET_URLS = [
+    "https://e.nasa.gov/f.tif#access_token=SECRET",
+    "https://e.nasa.gov/f.tif#token=SECRET&x=1",
+    "https://e.nasa.gov/f.tif?password=SECRET",
+    "https://e.nasa.gov/f.tif?apikey=SECRET",
+    "https://e.nasa.gov/f.tif?pwd=SECRET",
+    "https://e.nasa.gov/f.tif?sv=2020&se=2030&sp=r&sr=b&sig=SECRET",
+    "https://e.nasa.gov/f.tif?X-Amz-Security-Token=SECRET",
+    "https://u:SECRET@e.nasa.gov/f.tif",
+]
+
+
+@pytest.mark.parametrize("url", SECRET_URLS)
+def test_credential_like_source_url_fails_lineage_and_never_reaches_evidence(tmp_path: Path, url: str) -> None:
+    manifest = build(tmp_path, "geotiff_earth")
+    manifest.update(_nasa_url_manifest(url))
+    r = run(tmp_path, manifest)
+    assert status(r)["lineage_fields"] == "FAIL" and not r.usable_for_quantitative_claims
+    draft = source_evidence_draft(r, mode="live", algorithm_version="1.0.0", algorithm_config_sha256="a" * 64)
+    assert draft.source_uri is not None and "SECRET" not in draft.source_uri
+    assert "#" not in draft.source_uri and "@" not in draft.source_uri
+
+
+def test_benign_query_and_fragment_are_stripped_from_the_evidence_uri(tmp_path: Path) -> None:
+    manifest = build(tmp_path, "geotiff_earth")
+    manifest.update(_nasa_url_manifest("https://e.nasa.gov/f.tif?version=3#section"))
+    r = run(tmp_path, manifest)
+    assert status(r)["lineage_fields"] == "PASS"
+    draft = source_evidence_draft(r, mode="live", algorithm_version="1.0.0", algorithm_config_sha256="a" * 64)
+    assert draft.source_uri == "https://e.nasa.gov/f.tif"  # query and fragment are not part of the identity
+
+
+def _geographic_mars(root: Path, west: float, north: float, step: float, convention: str = "ZERO_360") -> Manifest:
+    manifest = build(root, "geotiff_mars_scaled")
+    d = root / manifest["dataset_id"]
+    raw = (np.arange(24 * 24).reshape(24, 24) % 400 + 200).astype("int16")
+    raw[0, 0] = -32768
+    b._gtiff(
+        d / "mola.tif", raw, crs=rasterio.crs.CRS.from_wkt(b.MARS_GEO_WKT),
+        transform=from_origin(west, north, step, step), nodata=-32768, scale=0.5, offset=-100.0,
+    )  # fmt: skip
+    manifest["longitude_convention"] = convention
+    manifest.pop("declared_native_resolution_m", None)
+    return manifest
+
+
+@pytest.mark.parametrize(
+    ("north", "step"),
+    [(100.0, 0.25), (90.2, 0.25), (95.0, 0.5), (-87.0, 0.25), (10.0, 100.0)],
+    ids=["north-100", "north-90.2", "north-95", "south-beyond-minus-90", "huge-cell"],
+)
+def test_latitudes_beyond_the_poles_fail_transform_without_raising(tmp_path: Path, north: float, step: float) -> None:
+    manifest = _geographic_mars(tmp_path, 10.0, north, step)
+    r = run(tmp_path, manifest)  # must not raise a pydantic ValidationError (NaN native resolution)
+    assert status(r)["transform_sane"] == "FAIL" and not r.usable_for_quantitative_claims
+    assert "latitude" in next(c.message for c in r.checks if c.check_id == "transform_sane")
+    assert r.payload is not None
+    if r.payload.native_resolution_m is not None:
+        assert np.isfinite(r.payload.native_resolution_m)
+
+
+def test_latitudes_inside_the_poles_and_exactly_at_them_pass(tmp_path: Path) -> None:
+    ok = _geographic_mars(tmp_path, 10.0, 90.0, 0.25)
+    assert status(run(tmp_path, ok))["transform_sane"] == "PASS"
+
+
+@pytest.mark.parametrize(
+    ("convention", "west", "expected"),
+    [
+        ("ZERO_360", 360.0, "FAIL"),
+        ("NEG180_180", 180.0, "FAIL"),
+        ("ZERO_360", 359.0, "PASS"),
+        ("NEG180_180", -180.0, "PASS"),
+    ],
+)
+def test_longitude_start_outside_the_declared_domain_is_rejected(
+    tmp_path: Path, convention: str, west: float, expected: str
+) -> None:
+    manifest = _geographic_mars(tmp_path, west, 10.0, 0.25, convention)
+    assert status(run(tmp_path, manifest))["longitude_convention"] == expected
+
+
+def test_positive_west_declaration_contradicting_a_positive_east_raster_fails(tmp_path: Path) -> None:
+    manifest = _geographic_mars(tmp_path, 10.0, 10.0, 0.25)
+    manifest["longitude_direction"] = "POSITIVE_WEST"
+    r = run(tmp_path, manifest)
+    assert status(r)["longitude_convention"] == "FAIL" and not r.usable_for_quantitative_claims
+    assert "POSITIVE_WEST" in next(c.message for c in r.checks if c.check_id == "longitude_convention")
+
+
+def test_reference_radius_tolerance_is_a_tenth_of_a_percent(tmp_path: Path) -> None:
+    base = build(tmp_path, "pds3_radius")
+    moon = 1_737_400.0
+    for ref, expected in [(moon, "PASS"), (moon * 1.0009, "PASS"), (moon * 1.0011, "FAIL"), (1_750_000.0, "FAIL")]:
+        m = copy.deepcopy(base)
+        m["reference_radius_m"] = ref
+        got = status(run(tmp_path, m))["units_and_quantity"]
+        assert got == expected, (ref, got)
+    mars = DatasetManifestCopy(base, body="MARS")
+    for ref, expected in [(3_396_190.0, True), (3_396_190.0 * 1.0009, True), (3_396_190.0 * 1.0011, False)]:
+        out = ck.check_units_and_quantity(mars.model_copy(update={"reference_radius_m": ref}), None)
+        assert (out.status != "FAIL") is expected, (ref, out)
+
+
+def DatasetManifestCopy(raw: Manifest, **update: Any) -> Any:  # noqa: N802 - tiny builder
+    from analogforge.ports.datasets import DatasetManifest
+
+    return DatasetManifest.model_validate(raw).model_copy(update=update)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        b"\xef\xbb\xbf<!DOCTYPE html><html>",
+        b"<!-- login --><html><body>sign in",
+        b'<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">',
+        b"<!-- a --> <!-- b -->\n<!DOCTYPE html>",
+        "<html><body>x".encode("utf-16"),
+        "<html><body>x".encode("utf-16-le"),
+        b" " * 700 + b"<html>",
+    ],
+    ids=["bom", "comment", "xml-prolog", "two-comments", "utf16-bom", "utf16-le", "late-html"],
+)
+def test_html_disguised_as_data_is_detected(tmp_path: Path, payload: bytes) -> None:
+    manifest = build(tmp_path, "geotiff_earth")
+    (tmp_path / manifest["dataset_id"] / "dem.tif").write_bytes(payload)
+    r = run(tmp_path, manifest)
+    assert status(r)["html_login_page"] == "FAIL" and not r.usable_for_quantitative_claims
+
+
+def test_nul_byte_in_a_manifest_file_path_fails_files_present(tmp_path: Path) -> None:
+    manifest = build(tmp_path, "geotiff_earth")
+    manifest["files"][0]["path"] = "dem\x00.tif"
+    manifest["primary_file"] = "dem\x00.tif"
+    r = run(tmp_path, manifest)
+    assert status(r)["files_present"] in ("FAIL",) or status(r)["manifest_schema"] == "FAIL"
+    assert not r.usable_for_quantitative_claims
+
+
+def _lock_fixture(tmp_path: Path) -> tuple[Path, Manifest, Any]:
+    incoming = tmp_path / "incoming"
+    manifest = b.build_geotiff_earth(incoming)
+    d = incoming / manifest["dataset_id"]
+    (d / "manifest.yaml").write_text(yaml.safe_dump(manifest), encoding="utf-8")
+    result = ingest_local_dataset(d, load_manifest_file(d), tmp_path / "s")
+    lock = build_lock("pol-v1", "2026-11-05T00:00:00Z", [lock_entry(result, d)])
+    assert verify_lock_integrity(lock, incoming) == []
+    return incoming, manifest, lock
+
+
+def test_lock_integrity_detects_a_tampered_manifest_even_when_files_are_intact(tmp_path: Path) -> None:
+    incoming, manifest, lock = _lock_fixture(tmp_path)
+    tampered = {**manifest, "scale_factor": 1000.0, "units": "km", "nodata_value": None}
+    (incoming / manifest["dataset_id"] / "manifest.yaml").write_text(yaml.safe_dump(tampered), encoding="utf-8")
+    problems = verify_lock_integrity(lock, incoming)
+    assert [(p.path, p.reason) for p in problems] == [("manifest.yaml", "SOURCE_CHECKSUM_MISMATCH")]
+    (incoming / manifest["dataset_id"] / "manifest.yaml").unlink()
+    assert [(p.path, p.reason) for p in verify_lock_integrity(lock, incoming)] == [("manifest.yaml", "MISSING")]
+    (incoming / manifest["dataset_id"] / "manifest.yaml").write_text("- not\n- a mapping\n", encoding="utf-8")
+    assert [p.reason for p in verify_lock_integrity(lock, incoming)] == ["SOURCE_CHECKSUM_MISMATCH"]
+
+
+def test_lock_integrity_rejects_symlinked_files_and_dataset_directories(tmp_path: Path) -> None:
+    incoming, manifest, lock = _lock_fixture(tmp_path)
+    d = incoming / manifest["dataset_id"]
+    outside = tmp_path / "outside.tif"
+    outside.write_bytes((d / "dem.tif").read_bytes())  # same bytes: a hash-only check would pass
+    (d / "dem.tif").unlink()
+    (d / "dem.tif").symlink_to(outside)
+    assert [(p.path, p.reason) for p in verify_lock_integrity(lock, incoming)] == [("dem.tif", "SYMLINK")]
+    (d / "dem.tif").unlink()
+    outside.rename(d / "dem.tif")
+    assert verify_lock_integrity(lock, incoming) == []
+    moved = tmp_path / "moved"
+    d.rename(moved)
+    d.symlink_to(moved, target_is_directory=True)
+    assert {p.reason for p in verify_lock_integrity(lock, incoming)} == {"SYMLINK"}

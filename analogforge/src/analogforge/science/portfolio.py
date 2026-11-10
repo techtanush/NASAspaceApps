@@ -192,7 +192,6 @@ def optimize_portfolio(
             covering[member.id] = sites
 
     assignments: list[PortfolioAssignment] = []
-    pool = selected if selected else tuple(windows)
     for req in reqs:
         if _is_gap(req):
             assignments.append(
@@ -225,7 +224,10 @@ def optimize_portfolio(
             and r.status in ("PARTIAL", "PASS")
             and not r.critic_blocking_open
         ]
-        pool_rows = [rows[(w, req.id)] for w in pool if (w, req.id) in rows]
+        # NONE / GAP assert that every evaluated candidate says so: a window with no row for this requirement is
+        # unevaluated (unknown), never a failure, so one missing row keeps the requirement UNKNOWN.
+        pool_rows = [rows[(w, req.id)] for w in windows if (w, req.id) in rows]
+        evaluated_everywhere = len(pool_rows) == len(windows) and bool(windows)
         if partial:
             assignments.append(
                 PortfolioAssignment(
@@ -236,9 +238,9 @@ def optimize_portfolio(
                     "residual remains",
                 )
             )
-        elif pool_rows and all(r.status == "GAP" for r in pool_rows):
+        elif evaluated_everywhere and all(r.status == "GAP" for r in pool_rows):
             assignments.append(PortfolioAssignment(requirement_id=req.id, window_ids=[], coverage="GAP"))
-        elif pool_rows and all(r.status == "FAIL" and not r.critic_blocking_open for r in pool_rows):
+        elif evaluated_everywhere and all(r.status == "FAIL" and not r.critic_blocking_open for r in pool_rows):
             assignments.append(PortfolioAssignment(requirement_id=req.id, window_ids=[], coverage="NONE"))
         else:
             assignments.append(PortfolioAssignment(requirement_id=req.id, window_ids=[], coverage="UNKNOWN"))

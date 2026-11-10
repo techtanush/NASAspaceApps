@@ -286,3 +286,50 @@ def test_ndimage_is_the_independent_component_oracle_for_the_island_geometry() -
     land[5:7, 5:7] = True
     labels, count = ndimage.label(land, structure=np.ones((3, 3)))
     assert count == 2 and labels[0, 0] != labels[5, 5]
+
+
+# ------------------------------------------------------------------------------------------------ corner touches
+@given(
+    cell=st.one_of(
+        st.sampled_from([27.8, 1 / 3, 7.3, 0.1, 30.0, 60.0, 12.5, 0.7]), st.floats(0.05, 120.0, allow_nan=False)
+    ),
+    origin_x=st.one_of(st.just(0.0), st.floats(-2.0e7, 2.0e7), st.sampled_from([494240.0, 500000.123, 1234567.891])),
+    origin_y=st.one_of(st.just(0.0), st.floats(-1.0e7, 1.0e7), st.sampled_from([3900000.0, 4123456.789])),
+    row=st.integers(1, 3),
+    col=st.integers(1, 3),
+    d_row=st.sampled_from([-1, 1]),
+    d_col=st.sampled_from([-1, 1]),
+    which=st.sampled_from([0, 1]),
+)
+@settings(max_examples=300, deadline=None, suppress_health_check=[HealthCheck.too_slow, HealthCheck.data_too_large])
+def test_one_pixel_nodata_channel_is_never_a_diagonal_bridge(cell, origin_x, origin_y, row, col, d_row, d_col, which):  # noqa: ANN001, ANN201
+    """For ANY cell size / origin a diagonal step passing exactly through a cell corner touches both corner cells, so
+    nodata at either of them blocks the step in BOTH algorithms (solver DDA and verifier slab clipping)."""
+    assume(0 <= row + d_row <= 4 and 0 <= col + d_col <= 4)
+    corner = (row, col + d_col) if which == 0 else (row + d_row, col)
+    valid = np.ones((5, 5), dtype=bool)
+    valid[corner] = False
+    grid = support.make_grid(
+        np.full((5, 5), 3.0), valid=valid, cell_size_m=cell, origin_x_m=origin_x, origin_y_m=origin_y
+    )
+    x0, y0 = grid.center_xy(row, col)
+    x1, y1 = grid.center_xy(row + d_row, col + d_col)
+    dda = {
+        (h.row, h.col) for h in supercover(x0, y0, x1, y1, cell_size_m=cell, origin_x_m=origin_x, origin_y_m=origin_y)
+    }
+    slab = {(r, c) for r, c, _ in slab_cells(x0, y0, x1, y1, grid)}
+    assert corner in dda and corner in slab
+    assert dda == slab
+    constraints, digest = support.raster_constraints(
+        grid, start=(row, col), tasks=[("W1", (row + d_row, col + d_col))], max_distance_m=1e9, task_tolerance_m=0.0
+    )
+    route = support.make_route(digest, [raster_node_id(row, col), raster_node_id(row + d_row, col + d_col)])
+    verdict = verify_route(constraints, digest, route, canonical_sha256(route), "NOT_RUN", grid=grid, mode="synthetic")
+    assert verdict.payload.outcome == "FAIL"
+    assert "UNKNOWN_TERRAIN" in {v.code for v in verdict.payload.violations}
+    found = search_route(constraints, digest, grid=grid, mode="synthetic")
+    if found.route is not None:
+        seq = found.route.node_sequence
+        assert {raster_node_id(row, col), raster_node_id(row + d_row, col + d_col)} not in [
+            {a, b} for a, b in zip(seq, seq[1:], strict=False)
+        ]

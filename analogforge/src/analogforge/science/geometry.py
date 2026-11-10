@@ -229,6 +229,15 @@ def assert_crs_matches_body(body: Body, crs_wkt: str) -> None:
             f"CRS ellipsoid (a={ellipsoid.semi_major_metre:.1f} m) does not belong to body {body}",
             detail_code="BODY_MISMATCH",
         )
+    if abs(float(ellipsoid.semi_minor_metre) - geometry.semi_minor_m) >= 1.0:
+        # The library models Moon and Mars as spheres (and Earth as WGS84): a CRS on a different (e.g. oblate Mars)
+        # ellipsoid would silently shift every coordinate, so it is rejected rather than approximated.
+        raise GeometryError(
+            f"CRS ellipsoid (a={ellipsoid.semi_major_metre:.1f} m, b={ellipsoid.semi_minor_metre:.1f} m) differs from "
+            f"the {body} figure used by this library (b={geometry.semi_minor_m:.1f} m); oblate planetary figures "
+            "are not supported",
+            detail_code="BODY_MISMATCH",
+        )
     if body != "EARTH" and crs.to_epsg(min_confidence=100) is not None:
         raise GeometryError("an EPSG-coded CRS cannot describe planetary data", detail_code="BODY_MISMATCH")
 

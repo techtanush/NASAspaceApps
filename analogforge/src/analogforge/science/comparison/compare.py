@@ -16,6 +16,7 @@ wrap :meth:`ComparisonOutcome.to_payload` plus a ``COMPARISON`` evidence draft.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Literal
 from uuid import UUID
@@ -147,7 +148,11 @@ def _flag_gate(
 
 
 def build_gates(
-    decision: PolicyDecision, policy: ObservablePolicy | None, policy_id: str, min_valid_fraction: float | None
+    decision: PolicyDecision,
+    policy: ObservablePolicy | None,
+    policy_id: str,
+    min_valid_fraction: float | None,
+    algorithm_lock: Mapping[str, str] | None = None,
 ) -> tuple[GateEvidence, ...]:
     """Gates SC-02..SC-11 and SC-13 for one decision (``NOT_APPLICABLE`` only with an observable-specific reason)."""
     refs = _refs(decision.consulted)
@@ -164,7 +169,7 @@ def build_gates(
             )
             gates.append(_gate(gate_id, "NOT_APPLICABLE", reason, []))
             continue
-        gates.append(_evaluate_gate(gate_id, decision, policy, refs, min_valid_fraction))
+        gates.append(_evaluate_gate(gate_id, decision, policy, refs, min_valid_fraction, algorithm_lock))
     return tuple(gates)
 
 
@@ -174,6 +179,7 @@ def _evaluate_gate(
     policy: ObservablePolicy,
     refs: list[EvidenceRef],
     min_valid_fraction: float | None,
+    algorithm_lock: Mapping[str, str] | None = None,
 ) -> GateEvidence:
     is_gap = d.status == "GAP"
     if gate_id == "SC-02":
@@ -229,31 +235,86 @@ def _evaluate_gate(
             )
         return _gate(gate_id, "SATISFIED", "observable is not time dependent", refs)
     if gate_id == "SC-07":
-        text = (
-            "direct measurement from the terrain model; no proxy is used"
-            if policy.proxy_policy == "DIRECT_ONLY"
-            else "no proxy is used or accepted for this observable"
-        )
-        return _gate(gate_id, "SATISFIED", text, refs)
+        return _sc07(d, policy, refs)
     if gate_id == "SC-08":
         if is_gap:
             return _gate(gate_id, "NOT_APPLICABLE", "no numerical conclusion is drawn for a physical gap", [])
-        if d.numeric_decided:
+        if not d.numeric_decided:
+            return _gate(gate_id, "NOT_ASSESSED", "no numerical decision was reached", refs)
+        decisive = _decisive_metrics(d)
+        if not decisive:
             return _gate(
-                gate_id, "SATISFIED", "uncertainty not quantified; nominal modeled result (inclusive threshold)", refs
+                gate_id, "NOT_ASSESSED", "the decision cites no value whose uncertainty can be inspected", refs
             )
-        return _gate(gate_id, "NOT_ASSESSED", "no numerical decision was reached", refs)
+        silent = sorted({m.metric_id for m in decisive if not m.uncertainty_note.strip()})
+        if silent:
+            return _gate(gate_id, "UNSATISFIED", f"metric(s) {silent} carry no uncertainty statement", refs)
+        return _gate(
+            gate_id, "SATISFIED", "uncertainty not quantified; nominal modeled result (inclusive threshold)", refs
+        )
     if gate_id == "SC-09":
         if is_gap:
             return _gate(gate_id, "NOT_APPLICABLE", "no numerical computation is involved in a physical gap", [])
         if not d.consulted:
             return _gate(gate_id, "NOT_ASSESSED", "no evidence was consulted", refs)
-        return _gate(gate_id, "SATISFIED", "finite values; algorithm, parameter and policy hashes present", refs)
+        lock = algorithm_lock or {}
+        bad = []
+        for h in d.consulted:
+            if not h.algorithm_version.strip():
+                bad.append(f"{h.evidence_id}: unversioned algorithm")
+            elif h.algorithm_id in lock and lock[h.algorithm_id] != h.algorithm_version:
+                bad.append(
+                    f"{h.evidence_id}: {h.algorithm_id} {h.algorithm_version} differs from "
+                    f"locked {lock[h.algorithm_id]}"
+                )
+        if bad:
+            return _gate(gate_id, "UNSATISFIED", "; ".join(sorted(bad)), refs)
+        return _gate(
+            gate_id, "SATISFIED", "finite values; versioned algorithms match the lock; parameter hashes present", refs
+        )
     if gate_id == "SC-11":
         if d.route_check == "INDEPENDENT":
             return _gate(gate_id, "SATISFIED", "an independent verify-route evidence recomputes the route", refs)
         return _gate(gate_id, "NOT_ASSESSED", "no independent verification of a route has been supplied", refs)
     return _gate(gate_id, "NOT_APPLICABLE", _NOT_APPLICABLE_REASON[gate_id], [])
+
+
+def _decisive_metrics(d: PolicyDecision) -> list[MeasuredMetric]:
+    """Metrics that carry the decision: those the policy attached plus the consulted metrics it names as subcriteria."""
+    named = set(d.covered) | set(d.uncovered)
+    found = list(d.metrics)
+    seen = {m.metric_id for m in found}
+    for h in d.consulted:
+        for m in h.metrics:
+            if m.value is not None and m.metric_id in named and m.metric_id not in seen:
+                found.append(m)
+                seen.add(m.metric_id)
+    return found
+
+
+def _sc07(d: PolicyDecision, policy: ObservablePolicy, refs: list[EvidenceRef]) -> GateEvidence:
+    """Proxy/assumption gate from the consulted metrics' quantity kinds (never a blanket SATISFIED)."""
+    if d.status == "GAP" and not d.consulted:
+        return _gate("SC-07", "NOT_APPLICABLE", "no measurement is consumed: the condition is a physical gap", [])
+    if not d.consulted:
+        return _gate("SC-07", "NOT_ASSESSED", "no evidence was consulted", refs)
+    kinds = {m.quantity_kind for h in d.consulted for m in h.metrics if m.value is not None}
+    kinds |= {m.quantity_kind for m in d.metrics if m.value is not None}  # e.g. the verifier's assumed reserve
+    accepts_proxy = policy.proxy_policy not in ("DIRECT_ONLY", "NO_PROXY_ACCEPTED")
+    if "PROXY" in kinds and not accepts_proxy:
+        return _gate("SC-07", "UNSATISFIED", "a proxy metric is consulted but the policy accepts no proxy", refs)
+    if "ASSUMED" in kinds:
+        if any(h.kind == "ASSUMPTION" for h in d.consulted):
+            return _gate("SC-07", "SATISFIED", "assumed parameters are covered by consulted ASSUMPTION evidence", refs)
+        return _gate(
+            "SC-07", "NOT_ASSESSED", "assumed model parameters are used; no acceptance evidence is consulted", refs
+        )
+    text = (
+        "direct measurement from the terrain model; no proxy is used"
+        if policy.proxy_policy == "DIRECT_ONLY"
+        else "no proxy is used or accepted for this observable"
+    )
+    return _gate("SC-07", "SATISFIED", text, refs)
 
 
 def _validation_level(mode: RuntimeMode, d: PolicyDecision) -> Literal["S0", "S1", "S2", "S3", "S4"]:
@@ -356,7 +417,7 @@ def compare_requirement(inputs: CompareInputs, config: ScienceConfig) -> Compari
         uncovered_subcriteria=decision.uncovered,
         explanation=decision.explanation,
         limitations=decision.limitations,
-        gates=build_gates(decision, policy, policy_id, min_cov),
+        gates=build_gates(decision, policy, policy_id, min_cov, config.algorithms.algorithm_lock),
         validation_level=_validation_level(inputs.mode, decision),
         metrics=decision.metrics,
         consulted_evidence_ids=consulted_ids,

@@ -507,10 +507,10 @@ def test_route_verified_in_live_mode_reaches_s4_only_with_independent_verificati
     assert out.status == "PASS" and out.validation_level == "S4"
     search_only = SideEvidence((handle(algorithm_id="search-route", mode="live"),))
     weaker = run("R-EXPOSURE", candidate=search_only, verification=summary("PASS", metrics=(exposure,)), mode="live")
-    assert (
-        next(g for g in weaker.gates if g.gate_id == "SC-11").outcome == "NOT_ASSESSED"
-        and weaker.validation_level == "S3"
-    )
+    # without an independent VERIFICATION handle a passing metric earns nothing (review defect: it used to PASS at S3)
+    assert (weaker.status, weaker.reason_code) == ("UNKNOWN", "ROUTE_NOT_VERIFIED")
+    assert next(g for g in weaker.gates if g.gate_id == "SC-11").outcome == "NOT_ASSESSED"
+    assert weaker.validation_level == "S2" and weaker.confidence == "LOW" and weaker.measured_value is None
 
 
 # ----------------------------------------------------------------------------- optional layers and scale-only rows
@@ -674,3 +674,129 @@ def test_truth_table_of_architecture_40_s5_rows_before_prove_it() -> None:
         assert run("R-EXPOSURE", candidate=verification_side()).evaluation_stage == "PRELIMINARY"
         assert run("R-CLEARANCE", candidate=slope_side(fraction)).reason_code == "SCALE_UNSUPPORTED"
         assert run("R-GRAVITY", candidate=slope_side(fraction)).status == "GAP"
+
+
+# ----------------------------------------------------------------------------- review defect 3: route-row credit
+@pytest.mark.parametrize("category", ["DATA", "SYSTEM", "SEARCH_LIMIT", "REQUIREMENT", "ROUTE", "ROVER", "ANALOG"])
+@pytest.mark.parametrize("rid", ["R-EXPOSURE", "R-TASKS"])
+def test_inconclusive_verification_never_credits_a_route_row(rid: str, category: str) -> None:
+    mid = "unique_exposure_m:R-EXPOSURE" if rid == "R-EXPOSURE" else "tasks_completed"
+    good = metric(mid, 500.0, unit="m")
+    out = run(rid, candidate=verification_side(), verification=summary("INCONCLUSIVE", category, (), (good,)))
+    assert (out.status, out.reason_code) == ("UNKNOWN", "ROUTE_NOT_VERIFIED")
+    assert out.confidence == "LOW" and out.measured_value is None and out.validation_level != "S4"
+
+
+def test_route_row_needs_an_independent_verification_handle_and_sc11_agrees() -> None:
+    exposure = metric("unique_exposure_m:R-EXPOSURE", 500.0, unit="m")
+    for algo in ("search-route", "diagnose-result", "verify-route"):
+        side = SideEvidence((handle(kind="DERIVED", algorithm_id=algo, scale=60.0), handle(scale=60.0)))
+        out = run("R-EXPOSURE", candidate=side, verification=summary("PASS", metrics=(exposure,)))
+        assert (out.status, out.reason_code, out.confidence) == ("UNKNOWN", "ROUTE_NOT_VERIFIED", "LOW"), algo
+        assert next(g for g in out.gates if g.gate_id == "SC-11").outcome == "NOT_ASSESSED"
+    ok = run("R-EXPOSURE", candidate=verification_side(), verification=summary("PASS", metrics=(exposure,)))
+    assert (ok.status, ok.reason_code) == ("PASS", "ROUTE_VERIFIED")
+    assert next(g for g in ok.gates if g.gate_id == "SC-11").outcome == "SATISFIED"
+
+
+def test_unknown_terrain_violation_blocks_credit_for_every_row() -> None:
+    exposure = metric("unique_exposure_m:R-EXPOSURE", 500.0, unit="m")
+    for outcome, codes in (("FAIL", ("UNKNOWN_TERRAIN", "WAYPOINT_MISSED")), ("PASS", ("UNKNOWN_TERRAIN",))):
+        out = run(
+            "R-EXPOSURE", candidate=verification_side(), verification=summary(outcome, "ROUTE", codes, (exposure,))
+        )
+        assert out.status != "PASS" and out.reason_code != "ROUTE_VERIFIED" and out.confidence == "LOW", codes
+
+
+def test_row_credit_after_an_overall_fail_only_for_row_scoped_violations() -> None:
+    """Spec (40 section 5): a failed exposure keeps tasks/reserve credit; a route-invalidating violation does not."""
+    tasks = metric("tasks_completed", 2.0, unit="count")
+    cand = verification_side()
+    shortfall = run("R-TASKS", candidate=cand, verification=summary("FAIL", "ROUTE", ("EXPOSURE_SHORTFALL",), (tasks,)))
+    assert (shortfall.status, shortfall.reason_code) == ("PASS", "ROUTE_VERIFIED")  # unrelated row keeps its credit
+    for code in ("MAX_SLOPE_EXCEEDED", "FORBIDDEN_INTERSECTION", "DISCONTINUOUS_ROUTE", "STALE_INPUT_HASH"):
+        hard = run("R-TASKS", candidate=cand, verification=summary("FAIL", "ROUTE", (code,), (tasks,)))
+        assert (hard.status, hard.reason_code) == ("FAIL", "ROUTE_FAILED"), code
+
+
+# ------------------------------------------------------------------- review defects 1 and 5: W1 coverage gates
+def test_w1_gates_on_the_coverage_actually_used_not_the_fine_scale_valid_fraction() -> None:
+    cand, tgt = w1_sides(point(3, 480.0), point(3, 480.0), valid=0.97)  # fine-scale valid_fraction metric: 0.97
+    used = lambda c: SideEvidence(cand.handles, cand.histogram, coverage=c)  # noqa: E731
+    assert run("R-TARGET-SLOPE-CONTEXT", candidate=used(None), target=tgt).status == "PASS"  # falls back to metric
+    out = run("R-TARGET-SLOPE-CONTEXT", candidate=used(0.56), target=tgt)  # only 56 % of coarse cells were used
+    assert (out.status, out.reason_code, out.measured_value) == ("UNKNOWN", "INSUFFICIENT_VALID_DATA", None)
+    assert out.confidence == "LOW"
+    assert next(g for g in out.gates if g.gate_id == "SC-05").outcome == "UNSATISFIED"
+    assert run("R-TARGET-SLOPE-CONTEXT", candidate=used(0.8), target=tgt).status == "PASS"  # exactly the minimum
+    assert run("R-TARGET-SLOPE-CONTEXT", candidate=used(0.7999), target=tgt).status == "UNKNOWN"
+    # the used coverage overrides a rosy metric in either direction
+    low_metric, _ = w1_sides(point(3, 480.0), point(3, 480.0), valid=0.5)
+    assert (
+        run(
+            "R-TARGET-SLOPE-CONTEXT",
+            candidate=SideEvidence(low_metric.handles, low_metric.histogram, coverage=0.9),
+            target=tgt,
+        ).status
+        == "PASS"
+    )
+
+
+def test_w1_also_checks_the_target_coverage() -> None:
+    cand, _ = w1_sides(point(3, 480.0), point(3, 480.0))
+    target_handle = lambda v: handle(  # noqa: E731
+        metric("valid_fraction", v, scale=480.0, valid=v), body="MARS", algorithm_id="characterize-target"
+    )
+    ok = SideEvidence((target_handle(0.8),), point(3, 480.0))
+    assert run("R-TARGET-SLOPE-CONTEXT", candidate=cand, target=ok).status == "PASS"  # equal to the minimum passes
+    for v in (0.79, 0.3):
+        low = SideEvidence((target_handle(v),), point(3, 480.0))
+        out = run("R-TARGET-SLOPE-CONTEXT", candidate=cand, target=low)
+        assert (out.status, out.reason_code, out.measured_value) == ("UNKNOWN", "INSUFFICIENT_VALID_DATA", None)
+        assert "Target" in out.explanation
+
+
+# ----------------------------------------------------------------------------- review defect 7: conditional gates
+def _gate_outcomes(out: ComparisonOutcome) -> dict[str, str]:
+    return {g.gate_id: g.outcome for g in out.gates}
+
+
+def test_sc08_needs_an_uncertainty_statement_on_the_decisive_metric() -> None:
+    silent = metric("slope_area_fraction:12-18", 0.08, kind="ASSUMED").model_copy(update={"uncertainty_note": ""})
+    out = run("R-SLOPE-AVAILABILITY", candidate=SideEvidence((handle(silent, scale=60.0),)))
+    assert out.status == "PASS"
+    assert _gate_outcomes(out)["SC-08"] == "UNSATISFIED"
+    ok = run("R-SLOPE-AVAILABILITY", candidate=slope_side(0.08))
+    assert _gate_outcomes(ok)["SC-08"] == "SATISFIED"
+
+
+def test_sc07_follows_the_quantity_kinds_of_the_consulted_metrics() -> None:
+    proxy = run(
+        "R-SLOPE-AVAILABILITY",
+        candidate=SideEvidence((handle(metric("slope_area_fraction:12-18", 0.08, kind="PROXY")),)),
+    )
+    assert _gate_outcomes(proxy)["SC-07"] == "UNSATISFIED"
+    assumed_metric = metric("slope_area_fraction:12-18", 0.08, kind="ASSUMED")
+    assumed = run("R-SLOPE-AVAILABILITY", candidate=SideEvidence((handle(assumed_metric),)))
+    assert _gate_outcomes(assumed)["SC-07"] == "NOT_ASSESSED"
+    accepted = SideEvidence((handle(assumed_metric), handle(kind="ASSUMPTION", algorithm_id="compare-requirement")))
+    assert _gate_outcomes(run("R-SLOPE-AVAILABILITY", candidate=accepted))["SC-07"] == "SATISFIED"
+    assert _gate_outcomes(run("R-SLOPE-AVAILABILITY", candidate=slope_side(0.08)))["SC-07"] == "SATISFIED"
+
+
+def test_sc09_checks_versions_against_the_algorithm_lock() -> None:
+    good = slope_side(0.08)
+    assert _gate_outcomes(run("R-SLOPE-AVAILABILITY", candidate=good))["SC-09"] == "SATISFIED"
+    stale = SideEvidence(tuple(h.model_copy(update={"algorithm_version": "0.0.1"}) for h in good.handles))
+    assert _gate_outcomes(run("R-SLOPE-AVAILABILITY", candidate=stale))["SC-09"] == "UNSATISFIED"
+    blank = SideEvidence(tuple(h.model_copy(update={"algorithm_version": " "}) for h in good.handles))
+    assert _gate_outcomes(run("R-SLOPE-AVAILABILITY", candidate=blank))["SC-09"] == "UNSATISFIED"
+
+
+def test_assumed_verifier_metric_without_uncertainty_is_not_a_clean_route_row() -> None:
+    """Review repro g2: an ASSUMED reserve with an empty uncertainty note PASSed with SC-07/SC-08 SATISFIED."""
+    bad = metric("reserve_pct", 30.0, unit="percent", kind="ASSUMED").model_copy(update={"uncertainty_note": ""})
+    out = run("R-RESERVE", candidate=verification_side(), verification=summary("PASS", metrics=(bad,)))
+    assert (out.status, out.reason_code) == ("PASS", "ROUTE_VERIFIED") and out.confidence == "LOW"
+    assert _gate_outcomes(out)["SC-07"] == "NOT_ASSESSED"
+    assert _gate_outcomes(out)["SC-08"] == "UNSATISFIED"

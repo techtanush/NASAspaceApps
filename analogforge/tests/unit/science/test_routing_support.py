@@ -224,6 +224,69 @@ def brute_force(spec: ConstraintsArtifact) -> tuple[float, float, tuple[str, ...
     return min(best, key=lambda b: (b[0], b[1], b[2]))
 
 
+def brute_force_full(spec: ConstraintsArtifact) -> tuple[float, float, tuple[str, ...]] | None:
+    """Exhaustive oracle that honours EVERYTHING the search honours on an abstract graph: traversal limit (1 or more),
+    max distance, the usable-energy bound, unique AND total exposure counting and the strategy's objective order
+    (MINIMUM_FEASIBLE_ROUTE: energy first; otherwise distance first).  Returns ``(distance, energy, sequence)``."""
+    assert spec.graph is not None and spec.start.node_id is not None
+    edges = {frozenset((e.a, e.b)): e for e in spec.graph.edges if e.surface_slope_deg <= spec.surface_slope_cap_deg}
+    adj: dict[str, list[str]] = {n: [] for n in spec.graph.nodes}
+    for e in edges.values():
+        adj[e.a].append(e.b)
+        adj[e.b].append(e.a)
+    tasks = {t.task_id: t for t in spec.tasks}
+    start = spec.start.node_id
+    need_exposure = spec.strategy != "WAYPOINT_RETURN"
+    model_battery = spec.energy.battery_wh
+    usable = model_battery * (1.0 - spec.energy.min_reserve_pct / 100.0)
+    best: list[tuple[float, float, tuple[str, ...]]] = []
+
+    def exposure_of(used: dict[frozenset[str], int], expo: ExposureSpec) -> float:
+        total = 0.0
+        for key, count in used.items():
+            e = edges[key]
+            lo, hi = expo.band_deg
+            if lo <= e.surface_slope_deg < hi or (expo.upper_inclusive and e.surface_slope_deg == hi):
+                total += e.length_m * (1 if expo.counting == "UNIQUE_UNDIRECTED_EDGE_DISTANCE" else count)
+        return total
+
+    def rec(
+        node: str, path: list[str], used: dict[frozenset[str], int], dist: float, energy: float, done: frozenset[str]
+    ) -> None:
+        if spec.max_distance_m is not None and dist > spec.max_distance_m + 1e-9:
+            return
+        if energy > usable + 1e-9:
+            return
+        if node == start and len(path) > 1 and len(done) == len(tasks):
+            if not need_exposure or all(exposure_of(used, x) >= x.minimum_distance_m - 1e-9 for x in spec.exposures):
+                best.append((round(dist, 9), round(energy, 9), tuple(path)))
+        for nbr in sorted(adj[node]):
+            key = frozenset((node, nbr))
+            if used.get(key, 0) >= spec.max_undirected_edge_traversals:
+                continue
+            newly = {t for t, ts in tasks.items() if ts.location.node_id == nbr and t not in done}
+            used[key] = used.get(key, 0) + 1
+            rec(
+                nbr,
+                [*path, nbr],
+                used,
+                dist + edges[key].length_m,
+                energy + (edges[key].mock_energy_wh or 0.0) + sum(tasks[t].incremental_energy_wh or 0.0 for t in newly),
+                done | newly,
+            )
+            used[key] -= 1
+            if used[key] == 0:
+                del used[key]
+
+    init_done = frozenset(t for t, ts in tasks.items() if ts.location.node_id == start)
+    rec(start, [start], {}, 0.0, sum(tasks[t].incremental_energy_wh or 0.0 for t in init_done), init_done)
+    if not best:
+        return None
+    if spec.strategy == "MINIMUM_FEASIBLE_ROUTE":
+        return min(best, key=lambda b: (b[1], b[0], b[2]))
+    return min(best, key=lambda b: (b[0], b[1], b[2]))
+
+
 # ----------------------------------------------------------------------------------------------- raster builders
 def make_grid(
     slope: np.ndarray,

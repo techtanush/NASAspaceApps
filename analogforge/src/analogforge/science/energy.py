@@ -28,11 +28,11 @@ from typing import Final, Literal
 
 from analogforge.ports.domain_models import EnergyModel
 from analogforge.ports.science_payloads import EnergySpec
+from analogforge.science.config import default_thresholds
 from analogforge.science.errors import ModelError
 
 EARTH_GRAVITY_MPS2: Final = 9.80665
 JOULES_PER_WH: Final = 3600.0
-DEFAULT_RESERVE_TOLERANCE_WH: Final = 1e-9
 
 
 def _finite(name: str, value: float) -> float:
@@ -300,10 +300,13 @@ def evaluate_route_energy(
     return route_energy(params, edges, tasks_completed=tasks_completed, dwell_s_total=dwell_s_total)
 
 
-def meets_reserve(
-    params: EnergyParams, conservative_wh: float, tolerance_wh: float = DEFAULT_RESERVE_TOLERANCE_WH
-) -> bool:
-    """Hard constraint ``E_conservative <= battery * (1 - min_reserve/100)`` (equality passes)."""
+def meets_reserve(params: EnergyParams, conservative_wh: float, tolerance_wh: float | None = None) -> bool:
+    """Hard constraint ``E_conservative <= battery * (1 - min_reserve/100)`` (equality passes).
+
+    ``tolerance_wh`` defaults to ``thresholds.energy_tolerance_wh`` of ``config/algorithms.yaml``.
+    """
+    if tolerance_wh is None:
+        tolerance_wh = default_thresholds().energy_tolerance_wh
     return _finite("conservative_wh", conservative_wh) <= params.usable_energy_wh + tolerance_wh
 
 

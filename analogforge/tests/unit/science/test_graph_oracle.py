@@ -3,6 +3,8 @@ brute-force oracle equality, lexicographic tie-break and mock-provider rejection
 
 from __future__ import annotations
 
+import itertools
+import random
 import sys
 from pathlib import Path
 
@@ -12,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from test_routing_support import (  # noqa: E402
     brute_force,
+    brute_force_full,
     design_input,
     graph_design,
     graph_design_with,
@@ -23,7 +26,7 @@ from test_routing_support import (  # noqa: E402
 
 from analogforge.ports import catalog  # noqa: E402
 from analogforge.ports.hashing import canonical_sha256  # noqa: E402
-from analogforge.ports.science_payloads import ConstraintsArtifact, GraphEdge, GraphSpec  # noqa: E402
+from analogforge.ports.science_payloads import ConstraintsArtifact, GraphEdge, GraphSpec, Waypoint  # noqa: E402
 from analogforge.science.routing import RouteInputError  # noqa: E402
 from analogforge.science.routing.fixture_graph import CANONICAL_GRAPH_EDGES, canonical_graph_spec  # noqa: E402
 from analogforge.science.routing.search import search_route  # noqa: E402
@@ -336,3 +339,134 @@ def test_traversal_limit_binds_the_search() -> None:
     route = make_route(digest_one, catalog.GRAPH_SEARCH_WAYPOINT_RETURN, strategy="WAYPOINT_RETURN")
     ver = verify_route(one, digest_one, route, canonical_sha256(route), "NOT_RUN", mode="synthetic")
     assert "EDGE_TRAVERSAL_LIMIT_EXCEEDED" in {v.code for v in ver.payload.violations}
+
+
+# ----------------------------------------------------------------------------------------------- random-graph oracle
+def _random_case(seed: int) -> tuple[ConstraintsArtifact, str]:
+    """Deterministic random abstract scenario: 3-5 nodes, random edges, any strategy, traversal limit 1 or 2, UNIQUE or
+    TOTAL exposure counting, optional distance cap and a tight/loose battery."""
+    rng = random.Random(seed)  # noqa: S311
+    nodes = [f"N{i}" for i in range(rng.randint(3, 5))]
+    pairs = [(a, b) for a, b in itertools.combinations(nodes, 2) if rng.random() < 0.6] or [(nodes[0], nodes[1])]
+    spec = GraphSpec(
+        nodes=nodes,
+        edges=[
+            GraphEdge(
+                a=a,
+                b=b,
+                length_m=float(rng.choice([10, 20, 30, 40, 50])),
+                surface_slope_deg=float(rng.choice([5, 10, 12, 15, 18])),
+                mock_energy_wh=float(rng.choice([0.5, 1, 2, 3])),
+            )
+            for a, b in pairs
+        ],
+    )
+    strategy = rng.choice(["EXPOSURE_COVERAGE", "WAYPOINT_RETURN", "MINIMUM_FEASIBLE_ROUTE"])
+    base = graph_design_with(spec, strategy).constraints  # type: ignore[arg-type]
+    n_tasks = rng.randint(1, 2)
+    task_nodes = rng.sample(nodes, n_tasks)
+    tasks = [
+        t.model_copy(update={"task_id": f"T{i}", "location": Waypoint(node_id=n)})
+        for i, (t, n) in enumerate(zip(base.tasks, task_nodes, strict=False))
+    ][:n_tasks]
+    exposures = [
+        e.model_copy(
+            update={
+                "minimum_distance_m": float(rng.choice([0, 20, 40, 60, 100, 150])),
+                "counting": rng.choice(["UNIQUE_UNDIRECTED_EDGE_DISTANCE", "TOTAL_TRAVERSED_DISTANCE"]),
+            }
+        )
+        for e in base.exposures
+    ]
+    max_traversals = rng.choice([1, 2])
+    max_distance = rng.choice([None, 100.0, 200.0, 300.0])
+    energy = base.energy.model_copy(update={"battery_wh": float(rng.choice([20, 50, 1000]))})
+    art = base.model_copy(
+        update={
+            "start": Waypoint(node_id=rng.choice(nodes)),
+            "tasks": tasks,
+            "exposures": exposures,
+            "max_undirected_edge_traversals": max_traversals,
+            "max_distance_m": max_distance,
+            "energy": energy,
+        }
+    )
+    art = ConstraintsArtifact.model_validate(art.model_dump(mode="json"))
+    return art, canonical_sha256(art)
+
+
+def _check_against_oracle(seed: int) -> None:
+    constraints, digest = _random_case(seed)
+    out = search_route(constraints, digest, mode="synthetic")
+    oracle = brute_force_full(constraints)
+    status = out.payload.search_status
+    context = f"seed {seed} {constraints.strategy} mt={constraints.max_undirected_edge_traversals}"
+    if oracle is None:
+        assert status == "EXHAUSTIVE_INFEASIBLE", f"{context}: oracle infeasible, search says {status}"
+        return
+    assert status == "FOUND", (
+        f"{context}: oracle feasible {oracle}, search says {status}: {out.payload.termination_reason}"
+    )
+    assert out.route is not None and out.route_sha256 is not None
+    assert tuple(out.route.node_sequence) == oracle[2], f"{context}: not the oracle optimum {oracle}"
+    assert out.route.solver_claimed.distance_m == pytest.approx(oracle[0])
+    if constraints.strategy != "WAYPOINT_RETURN":  # WAYPOINT_RETURN deliberately ignores exposure requirements
+        ver = verify_route(constraints, digest, out.route, out.route_sha256, "FOUND", mode="synthetic")
+        assert ver.payload.outcome == "PASS", f"{context}: {[v.code for v in ver.payload.violations]}"
+
+
+# seeds that exposed the traversal-limit-1 dominance defect (reviewer finding) plus a TOTAL-counting one
+@pytest.mark.parametrize("seed", [1047, 1071, 1074, 1115])
+def test_traversal_limit_one_dominance_regressions(seed: int) -> None:
+    constraints, _ = _random_case(seed)
+    assert constraints.max_undirected_edge_traversals == 1
+    _check_against_oracle(seed)
+
+
+def test_search_equals_exhaustive_oracle_over_random_graphs_all_strategies_limits_and_counting() -> None:
+    seen: set[tuple[str, int, str]] = set()
+    for seed in range(260):
+        _check_against_oracle(seed)
+        art, _ = _random_case(seed)
+        seen.add((art.strategy, art.max_undirected_edge_traversals, art.exposures[0].counting))
+    assert len(seen) >= 12  # every strategy x {1,2} x {unique,total} combination was actually exercised
+
+
+def test_total_counting_minimum_feasible_route_is_energy_minimal() -> None:
+    """Dominance must not discard a prefix whose extra traversals count toward TOTAL exposure (seed 2143 family)."""
+    edges = [
+        ("N0", "N1", 40.0, 0.5, 10.0),
+        ("N0", "N3", 30.0, 0.5, 15.0),
+        ("N1", "N4", 20.0, 2.0, 15.0),
+        ("N2", "N3", 20.0, 2.0, 10.0),
+        ("N2", "N4", 10.0, 1.0, 15.0),
+        ("N3", "N4", 50.0, 3.0, 10.0),
+    ]
+    spec = GraphSpec(
+        nodes=[f"N{i}" for i in range(5)],
+        edges=[
+            GraphEdge(a=a, b=b, length_m=length, surface_slope_deg=slope, mock_energy_wh=wh)
+            for a, b, length, wh, slope in edges
+        ],
+    )
+    base = graph_design_with(spec, "MINIMUM_FEASIBLE_ROUTE").constraints
+    task = base.tasks[0].model_copy(update={"task_id": "T0", "location": Waypoint(node_id="N3")})
+    expo = base.exposures[0].model_copy(update={"minimum_distance_m": 100.0, "counting": "TOTAL_TRAVERSED_DISTANCE"})
+    art = ConstraintsArtifact.model_validate(
+        base.model_copy(
+            update={
+                "start": Waypoint(node_id="N2"),
+                "tasks": [task],
+                "exposures": [expo],
+                "max_distance_m": None,
+                "energy": base.energy.model_copy(update={"battery_wh": 50.0}),
+            }
+        ).model_dump(mode="json")
+    )
+    digest = canonical_sha256(art)
+    out = search_route(art, digest, mode="synthetic")
+    oracle = brute_force_full(art)
+    assert oracle is not None and out.route is not None
+    assert tuple(out.route.node_sequence) == oracle[2]
+    assert (oracle[0], oracle[1]) == (200.0, 18.0)
+    assert out.route.solver_claimed.energy_conservative_wh == pytest.approx(18.0)

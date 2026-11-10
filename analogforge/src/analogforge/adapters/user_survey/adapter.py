@@ -191,8 +191,16 @@ def decode(path: Path, params: SurveyDecodeParams) -> DecodedRaster:
         if ellipsoid is None or abs(ellipsoid.semi_major_metre - EARTH_SEMI_MAJOR_M) > 20_000.0:
             raise AdapterError("UNSUPPORTED_CRS", "raster CRS is not an Earth CRS", detail_code="BODY_MISMATCH")
         band = src.read(1).astype(np.float64)
+        scale = float(src.scales[0]) if src.scales and src.scales[0] is not None else 1.0
+        offset = float(src.offsets[0]) if src.offsets and src.offsets[0] is not None else 0.0
+        if not (np.isfinite(scale) and np.isfinite(offset)) or scale == 0.0:
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID",
+                f"{path.name} carries an unusable GDAL scale/offset ({scale}, {offset})",
+                detail_code="METADATA_INCOMPLETE",
+            )
         nodata = src.nodata if src.nodata is not None else md.nodata_value
-        valid = np.isfinite(band)
+        valid = np.isfinite(band)  # nodata is a RAW value: matched before the scale is applied
         if nodata is None:
             issues.append("nodata_not_declared")
         else:
@@ -214,6 +222,10 @@ def decode(path: Path, params: SurveyDecodeParams) -> DecodedRaster:
         raise AdapterError(
             "UNSUPPORTED_PRODUCT", f"unsupported vertical unit {md.vertical_units!r}", detail_code="UNSUPPORTED_FORMAT"
         )
+    scale_applied = scale != 1.0 or offset != 0.0
+    if scale_applied:  # GDAL semantics: physical = raw * scale + offset, applied exactly once, before unit conversion
+        band = band * scale + offset
+        notes.append(f"GDAL scale {scale:g} and offset {offset:g} from the file applied once.")
     data = np.where(valid, band * factor_v, np.nan)
     declared = md.cell_support_m
     if pixel_m is not None and declared is not None and abs(pixel_m - declared) > 0.05 * declared:
@@ -234,6 +246,9 @@ def decode(path: Path, params: SurveyDecodeParams) -> DecodedRaster:
         height=height,
         pixel_registration="GDAL_PIXEL_EDGE",
         nodata_raw=float(nodata) if nodata is not None else None,
+        source_scale=scale,
+        source_offset=offset,
+        scale_applied=scale_applied,
         product_id=path.stem,
         notes=tuple(notes),
         quantitative_use_allowed=allowed,

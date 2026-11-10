@@ -42,6 +42,25 @@ def _aoi_mask(aoi: AreaOfInterest, frame, x: np.ndarray, y: np.ndarray) -> np.nd
     return np.asarray(in_lon & (lat >= south - 1e-9) & (lat <= north + 1e-9), dtype=bool)
 
 
+_COUNT_CHUNK_ROWS = 256
+
+
+def _aoi_cell_count(aoi: AreaOfInterest, frame, g, r0: int, r1: int, c0: int, c1: int) -> int:  # type: ignore[no-untyped-def]
+    """Cells of the (unclipped) row/column range ``[r0, r1) x [c0, c1)`` whose centre lies inside the AOI.
+
+    The range may extend beyond the dataset: the denominator of the valid fraction is the whole AOI, so the part
+    of the AOI outside the dataset counts as missing, never as absent.  Rows are processed in chunks.
+    """
+    cols = g.origin_x_m + (np.arange(c0, c1) + 0.5) * g.cell_size_m
+    total = 0
+    for start in range(r0, r1, _COUNT_CHUNK_ROWS):
+        rows = np.arange(start, min(r1, start + _COUNT_CHUNK_ROWS))
+        ys = g.origin_y_m - (rows + 0.5) * g.cell_size_m
+        xx, yy = np.meshgrid(cols, ys)
+        total += int(_aoi_mask(aoi, frame, xx, yy).sum())
+    return total
+
+
 def run_characterize(env: OpEnv) -> OpOutcome:
     inp = env.request.inputs
     assert isinstance(inp, CharacterizeTargetInput)
@@ -62,10 +81,11 @@ def run_characterize(env: OpEnv) -> OpOutcome:
     aoi = inp.target
     xmin, ymin, xmax, ymax = bbox_to_projected_bounds(frame, tuple(aoi.bbox), aoi.longitude_convention)  # type: ignore[arg-type]
     g = prep.grid
-    c0 = max(0, int(np.floor((xmin - g.origin_x_m) / g.cell_size_m)))
-    c1 = min(g.width, int(np.ceil((xmax - g.origin_x_m) / g.cell_size_m)))
-    r0 = max(0, int(np.floor((g.origin_y_m - ymax) / g.cell_size_m)))
-    r1 = min(g.height, int(np.ceil((g.origin_y_m - ymin) / g.cell_size_m)))
+    uc0 = int(np.floor((xmin - g.origin_x_m) / g.cell_size_m))
+    uc1 = int(np.ceil((xmax - g.origin_x_m) / g.cell_size_m))
+    ur0 = int(np.floor((g.origin_y_m - ymax) / g.cell_size_m))
+    ur1 = int(np.ceil((g.origin_y_m - ymin) / g.cell_size_m))
+    c0, c1, r0, r1 = max(0, uc0), min(g.width, uc1), max(0, ur0), min(g.height, ur1)
     if c1 <= c0 or r1 <= r0:
         raise OpBlocked("the target AOI does not intersect the dataset", code="NO_COVERAGE")
     sub = g.window(r0, c0, r1 - r0, c1 - c0)
@@ -77,7 +97,9 @@ def run_characterize(env: OpEnv) -> OpOutcome:
     surf = prep.surf
     quality = surf.quality[rs]
     valid = surf.valid[rs] & mask
-    vf = float(valid.sum()) / float(mask.sum())
+    # denominator: every AOI cell, including the part outside the dataset (outside is missing data, not absent area)
+    aoi_cells = max(int(mask.sum()), _aoi_cell_count(aoi, frame, g, ur0, ur1, uc0, uc1))
+    vf = float(valid.sum()) / float(aoi_cells)
     if vf < cfg.algorithms.thresholds.hard_block_valid_fraction:
         raise OpBlocked(
             f"valid fraction {vf:.3f} of the target AOI is below the hard minimum",

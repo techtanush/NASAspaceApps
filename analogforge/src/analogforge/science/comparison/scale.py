@@ -10,6 +10,7 @@ import math
 from dataclasses import dataclass
 from typing import Literal
 
+from analogforge.science.config import default_thresholds
 from analogforge.science.errors import ScaleError
 
 _FACTOR_TOLERANCE = 1e-6
@@ -70,9 +71,14 @@ class SupportVerdict:
 
 
 def check_support_window(
-    support_m: float, minimum_m: float | None, maximum_m: float | None, tolerance: float = 1e-9
+    support_m: float, minimum_m: float | None, maximum_m: float | None, tolerance: float | None = None
 ) -> SupportVerdict:
-    """Is ``support_m`` inside ``[minimum_m, maximum_m]`` (``None`` bound = unbounded; bounds inclusive)?"""
+    """Is ``support_m`` inside ``[minimum_m, maximum_m]`` (``None`` bound = unbounded; bounds inclusive)?
+
+    ``tolerance`` defaults to ``thresholds.numeric_tolerance`` of ``config/algorithms.yaml``.
+    """
+    if tolerance is None:
+        tolerance = default_thresholds().numeric_tolerance
     if not (math.isfinite(support_m) and support_m >= 0):
         raise ScaleError("support scale must be finite and non-negative")
     if minimum_m is not None and support_m < minimum_m - tolerance:

@@ -86,19 +86,34 @@ def test_pert_04_battery_30_vs_1800(tmp_path: Path) -> None:
 
 
 def test_pert_05_shifted_target_histogram_flips_the_context_row(tmp_path: Path) -> None:
+    """B's 480 m W1 flips PASS -> FAIL with the target; A (island with a water moat) has too little 480 m coverage."""
+    from test_truth_table import independent_w1
+
     mission = load_mission("mission-mars-mobility")
     req = requirement(mission, "R-TARGET-SLOPE-CONTEXT")
     rows: dict[str, dict[str, str]] = {}
     for label, gen in (("base", {}), ("shifted", {"target_fractions": ((22.0, 1.0),)})):
-        flow, _, th, sc = setup(tmp_path / label, **gen)
+        flow, target, th, sc = setup(tmp_path / label, **gen)
         for w in (A, B):
             cand = candidate_ref(sc, w)
             _, handles = analyze(flow, cand)
             payload = compare(flow, req, cand, [th], handles).payload
             assert isinstance(payload, CompareRequirementPayload)
             rows.setdefault(label, {})[w] = payload.proposed_status
-    assert rows["base"] == {A: "PASS", B: "PASS"}
-    assert rows["shifted"] == {A: "FAIL", B: "FAIL"}
+            # independent oracle from the raw rasters decides whether the window is decidable at all
+            grid = flow.ctx.artifact_paths[handles[0].artifact_sha256]  # type: ignore[index]
+            w1, coverage = independent_w1(
+                grid,
+                tmp_path / label / "data" / "practice-earth-grid-v1",
+                list(target.slope_histogram.area_fraction),
+                480.0,
+            )
+            if coverage < 0.8:
+                assert (payload.proposed_status, payload.reason_code) == ("UNKNOWN", "INSUFFICIENT_VALID_DATA")
+            else:
+                assert payload.proposed_status == ("PASS" if w1 <= 6.0 else "FAIL")
+    assert rows["base"] == {A: "UNKNOWN", B: "PASS"}
+    assert rows["shifted"] == {A: "UNKNOWN", B: "FAIL"}
 
 
 def test_pert_06_exposure_requirement_beyond_route_domain(tmp_path: Path) -> None:
@@ -152,7 +167,14 @@ def test_pert_08_one_nodata_cell_on_the_route(tmp_path: Path) -> None:
     # (a) the OLD route replayed against constraints built on the corrupted grid is rejected by the verifier
     cand2 = candidate_ref(sc2, B)
     _, handles = analyze(flow2, cand2)
-    design = DesignBenchmarkInput(mission=load_mission("mission-mars-mobility"), rover=ares, candidate=cand2, analysis_evidence_id=handles[0].evidence_id, strategy="EXPOSURE_COVERAGE", test_revision=2)
+    design = DesignBenchmarkInput(
+        mission=load_mission("mission-mars-mobility"),
+        rover=ares,
+        candidate=cand2,
+        analysis_evidence_id=handles[0].evidence_id,
+        strategy="EXPOSURE_COVERAGE",
+        test_revision=2,
+    )
     att2 = attempt(flow2.svc, flow2.ctx, design, evidence=[handles[0]], datasets=["practice-earth-grid-v1"])
     forged_route = route.model_copy(update={"constraints_sha256": att2.constraints_sha})
     res, _ = flow2.call(
@@ -175,8 +197,23 @@ def test_pert_09_longer_graph_edge_changes_the_search_result(tmp_path: Path) -> 
     svc = service()
     ctx = make_context(tmp_path)
     mission = load_mission("mission-graph-regression")
-    cand = CandidateRef(window_id=catalog.GRAPH_WINDOW_ID, name="g", aoi=mission.target.model_copy(update={"body": "EARTH"}), origin="SYNTHETIC_CONTROL", novelty_status="NOT_ASSESSED", discovery_method="canonical graph")
-    inp = DesignBenchmarkInput(mission=mission, rover=load_rover("ares-1"), candidate=cand, analysis_evidence_id=None, graph_fixture_id=catalog.FIXTURE_CANONICAL_GRAPH, strategy="EXPOSURE_COVERAGE", test_revision=1)
+    cand = CandidateRef(
+        window_id=catalog.GRAPH_WINDOW_ID,
+        name="g",
+        aoi=mission.target.model_copy(update={"body": "EARTH"}),
+        origin="SYNTHETIC_CONTROL",
+        novelty_status="NOT_ASSESSED",
+        discovery_method="canonical graph",
+    )
+    inp = DesignBenchmarkInput(
+        mission=mission,
+        rover=load_rover("ares-1"),
+        candidate=cand,
+        analysis_evidence_id=None,
+        graph_fixture_id=catalog.FIXTURE_CANONICAL_GRAPH,
+        strategy="EXPOSURE_COVERAGE",
+        test_revision=1,
+    )
     base = attempt(svc, ctx, inp)
     assert tuple(base.search.route.node_sequence) == catalog.GRAPH_SEARCH_EXPOSURE_COVERAGE  # type: ignore[union-attr]
     graph = base.constraints.graph
@@ -187,7 +224,11 @@ def test_pert_09_longer_graph_edge_changes_the_search_result(tmp_path: Path) -> 
     res, _ = Flow(svc, ctx).call(SearchRouteInput(constraints=changed, constraints_sha256=sha))
     out = res.payload
     assert isinstance(out, SearchRoutePayload)
-    same = out.search_status == "FOUND" and out.route is not None and out.route.node_sequence == base.search.route.node_sequence  # type: ignore[union-attr]
+    same = (
+        out.search_status == "FOUND"
+        and out.route is not None
+        and out.route.node_sequence == base.search.route.node_sequence
+    )  # type: ignore[union-attr]
     assert not same
     if out.route is not None:
         assert out.route.solver_claimed.distance_m != 230.0

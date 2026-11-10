@@ -11,7 +11,7 @@ column 0, origin_y_m = NORTH edge of row 0). Wire it from the ANALYSIS_GRID blob
 `routing.load_grid_arrays(path, expected_sha256=GridSpec.analysis_grid_sha256)` (uses `raster.store.decode_analysis_grid`;
 a hash mismatch raises `RouteInputError(code="STALE_INPUT_HASH")`). Abstract graph scenarios pass `grid=None`.
 
-Identifier conventions: raster node `r{row}c{col}` (row 0 = north); undirected edge `"{lo}--{hi}"` (string order);
+Identifier conventions: raster node `r{row}c{col}` (row 0 = north; canonical decimal only, `r05c13` is rejected, see DECISIONS R-03); undirected edge `"{lo}--{hi}"` (string order);
 `ConstraintsArtifact.blocked_edge_ids` use the edge ids.
 
 ## DESIGN_BENCHMARK -> `routing.waypoints.design_benchmark`
@@ -52,7 +52,7 @@ SearchOutput(payload: SearchRoutePayload, route: RouteArtifact | None, route_sha
 * `to_lonlat(x_m, y_m) -> (lon, lat)` (from core geometry) fills `RouteArtifact.display_geometry`; otherwise `None`.
 * Serialise `output.route` with `canonical_json_bytes` as the ROUTE artifact; `payload.route_artifact_key` is whatever
   `route_artifact_key` you passed.
-* Statuses: `FOUND`; `EXHAUSTIVE_INFEASIBLE` (certificate or complete enumeration, `labels_pruned_lossy == 0` always);
+* Task semantics: a task is done at ANY traversable node within its tolerance (`Problem.task_sets`), identical in solver, certificate and verifier. Statuses: `FOUND`; `EXHAUSTIVE_INFEASIBLE` (certificate or complete enumeration, `labels_pruned_lossy == 0` always);
   `BUDGET_EXHAUSTED` (expansions/seconds, or lossy label-cap pruning); `ERROR` is not produced by this function (the
   facade maps unexpected exceptions to `FAILED`). `termination_reason` starts with `CERTIFICATE:` when no label search ran.
 * Strategies: `WAYPOINT_RETURN` ignores exposures; `EXPOSURE_COVERAGE` / `RECOVERY_ALTERNATIVE` minimise distance, then

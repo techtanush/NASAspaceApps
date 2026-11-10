@@ -14,7 +14,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Final, Literal
-from urllib.parse import parse_qsl, urlsplit
+from urllib.parse import parse_qsl, urlsplit, urlunsplit
 
 import numpy as np
 from numpy.typing import NDArray
@@ -22,6 +22,8 @@ from pydantic import ValidationError
 from pyproj import CRS, Transformer
 from pyproj.exceptions import CRSError
 
+from analogforge.adapters.source_http.sniff import SNIFF_BYTES
+from analogforge.adapters.source_http.sniff import looks_like_html as sniff_html
 from analogforge.ports.datasets import CrsSpec, DatasetManifest
 from analogforge.ports.hashing import file_sha256
 from analogforge.ports.science_payloads import ValidationCheck
@@ -49,13 +51,20 @@ CHECK_IDS: Final = (
 )
 MAX_DOWNLOAD_BYTES: Final = 2_147_483_648  # architecture 21: per-asset cap
 TODO_MARKER: Final = "TODO_FILL_IN"
-BODY_RADIUS_TOLERANCE: Final = 0.01
+BODY_RADIUS_TOLERANCE: Final = 0.01  # CRS ellipsoids (a spheroid may sit ~0.3 % above a body's mean radius)
+# A RADIUS product's ``reference_radius_m`` is subtracted from every sample, so an error in it is a height bias of
+# the same size.  0.1 % of the mean radius (Moon 1737 m, Mars 3396 m) is already far above any published reference
+# sphere/ellipsoid difference this pipeline accepts (Moon 1 737 400 m, Mars 3 396 190 m) and far below a 1 % slip.
+REFERENCE_RADIUS_TOLERANCE: Final = 0.001
 NOT_EVALUATED: Final = "NOT_EVALUATED"
 # Formats whose files must embed a CRS (the others legitimately rely on the manifest CRS).
 CRS_EMBEDDED_FORMATS: Final = frozenset({"GEOTIFF", "COG", "HGT", "HGT_ZIP"})
 SENTINELS: Final = (-32768.0, -9999.0)
-_TOKEN_QUERY_KEYS: Final = ("token", "signature", "sig", "x-amz", "access_key", "key", "auth", "credential", "expires")
-_HTML_PREFIXES: Final = (b"<html", b"<!doctype", b"<head", b"<body")
+_TOKEN_QUERY_KEYS: Final = (
+    "token", "signature", "sig", "x-amz", "x-goog", "access", "key", "auth", "credential", "expires",
+    "pass", "pwd", "secret", "session", "bearer", "jwt",
+)  # fmt: skip
+_TOKEN_QUERY_EXACT: Final = frozenset({"sv", "se", "sp", "sr", "st", "sas", "code", "sign"})  # short SAS-style keys
 
 _ROLE_QUANTITIES: Final[dict[str, frozenset[str]]] = {
     "TARGET_TERRAIN": frozenset({"ELEVATION", "RADIUS", "SLOPE_DEG"}),
@@ -121,7 +130,7 @@ def check_files_present(
         candidate = dataset_dir / entry.path
         try:
             resolved = candidate.resolve(strict=True)
-        except (FileNotFoundError, OSError, RuntimeError):
+        except (FileNotFoundError, OSError, RuntimeError, ValueError):  # ValueError: embedded NUL byte
             problems.append(f"{entry.path}: missing")
             continue
         if root not in resolved.parents:
@@ -150,8 +159,8 @@ def check_checksums(manifest: DatasetManifest, present: Mapping[str, Path]) -> t
 
 
 def looks_like_html(prefix: bytes) -> bool:
-    text = prefix.lstrip(b"\xef\xbb\xbf \t\r\n\x00").lower()
-    return text.startswith(_HTML_PREFIXES)
+    """Shared sniffer (BOMs, comments, XML prolog, UTF-16/32) from the transport layer."""
+    return sniff_html(prefix)
 
 
 def html_files(manifest: DatasetManifest, present: Mapping[str, Path]) -> list[str]:
@@ -161,7 +170,7 @@ def html_files(manifest: DatasetManifest, present: Mapping[str, Path]) -> list[s
         if real is None or entry.role == "DOCUMENTATION":
             continue
         with real.open("rb") as handle:
-            if looks_like_html(handle.read(512)):
+            if looks_like_html(handle.read(SNIFF_BYTES)):
                 found.append(entry.path)
     return found
 
@@ -353,9 +362,10 @@ def check_units_and_quantity(manifest: DatasetManifest, physical: FloatArray | N
     if q == "RADIUS":
         ref = manifest.reference_radius_m
         mean = body_geometry(manifest.body).mean_radius_m
-        if ref is None or abs(ref - mean) / mean > BODY_RADIUS_TOLERANCE:
+        if ref is None or abs(ref - mean) / mean > REFERENCE_RADIUS_TOLERANCE:
             problems.append(
-                f"reference_radius_m {ref} is not within 1% of the {manifest.body} mean radius {mean:.1f} m"
+                f"reference_radius_m {ref} is not within {REFERENCE_RADIUS_TOLERANCE:.1%} of the "
+                f"{manifest.body} mean radius {mean:.1f} m"
             )
     if physical is not None and not problems:
         v = _finite(physical)
@@ -399,25 +409,45 @@ def check_units_and_quantity(manifest: DatasetManifest, physical: FloatArray | N
 
 
 # ----------------------------------------------------------------------------------------------- nodata / transform
-def check_nodata_declared(
-    manifest_nodata: float | None, file_nodata: float | None, raws: Sequence[NDArray[Any]] | None
-) -> CheckOutcome:
-    if manifest_nodata is not None and file_nodata is not None and not math.isclose(manifest_nodata, file_nodata):
-        return _fail("nodata_declared", f"manifest nodata {manifest_nodata} conflicts with file nodata {file_nodata}")
-    if manifest_nodata is not None or file_nodata is not None:
-        side = "manifest" if manifest_nodata is not None else "file"
-        return _ok(
-            "nodata_declared",
-            f"nodata {manifest_nodata if manifest_nodata is not None else file_nodata} declared by the {side}",
-        )
-    if raws is None:
-        return not_evaluated("nodata_declared", "raster could not be read, cannot scan for sentinel values")
+def _sentinel_problems(raws: Sequence[NDArray[Any]], declared: Sequence[float]) -> list[str]:
+    """Known void sentinels present in the raw values that no declaration names (declared values are excluded)."""
     problems: list[str] = []
     for index, raw in enumerate(raws):
         arr = np.asarray(raw)
         for sentinel in SENTINELS:
+            if any(math.isclose(sentinel, d) for d in declared):
+                continue
             if np.any(arr == sentinel):
                 problems.append(f"tile {index}: sentinel value {sentinel:g} present")
+    return problems
+
+
+def check_nodata_declared(
+    manifest_nodata: float | None, file_nodata: float | None, raws: Sequence[NDArray[Any]] | None
+) -> CheckOutcome:
+    """A declared nodata must name the voids that are really in the data.
+
+    Known void sentinels (:data:`SENTINELS`) that are present in the raw values but not named by the manifest/file
+    declaration FAIL even when *some* nodata is declared (a wrong declaration lets voids flow in as heights).
+    All-zero borders are an undeclared-nodata heuristic and are only examined when nothing is declared.
+    """
+    if manifest_nodata is not None and file_nodata is not None and not math.isclose(manifest_nodata, file_nodata):
+        return _fail("nodata_declared", f"manifest nodata {manifest_nodata} conflicts with file nodata {file_nodata}")
+    declared = [v for v in (manifest_nodata, file_nodata) if v is not None]
+    if declared:
+        side = "manifest" if manifest_nodata is not None else "file"
+        text = f"nodata {declared[0]} declared by the {side}"
+        if raws is None:
+            return _ok("nodata_declared", text)
+        stray = _sentinel_problems(raws, declared)
+        if stray:
+            return _fail("nodata_declared", f"{text} but undeclared void sentinel(s) in the data: " + "; ".join(stray))
+        return _ok("nodata_declared", text)
+    if raws is None:
+        return not_evaluated("nodata_declared", "raster could not be read, cannot scan for sentinel values")
+    problems = _sentinel_problems(raws, ())
+    for index, raw in enumerate(raws):
+        arr = np.asarray(raw)
         if arr.ndim == 2 and min(arr.shape) >= 2:
             borders = {
                 "first row": arr[0, :],
@@ -431,7 +461,15 @@ def check_nodata_declared(
     return _ok("nodata_declared", "no nodata declared and no sentinel values or all-zero border found")
 
 
-def check_transform_sane(gt: tuple[float, float, float, float, float, float] | None, registration: str) -> CheckOutcome:
+LATITUDE_EPS: Final = 1e-6
+
+
+def check_transform_sane(
+    gt: tuple[float, float, float, float, float, float] | None,
+    registration: str,
+    bbox: tuple[float, float, float, float] | None = None,
+) -> CheckOutcome:
+    """Geotransform sanity; ``bbox`` (W, S, E, N degrees, cell extents included) must stay on the globe."""
     if gt is None:
         return not_evaluated("transform_sane", "raster could not be read")
     _, a, b, _, d, e = gt
@@ -439,6 +477,12 @@ def check_transform_sane(gt: tuple[float, float, float, float, float, float] | N
         return _fail("transform_sane", "geotransform has non-finite entries")
     if a * e - b * d == 0.0:
         return _fail("transform_sane", "geotransform is not invertible")
+    if bbox is not None and not all(math.isfinite(x) for x in bbox):
+        return _fail("transform_sane", "raster extent cannot be expressed in degrees (non-finite bounds)")
+    if bbox is not None and (bbox[1] < -90.0 - LATITUDE_EPS or bbox[3] > 90.0 + LATITUDE_EPS):
+        return _fail(
+            "transform_sane", f"latitude extent {bbox[1]:.6g}..{bbox[3]:.6g} deg (cell edges included) exceeds +-90"
+        )
     if abs(b) > 1e-9 * abs(a) or abs(d) > 1e-9 * abs(e):
         return _fail("transform_sane", f"rotated geotransform (b={b}, d={d}) is not supported")
     if e > 0:
@@ -513,6 +557,14 @@ def lonlat_bbox(
     return (lo_n, float(lat_a.min()), lo_n + (hi - lo), float(lat_a.max()))
 
 
+def _longitude_axis_direction(crs: CRS) -> str | None:
+    """``east``/``west`` for the longitude axis of a geographic CRS (None when it cannot be told)."""
+    for axis in crs.axis_info:
+        if axis.abbrev.lower() in ("lon", "long", "longitude") or axis.name.lower().startswith("longitude"):
+            return str(axis.direction).lower() if str(axis.direction).lower() in ("east", "west") else None
+    return None
+
+
 def check_longitude_convention(
     manifest: DatasetManifest,
     crs: CRS | None,
@@ -532,9 +584,18 @@ def check_longitude_convention(
         )
     eps = 0.5 * (pixel_deg or 0.0) + 1e-9
     west, east = bbox[0], bbox[2]
+    axis = _longitude_axis_direction(crs)
+    declared_direction = "west" if manifest.longitude_direction == "POSITIVE_WEST" else "east"
+    if axis is not None and axis != declared_direction:
+        return _fail(
+            "longitude_convention",
+            f"manifest longitude_direction {manifest.longitude_direction} contradicts the raster CRS, whose "
+            f"longitude axis is positive-{axis}; the pipeline never mirrors longitudes",
+        )
     lo, hi = (-180.0, 180.0) if conv == "NEG180_180" else (0.0, 360.0)
     # An unwrapped raster may spill past the upper bound when it starts inside the range (antimeridian crossing).
-    if west < lo - eps or west >= hi + eps or east - west > 360.0 + eps:
+    # The start must lie inside the half-open domain [lo, hi): 360 is not a ZERO_360 start and 180 not a NEG180_180 one.
+    if west < lo - eps or west >= hi - 1e-9 or east - west > 360.0 + eps:
         return _fail(
             "longitude_convention",
             f"raster longitudes {west:.4f}..{east:.4f} contradict declared {conv} ({lo:g}..{hi:g})",
@@ -545,6 +606,43 @@ def check_longitude_convention(
 # ----------------------------------------------------------------------------------------------- lineage
 def _placeholder(text: str | None) -> bool:
     return text is None or not text.strip() or TODO_MARKER in text
+
+
+def _credential_keys(pairs: Sequence[tuple[str, str]]) -> bool:
+    keys = [k.lower() for k, _ in pairs]
+    return any(k in _TOKEN_QUERY_EXACT or any(t in k for t in _TOKEN_QUERY_KEYS) for k in keys)
+
+
+def credential_like_url(url: str) -> bool:
+    """True when ``url`` carries userinfo, or credential-like parameter names in its query or fragment."""
+    try:
+        parts = urlsplit(url)
+        parts.port  # noqa: B018 - raises ValueError for an invalid port
+    except ValueError:
+        return True  # an unparseable URL is never accepted as a lineage identity
+    if parts.username or parts.password:
+        return True
+    return any(
+        _credential_keys(parse_qsl(piece, keep_blank_values=True)) for piece in (parts.query, parts.fragment) if piece
+    )
+
+
+def sanitized_source_url(url: str | None) -> str | None:
+    """The URL as it may appear in evidence: scheme, host[:port] and path only.
+
+    Userinfo, query and fragment are dropped (the evidence registrar refuses a query string or credentials, and a
+    fragment/query can carry a token); the query is never part of a source's identity here.
+    """
+    if url is None:
+        return None
+    try:
+        parts = urlsplit(url)
+        host = parts.hostname or ""
+        if parts.port is not None:
+            host = f"{host}:{parts.port}"
+    except ValueError:
+        return None
+    return urlunsplit((parts.scheme, host, parts.path, "", ""))
 
 
 def check_lineage_fields(manifest: DatasetManifest) -> CheckOutcome:
@@ -560,11 +658,8 @@ def check_lineage_fields(manifest: DatasetManifest) -> CheckOutcome:
         if _placeholder(value)
     ]
     url = manifest.product_identity.source_url
-    if url is not None:
-        parts = urlsplit(url)
-        keys = [k.lower() for k, _ in parse_qsl(parts.query, keep_blank_values=True)]
-        if parts.username or parts.password or any(any(t in k for t in _TOKEN_QUERY_KEYS) for k in keys):
-            problems.append("product_identity.source_url (signed or token-bearing)")
+    if url is not None and credential_like_url(url):
+        problems.append("product_identity.source_url (signed, token-bearing or credential-carrying)")
     if problems:
         return _fail("lineage_fields", "empty or placeholder lineage field(s): " + ", ".join(problems))
     return _ok("lineage_fields", "license_note, citation, provider and vertical_reference are filled")
@@ -593,6 +688,7 @@ __all__ = [
     "check_html_login_page",
     "check_lineage_fields",
     "check_longitude_convention",
+    "credential_like_url",
     "check_manifest_schema",
     "check_nodata_declared",
     "check_resolution_cross_check",
@@ -607,6 +703,7 @@ __all__ = [
     "lonlat_bbox",
     "looks_like_html",
     "not_evaluated",
+    "sanitized_source_url",
     "semi_major_m",
     "usable",
 ]

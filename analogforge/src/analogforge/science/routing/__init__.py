@@ -6,7 +6,11 @@ solver module, so the verifier can use it without depending on the search or gra
 
 Identifier conventions (normative for solver and verifier):
 
-* raster node id        ``r{row}c{col}`` (row 0 is the NORTH row of the analysis grid)
+* raster node id        ``r{row}c{col}`` (row 0 is the NORTH row of the analysis grid).  ONLY the canonical spelling
+  is a node id: decimal digits without leading zeros (``r5c13``, never ``r05c13``/``r5c013``).  Non-canonical
+  spellings alias the same cell but would hash to different undirected edge ids (traversal limits and unique
+  exposure are keyed by edge id), so ``parse_raster_node_id`` returns ``None`` for them and the verifier reports
+  them as ``DISCONTINUOUS_ROUTE`` (decision: REJECT, not canonicalise).
 * undirected edge id    ``{lo}--{hi}`` where ``lo <= hi`` in plain string order of the two node ids
 * abstract graph nodes  the ``GraphSpec.nodes`` strings
 """
@@ -31,7 +35,9 @@ CONSTRAINT_TERRAIN_MASK: Final = "C-TERRAIN-MASK"
 CONSTRAINT_INPUT_HASH: Final = "C-INPUT-HASH"
 METRIC_SURFACE_SLOPE: Final = "surface_slope_deg"
 
-_NODE_RE: Final = re.compile(r"^r(\d+)c(\d+)$")
+_NODE_RE: Final = re.compile(r"r(0|[1-9][0-9]*)c(0|[1-9][0-9]*)", re.ASCII)
+_LOOSE_NODE_RE: Final = re.compile(r"r[0-9]+c[0-9]+", re.ASCII)
+_MACHINE_EPS: Final = 2.220446049250313e-16
 
 
 class RouteInputError(ScienceError):
@@ -48,10 +54,28 @@ def raster_node_id(row: int, col: int) -> str:
 
 
 def parse_raster_node_id(node_id: str) -> tuple[int, int] | None:
-    match = _NODE_RE.match(node_id)
+    match = _NODE_RE.fullmatch(node_id)
     if match is None:
         return None
     return int(match.group(1)), int(match.group(2))
+
+
+def is_noncanonical_raster_node_id(node_id: str) -> bool:
+    """True for ids that spell a raster cell with leading zeros (they alias a canonical id and are rejected)."""
+    return _LOOSE_NODE_RE.fullmatch(node_id) is not None and _NODE_RE.fullmatch(node_id) is None
+
+
+def tie_slack_cells(cell_size_m: float, *coordinates_m: float) -> float:
+    """Scale-aware geometric tolerance in CELL units for corner-touch decisions.
+
+    Coordinates are converted to cell-index space as ``(x - origin) / cell_size``; with UTM-sized origins and
+    non-dyadic cell sizes that conversion carries a rounding error of a few ulp of the metre-valued operands divided
+    by the cell size, which a fixed 1e-12 cannot absorb (a diagonal step that exactly crosses a cell corner then looks
+    like it narrowly misses the corner cells).  The slack is therefore ``1e-12 + 8 * machine_eps * max|coordinate| /
+    cell_size``.  Treating a near-miss as a touch is the conservative direction (it only adds zero-length hits).
+    """
+    scale = max((abs(c) for c in coordinates_m), default=0.0)
+    return 1e-12 + 8.0 * _MACHINE_EPS * scale / cell_size_m
 
 
 def undirected_edge_id(node_a: str, node_b: str) -> str:

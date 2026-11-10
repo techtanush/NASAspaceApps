@@ -1,0 +1,7 @@
+{
+  "id": "CHANGE-REQUEST-analyze-rover-cap",
+  "kit_file": "ports/science_payloads.py::AnalyzeCandidateInput",
+  "problem": "ANALYZE_CANDIDATE computes connected safe zones with the config default cap (18 deg) because the input carries no rover. For PRACTICE-LITE (12 deg) the zones and ConnectedZone.band_area_m2 overstate reachable band area.",
+  "requested_change": "Add an optional `safe_slope_cap_deg: float | None = None` (or `rover_max_slope_deg`) to AnalyzeCandidateInput. Science would use it when present and fall back to thresholds.default_cap_deg.",
+  "workaround": "The payload limitations now state which cap was used; reachability for a specific rover is decided by SEARCH_ROUTE/DIAGNOSE_RESULT, not by the zones."
+}

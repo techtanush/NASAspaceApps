@@ -50,7 +50,12 @@ class IndexEntry:
 
 
 def validate_relative(path: str) -> str:
-    if not _SAFE_REL.match(path) or ".." in path.split("/") or "//" in path:
+    segments = path.split("/")
+    if (
+        not _SAFE_REL.fullmatch(path)  # fullmatch: "$" would accept a trailing newline
+        or path.endswith("/")
+        or any(seg in ("", ".", "..") for seg in segments)
+    ):
         raise AdapterError(
             "SOURCE_CONTENT_INVALID", f"unsafe product path {path!r}", detail_code="ARCHIVE_PATH_TRAVERSAL"
         )

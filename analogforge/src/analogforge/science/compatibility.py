@@ -18,9 +18,9 @@ from analogforge.ports.science_payloads import (
     ConstraintsArtifact,
     VerificationSummary,
 )
+from analogforge.science.config import default_thresholds
 
 DEFAULT_TASK_CAPABILITY = "geological_sampling"
-_TOLERANCE = 1e-9
 
 
 @dataclass(frozen=True)
@@ -30,14 +30,21 @@ class CompatibilityResult:
 
 
 def verified_route_supplied(verification: VerificationSummary | None) -> bool:
-    """A verified route exists only if the verification reports a route distance."""
-    if verification is None:
+    """A verified route exists only if a conclusive verification (PASS or FAIL) reports a route distance.
+
+    An INCONCLUSIVE verification, or one that reports ``UNKNOWN_TERRAIN``, proves nothing about the route, so a
+    ``route_distance_m`` metric alone (e.g. the length of a route that was merely found) is not enough.
+    """
+    if verification is None or verification.outcome not in ("PASS", "FAIL"):
+        return False
+    if "UNKNOWN_TERRAIN" in verification.violation_codes:
         return False
     return any(m.metric_id == "route_distance_m" and m.value is not None for m in verification.metrics)
 
 
 def _metric(verification: VerificationSummary | None, metric_id: str) -> float | None:
-    if verification is None:
+    """A verified metric value; ``None`` unless a conclusive verified route was supplied."""
+    if verification is None or not verified_route_supplied(verification):
         return None
     for m in verification.metrics:
         if m.metric_id == metric_id:
@@ -68,6 +75,7 @@ def assess_compatibility(
     evidence: Sequence[EvidenceRef] = (),
 ) -> CompatibilityResult:
     """Compatibility dimensions of ``rover`` for ``requirements`` (optionally with a verified route)."""
+    tol = default_thresholds().numeric_tolerance
     refs = list(evidence)
     verified = verified_route_supplied(verification)
     dims: list[CompatibilityDimension] = []
@@ -102,7 +110,7 @@ def assess_compatibility(
         dim("max_surface_slope_deg", "UNKNOWN", rover.max_slope_deg, None, "deg", "No requirement names a slope band.")
     else:
         need = max(uppers)
-        ok = rover.max_slope_deg >= need - _TOLERANCE
+        ok = rover.max_slope_deg >= need - tol
         dim(
             "max_surface_slope_deg",
             "PASS" if ok else "FAIL",
@@ -144,7 +152,7 @@ def assess_compatibility(
                 "The verification did not evaluate the energy reserve.",
             )
         else:
-            ok = reserve >= rover.min_reserve_pct - _TOLERANCE
+            ok = reserve >= rover.min_reserve_pct - tol
             note = (
                 " Energy parameters are assumed, not calibrated."
                 if rover.energy_model.calibration_status == "ASSUMED"
@@ -201,9 +209,18 @@ def assess_compatibility(
                 "m",
                 f"{gate_why} Declared {label} {declared:g} m is not tested.",
             )
+        elif required_clearance is None:
+            dim(
+                metric_id,
+                "UNKNOWN",
+                declared,
+                None,
+                "m",
+                f"The clearance requirement states no numeric lower bound, so declared {label} {declared:g} m "
+                "cannot be compared (unknown, not met).",
+            )
         else:
-            assert required_clearance is not None
-            ok = declared >= required_clearance - _TOLERANCE
+            ok = declared >= required_clearance - tol
             dim(
                 metric_id,
                 "PASS" if ok else "FAIL",
@@ -237,7 +254,7 @@ def assess_compatibility(
         if distance is None:
             dim("route_length_m", "UNKNOWN", rover.max_route_m, None, "m", "No verified route length yet.")
         else:
-            ok = distance <= rover.max_route_m + _TOLERANCE
+            ok = distance <= rover.max_route_m + tol
             dim(
                 "route_length_m",
                 "PASS" if ok else "FAIL",

@@ -10,6 +10,10 @@ southwards.  Work is done in grid-index space (cell size 1) and lengths are scal
 *Supercover*: when the segment passes exactly through a cell corner, the two cells that only touch the segment at
 that corner are reported too, with ``length_m == 0``.  A diagonal step therefore "touches" four cells, so a
 one-pixel nodata channel can never become a diagonal bridge.
+
+"Exactly through a corner" is decided with a scale-aware slack (``tie_slack_cells``): index-space coordinates carry a
+rounding error proportional to ``|origin| / cell_size`` (UTM origins, non-dyadic cell sizes such as 27.8 m, 0.1 m or
+1/3 m), so a fixed epsilon silently loses corner touches.
 """
 
 from __future__ import annotations
@@ -17,7 +21,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
-_TIE_EPS = 1e-12
+from analogforge.science.routing import tie_slack_cells
 
 
 @dataclass(frozen=True)
@@ -52,6 +56,8 @@ def supercover(
     if length_cells == 0.0:
         return [CellHit(row, col, 0.0)]
     length_m = length_cells * cell_size_m
+    slack = tie_slack_cells(cell_size_m, x0_m, y0_m, x1_m, y1_m, origin_x_m, origin_y_m)
+    span = max(abs(du), abs(dv))  # a parameter gap dt corresponds to at most ``dt * span`` cells of positional gap
 
     step_col = 1 if du > 0 else (-1 if du < 0 else 0)
     step_row = 1 if dv > 0 else (-1 if dv < 0 else 0)
@@ -76,12 +82,12 @@ def supercover(
     while guard > 0:
         guard -= 1
         t_next = min(t_max_u, t_max_v)
-        if t_next >= 1.0 - _TIE_EPS:
+        if (1.0 - t_next) * span <= slack:
             hits.append(CellHit(row, col, max(0.0, 1.0 - t_prev) * length_m))
             break
         hits.append(CellHit(row, col, max(0.0, t_next - t_prev) * length_m))
         t_prev = t_next
-        if abs(t_max_u - t_max_v) <= _TIE_EPS:
+        if abs(t_max_u - t_max_v) * span <= slack:
             # exact corner crossing: also report the two cells that only touch the segment at the corner
             hits.append(CellHit(row, col + step_col, 0.0))
             hits.append(CellHit(row + step_row, col, 0.0))

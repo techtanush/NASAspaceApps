@@ -305,3 +305,23 @@ def test_matches_brute_force_on_random_matrices() -> None:
 
 def _unused(_: Any) -> None:  # keep Any import meaningful for typed helpers
     return None
+
+
+def test_none_coverage_needs_a_failing_row_in_every_candidate_window() -> None:
+    """Review defect: a window with no row was ignored, so one FAIL row turned an unevaluated requirement into NONE."""
+    r1, r2 = req("r1", "slope_band_area_fraction"), req("r2", "slope_band_area_fraction")
+    # B was never evaluated for r2: r2 is unknown, not 'no site covers it'
+    out = run([r1, r2], ["A", "B"], [row("A", "r1"), row("A", "r2", "FAIL"), row("B", "r1", "UNKNOWN")], max_sites=2)
+    cov = {a.requirement_id: a.coverage for a in out.assignments}
+    assert out.selected_window_ids == ["A"] and cov == {"r1": "FULL", "r2": "UNKNOWN"}
+    # the same with an empty selection (pool = all windows)
+    empty = run([r1], ["A", "B"], [row("A", "r1", "FAIL")], max_sites=2)
+    assert empty.selected_window_ids == [] and empty.assignments[0].coverage == "UNKNOWN"
+    # perturbation: once B has a FAIL row too, NONE is justified
+    done = run([r1], ["A", "B"], [row("A", "r1", "FAIL"), row("B", "r1", "FAIL")], max_sites=2)
+    assert done.assignments[0].coverage == "NONE"
+    # GAP needs every window to say GAP as well
+    gap_partial = run([r1], ["A", "B"], [row("A", "r1", "GAP")], max_sites=2)
+    assert gap_partial.assignments[0].coverage == "UNKNOWN"
+    gap_all = run([r1], ["A", "B"], [row("A", "r1", "GAP"), row("B", "r1", "GAP")], max_sites=2)
+    assert gap_all.assignments[0].coverage == "GAP"

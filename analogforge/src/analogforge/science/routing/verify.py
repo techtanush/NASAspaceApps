@@ -44,7 +44,9 @@ from analogforge.science.routing import (
     EPS_VALUE,
     GridArrays,
     RouteInputError,
+    is_noncanonical_raster_node_id,
     parse_raster_node_id,
+    tie_slack_cells,
     undirected_edge_id,
 )
 from analogforge.science.routing.constraints import (
@@ -83,29 +85,40 @@ def slab_cells(x0_m: float, y0_m: float, x1_m: float, y1_m: float, grid: GridArr
     u1 = (x1_m - grid.origin_x_m) / cs
     v1 = (grid.origin_y_m - y1_m) / cs
     du, dv = u1 - u0, v1 - v0
-    length_m = math.hypot(du, dv) * cs
+    length_cells = math.hypot(du, dv)
     col_lo, col_hi = math.floor(min(u0, u1)) - 1, math.floor(max(u0, u1)) + 1
     row_lo, row_hi = math.floor(min(v0, v1)) - 1, math.floor(max(v0, v1)) + 1
-    eps = 1e-12
+    # Scale-aware slack (cells): inclusion is decided against squares EXPANDED by it so a corner touch survives the
+    # rounding of the metre -> index conversion at UTM-sized origins and non-dyadic cell sizes; the reported length is
+    # measured on the exact square and lengths within the slack are zero (a point/corner touch).
+    slack = tie_slack_cells(cs, x0_m, y0_m, x1_m, y1_m, grid.origin_x_m, grid.origin_y_m)
     hits: list[tuple[int, int, float]] = []
     for row in range(row_lo, row_hi + 1):
         for col in range(col_lo, col_hi + 1):
-            t_in, t_out = 0.0, 1.0
+            t_in, t_out = 0.0, 1.0  # exact square
+            e_in, e_out = 0.0, 1.0  # expanded square (inclusion test)
             empty = False
             for p0, d, lo in ((u0, du, float(col)), (v0, dv, float(row))):
                 hi = lo + 1.0
                 if d == 0.0:
-                    if p0 < lo - eps or p0 > hi + eps:
+                    if p0 < lo - slack or p0 > hi + slack:
                         empty = True
                         break
+                    if p0 < lo or p0 > hi:
+                        t_out = -1.0  # outside the exact square: zero-length touch only
                 else:
                     ta, tb = (lo - p0) / d, (hi - p0) / d
                     if ta > tb:
                         ta, tb = tb, ta
                     t_in, t_out = max(t_in, ta), min(t_out, tb)
-            if empty or t_in > t_out + eps:
+                    xa, xb = (lo - slack - p0) / d, (hi + slack - p0) / d
+                    if xa > xb:
+                        xa, xb = xb, xa
+                    e_in, e_out = max(e_in, xa), min(e_out, xb)
+            if empty or e_in > e_out:
                 continue
-            hits.append((row, col, max(0.0, t_out - t_in) * length_m))
+            inside_cells = max(0.0, t_out - t_in) * length_cells
+            hits.append((row, col, 0.0 if inside_cells <= slack else inside_cells * cs))
     return hits
 
 
@@ -148,6 +161,8 @@ class _Findings:
     violations: list[RouteViolation] = field(default_factory=list)
     discontinuities: int = 0
     terrain_hits: int = 0
+    nonfinite_terrain: int = 0  # valid cells with NaN/inf slope or elevation: a DATA problem, never a silent pass
+    data_violations: list[RouteViolation] = field(default_factory=list)
     max_slope_deg: float | None = None
 
 
@@ -379,7 +394,12 @@ def verify_route(
                 _violation(
                     "DISCONTINUOUS_ROUTE",
                     catalog.CONSTRAINT_CONTINUITY,
-                    f"{a} -> {b} is not an 8-neighbour step inside the grid",
+                    f"{a} -> {b} is not an 8-neighbour step inside the grid"
+                    + (
+                        " (non-canonical node id: raster ids are r{row}c{col} without leading zeros)"
+                        if is_noncanonical_raster_node_id(a) or is_noncanonical_raster_node_id(b)
+                        else ""
+                    ),
                     segment=index,
                 )
             )
@@ -391,6 +411,7 @@ def verify_route(
         hazard: float | None = None
         positive: list[tuple[float, float]] = []
         steep: tuple[float, int, int] | None = None
+        nonfinite_cell = False
         for row, col, length in cells:
             if not grid.contains(row, col) or not grid.valid[row, col]:
                 unknown_cell = True
@@ -398,12 +419,25 @@ def verify_route(
             if unsafe[row, col]:
                 forbidden_cell = True
                 continue
+            if not (math.isfinite(float(cell_slope[row, col])) and math.isfinite(float(grid.elevation_m[row, col]))):
+                nonfinite_cell = True
+                continue
             if length > EPS_LEN_M:
                 s = float(cell_slope[row, col])
                 positive.append((s, length))
                 hazard = s if hazard is None else max(hazard, s)
                 if s > cap + _SLOPE_TOL and (steep is None or s > steep[0]):
                     steep = (s, row, col)
+        if nonfinite_cell:
+            findings.nonfinite_terrain += 1
+            findings.data_violations.append(
+                _violation(
+                    "UNKNOWN_TERRAIN",
+                    CONSTRAINT_TERRAIN_MASK,
+                    f"step {a} -> {b} intersects a valid cell whose slope or elevation is not finite (NaN/inf)",
+                    segment=index,
+                )
+            )
         if unknown_cell:
             findings.terrain_hits += 1
             findings.violations.append(
@@ -444,6 +478,8 @@ def verify_route(
         ]
         d_xy = math.hypot(x1 - x0, y1 - y0)
         dz = float(grid.elevation_m[pb]) - float(grid.elevation_m[pa])
+        if not math.isfinite(dz):
+            dz = 0.0  # already reported as a non-finite-terrain data violation; keeps the energy model total
         steps.append(_Step(index, eid, d_xy, dz, hazard, band, None))
 
     # ---- tasks, start and closure
@@ -675,6 +711,7 @@ def verify_route(
             0.0,
             "steps",
             "LTE",
+            force_status="INCONCLUSIVE" if findings.nonfinite_terrain and not findings.terrain_hits else None,
         ),
         _row(
             catalog.CONSTRAINT_EDGE_TRAVERSALS,
@@ -860,7 +897,8 @@ def verify_route(
         elevation = None
         parsed_node = parse_raster_node_id(node) if grid is not None else None
         if grid is not None and parsed_node is not None and grid.contains(*parsed_node):
-            elevation = float(grid.elevation_m[parsed_node])
+            raw_elevation = float(grid.elevation_m[parsed_node])
+            elevation = raw_elevation if math.isfinite(raw_elevation) else None
         tele_rows.append(
             TelemetryRow(
                 node_id=node,
@@ -900,6 +938,21 @@ def verify_route(
     if findings.violations:
         outcome, category = "FAIL", "ROUTE"
         verified = None
+    elif findings.data_violations:
+        outcome, category = "INCONCLUSIVE", "DATA"
+        verified = None
+        limitations.append(
+            "Terrain data on the route contains non-finite (NaN/inf) slope or elevation values: the route cannot be "
+            "verified until the analysis grid is repaired."
+        )
+        issues.append(
+            ScienceIssue(
+                code="INPUT_INVALID",
+                detail_code="NONFINITE_TERRAIN",
+                message="The route intersects valid cells with non-finite slope or elevation.",
+                scope="VERIFY_ROUTE",
+            )
+        )
     elif not energy_ok:
         outcome, category = "INCONCLUSIVE", "DATA"
         verified = None
@@ -921,7 +974,7 @@ def verify_route(
             "search_status": search_status,
             "verified_route_sha256": verified,
             "metrics": metrics,
-            "violations": findings.violations,
+            "violations": [*findings.violations, *findings.data_violations],
             "benchmark_rows": rows,
             "telemetry_artifact_key": telemetry_artifact_key,
             "verification_evidence": evidence,

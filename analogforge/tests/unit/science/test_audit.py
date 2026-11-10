@@ -300,3 +300,78 @@ def test_audit_reports_never_a_publication_decision() -> None:
     p = audit([handle(scale=60.0, art=None)], req=requirement())
     assert set(AuditEvidencePayload.model_fields) == {"operation", "claim_gates", "findings"}
     assert any(f.severity == "BLOCKING" for f in p.findings)
+
+
+# ----------------------------------------------------------------------------- review defects 7 and 8
+def test_sc10_matches_source_products_as_whole_words_not_substrings() -> None:
+    # "raster" contains "aster"; "emitted" contains "emit"; "lolabel" contains "lola": none names a source product
+    decoys = [
+        handle("SOURCE", "ingest-local-dataset", None, limits=["Resampled raster grid"], art=None),
+        handle("SOURCE", "ingest-local-dataset", None, limits=["emitted by the lolabel tool, modula"], art=None),
+        handle("SOURCE", "ingest-local-dataset", None, limits=["srtmgl-like but unrelated"], art=None),
+    ]
+    srtm = handle("SOURCE", "ingest-local-dataset", None, limits=["SRTM v3"], art=None)
+    p = audit([*decoys, srtm])
+    assert gates(p)["SC-10"] == "NOT_APPLICABLE" and "SHARED_ANCESTRY" not in rules(p)  # only one real product
+    # real products are still found as words, with punctuation and product-id suffixes
+    nasadem = handle("SOURCE", "adapter", None, limits=["earth_nasadem_hgt_v001 tile"], art=None)
+    aster = handle("SOURCE", "adapter", None, limits=["ASTER GDEM v3"], art=None)
+    assert gates(audit([nasadem, srtm]))["SC-10"] == "UNSATISFIED"
+    assert gates(audit([nasadem, aster]))["SC-10"] == "SATISFIED"
+    assert (
+        gates(audit([aster, handle("SOURCE", "adapter", None, limits=["ASTER"], art=None)]))["SC-10"]
+        == "NOT_APPLICABLE"
+    )
+
+
+def test_sc07_accepted_assumption_still_needs_an_uncertainty_statement() -> None:
+    silent = handle(metrics=[metric("reserve_pct", 50.0, "percent", kind="ASSUMED", note="")])
+    assumption = handle("ASSUMPTION", "assumption", None, metrics=[])
+    p = audit([silent, assumption], req=requirement("final_battery_reserve_pct"))
+    assert gates(p)["SC-07"] == "NOT_ASSESSED" and "UNCERTAINTY_UNQUANTIFIED" in rules(p)
+    stated = handle(metrics=[metric("reserve_pct", 50.0, "percent", kind="ASSUMED", note="assumed, +/-10 %")])
+    assert gates(audit([stated, assumption], req=requirement("final_battery_reserve_pct")))["SC-07"] == "SATISFIED"
+
+
+def _screening_payload(extent: list[float], screened: int = 9):  # type: ignore[no-untyped-def]
+    from analogforge.ports.domain_models import AreaOfInterest
+    from analogforge.ports.science_payloads import ScreenCandidatesPayload
+
+    return ScreenCandidatesPayload(
+        screened_count=screened, windows=[], shortlist_window_ids=[], stop_reason="GRID_EXHAUSTED",
+        search_extent=AreaOfInterest(
+            body="EARTH", bbox=extent, longitude_convention="NEG180_180", latitude_type="GEODETIC", crs_wkt=None,
+            vertical_datum="WGS84",
+        ),
+    )  # fmt: skip
+
+
+def test_search_extent_is_derived_from_the_screening_payload() -> None:
+    from analogforge.science.audit import discovery_evidence_from_screening
+
+    assert discovery_evidence_from_screening(
+        _screening_payload([-112.0, 35.0, -111.9, 35.1]), reference_set_id="r"
+    ).search_extent_recorded
+    for bbox, n in (
+        ([-112.0, 35.0, -112.0, 35.1], 9),
+        ([-112.0, 35.0, -111.9, 35.0], 9),
+        ([-112.0, 35.0, -111.9, 35.1], 0),
+    ):
+        ev = discovery_evidence_from_screening(_screening_payload(bbox, n), reference_set_id="r")
+        assert not ev.search_extent_recorded and "search extent" in ev.missing(), (bbox, n)
+
+
+def test_mission_sensitivity_needs_comparisons_under_distinct_contracts() -> None:
+    from analogforge.science.ops.audit import _mission_sensitivity_ids
+
+    def comparison(sha: str) -> EvidenceHandle:
+        return handle("COMPARISON", "compare-requirement", 480.0).model_copy(update={"parameters_sha256": sha})
+
+    one = comparison("1" * 64)
+    assert _mission_sensitivity_ids([one]) == []  # a single verdict is not a sensitivity analysis
+    assert _mission_sensitivity_ids([one, one.model_copy(update={"evidence_id": uuid4()})]) == []  # same contract twice
+    two = comparison("2" * 64)
+    assert sorted(map(str, _mission_sensitivity_ids([one, two]))) == sorted(
+        map(str, [one.evidence_id, two.evidence_id])
+    )
+    assert _mission_sensitivity_ids([handle("DERIVED", "analyze-candidate", 60.0), one]) == []

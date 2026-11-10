@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import math
 import re
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -31,13 +32,28 @@ WGS84_WKT = (
 )
 VERTICAL_REFERENCE = "EGM96 geoid (orthometric height); horizontal reference WGS84"
 NASADEM_ARCHIVE_SUFFIXES = frozenset({".hgt", ".num", ".swb", ".nc", ".met", ".xml", ".txt", ".json"})
+# Mosaic allocation budget in cells (each cell costs ~12 bytes across the data/valid/covered/water/num arrays).
+DEFAULT_MOSAIC_MAX_CELLS = 64_000_000
+
+
+def archive_limits(expected_samples: int | None = None) -> ArchiveLimits:
+    """Archive limits for a NASADEM tile zip.
+
+    Expansion rule: the ratio cap (20x) is waived only for members whose declared size is exactly that of a standard
+    raster, ``N*N`` (``.num``/``.swb``, uint8) or ``2*N*N`` (``.hgt``, int16) for ``N`` in {1201, 3601} (or
+    ``expected_samples``).  A constant tile (open ocean, a flat plain) compresses ~1000:1 and is legitimate; the
+    exemption can neither enlarge a member beyond its declared size nor an archive beyond ``max_total_bytes``.
+    """
+    sizes = (expected_samples,) if expected_samples is not None else tuple(sorted(STANDARD_SAMPLES))
+    exact = frozenset(k * n * n for n in sizes for k in (1, 2))
+    return ArchiveLimits(max_members=16, allowed_suffixes=NASADEM_ARCHIVE_SUFFIXES, exempt_member_sizes=exact)
 
 
 @dataclass(frozen=True)
 class NasademParams:
     adapter_id: str = "earth_nasadem_hgt_v001"
     expected_samples: int | None = None  # None accepts only the standard 1201 / 3601 tile shapes
-    work_dir: Path | None = None  # extraction directory for zips (default: next to the archive)
+    work_dir: Path | None = None  # extraction directory for zips (default: a temporary directory, removed after decode)
 
 
 def parse_tile_name(name: str) -> tuple[int, int]:
@@ -49,6 +65,12 @@ def parse_tile_name(name: str) -> tuple[int, int]:
         )
     lat = int(match.group(2)) * (1 if match.group(1).lower() == "n" else -1)
     lon = int(match.group(4)) * (1 if match.group(3).lower() == "e" else -1)
+    if not (-90 <= lat <= 89 and -180 <= lon <= 179):  # a tile spans [lat0, lat0+1] x [lon0, lon0+1]
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            f"tile corner {lat},{lon} from name {name!r} is outside -90..89 / -180..179",
+            detail_code="METADATA_INCOMPLETE",
+        )
     return lat, lon
 
 
@@ -79,13 +101,23 @@ def _find_member(files: list[Path], suffix: str, stem: str) -> Path | None:
 
 
 def decode(path: Path, params: NasademParams | None = None) -> DecodedRaster:
-    """Decode one tile from a ``.zip`` (extracted safely) or a bare ``.hgt``."""
+    """Decode one tile from a ``.zip`` (extracted safely) or a bare ``.hgt``.
+
+    A zip is extracted below ``params.work_dir`` or, by default, a temporary directory that is removed before
+    returning: nothing is ever written next to the source file.
+    """
     prm = params or NasademParams()
-    if path.suffix.lower() == ".zip":
-        work = prm.work_dir or path.with_name(path.stem + "_members")
-        files = safe_extract_zip(path, work, ArchiveLimits(max_members=16, allowed_suffixes=NASADEM_ARCHIVE_SUFFIXES))
-    else:
+    if path.suffix.lower() != ".zip":
         files = [path] + [p for p in path.parent.iterdir() if p.stem.lower() == path.stem.lower() and p != path]
+        return _decode_members(files, prm)
+    limits = archive_limits(prm.expected_samples)
+    if prm.work_dir is not None:
+        return _decode_members(safe_extract_zip(path, prm.work_dir, limits), prm)
+    with tempfile.TemporaryDirectory(prefix="nasadem-") as tmp:
+        return _decode_members(safe_extract_zip(path, Path(tmp) / "members", limits), prm)
+
+
+def _decode_members(files: list[Path], prm: NasademParams) -> DecodedRaster:
     hgt_files = sorted(p for p in files if p.suffix.lower() == ".hgt")
     if len(hgt_files) != 1:
         raise AdapterError(
@@ -140,8 +172,12 @@ def decode(path: Path, params: NasademParams | None = None) -> DecodedRaster:
     return DecodedRaster(data=data, valid=valid, metadata=meta, aux=aux)
 
 
-def mosaic(tiles: list[DecodedRaster]) -> DecodedRaster:
-    """Merge adjoining tiles de-duplicating shared border samples; report disagreements, never hide them."""
+def mosaic(tiles: list[DecodedRaster], *, max_cells: int = DEFAULT_MOSAIC_MAX_CELLS) -> DecodedRaster:
+    """Merge adjoining tiles de-duplicating shared border samples; report disagreements, never hide them.
+
+    The output extent is the bounding box of the tiles, so two distant tiles would allocate a world-sized array:
+    more than ``max_cells`` output cells is refused (``RESOURCE_LIMIT``/``MOSAIC_TOO_LARGE``) before any allocation.
+    """
     if not tiles:
         raise AdapterError("NO_COVERAGE", "no tiles to mosaic", detail_code="NO_GRANULES")
     ordered = sorted(tiles, key=lambda t: t.metadata.product_id or "")
@@ -167,6 +203,13 @@ def mosaic(tiles: list[DecodedRaster]) -> DecodedRaster:
     step_n = n - 1
     rows = (lat_max - lat_min + 1) * step_n + 1
     cols = (lon_max - lon_min + 1) * step_n + 1
+    if rows * cols > max_cells:
+        raise AdapterError(
+            "RESOURCE_LIMIT",
+            f"mosaic of the selected tiles would be {rows}x{cols} = {rows * cols} cells (budget {max_cells}); "
+            "select tiles that adjoin or request a smaller area",
+            detail_code="MOSAIC_TOO_LARGE",
+        )
     data = np.full((rows, cols), np.nan)
     valid = np.zeros((rows, cols), dtype=bool)
     covered = np.zeros((rows, cols), dtype=bool)

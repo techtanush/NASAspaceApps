@@ -7,16 +7,32 @@ The kit's ``AuditEvidenceInput`` carries no requirement records, so requirement-
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from uuid import UUID
 
 from analogforge.ports import catalog
 from analogforge.ports.domain_models import Requirement
-from analogforge.ports.science import ComputationStatus
+from analogforge.ports.science import ComputationStatus, EvidenceHandle
 from analogforge.ports.science_payloads import AuditEvidenceInput, ScreenCandidatesPayload
 from analogforge.science.audit import DiscoveryEvidence, audit_evidence, discovery_evidence_from_screening
 from analogforge.science.ops.base import OpBlocked, OpEnv, OpOutcome, derived_evidence, json_artifact
 
 _REF = re.compile(r"reference_set=([A-Za-z0-9._-]+)")
+
+
+def _mission_sensitivity_ids(evidence: Sequence[EvidenceHandle]) -> list[UUID]:
+    """Comparison evidence that shows the screening was judged under more than one mission contract.
+
+    One comparison is a single verdict, not a sensitivity analysis.  Sensitivity evidence needs at least two
+    ``COMPARISON`` records computed with different parameters (different requirements or thresholds); otherwise the
+    list is empty and SC-13 reports the gap.
+    """
+    comparisons = [
+        h for h in evidence if h.kind == "COMPARISON" and h.algorithm_id == catalog.ALGORITHM_IDS["COMPARE_REQUIREMENT"]
+    ]
+    if len({h.parameters_sha256 for h in comparisons}) < 2:
+        return []
+    return [h.evidence_id for h in comparisons]
 
 
 def run_audit(env: OpEnv) -> OpOutcome:
@@ -36,9 +52,7 @@ def run_audit(env: OpEnv) -> OpOutcome:
         discovery[h.evidence_id] = discovery_evidence_from_screening(
             table,
             reference_set_id=ref,
-            mission_sensitivity_evidence_ids=[
-                x.evidence_id for x in env.request.input_evidence if x.algorithm_id == "compare-requirement"
-            ][:1],
+            mission_sensitivity_evidence_ids=_mission_sensitivity_ids(env.request.input_evidence),
         )
     requirements: dict[str, Requirement] = {}
     for h in env.request.input_evidence:

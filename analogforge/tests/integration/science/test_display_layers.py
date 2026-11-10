@@ -245,3 +245,43 @@ def test_value_perturbation_moves_colours_and_duplicate_kinds_rejected(tmp_path:
     hi = render_layer(layer(g, values=v, kind="SLOPE", unit="deg"))
     lo = render_layer(layer(g, values=np.full(g.shape, 2.0), kind="SLOPE", unit="deg"))
     assert tuple(hi.rgba[0, 0, :3]) != tuple(lo.rgba[0, 0, :3])
+
+
+def test_earth_mercator_pixels_match_an_independent_pyproj_lookup() -> None:
+    """Every Web-Mercator pixel must show the analysis cell that contains its centre (floor, not ceil/round)."""
+    import math
+
+    from analogforge.science.display.layers import _earth, _factor
+
+    grid = earth_grid(40, 30)
+    values = np.arange(grid.width * grid.height, dtype=np.float64).reshape(grid.height, grid.width)  # unique per cell
+    out, affine, crs_wkt, pixel = _earth(layer(grid, values=values))
+    to_utm = Transformer.from_crs(3857, grid.crs_wkt, always_xy=True)
+    to_ll = Transformer.from_crs(grid.crs_wkt, 4326, always_xy=True)
+
+    # independent pixel scale: ground cell size / cos(mid latitude of the footprint), then the integer upscale
+    xmin, ymin, xmax, ymax = grid.bounds
+    corners_lat = [to_ll.transform(x, y)[1] for x in (xmin, xmax) for y in (ymin, ymax)]
+    edge_lat = [to_ll.transform(x, y)[1] for x in np.linspace(xmin, xmax, 41) for y in (ymin, ymax)]
+    mid_lat = 0.5 * (min(edge_lat + corners_lat) + max(edge_lat + corners_lat))
+    upscale, stride = _factor(grid.width, grid.height)
+    expected_pixel = grid.cell_size_m / math.cos(math.radians(mid_lat)) * stride / upscale
+    assert (
+        pixel == pytest.approx(expected_pixel, rel=1e-3)
+        and affine[1] == pytest.approx(pixel)
+        and affine[5] == -affine[1]
+    )
+    assert crs_wkt == CRS.from_epsg(3857).to_wkt()
+
+    height, width = out.shape
+    cols = affine[0] + (np.arange(width) + 0.5) * affine[1]
+    rows = affine[3] + (np.arange(height) + 0.5) * affine[5]
+    mx, my = np.meshgrid(cols, rows)
+    ux, uy = to_utm.transform(mx, my)
+    col = np.floor((ux - grid.origin_x_m) / grid.cell_size_m).astype(int)
+    row = np.floor((grid.origin_y_m - uy) / grid.cell_size_m).astype(int)
+    inside = (col >= 0) & (col < grid.width) & (row >= 0) & (row < grid.height)
+    expected = np.full(out.shape, np.nan)
+    expected[inside] = values[row[inside], col[inside]]
+    assert inside.sum() > 0.5 * inside.size
+    assert np.array_equal(out, expected, equal_nan=True)

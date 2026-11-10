@@ -21,6 +21,7 @@ from analogforge.ports.science_payloads import AcquiredAsset, CoverageSelection,
 MOLA_ADAPTER_ID = "mars_mola_megdr"
 LOLA_ADAPTER_ID = "moon_lola_gdr"
 PDS_HOST = "pds-geosciences.wustl.edu"
+_XML_MAGIC = (b"<?xml", b"\xef\xbb\xbf<?xml")  # PDS4 labels; PDS3 labels and raw images have no single signature
 
 # Unverified configuration proposals (no live server was contacted); override via ``sources=``.
 DEFAULT_SOURCES: dict[str, PdsSource] = {
@@ -118,7 +119,12 @@ def fetch_pds_products(
         if root not in label_dest.resolve().parents:
             raise AdapterError("SOURCE_CONTENT_INVALID", "scratch path escape", detail_code="PATH_ESCAPE")
         label_url = source.base_url + rel
-        res = http.download(label_url, label_dest, max_bytes=http.policy.max_metadata_bytes)
+        res = http.download(
+            label_url,
+            label_dest,
+            max_bytes=http.policy.max_metadata_bytes,
+            expected_magic=_XML_MAGIC if rel.lower().endswith(".xml") else None,
+        )
         out.append(_asset(source, selection, rel, res.sha256, res.size_bytes, label_url, role="label"))
         data_name = validate_relative(_data_reference(label_dest))
         data_rel = (rel.rsplit("/", 1)[0] + "/" if "/" in rel else "") + data_name

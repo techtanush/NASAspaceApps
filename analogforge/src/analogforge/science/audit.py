@@ -24,6 +24,8 @@ Gate semantics used here (``NOT_ASSESSED`` = could not be established, never a s
 
 from __future__ import annotations
 
+import math
+import re
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Final, Literal
@@ -77,12 +79,17 @@ SCREEN_ALGORITHM_ID: Final = catalog.ALGORITHM_IDS["SCREEN_CANDIDATES"]
 ANCESTRY_FAMILY_BY_PRODUCT: Final[dict[str, str]] = {
     "NASADEM": "SRTM",
     "SRTM": "SRTM",
+    "SRTMGL1": "SRTM",
+    "SRTMGL3": "SRTM",
     "ASTER": "ASTER",
+    "ASTGTM": "ASTER",
     "MOLA": "MOLA",
+    "MEGDR": "MOLA",
     "LOLA": "LOLA",
     "DIVINER": "DIVINER",
     "EMIT": "EMIT",
 }
+_WORD = re.compile(r"[A-Z0-9]+")
 # metric id (prefix before ':' or '@') -> accepted units
 EXPECTED_UNITS: Final[dict[str, frozenset[str]]] = {
     "valid_fraction": frozenset({"fraction"}),
@@ -133,8 +140,15 @@ def discovery_evidence_from_screening(
     mission_sensitivity_evidence_ids: Iterable[UUID] = (),
 ) -> DiscoveryEvidence:
     """Derive :class:`DiscoveryEvidence` from a ``SCREEN_CANDIDATES`` payload (no value is invented)."""
+    lo_lon, lo_lat, hi_lon, hi_lat = payload.search_extent.bbox
+    extent_recorded = (
+        payload.screened_count > 0
+        and all(map(math.isfinite, (lo_lon, lo_lat, hi_lon, hi_lat)))
+        and hi_lat > lo_lat
+        and hi_lon != lo_lon  # a degenerate (empty) box is no search extent; longitude may wrap, so != not >
+    )
     return DiscoveryEvidence(
-        search_extent_recorded=True,
+        search_extent_recorded=extent_recorded,
         reference_set_id=reference_set_id,
         negative_control_window_ids=tuple(sorted(w.window_id for w in payload.windows if w.is_negative_control)),
         novelty_statuses_recorded=bool(payload.windows)
@@ -154,8 +168,9 @@ def _metric_family(metric_id: str) -> str:
 
 
 def _product_tokens(handle: EvidenceHandle) -> set[str]:
+    """Source products named in the handle's text, matched as whole words (``raster`` is not ``ASTER``)."""
     text = " ".join([handle.local_key_origin or "", handle.algorithm_id, *handle.limitations]).upper()
-    return {token for token in ANCESTRY_FAMILY_BY_PRODUCT if token in text}
+    return set(_WORD.findall(text)) & ANCESTRY_FAMILY_BY_PRODUCT.keys()
 
 
 class _ClaimAudit:
@@ -367,6 +382,16 @@ class _ClaimAudit:
             return self._gate("SC-07", "UNSATISFIED", "a proxy is cited where only direct measurement is accepted")
         if assumed:
             if any(h.kind == "ASSUMPTION" for h in self.handles):
+                silent = [(h, m) for h, m in assumed if not m.uncertainty_note.strip()]
+                if silent:
+                    self._finding(
+                        "UNCERTAINTY_UNQUANTIFIED", "WARNING", [h.evidence_id for h, _ in silent],
+                        f"assumed metric(s) {sorted({m.metric_id for _, m in silent})} are accepted without any "
+                        "uncertainty statement", "NARROW_LANGUAGE",
+                    )  # fmt: skip
+                    return self._gate(
+                        "SC-07", "NOT_ASSESSED", "assumed parameters carry no uncertainty statement to accept"
+                    )
                 return self._gate("SC-07", "SATISFIED", "assumed parameters are covered by cited ASSUMPTION evidence")
             self._finding(
                 "PROXY_OVERSTATED", "WARNING", [h.evidence_id for h, _ in assumed],

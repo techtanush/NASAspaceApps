@@ -9,6 +9,7 @@ No environment access: the default config directory is located relative to this 
 
 from __future__ import annotations
 
+from functools import lru_cache
 from pathlib import Path
 from threading import Lock
 from typing import Any, Literal
@@ -198,6 +199,13 @@ class AlgorithmsConfig(_Strict):
         for spec_id in (catalog.MEASUREMENT_SPEC_TARGET, catalog.MEASUREMENT_SPEC_EARTH):
             if spec_id not in self.measurement_specs:
                 raise ValueError(f"measurement_specs lacks {spec_id}")
+        earth_default = self.measurement_specs[catalog.MEASUREMENT_SPEC_EARTH].comparison_support.default_requested_m
+        if earth_default != self.grid.target_support_m.earth_default_m:
+            raise ValueError(
+                f"grid.target_support_m.earth_default_m ({self.grid.target_support_m.earth_default_m}) must equal "
+                f"measurement_specs.{catalog.MEASUREMENT_SPEC_EARTH}.comparison_support.default_requested_m "
+                f"({earth_default})"
+            )
         needed = sorted(set(catalog.OBSERVABLE_POLICY_BY_OBSERVABLE.values()) - set(self.observable_policies))
         if needed:
             raise ValueError(f"observable_policies lacks policies: {needed}")
@@ -431,6 +439,12 @@ def load_config(config_dir: Path | None = None) -> ScienceConfig:
         _CACHE[key] = config
         _BY_ALGORITHM_HASH[key[0]] = config
         return config
+
+
+@lru_cache(maxsize=1)
+def default_thresholds() -> Thresholds:
+    """``thresholds`` of the repository's own ``algorithms.yaml`` (cached) for pure helpers without a config handle."""
+    return load_config().algorithms.thresholds
 
 
 def config_for_hash(algorithm_config_sha256: str) -> ScienceConfig | None:

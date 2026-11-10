@@ -16,6 +16,8 @@ def validate_bbox(bbox: Sequence[float]) -> Box:
     if len(bbox) != 4:
         raise AdapterError("NO_COVERAGE", "bbox must be [west, south, east, north]", detail_code="INPUT_INVALID")
     west, south, east, north = (float(v) for v in bbox)
+    if west == east:  # zero-width (a full circle is expressed as west + 360 = east, e.g. 0..360 or -180..180)
+        raise AdapterError("NO_COVERAGE", "bbox has zero width (west == east)", detail_code="INPUT_INVALID")
     if not (-90.0 <= south < north <= 90.0):
         raise AdapterError(
             "NO_COVERAGE", "bbox latitudes must satisfy -90 <= south < north <= 90", detail_code="INPUT_INVALID"
@@ -51,11 +53,24 @@ def split_bbox(bbox: Sequence[float], source_convention: str, target_convention:
 
 
 def coverage_fraction(aoi_pieces: Iterable[Box], product_boxes: Iterable[Box]) -> float:
-    """Planar-degree fraction of the AOI covered by the union of ``product_boxes`` (0..1)."""
+    """Planar-degree fraction of the AOI covered by the union of ``product_boxes`` (0..1).
+
+    A product box with west > east wraps through the seam of its domain (0/360 when any longitude exceeds 180, else
+    -180/180) and is split there.  A box with west == east is empty.
+    """
     aoi = unary_union([box(w, s, e, n) for w, s, e, n in aoi_pieces])
     if aoi.is_empty or aoi.area <= 0.0:
         return 0.0
-    prods = [box(w, s, e, n) for w, s, e, n in product_boxes if e > w and n > s]
+    domain_hi = 360.0 if any(max(b[0], b[2]) > 180.0 for b in [*aoi_pieces, *product_boxes]) else 180.0
+    domain_lo = 0.0 if domain_hi == 360.0 else -180.0
+    prods = []
+    for w, s, e, n in product_boxes:
+        if n <= s:
+            continue
+        if e > w:
+            prods.append(box(w, s, e, n))
+        elif e < w:  # west > east: the footprint crosses the seam of its longitude domain
+            prods += [box(w, s, domain_hi, n), box(domain_lo, s, e, n)]
     if not prods:
         return 0.0
     inter = aoi.intersection(unary_union(prods))

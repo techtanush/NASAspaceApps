@@ -8,7 +8,7 @@ from pathlib import Path
 import httpx
 
 from analogforge.adapters.earthdata import nasadem
-from analogforge.adapters.source_http.archive import ArchiveLimits, safe_extract_zip
+from analogforge.adapters.source_http.archive import safe_extract_zip
 from analogforge.adapters.source_http.client import SafeHttp
 from analogforge.adapters.source_http.cmr import (
     asset_directory,
@@ -153,7 +153,7 @@ def fetch(
         safe_extract_zip(
             archive,
             archive.with_name(archive.stem + "_check"),
-            ArchiveLimits(max_members=16, allowed_suffixes=nasadem.NASADEM_ARCHIVE_SUFFIXES),
+            nasadem.archive_limits(),
             extract=False,
         )
     return assets

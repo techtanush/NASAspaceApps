@@ -468,12 +468,16 @@ def test_one_pixel_registration_offset_is_caught_by_control_points() -> None:
 
 
 # ----------------------------------------------------------------------------- ANALYSIS_GRID container
+def _sample_elevation() -> np.ndarray:
+    _, xx = np.mgrid[0:10, 0:12]
+    return 50.0 + np.tan(np.radians(15.0)) * 60.0 * xx
+
+
 def _sample_grid() -> store.AnalysisGrid:
     spec = AnalysisGridSpec(
         "MARS", projected_frame_for_aoi("MARS", (137.0, -5.0, 138.0, -4.0)).crs_wkt, -1000.0, 2000.0, 60.0, 12, 10
     )
-    yy, xx = np.mgrid[0:10, 0:12]
-    elevation = 50.0 + np.tan(np.radians(15.0)) * 60.0 * xx
+    elevation = _sample_elevation()
     water = np.zeros((10, 12), dtype=bool)
     water[8:, 9:] = True
     surf = analyze_surface(elevation, spec.pixel_geometry(), water=water)
@@ -503,7 +507,11 @@ def test_analysis_grid_roundtrip_and_semantics() -> None:
     assert back.meta == grid.meta and back.meta.source_evidence_ids == ("a-ev", "b-ev")
     assert back.spec == grid.spec
     assert back.slope_deg[back.valid] == pytest.approx(15.0, abs=1e-6)
-    assert not back.elevation_m[~back.valid].any() and not back.slope_deg[~back.valid].any()
+    assert not back.slope_deg[~back.valid].any()
+    # elevation is zero only where there is no source elevation (water here); border land keeps its real value
+    assert not back.elevation_m[~back.land].any()
+    border = (back.quality == 3) & back.land
+    assert border.any() and np.all(back.elevation_m[border] == _sample_elevation()[border])
     assert np.isnan(back.aspect_deg[~back.valid]).all()
     assert not back.land[8:, 9:].any() and not back.valid[8:, 9:].any()
     assert not np.isnan(back.elevation_m).any()
@@ -556,7 +564,7 @@ def test_analysis_grid_invariant_and_corruption_failures() -> None:
     with pytest.raises(RasterError):
         store.encode_analysis_grid(mutated(elevation_m=nan_elev))
     bad_invalid_elev = good.elevation_m.copy()
-    r, c = np.argwhere(~good.valid)[0]
+    r, c = np.argwhere(~good.land)[0]  # a water cell has no usable elevation: must hold 0
     bad_invalid_elev[r, c] = 5.0
     with pytest.raises(RasterError):
         store.encode_analysis_grid(mutated(elevation_m=bad_invalid_elev))
@@ -657,3 +665,48 @@ def test_source_naming_and_scratch_safety(tmp_path: pytest.TempPathFactory) -> N
     assert (
         ev.parent_local_keys == ["a", "z"] and ev.artifact_key == "art" and ev.artifact_media_type == "application/json"
     )
+
+
+def test_oblate_planetary_ellipsoids_are_rejected_not_approximated() -> None:
+    """Moon and Mars are modelled as spheres; a CRS on the oblate IAU-2000 Mars figure would shift coordinates."""
+    oblate_mars = CRS.from_proj4("+proj=eqc +lat_ts=-4.5 +lon_0=137.5 +a=3396190 +b=3376200 +units=m +no_defs").to_wkt()
+    sphere_mars = CRS.from_proj4("+proj=eqc +lat_ts=-4.5 +lon_0=137.5 +R=3396190 +units=m +no_defs").to_wkt()
+    with pytest.raises(GeometryError) as err:
+        assert_crs_matches_body("MARS", oblate_mars)
+    assert err.value.detail_code == "BODY_MISMATCH" and "oblate" in err.value.message
+    with pytest.raises(GeometryError):
+        frame_from_crs_wkt("MARS", oblate_mars)
+    assert_crs_matches_body("MARS", sphere_mars)  # same semi-major axis, spherical: accepted
+
+
+def test_to_positive_east_flips_only_positive_west_products() -> None:
+    from analogforge.science.geometry import to_positive_east
+
+    assert to_positive_east(137.5, "POSITIVE_EAST") == 137.5
+    assert to_positive_east(222.5, "POSITIVE_WEST") == -222.5  # a positive-west product: 222.5 W is 137.5 E mod 360
+    assert (to_positive_east(222.5, "POSITIVE_WEST") % 360.0) == pytest.approx(137.5)
+    assert to_positive_east(-10.0, "POSITIVE_WEST") == 10.0
+
+
+def test_analysis_grid_keeps_elevation_of_border_land_and_zeroes_nodata_and_water() -> None:
+    spec = AnalysisGridSpec(
+        "MARS", projected_frame_for_aoi("MARS", (137.0, -5.0, 138.0, -4.0)).crs_wkt, 0.0, 600.0, 60.0, 10, 10
+    )
+    elevation = 100.0 + np.arange(100, dtype=np.float64).reshape(10, 10)
+    nodata = np.zeros((10, 10), dtype=bool)
+    nodata[4, 4] = True
+    water = np.zeros((10, 10), dtype=bool)
+    water[7, 7] = True
+    surf = analyze_surface(np.where(nodata, np.nan, elevation), spec.pixel_geometry(), water=water, nodata=nodata)
+    grid = store.build_analysis_grid(
+        spec, elevation_m=np.where(nodata, 0.0, elevation), valid=surf.valid, land=surf.land,
+        slope_deg=np.nan_to_num(surf.slope_deg), aspect_deg=surf.aspect_deg, quality=surf.quality,
+        source_evidence_ids=("e",), algorithm_id="analyze-candidate", algorithm_version="1.0.0",
+        parameters_sha256="0" * 64,
+    )  # fmt: skip
+    border = (grid.quality == 3) & grid.land
+    assert border[0, :].all() and border[3, 4] and not grid.valid[0, 0]  # the raster border and nodata neighbours
+    assert np.array_equal(grid.elevation_m[border], elevation[border])  # real elevation, not a zero placeholder
+    assert grid.elevation_m[4, 4] == 0.0 and grid.elevation_m[7, 7] == 0.0  # nodata and water: no elevation
+    assert np.array_equal(grid.elevation_m[grid.valid], elevation[grid.valid])
+    store.decode_analysis_grid(store.encode_analysis_grid(grid))  # the invariant accepts exactly this layout

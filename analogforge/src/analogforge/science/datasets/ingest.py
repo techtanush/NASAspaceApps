@@ -11,6 +11,7 @@ No environment, network, clock or randomness is used.
 
 from __future__ import annotations
 
+import math
 import warnings
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
@@ -446,11 +447,20 @@ def ingest_local_dataset(
                     bbox = ck.lonlat_bbox(effective_crs, gt, h, w, m.longitude_convention) if effective_crs else None
                 except (ScienceError, ValueError, CRSError):
                     native, bbox = None, None
+            if native is not None and not (math.isfinite(native) and native > 0.0):
+                native = None  # e.g. cells beyond the poles: unknown, never NaN
             pixel_deg = abs(gt[1]) if effective_crs is not None and effective_crs.is_geographic else None
-            out["transform_sane"] = ck.check_transform_sane(gt, m.pixel_registration)
-            out["resolution_cross_check"] = ck.check_resolution_cross_check(
-                m.declared_native_resolution_m, nominal_posting_m(m.body, effective_crs, gt, h, w) if native else None
-            )
+            out["transform_sane"] = ck.check_transform_sane(gt, m.pixel_registration, bbox)
+            if bbox is not None and not (
+                all(math.isfinite(x) for x in bbox)
+                and -90.0 - ck.LATITUDE_EPS <= bbox[1]
+                and bbox[3] <= 90.0 + ck.LATITUDE_EPS
+            ):
+                bbox = None  # an off-globe extent is reported by transform_sane, never published as a bbox
+            posting = nominal_posting_m(m.body, effective_crs, gt, h, w) if native is not None else None
+            if posting is not None and not (math.isfinite(posting) and posting > 0.0):
+                posting = None
+            out["resolution_cross_check"] = ck.check_resolution_cross_check(m.declared_native_resolution_m, posting)
             out["valid_fraction"] = ck.check_valid_fraction(valid_fraction)
             out["longitude_convention"] = ck.check_longitude_convention(m, effective_crs, bbox, pixel_deg)
             raster = NormalizedRaster(
@@ -559,7 +569,7 @@ def source_evidence_draft(
         license_note=m.license_note,
         dataset_product_id=result.product_id,
         dataset_version=m.product_identity.version,
-        source_uri=None if m.is_synthetic else m.product_identity.source_url,
+        source_uri=None if m.is_synthetic else ck.sanitized_source_url(m.product_identity.source_url),
         native_resolution_m=None if result.payload is None else result.payload.native_resolution_m,
         aoi_bbox=None if result.payload is None else result.payload.bbox_lonlat,
         limitations=list(result.limitations),

@@ -7,7 +7,9 @@ from pathlib import Path
 from typing import Any
 
 from analogforge.adapters.source_http.errors import AdapterError
+from analogforge.adapters.source_http.geo import Box, coverage_fraction, split_bbox
 from analogforge.ports.common import EvidenceRef
+from analogforge.ports.domain_models import AreaOfInterest
 from analogforge.ports.hashing import bytes_sha256
 from analogforge.ports.science import ArtifactDraft, ArtifactRole, ComputationStatus
 from analogforge.ports.science_payloads import (
@@ -57,6 +59,53 @@ def _overlap_fraction(aoi: list[float], other: tuple[float, float, float, float]
     return min(1.0, inter / total)
 
 
+def _aoi_pieces(aoi: AreaOfInterest) -> list[Box]:
+    """The AOI as boxes in the -180..180 domain; a malformed AOI (zero width, off-globe latitude) is BLOCKED."""
+    try:
+        return split_bbox(aoi.bbox, aoi.longitude_convention, "NEG180_180")
+    except AdapterError as exc:
+        raise OpBlocked(f"invalid AOI: {exc.message}", code="INPUT_INVALID", detail_code="AOI_INVALID") from exc
+
+
+def _extent_pieces(bbox: tuple[float, float, float, float]) -> list[Box]:
+    convention = "ZERO_360" if max(bbox[0], bbox[2]) > 180.0 else "NEG180_180"
+    try:
+        return split_bbox(bbox, convention, "NEG180_180")
+    except AdapterError:
+        return []  # an invalid extent authorizes nothing
+
+
+def enforce_source_policy(env: OpEnv, adapter_id: str, aoi: AreaOfInterest) -> None:
+    """Refuse before any request is made: mode, network permission, adapter allow-list and allowed extents.
+
+    * ``synthetic_practice`` exists only in synthetic mode (never presented as live or replay data).
+    * A network adapter needs ``allow_network`` and an explicit ``allowed_adapter_ids`` entry (outside live mode the
+      caller's own mode block applies first).
+    * A non-empty ``allowed_adapter_ids`` restricts local adapters as well (an empty one restricts nothing there:
+      local sources are authorized by ``local_dataset_ids`` / ``synthetic_fixture_ids``).
+    * A non-empty ``allowed_extents`` must contain the whole AOI (same body, planar-degree union).
+    """
+    policy = env.request.source_policy
+    if adapter_id == "synthetic_practice" and env.request.mode != "synthetic":
+        raise OpBlocked(
+            "synthetic practice data is only available in synthetic mode",
+            code="UNSUPPORTED_PRODUCT",
+            detail_code="MODE_MISMATCH",
+        )
+    network = adapter_id in NETWORK_ADAPTERS
+    if network and env.request.mode != "live":
+        return  # the caller blocks network adapters outside live mode (NETWORK_UNAVAILABLE / FETCH_NOT_AVAILABLE)
+    if network and not policy.allow_network:
+        raise OpBlocked(f"the source policy does not allow network access ({adapter_id})", detail_code="POLICY_DENIED")
+    if (network or policy.allowed_adapter_ids) and adapter_id not in policy.allowed_adapter_ids:
+        raise OpBlocked(f"adapter {adapter_id} is not authorized by the source policy", detail_code="POLICY_DENIED")
+    pieces = _aoi_pieces(aoi)
+    if policy.allowed_extents:
+        permitted = [b for e in policy.allowed_extents if e.body == aoi.body for b in _extent_pieces(e.bbox)]
+        if coverage_fraction(pieces, permitted) < 1.0 - 1e-9:
+            raise OpBlocked("the AOI is not inside the source policy's allowed extents", detail_code="POLICY_DENIED")
+
+
 def _roles(inp: ResolveCoverageInput) -> tuple[str, ...]:
     kinds = {k.upper() for k in inp.measurement_kinds}
     if inp.subject_kind == "TARGET":
@@ -68,6 +117,7 @@ def run_resolve_coverage(env: OpEnv) -> OpOutcome:
     inp = env.request.inputs
     assert isinstance(inp, ResolveCoverageInput)
     algo = "resolve-coverage"
+    enforce_source_policy(env, inp.adapter_id, inp.aoi)
     if inp.adapter_id in NETWORK_ADAPTERS:
         if env.request.mode != "live" or env.context.http_client() is None:
             raise OpBlocked(
@@ -163,6 +213,7 @@ def run_fetch_source(env: OpEnv) -> OpOutcome:
     assert isinstance(inp, FetchSourceInput)
     algo = "fetch-source"
     sel = inp.selection
+    enforce_source_policy(env, sel.adapter_id, inp.aoi)
     client = env.context.http_client()
     if env.request.mode != "live" or client is None or sel.adapter_id not in NETWORK_ADAPTERS:
         raise OpBlocked(

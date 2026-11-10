@@ -5,7 +5,11 @@ the bytes -- and therefore ``GridSpec.analysis_grid_sha256`` -- depend only on t
 
 ``aspect_deg``, ``elevation_m``, ``land``, ``quality``, ``slope_deg``, ``valid`` (``.npy``) and ``meta.json``.
 
-``elevation_m`` is NaN-free (invalid cells hold 0 with ``valid=false``), ``valid`` means "not nodata with a full 3x3
+``elevation_m`` is NaN-free.  Cells that carry real elevation data -- ``quality`` OK or NO_FULL_SUPPORT (land with a
+finite source value but without a full 3x3 neighbourhood, e.g. the raster border) -- keep it; every other cell
+(nodata, water, outside the source) holds 0 with ``valid=false``.  A reader must therefore aggregate elevation only
+over ``land & quality in (OK, NO_FULL_SUPPORT)`` (never over ``~valid`` as a whole, and never over the zeros).
+``valid`` means "not nodata with a full 3x3
 usable neighbourhood", ``land`` is false for water, ``slope_deg`` is defined where ``valid`` (0 elsewhere) and
 ``aspect_deg`` is the only member that may hold NaN.  This module is the only code that parses the container; the
 independent verifier and the solver both use :func:`decode_analysis_grid`.
@@ -35,6 +39,7 @@ MEDIA_TYPE: Final = "application/x-npz"
 ARRAY_MEMBERS: Final = ("aspect_deg", "elevation_m", "land", "quality", "slope_deg", "valid")
 META_MEMBER: Final = "meta.json"
 MEMBER_NAMES: Final = tuple(sorted([f"{n}.npy" for n in ARRAY_MEMBERS] + [META_MEMBER]))
+_ELEVATION_QUALITIES: Final = (0, 3)  # QUALITY_OK, QUALITY_NO_FULL_SUPPORT: land cells that carry a source elevation
 _ZIP_DATE: Final = (1980, 1, 1, 0, 0, 0)
 _MAX_UNCOMPRESSED_BYTES: Final = 512 * 1024 * 1024
 _EXPECTED_DTYPES: Final = {
@@ -111,7 +116,12 @@ def build_analysis_grid(
     algorithm_version: str,
     parameters_sha256: str,
 ) -> AnalysisGrid:
-    """Canonicalise raw analysis arrays (invalid cells -> elevation 0, slope 0) into an :class:`AnalysisGrid`."""
+    """Canonicalise raw analysis arrays into an :class:`AnalysisGrid`.
+
+    Slope is 0 on invalid cells.  Elevation is 0 only where the cell has no usable elevation (nodata, water, outside
+    the source); a land cell that merely lacks a full 3x3 neighbourhood keeps its real elevation so that coarser
+    supports can still be area-averaged from it (zero-filling it would invent cliffs at borders).
+    """
     shape = spec.shape
     for name, arr in (
         ("elevation_m", elevation_m),
@@ -137,10 +147,12 @@ def build_analysis_grid(
         parameters_sha256=parameters_sha256,
     )
     ok = np.asarray(valid, dtype=bool)
+    quality_arr = np.asarray(quality, dtype=np.uint8)
+    has_elevation = ok | (np.asarray(land, dtype=bool) & np.isin(quality_arr, _ELEVATION_QUALITIES))
     aspect = np.where(ok, aspect_deg, np.nan).astype(np.float64)
     return AnalysisGrid(
         meta=meta,
-        elevation_m=np.where(ok, elevation_m, 0.0).astype(np.float64),
+        elevation_m=np.where(has_elevation, elevation_m, 0.0).astype(np.float64),
         valid=ok,
         land=np.asarray(land, dtype=bool),
         slope_deg=np.where(ok, slope_deg, 0.0).astype(np.float64),
@@ -162,8 +174,9 @@ def _check_invariants(grid: AnalysisGrid) -> None:
             raise RasterError(f"{name} dtype {arr.dtype} != {_EXPECTED_DTYPES[name]}")
     if not np.all(np.isfinite(grid.elevation_m)):
         raise RasterError("elevation_m must be NaN-free")
-    if np.any(grid.elevation_m[~grid.valid] != 0.0):
-        raise RasterError("invalid cells must hold elevation 0")
+    has_elevation = grid.valid | (grid.land & np.isin(grid.quality, _ELEVATION_QUALITIES))
+    if np.any(grid.elevation_m[~has_elevation] != 0.0):
+        raise RasterError("cells without usable elevation (nodata, water, outside) must hold elevation 0")
     if not np.all(np.isfinite(grid.slope_deg)) or np.any(grid.slope_deg < 0) or np.any(grid.slope_deg >= 90):
         raise RasterError("slope_deg must be finite in [0, 90)")
     if np.any(grid.slope_deg[~grid.valid] != 0.0):

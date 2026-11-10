@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import re
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -23,22 +22,26 @@ import httpx
 
 from analogforge.adapters.source_http.errors import AdapterError
 from analogforge.adapters.source_http.policy import HttpPolicy
+from analogforge.adapters.source_http.sniff import SNIFF_BYTES, looks_like_html
 
 T = TypeVar("T")
 
 _REDIRECTS = {301, 302, 303, 307, 308}
 _TRANSIENT_STATUS = {429, 500, 502, 503, 504}
 _BINARY_FALLBACK_TYPES = ("application/octet-stream", "binary/octet-stream")
-_HTML_SNIFF = re.compile(rb"^\s*(<!doctype\s+html|<html|<head|<body)", re.IGNORECASE)
 _CHUNK = 1 << 16
 
 
 def redact_url(url: str) -> str:
     """Stable identity for a URL: scheme+host+path only (no userinfo, query or fragment)."""
-    parts = urlsplit(url)
-    host = parts.hostname or ""
-    if parts.port:
-        host = f"{host}:{parts.port}"
+    try:
+        parts = urlsplit(url)
+        host = parts.hostname or ""
+        port = parts.port
+    except ValueError:
+        return "<unparseable url>"
+    if port:
+        host = f"{host}:{port}"
     return urlunsplit((parts.scheme, host, parts.path, "", ""))
 
 
@@ -49,15 +52,11 @@ def has_credentials(client: httpx.Client | None) -> bool:
     return "authorization" in client.headers or client.auth is not None
 
 
-def looks_like_html(head: bytes) -> bool:
-    return bool(_HTML_SNIFF.match(head))
-
-
 def _parse_retry_after(value: str | None) -> float | None:
     if value is None:
         return None
     value = value.strip()
-    if value.isdigit():
+    if value.isascii() and value.isdigit():  # str.isdigit is also true for "²" / non-ASCII digits float() rejects
         return float(value)
     try:
         when = parsedate_to_datetime(value)
@@ -132,7 +131,13 @@ class SafeHttp:
 
     # ------------------------------------------------------------------ one attempt
     def _check_host(self, url: str) -> str:
-        parts = urlsplit(url)
+        try:
+            parts = urlsplit(url)
+            port = parts.port
+        except ValueError as exc:
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID", f"unparseable URL {redact_url(url)}", detail_code="INVALID_URL"
+            ) from exc
         host = (parts.hostname or "").lower()
         if parts.scheme != "https" and not (self._policy.allow_insecure and parts.scheme == "http"):
             raise AdapterError(
@@ -149,6 +154,13 @@ class SafeHttp:
                 "SOURCE_CONTENT_INVALID",
                 f"host {host!r} is not on the adapter allow-list",
                 detail_code="HOST_NOT_ALLOWED",
+            )
+        effective = port if port is not None else (443 if parts.scheme == "https" else 80)
+        if effective not in self._policy.permitted_ports:
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID",
+                f"port {effective} of {host!r} is not on the adapter allow-list",
+                detail_code="PORT_NOT_ALLOWED",
             )
         return host
 
@@ -168,9 +180,8 @@ class SafeHttp:
             )
             send_auth: Any = httpx.USE_CLIENT_DEFAULT
             if host not in credential_hosts:
-                for name in ("authorization", "cookie", "proxy-authorization"):
-                    if name in request.headers:
-                        del request.headers[name]
+                for name in [n for n in request.headers if policy.is_sensitive_header(n)]:
+                    del request.headers[name]
                 send_auth = None
             try:
                 response = self._client.send(request, stream=True, follow_redirects=False, auth=send_auth)
@@ -255,7 +266,7 @@ class SafeHttp:
                     raise AdapterError("SOURCE_UNAVAILABLE", "connection dropped mid-body", transient=True) from exc
                 body = b"".join(chunks)
                 if not allow_html and (
-                    looks_like_html(body[:512])
+                    looks_like_html(body[:SNIFF_BYTES])
                     or response.headers.get("content-type", "").lower().startswith("text/html")
                 ):
                     raise AdapterError(
@@ -291,7 +302,7 @@ class SafeHttp:
         expected: ExpectedChecksum | None = None,
         max_bytes: int | None = None,
         accept_content_types: tuple[str, ...] | None = None,
-        expected_magic: bytes | None = None,
+        expected_magic: bytes | tuple[bytes, ...] | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> DownloadResult:
         """Stream ``url`` to ``dest`` atomically with every safety check; a partial file never survives."""
@@ -330,25 +341,30 @@ class SafeHttp:
                 md5 = hashlib.md5(usedforsecurity=False)
                 total = 0
                 head = b""
+                html_ok = bool(accept_content_types and "text/html" in accept_content_types)
+
+                def reject_html() -> None:
+                    raise AdapterError(
+                        "SOURCE_CONTENT_INVALID",
+                        f"{redact_url(url)} returned an HTML page",
+                        detail_code="HTML_LOGIN_PAGE",
+                    )
+
                 try:
                     with part.open("wb") as handle:
                         for chunk in response.iter_bytes(_CHUNK):
-                            if not head:
-                                head = chunk[:512]
-                                if looks_like_html(head) and not (
-                                    accept_content_types and "text/html" in accept_content_types
-                                ):
-                                    raise AdapterError(
-                                        "SOURCE_CONTENT_INVALID",
-                                        f"{redact_url(url)} returned an HTML page",
-                                        detail_code="HTML_LOGIN_PAGE",
-                                    )
+                            if len(head) < SNIFF_BYTES:
+                                head = (head + chunk)[:SNIFF_BYTES]
+                                if len(head) >= SNIFF_BYTES and not html_ok and looks_like_html(head):
+                                    reject_html()
                             total += len(chunk)
                             if total > limit:
                                 raise AdapterError("RESOURCE_LIMIT", f"download exceeds {limit} byte limit")
                             sha.update(chunk)
                             md5.update(chunk)
                             handle.write(chunk)
+                    if len(head) < SNIFF_BYTES and head and not html_ok and looks_like_html(head):
+                        reject_html()
                 except httpx.RequestError as exc:
                     raise AdapterError("SOURCE_UNAVAILABLE", "connection dropped mid-body", transient=True) from exc
                 encoded = response.headers.get("content-encoding", "identity").lower() != "identity"

@@ -111,7 +111,7 @@ def _certificate_of(
         problem.provider,
         problem.costs,
         problem.start,
-        problem.task_nodes,
+        problem.task_sets,
         unbounded_battery=relaxed,
     )
     return cert, problem

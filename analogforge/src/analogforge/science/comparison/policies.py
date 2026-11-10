@@ -23,7 +23,7 @@ from analogforge.ports.science import EvidenceHandle
 from analogforge.ports.science_payloads import Histogram, VerificationSummary
 from analogforge.science.comparison.scale import check_support_window
 from analogforge.science.comparison.w1 import w1_from_histograms
-from analogforge.science.config import ObservablePolicy
+from analogforge.science.config import ObservablePolicy, default_thresholds
 from analogforge.science.errors import RasterError, ScaleError
 from analogforge.science.features.histogram import slope_area_metric_id
 from analogforge.science.qualification import ReasonCode, ThresholdVerdict, evaluate_threshold
@@ -36,6 +36,11 @@ ANALYSIS_ALGORITHM_IDS = frozenset({"analyze-candidate", "analysis-summary"})
 _EXPOSURE_VIOLATIONS = frozenset({"EXPOSURE_SHORTFALL"})
 _TASK_VIOLATIONS = frozenset({"WAYPOINT_MISSED", "TASK_CAPABILITY_MISSING", "RETURN_NOT_COMPLETED"})
 _RESERVE_VIOLATIONS = frozenset({"ENERGY_RESERVE_SHORTFALL"})
+_CLASS_VIOLATIONS = frozenset({"CLASS_DIVERSITY_SHORTFALL"})
+#: Violations that concern one requirement row only.  Any other code (slope, forbidden terrain, discontinuity, stale
+#: hash, distance/duration/traversal budget, ...) invalidates the route itself, so no row may be credited from it.
+ROW_SCOPED_VIOLATIONS = _EXPOSURE_VIOLATIONS | _TASK_VIOLATIONS | _RESERVE_VIOLATIONS | _CLASS_VIOLATIONS
+UNKNOWN_TERRAIN_VIOLATION = "UNKNOWN_TERRAIN"
 NOMINAL_LIMITATION = "Uncertainty not quantified; nominal modeled result."
 
 
@@ -45,6 +50,9 @@ class SideEvidence:
 
     handles: tuple[EvidenceHandle, ...] = ()
     histogram: Histogram | None = None
+    #: Fraction of the window the ``histogram`` was actually built from (e.g. coarse cells with full support);
+    #: when ``None`` the policy falls back to the ``valid_fraction`` metric of the evidence.
+    coverage: float | None = None
 
     def metric(self, metric_id: str) -> MeasuredMetric | None:
         """First metric with this id (handles are searched in order); its ``value`` may still be ``None``."""
@@ -331,7 +339,7 @@ def slope_w1_common_support(ctx: PolicyContext) -> PolicyDecision:
     scale = cand_h.support_scale_m
     in_window = check_support_window(scale, req.minimum_support_scale_m, req.maximum_support_scale_m)
     consulted = ctx.candidate.handles + ctx.target.handles
-    if not in_window.supported or abs(scale - target_h.support_scale_m) > 1e-9:
+    if not in_window.supported or abs(scale - target_h.support_scale_m) > default_thresholds().numeric_tolerance:
         return PolicyDecision(
             status="UNKNOWN",
             reason="SCALE_UNSUPPORTED",
@@ -348,7 +356,13 @@ def slope_w1_common_support(ctx: PolicyContext) -> PolicyDecision:
             scale_ok=False,
         )
     coverage_metric = ctx.candidate.metric("valid_fraction")
-    if coverage_metric is None or coverage_metric.value is None:
+    if ctx.candidate.coverage is not None:
+        coverage: float | None = ctx.candidate.coverage
+    elif coverage_metric is not None and coverage_metric.value is not None:
+        coverage = coverage_metric.value
+    else:
+        coverage = None
+    if coverage is None:
         return PolicyDecision(
             status="UNKNOWN",
             reason="METADATA_INCOMPLETE",
@@ -361,14 +375,25 @@ def slope_w1_common_support(ctx: PolicyContext) -> PolicyDecision:
             body_ok=True,
             scale_ok=True,
         )
-    coverage = coverage_metric.value
-    if coverage < ctx.policy.min_valid_fraction or cand_h.valid_area_m2 <= 0 or target_h.valid_area_m2 <= 0:
+    target_cov = ctx.target.coverage
+    if target_cov is None:
+        tm = ctx.target.metric("valid_fraction")
+        target_cov = tm.value if tm is not None else None
+    target_low = target_cov is not None and target_cov < ctx.policy.min_valid_fraction
+    if (
+        coverage < ctx.policy.min_valid_fraction
+        or target_low
+        or cand_h.valid_area_m2 <= 0
+        or target_h.valid_area_m2 <= 0
+    ):
+        side = "Target" if target_low and coverage >= ctx.policy.min_valid_fraction else "Candidate"
+        shown = target_cov if side == "Target" and target_cov is not None else coverage
         return PolicyDecision(
             status="UNKNOWN",
             reason="INSUFFICIENT_VALID_DATA",
             stage="FINAL",
             explanation=(
-                f"Valid coverage {coverage:.3f} is below the policy minimum {ctx.policy.min_valid_fraction:.2f}."
+                f"{side} valid coverage {shown:.3f} is below the policy minimum {ctx.policy.min_valid_fraction:.2f}."
             ),
             comparison_scale_m=scale,
             coverage=coverage,
@@ -680,11 +705,45 @@ def route_dependent(ctx: PolicyContext) -> PolicyDecision:
         scale_ok=True if scale is not None else None,
         route_check="INDEPENDENT" if independent else "ABSENT",
     )
-    if v.outcome == "INCONCLUSIVE" and v.failure_category in ("SYSTEM", "SEARCH_LIMIT", "REQUIREMENT"):
+    if v.outcome == "INCONCLUSIVE":
+        # An inconclusive verification proves nothing about any row, whatever its failure category.
+        if kind == "reserve" and v.failure_category == "DATA" and (metric is None or metric.value is None):
+            return replace(
+                base,
+                reason="ENERGY_MODEL_MISSING",
+                explanation="The energy reserve could not be evaluated because no usable energy model exists.",
+                limitations=("Missing energy model is unknown, never zero consumption.",),
+            )
         return replace(
             base,
             explanation=f"The verification is inconclusive ({v.failure_category}); no route result can be credited.",
-            limitations=("Bounded search or a system fault is not proof about the route.",),
+            limitations=("An inconclusive verification (bounded search, system fault or missing data) is not proof.",),
+        )
+    if not independent:
+        return replace(
+            base,
+            explanation=(
+                "No independent VERIFICATION evidence is among the candidate evidence; a route result "
+                "that was not recomputed by the independent verifier cannot be credited."
+            ),
+            limitations=("Only the independent verifier may credit a route-dependent row.",),
+        )
+    if UNKNOWN_TERRAIN_VIOLATION in v.violation_codes:
+        return replace(
+            base,
+            explanation="The verified route crosses terrain of unknown quality; no row can be credited from it.",
+            limitations=("Unknown terrain is not safe terrain; the route is not accepted as evidence.",),
+        )
+    hard = sorted(set(v.violation_codes) - ROW_SCOPED_VIOLATIONS)
+    if hard:
+        return replace(
+            base,
+            status="FAIL",
+            reason="ROUTE_FAILED",
+            explanation=f"The verification reports route-invalidating violations {hard}; no row is credited.",
+            limitations=(NOMINAL_LIMITATION,),
+            numeric_decided=True,
+            direct_evidence=True,
         )
     if metric is not None and metric.value is not None:
         verdict = evaluate_threshold(metric.value, "GTE", req.lower, None, ctx.policy.tolerance)

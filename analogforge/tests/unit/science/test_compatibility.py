@@ -270,3 +270,37 @@ def test_assessment_is_deterministic() -> None:
     a = assess_compatibility(rover(catalog.ROVER_ARES_1), MARS, verification=verification())
     b = assess_compatibility(rover(catalog.ROVER_ARES_1), MARS, verification=verification())
     assert a == b
+
+
+# ----------------------------------------------------------------------------- review defects 4 and 9
+def test_a_route_distance_metric_alone_is_not_a_verified_route() -> None:
+    metrics = [metric("route_distance_m", 9999.0), metric("reserve_pct", 90.0, "percent")]
+    ares = rover(catalog.ROVER_ARES_1, max_route_m=250.0)
+    for outcome, category, codes in (
+        ("INCONCLUSIVE", "DATA", []),
+        ("INCONCLUSIVE", "SYSTEM", []),
+        ("INCONCLUSIVE", "SEARCH_LIMIT", []),
+        ("FAIL", "ROUTE", ["UNKNOWN_TERRAIN"]),
+        ("PASS", None, ["UNKNOWN_TERRAIN"]),
+    ):
+        v = VerificationSummary(outcome=outcome, failure_category=category, violation_codes=codes, metrics=metrics)  # type: ignore[arg-type]
+        assert not verified_route_supplied(v), (outcome, category, codes)
+        result = assess_compatibility(ares, MARS, verification=v)
+        dims = by_id(result.dimensions)
+        assert result.preliminary
+        assert dims["energy_reserve_pct"].status == "UNKNOWN" and dims["route_length_m"].status == "UNKNOWN"
+    # a conclusive PASS/FAIL outcome with a distance is a verified route
+    for outcome, category in (("PASS", None), ("FAIL", "ROUTE")):
+        v = VerificationSummary(outcome=outcome, failure_category=category, violation_codes=[], metrics=metrics)  # type: ignore[arg-type]
+        assert verified_route_supplied(v)
+        assert by_id(assess_compatibility(ares, MARS, verification=v).dimensions)["route_length_m"].status == "FAIL"
+
+
+def test_clearance_requirement_without_a_lower_bound_is_unknown_not_a_crash() -> None:
+    clearance = next(r for r in MARS if r.observable == "ground_clearance_m")
+    no_lower = clearance.model_copy(update={"lower": None})
+    ares = rover(catalog.ROVER_ARES_1, ground_clearance_m=0.3, max_obstacle_height_m=0.3)
+    dims = by_id(assess_compatibility(ares, [no_lower], candidate_support_scale_m=0.01).dimensions)
+    for metric_id in ("ground_clearance_m", "max_obstacle_height_m"):
+        assert dims[metric_id].status == "UNKNOWN" and dims[metric_id].required_value is None
+        assert "no numeric lower bound" in dims[metric_id].explanation

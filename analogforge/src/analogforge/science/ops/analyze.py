@@ -161,6 +161,10 @@ def run_analyze(env: OpEnv) -> OpOutcome:
     ]
     if prep.support_m > cell + 1e-9:
         limitations.append(f"Source is coarser than the {cell:g} m analysis cell; it was not upsampled.")
+    limitations.append(
+        f"Connected zones use the default safe-slope cap of {cap:g} deg: ANALYZE_CANDIDATE carries no rover, so a "
+        "rover with a lower declared cap needs its own route search to establish reachability."
+    )
     limitations += limitations_extra
     status = ComputationStatus.SUCCEEDED
     if vf < th.min_valid_fraction:

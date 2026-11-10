@@ -3,7 +3,9 @@
 A certificate may only use OPTIMISTIC bounds, so that "infeasible" is a statement about the whole discrete problem
 (graph, route-domain bounds, model) and never about a heuristic:
 
-* start/task connectivity in the start component;
+* start/task connectivity in the start component.  A task is satisfied at ANY traversable node within its tolerance
+  (the verifier accepts any route node in tolerance), so it is reachable iff at least one of those nodes lies in the
+  start component; distance/energy bounds use the cheapest such node;
 * optimistic exposure bound per requirement =
   ``min(sum of in-band subsegment length over the component's undirected edges, max_distance_m,
   energy distance bound)``;
@@ -18,7 +20,7 @@ from __future__ import annotations
 
 import heapq
 import math
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Collection, Mapping, Sequence
 from dataclasses import dataclass
 
 from analogforge.ports import catalog
@@ -56,11 +58,15 @@ class Certificate:
         return sorted({r.constraint_id for r in self.reasons})
 
 
-def dijkstra(graph: RouteGraph, source: int, cost: CostFn) -> list[float]:
-    """Single-source shortest path; unreachable nodes get ``inf``.  Deterministic (ties by node index)."""
+def dijkstra(graph: RouteGraph, source: int | Collection[int], cost: CostFn) -> list[float]:
+    """Shortest path from one node or (multi-source) a set of nodes; unreachable nodes get ``inf``.  Deterministic."""
+    sources = [source] if isinstance(source, int) else sorted(source)
     dist = [math.inf] * len(graph.node_ids)
-    dist[source] = 0.0
-    heap: list[tuple[float, int]] = [(0.0, source)]
+    heap: list[tuple[float, int]] = []
+    for src in sources:
+        dist[src] = 0.0
+        heap.append((0.0, src))
+    heapq.heapify(heap)
     while heap:
         d, node = heapq.heappop(heap)
         if d > dist[node]:
@@ -99,7 +105,7 @@ def compute_certificate(
     provider: EnergyProvider,
     costs: EdgeCosts,
     start: int | None,
-    task_nodes: Mapping[str, int | None],
+    task_nodes: Mapping[str, Collection[int]],
     *,
     unbounded_battery: bool = False,
 ) -> Certificate:
@@ -119,9 +125,10 @@ def compute_certificate(
         return Certificate(True, tuple(reasons), {}, 0, None, None, None)
 
     component = reachable_from(graph, start)
+    reachable_sets: dict[str, list[int]] = {}
     for task in constraints.tasks:
-        node = task_nodes.get(task.task_id)
-        if node is None or node not in component:
+        reachable_sets[task.task_id] = sorted(n for n in task_nodes.get(task.task_id, ()) if n in component)
+        if not reachable_sets[task.task_id]:
             reasons.append(
                 CertificateReason(
                     "TASK_UNREACHABLE",
@@ -137,8 +144,7 @@ def compute_certificate(
         return Certificate(True, tuple(reasons), {}, len(component), None, None, None)
 
     dist = dijkstra(graph, start, lambda ei, _s: graph.edges[ei].d_xy_m)
-    task_indices = [n for t in constraints.tasks if (n := task_nodes[t.task_id]) is not None]
-    far = max((dist[n] for n in task_indices), default=0.0)
+    far = max((min(dist[n] for n in reachable_sets[t.task_id]) for t in constraints.tasks), default=0.0)
     distance_lb = 2.0 * far if constraints.return_required else far
     if constraints.max_distance_m is not None and distance_lb > constraints.max_distance_m + EPS_VALUE:
         reasons.append(
@@ -163,9 +169,8 @@ def compute_certificate(
         back = dijkstra(graph, start, lambda ei, s: costs.edge(ei, -s).conservative_wh)  # cost of travelling TO start
         task_wh = sum(c.conservative_wh for c in costs.per_task.values())
         trips = [
-            fwd[n] + (back[n] if constraints.return_required else 0.0)
+            min(fwd[n] + (back[n] if constraints.return_required else 0.0) for n in reachable_sets[t.task_id])
             for t in constraints.tasks
-            if (n := task_nodes[t.task_id]) is not None
         ]
         energy_lb = (max(trips) if trips else 0.0) + task_wh
         if energy_lb > usable + EPS_VALUE:
@@ -227,13 +232,14 @@ def compute_certificate(
 def remaining_bound_tables(
     graph: RouteGraph,
     start: int,
-    task_nodes: Sequence[int],
+    task_nodes: Sequence[Collection[int]],
     costs: EdgeCosts,
     *,
     use_energy: bool,
 ) -> tuple[list[float], list[list[float]]]:
-    """Distance tables for the A* heuristic: ``to_start[n]`` and ``to_task[k][n]`` (shortest horizontal metres) or,
-    with ``use_energy``, the shortest conservative-energy tables for travelling n -> start / n -> task_k."""
+    """Distance tables for the A* heuristic: ``to_start[n]`` and ``to_task[k][n]`` (shortest horizontal metres to the
+    NEAREST node of task k's in-tolerance node set) or, with ``use_energy``, the shortest conservative-energy tables for
+    travelling n -> start / n -> that set."""
     if use_energy:
         # cost of travelling n -> target equals reverse Dijkstra from target with reversed direction costs
         def cost(ei: int, sign: int) -> float:
@@ -244,5 +250,5 @@ def remaining_bound_tables(
             return graph.edges[ei].d_xy_m
 
     to_start = dijkstra(graph, start, cost)
-    to_task = [dijkstra(graph, node, cost) for node in task_nodes]
+    to_task = [dijkstra(graph, nodes, cost) for nodes in task_nodes]
     return to_start, to_task

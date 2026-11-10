@@ -139,7 +139,10 @@ def passable_mask(grid: GridArrays, dilation_m: float) -> np.ndarray:
     if dilation_m > 0.0 and bad.any():
         distance_m = ndimage.distance_transform_edt(passable) * grid.cell_size_m
         passable = passable & (distance_m > dilation_m + _SLOPE_TOL)
-    return np.asarray(passable, dtype=np.bool_)
+    # a VALID cell with a NaN/inf slope or elevation is corrupt data, not terrain: it can neither be a node nor be
+    # crossed (never silently treated as flat/safe; the verifier reports routes touching such cells as a DATA problem)
+    finite = np.isfinite(grid.slope_deg) & np.isfinite(grid.elevation_m)
+    return np.asarray(passable & (finite | ~grid.valid), dtype=np.bool_)
 
 
 def build_raster_graph(
