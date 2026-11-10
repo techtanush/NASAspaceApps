@@ -262,4 +262,13 @@ def run_fetch_source(env: OpEnv) -> OpOutcome:
         )
         refs.append(EvidenceRef(local_key=key))
     payload = FetchSourcePayload(source_evidence=refs, acquired_assets=assets)
+    report = json_artifact(env, params_sha=params, key="fetch-json", name="fetch.json", payload=payload)
+    artifacts.append(report)
+    evidence.append(derived_evidence(
+        env, key="fetch-report", kind="DERIVED", body=inp.aoi.body, algorithm_id=algo,
+        params_sha=params, artifact=report, parent_keys=[r.local_key for r in refs if r.local_key is not None],
+        limitations=[
+            "Acquired source bytes; product-specific normalization and validation are required before analysis."
+        ],
+    ))
     return OpOutcome(ComputationStatus.SUCCEEDED, payload, algo, params, artifacts, evidence)

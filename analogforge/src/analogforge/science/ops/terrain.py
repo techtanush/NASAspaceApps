@@ -8,7 +8,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 from analogforge.ports.domain_models import AreaOfInterest, MeasuredMetric
-from analogforge.science.comparison.scale import aggregation_factor
 from analogforge.science.features.histogram import (
     area_weighted_histogram,
     band_area_fraction,
@@ -20,7 +19,7 @@ from analogforge.science.features.roughness import detrended_rms_height_m, relie
 from analogforge.science.features.slope import SurfaceAnalysis, analyze_surface
 from analogforge.science.geometry import AnalysisGridSpec, PixelGeometry, ProjectedFrame, projected_bounds_to_bbox
 from analogforge.science.raster.normalize import aggregate_any, aggregate_blocks
-from analogforge.science.raster.source import SourceRaster
+from analogforge.science.raster.source import SourceRaster, coarsen_metric_grid
 
 FloatArray = NDArray[np.float64]
 BoolArray = NDArray[np.bool_]
@@ -36,16 +35,23 @@ class Prepared:
     water: BoolArray
     surf: SurfaceAnalysis
     support_m: float
-    factor: int
+    factor: float
 
 
 def prepare(src: SourceRaster, support_m: float | None, flat_tol: float) -> Prepared:
     """Area-average to ``max(native, support_m)`` (never upsample) and compute the surface over the whole raster."""
-    native = src.native_resolution_m
+    native = max(src.native_resolution_m, src.support_scale_m, src.grid.cell_size_m)
     target = native if support_m is None else max(native, support_m)
-    factor = aggregation_factor(native, target)
+    ratio = target / src.grid.cell_size_m
+    factor = round(ratio)
     water = np.zeros(src.values.shape, dtype=bool) if src.water is None else src.water
-    if factor == 1:
+    if abs(ratio - factor) > 1e-9:
+        grid, elev, ok = coarsen_metric_grid(src.grid, src.values, src.nodata | water, target)
+        # A destination cell touching any water must remain water, not missing land.
+        _, _, dry = coarsen_metric_grid(src.grid, np.zeros(src.grid.shape), water, target)
+        wet = ~dry
+        nodata = ~ok & ~wet
+    elif factor == 1:
         grid, elev, nodata, wet = src.grid, src.values, src.nodata, water
     else:
         wet_any = aggregate_any(water, factor)
@@ -57,7 +63,7 @@ def prepare(src: SourceRaster, support_m: float | None, flat_tol: float) -> Prep
     surf = analyze_surface(
         elev, PixelGeometry.north_up(grid.cell_size_m), nodata=nodata, water=wet, flat_gradient_tolerance=flat_tol
     )
-    return Prepared(grid, elev, nodata, wet, surf, grid.cell_size_m, factor)
+    return Prepared(grid, elev, nodata, wet, surf, grid.cell_size_m, ratio)
 
 
 def metric(

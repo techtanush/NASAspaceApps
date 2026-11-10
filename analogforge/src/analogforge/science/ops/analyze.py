@@ -3,16 +3,17 @@
 from __future__ import annotations
 
 import numpy as np
+from pyproj import CRS
 
 from analogforge.ports import catalog
 from analogforge.ports.common import EvidenceRef, ScienceIssue
 from analogforge.ports.science import ArtifactRole, ComputationStatus
-from analogforge.ports.science_payloads import AnalyzeCandidateInput, AnalyzeCandidatePayload
+from analogforge.ports.science_payloads import AnalyzeCandidateInput, AnalyzeCandidatePayload, SourceSelector
 from analogforge.science.features.connected import Band, connected_zones, largest_component, safe_mask, to_port_zone
 from analogforge.science.features.coverage import coverage_summary
 from analogforge.science.features.histogram import to_port_histogram
 from analogforge.science.ops.base import OpBlocked, OpEnv, OpOutcome, bytes_artifact, derived_evidence, json_artifact
-from analogforge.science.ops.source import find_bound_dataset, resolve_source
+from analogforge.science.ops.source import find_bound_dataset, resolve_source, source_limitations
 from analogforge.science.ops.terrain import (
     band_metrics,
     band_pairs,
@@ -35,7 +36,7 @@ def run_analyze(env: OpEnv) -> OpOutcome:
     src = resolve_source(env, inp.source, roles=("EARTH_TERRAIN",))
     cell = float(cfg.algorithms.grid.cell_size_m)
     prep = prepare(src.raster, cell, cfg.algorithms.thresholds.flat_gradient_tolerance)
-    win = find_window(cfg, inp.candidate.window_id, prep.grid)
+    win = find_window(cfg, inp.candidate.window_id, prep.grid, inp.candidate.aoi)
     if not win.inside_source:
         raise OpBlocked(
             f"window {win.window_id} lies outside the source extent", code="NO_COVERAGE", detail_code="WINDOW_OUTSIDE"
@@ -58,12 +59,17 @@ def run_analyze(env: OpEnv) -> OpOutcome:
     land = surf.land[rs]
     slope = np.where(valid, surf.slope_deg[rs], 0.0)
     elev = np.where(np.isfinite(prep.elevation[rs]), prep.elevation[rs], 0.0)
+    mineral_id = find_bound_dataset(env, "EARTH_MINERAL", "EARTH")
+    msrc = None if mineral_id is None else resolve_source(
+        env, SourceSelector(kind="LOCAL_DATASET", dataset_id=mineral_id), roles=("EARTH_MINERAL",)
+    )
     params = env.params_hash(
         algo,
         env.operation_params(),
         [
             src.draft.parameters_sha256,
             *src.raster.source_hashes,
+            *([] if msrc is None else [msrc.draft.parameters_sha256, *msrc.raster.source_hashes]),
             *[f"bound-dataset:{d}" for d in sorted(env.request.source_policy.local_dataset_ids)],
         ],
     )
@@ -92,16 +98,13 @@ def run_analyze(env: OpEnv) -> OpOutcome:
     )
     parents = [src.draft.local_key]
     extra_evidence = []
-    mineral_id = find_bound_dataset(env, "EARTH_MINERAL", "EARTH")
-    if mineral_id is not None:
-        from analogforge.ports.science_payloads import SourceSelector
-
-        msrc = resolve_source(
-            env, SourceSelector(kind="LOCAL_DATASET", dataset_id=mineral_id), roles=("EARTH_MINERAL",)
-        )
+    if msrc is not None:
+        parents.append(msrc.draft.local_key)
+        extra_evidence.append(msrc.draft)
         mg = msrc.raster.grid
         if (
-            abs(mg.cell_size_m - cell) < 1e-9
+            CRS.from_wkt(mg.crs_wkt).equals(CRS.from_wkt(prep.grid.crs_wkt))
+            and abs(mg.cell_size_m - prep.support_m) < 1e-9
             and abs(mg.origin_x_m - prep.grid.origin_x_m) < 1e-6
             and abs(mg.origin_y_m - prep.grid.origin_y_m) < 1e-6
             and mg.shape == prep.grid.shape
@@ -132,8 +135,6 @@ def run_analyze(env: OpEnv) -> OpOutcome:
                         "Categorical area fraction; class ids are never interpolated.",
                     )
                 )
-            parents.append(msrc.draft.local_key)
-            extra_evidence.append(msrc.draft)
             limitations_extra = [
                 "Mineral classes are categorical (nearest/area-fraction only); retrievals cover part of the window."
             ]
@@ -158,6 +159,7 @@ def run_analyze(env: OpEnv) -> OpOutcome:
         f"Terrain model at {prep.support_m:g} m support; cannot resolve 0.20 m obstacles.",
         "Derivatives computed over the whole source extent and cropped to the window; "
         "cells next to nodata or water are not valid.",
+        *source_limitations(src.manifest),
     ]
     if prep.support_m > cell + 1e-9:
         limitations.append(f"Source is coarser than the {cell:g} m analysis cell; it was not upsampled.")

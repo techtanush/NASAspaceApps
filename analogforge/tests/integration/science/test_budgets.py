@@ -54,7 +54,10 @@ def test_ingest_each_practice_dataset_within_budget(world) -> None:  # type: ign
         res, reg = flow.call(IngestLocalDatasetInput(manifest=manifest), name=f"ingest:{ds}", datasets=[ds])
         assert isinstance(res.payload, IngestLocalDatasetPayload) and res.payload.usable_for_quantitative_claims, ds
         assert reg is not None and flow.elapsed[f"ingest:{ds}"] <= 5.0
-        assert res.evidence_drafts[0].kind == "SOURCE" and res.artifacts == []
+        assert res.evidence_drafts[0].kind == "SOURCE"
+        assert {a.role.value for a in res.artifacts} == {"NORMALIZED_RASTER", "DERIVED_JSON"}
+        assert res.evidence_drafts[0].artifact_key == "normalized-source"
+        assert any(e.local_key == "ingest-report" and e.artifact_key == "ingest-json" for e in res.evidence_drafts)
 
 
 def test_ingest_failed_checks_are_a_successful_computation(world, tmp_path: Path) -> None:  # type: ignore[no-untyped-def]

@@ -1,0 +1,19 @@
+# FROZEN CONTRACT KIT FILE (architecture 35)
+.env
+.env.*
+!.env.example
+data/
+.runtime/
+.cache/
+.venv/
+node_modules/
+apps/web/dist/
+playwright-report/
+test-results/
+.coverage
+htmlcov/
+__pycache__/
+*.pyc
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/

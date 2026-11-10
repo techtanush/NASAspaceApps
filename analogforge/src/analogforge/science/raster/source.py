@@ -111,7 +111,7 @@ class SourceRaster:
 
 
 def native_cell_size_m(raw: RawRaster, body: Body) -> float:
-    """Approximate native cell size in metres (projected: geotransform; geographic: geodesic at the centre)."""
+    """Conservative native pixel-axis spacing in metres over the source footprint."""
     a, b, d, e = raw.geotransform[1], raw.geotransform[2], raw.geotransform[4], raw.geotransform[5]
     if raw.crs_wkt is None:
         raise RasterError("raster has no CRS", code="UNSUPPORTED_CRS")
@@ -119,14 +119,16 @@ def native_cell_size_m(raw: RawRaster, body: Body) -> float:
 
     crs = CRS.from_wkt(raw.crs_wkt)
     if crs.is_projected:
-        return float(math.sqrt(abs(a * e - b * d)))
+        ux, uy = (float(axis.unit_conversion_factor) for axis in crs.axis_info[:2])
+        return float(max(math.hypot(a * ux, d * uy), math.hypot(b * ux, e * uy)))
     height, width = raw.values.shape
     x0, y0 = raw.geotransform[0], raw.geotransform[3]
-    lon_c, lat_c = x0 + 0.5 * width * a, y0 + 0.5 * height * e
+    rr, cc = np.meshgrid(np.linspace(.5, height - .5, 5), np.linspace(.5, width - .5, 5))
+    lon_c, lat_c = x0 + cc * a + rr * b, y0 + cc * d + rr * e
     geod = body_geometry(body).geod()
-    _, _, dx = geod.inv(lon_c, lat_c, lon_c + abs(a), lat_c)
-    _, _, dy = geod.inv(lon_c, lat_c, lon_c, lat_c + abs(e))
-    return float(math.sqrt(dx * dy))
+    _, _, dx = geod.inv(lon_c, lat_c, lon_c + a, lat_c + d)
+    _, _, dy = geod.inv(lon_c, lat_c, lon_c + b, lat_c + e)
+    return float(max(np.max(dx), np.max(dy)))
 
 
 def resample_to_grid(
@@ -190,3 +192,24 @@ def resample_to_grid(
     out = np.full(dst.shape, np.nan)
     np.divide(weighted, coverage, out=out, where=valid)
     return out, np.asarray(valid, dtype=bool)
+
+
+def coarsen_metric_grid(
+    grid: AnalysisGridSpec, values: FloatArray, missing: BoolArray, support_m: float,
+) -> tuple[AnalysisGridSpec, FloatArray, BoolArray]:
+    """Area-average a metric grid at arbitrary coarser support, retaining only complete footprints.
+
+    The NW origin is fixed. Partial cells on the south/east boundary are omitted;
+    any missing contributor invalidates its destination cell. No interpolation of
+    categorical data or improvement of source resolution is permitted here.
+    """
+    if not math.isfinite(support_m) or support_m < grid.cell_size_m - 1e-9:
+        raise ScaleError("Requested support is finer than the available metric grid")
+    cols = int(math.floor(grid.width * grid.cell_size_m / support_m + 1e-9))
+    rows = int(math.floor(grid.height * grid.cell_size_m / support_m + 1e-9))
+    if min(rows, cols) < 1:
+        raise ScaleError("Source extent is smaller than one cell at requested support")
+    dst = AnalysisGridSpec(grid.body, grid.crs_wkt, grid.origin_x_m, grid.origin_y_m, support_m, cols, rows)
+    raw = RawRaster(values, grid.geotransform, grid.crs_wkt, None, str(values.dtype), "MEM", 1, 0)
+    mean, valid = resample_to_grid(raw, values, missing, dst, src_cell_size_m=grid.cell_size_m)
+    return dst, mean, valid

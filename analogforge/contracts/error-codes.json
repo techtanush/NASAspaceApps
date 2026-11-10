@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0",
+  "codes": [
+    {
+      "code": "REVISION_CONFLICT",
+      "http_status": 409,
+      "retryable": false
+    },
+    {
+      "code": "IDEMPOTENCY_CONFLICT",
+      "http_status": 409,
+      "retryable": false
+    },
+    {
+      "code": "INVALID_TRANSITION",
+      "http_status": 409,
+      "retryable": false
+    },
+    {
+      "code": "ROVER_REQUIRED",
+      "http_status": 409,
+      "retryable": false
+    },
+    {
+      "code": "CONTRACT_NOT_ACCEPTED",
+      "http_status": 409,
+      "retryable": false
+    },
+    {
+      "code": "INPUT_INVALID",
+      "http_status": 422,
+      "retryable": false
+    },
+    {
+      "code": "EVENT_CURSOR_EXPIRED",
+      "http_status": 410,
+      "retryable": false
+    },
+    {
+      "code": "PROVIDER_AUTH_FAILED",
+      "http_status": 503,
+      "retryable": false
+    },
+    {
+      "code": "PROVIDER_RATE_LIMITED",
+      "http_status": 503,
+      "retryable": true
+    },
+    {
+      "code": "SOURCE_UNAVAILABLE",
+      "http_status": 503,
+      "retryable": true
+    },
+    {
+      "code": "SOURCE_CHECKSUM_MISMATCH",
+      "http_status": 422,
+      "retryable": false
+    },
+    {
+      "code": "SOURCE_CONTENT_INVALID",
+      "http_status": 422,
+      "retryable": false
+    },
+    {
+      "code": "DOWNLOAD_AUTH_UNSUPPORTED",
+      "http_status": 503,
+      "retryable": false
+    },
+    {
+      "code": "UNSUPPORTED_PRODUCT",
+      "http_status": 422,
+      "retryable": false
+    },
+    {
+      "code": "UNSUPPORTED_CRS",
+      "http_status": 422,
+      "retryable": false
+    },
+    {
+      "code": "NO_COVERAGE",
+      "http_status": 422,
+      "retryable": false
+    },
+    {
+      "code": "SCALE_INCOMPATIBLE",
+      "http_status": 422,
+      "retryable": false
+    },
+    {
+      "code": "INSUFFICIENT_VALID_DATA",
+      "http_status": 422,
+      "retryable": false
+    },
+    {
+      "code": "ENERGY_UNCALIBRATED",
+      "http_status": 422,
+      "retryable": false
+    },
+    {
+      "code": "RESOURCE_LIMIT",
+      "http_status": 429,
+      "retryable": false
+    },
+    {
+      "code": "SEARCH_LIMIT",
+      "http_status": 422,
+      "retryable": false
+    },
+    {
+      "code": "TOOL_TIMEOUT",
+      "http_status": 503,
+      "retryable": true
+    },
+    {
+      "code": "WORKER_LOST",
+      "http_status": 503,
+      "retryable": true
+    },
+    {
+      "code": "MODEL_OUTPUT_INVALID",
+      "http_status": 503,
+      "retryable": false
+    },
+    {
+      "code": "SCIENTIFIC_CLAIM_REJECTED",
+      "http_status": 422,
+      "retryable": false
+    }
+  ],
+  "note": "Tool/science outcomes map to these HTTP codes only at synchronous request boundaries. In asynchronous runs they appear in receipts/reports without changing already accepted HTTP202 responses."
+}

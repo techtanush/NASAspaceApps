@@ -20,10 +20,10 @@ result = svc.execute(request, context)      # ScienceComputationResult
 ## Evidence and artifacts per operation (local keys)
 | Operation | Evidence drafts (algorithm id) | Artifacts |
 | --- | --- | --- |
-| INGEST_LOCAL_DATASET | `source-<dataset_id>` SOURCE (`ingest-local-dataset`), only when a raster was read | none |
+| INGEST_LOCAL_DATASET | `source-<dataset_id>` SOURCE when read; `ingest-report` DERIVED | immutable `normalized-source.npz` when quantitatively valid; canonical `ingest.json` report |
 | RESOLVE_COVERAGE | `coverage` (`resolve-coverage`) | JSON payload |
-| FETCH_SOURCE (live) | `source-<i>` SOURCE per asset | SOURCE_BYTES per asset |
-| CHARACTERIZE_TARGET | SOURCE, `profile` (`characterize-target`), `target-grid` (`characterize-target`, ANALYSIS_GRID of the AOI) | profile JSON, `target-grid.npz` |
+| FETCH_SOURCE (live) | `source-<i>` SOURCE per asset, `fetch-report` DERIVED | SOURCE_BYTES per asset and canonical `fetch.json` |
+| CHARACTERIZE_TARGET | terrain SOURCE, consulted thermal SOURCE, `profile`, `target-grid` (ANALYSIS_GRID of the AOI) | profile JSON, `target-grid.npz` |
 | SCREEN_CANDIDATES | SOURCE, `window-<id>` per non-excluded window (no artifact, `comparison_scale_m` = common support), `screening` (`screen-candidates`) | screening JSON |
 | ANALYZE_CANDIDATE | SOURCE (+mineral SOURCE if bound), `analysis` (`analyze-candidate`, ANALYSIS_GRID), `analysis-summary` child (`analysis-summary`) | `analysis-grid.npz`, summary JSON |
 | COMPARE_REQUIREMENT | `requirement` ASSUMPTION (Requirement JSON), `comparison` COMPARISON (`compare-requirement`) | requirement JSON, comparison JSON |
@@ -39,18 +39,22 @@ result = svc.execute(request, context)      # ScienceComputationResult
 ## Request conventions the platform must follow
 * SYNTHETIC_FIXTURE sources need `source_policy.synthetic_fixture_ids` to contain the fixture (or be empty); LOCAL_DATASET sources need the id in `local_dataset_ids`
   and `context.local_dataset_root(id)`. A bound `LUNAR_THERMAL` / `EARTH_MINERAL` dataset is "bound" by being listed in `local_dataset_ids`.
-* `ANALYZE_CANDIDATE`: the window is found by `candidate.window_id` in `config/candidates.yaml` (fixed practice grid first, else the generated grid).
+* `ANALYZE_CANDIDATE`: window id and candidate AOI must identify the same body/window. Fixed and generated grids may share ids; the AOI disambiguates them.
 * `COMPARE_REQUIREMENT`: `target_evidence_ids` / `candidate_evidence_ids` must be in `input_evidence`; candidate side should contain the `analysis` and
   `analysis-summary` handles (W1 is re-derived from the ANALYSIS_GRID at the target's support). Target handles are only consulted by policies that read the target
   (`slope-w1-common-support-v1`, `mineral-presence-v1`, `thermal-min-v1`).
 * `AUDIT_EVIDENCE`: include the `requirement` ASSUMPTION handle(s) among `input_evidence` so SC-04 can read the requirement window; otherwise SC-04 is NOT_ASSESSED.
 * `DESIGN_BENCHMARK` raster: `analysis_evidence_id` must be in `input_evidence` with its ANALYSIS_GRID artifact readable via `context.read_artifact`.
   `SEARCH_ROUTE`/`VERIFY_ROUTE`/`DIAGNOSE_RESULT` read `constraints.grid.analysis_grid_sha256` via `context.read_artifact` (the platform must authorize that blob).
-* Dataset-slot `LOCAL_DATASET` rasters must be north-up, square-cell, projected (UTM/planetary); geographic rasters are BLOCKED `UNSUPPORTED_CRS` (no reprojection in this build).
+* Validated geographic/non-metric/non-square source grids are projected into a body-specific metric grid. Effective support is never finer than the coarsest sampled native pixel-axis spacing. Continuous values use area averaging; mineral ids use nearest sampling; masks stay conservative.
+* Arbitrary coarser comparison support is supported, including non-integer ratios. Generated windows retain complete cells within the configured physical footprint; fixed practice windows retain their declared CRS/60 m support. Sources too coarse for a three-cell window are blocked.
+* `ADAPTER_EVIDENCE` accepts one authorized SOURCE handle carrying the normalized NPZ emitted by ingestion. Supply it in `input_evidence`, with its immutable bytes readable through `context.read_artifact`. Checksum, mode, body and role are checked; its UUID becomes a persisted parent. Incoming directories are unnecessary after ingestion.
+* Display THERMAL/MINERAL accepts normalized source handles; terrain derivatives use ANALYSIS_GRID handles. Actual source citation/license survives through the frozen handle's limitations. Mixed-body/mode display input is rejected. Normalized elevation/radius is displayed in metres.
 
 ## Known limitations (honest)
-* ADAPTER_EVIDENCE sources, live RESOLVE_COVERAGE/FETCH_SOURCE are wired to the adapters but only exercised with mocked transports (SCN-18); not validated against real servers.
-* Display THERMAL/MINERAL layers: no evidence artifact carries those rasters, so they are reported as issues.
+* Live RESOLVE_COVERAGE/FETCH_SOURCE is exercised with mocked transports only; actual NASA granules/servers are unvalidated. FETCH_SOURCE returns raw assets, which require product-specific decoding and a validated manifest before INGEST_LOCAL_DATASET. A raw SOURCE_BYTES blob is not normalized evidence.
+* Bound mineral data with a different CRS/alignment is retained in consulted lineage and parameter identity, but not credited as a co-located retrieval. Thermal variable/local-time interpretation remains unresolved for qualification; a product statistic does not establish Earth–Moon thermal equivalence.
+* The geographic normalization path is exercised on format-faithful synthetic data; this does not establish real-product S2/S3 readiness.
 * The kit `ClaimScope` has no requirement window: see DECISIONS A-02 / F-06.
 
 ## Tests

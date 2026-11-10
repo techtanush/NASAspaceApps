@@ -4,8 +4,8 @@
    "id": "M1",
    "description": "search tie-break uses reverse lexicographic order",
    "file": "analogforge/science/routing/search.py",
-   "old": "return (round(f * _MICRO), label.rd, label.rc, label.seq, counter)",
-   "new": "return (round(f * _MICRO), label.rd, label.rc, bytes(255 - b for b in label.seq), counter)",
+   "old": "key=lambda i: graph.node_ids[i]))}",
+   "new": "key=lambda i: graph.node_ids[i], reverse=True))}",
    "tests": [
     "tests/unit/science/test_graph_oracle.py",
     "tests/integration/science/test_storylines.py"
@@ -34,22 +34,11 @@
    ]
   },
   {
-   "id": "M4a",
-   "description": "slope cap removed from grid graph nodes",
-   "file": "analogforge/science/routing/grid_graph.py",
-   "old": "node_ok = passable & (slope <= slope_cap_deg + _SLOPE_TOL)",
-   "new": "node_ok = passable",
-   "tests": [
-    "tests/integration/science/test_storylines.py",
-    "tests/integration/science/test_perturbations.py"
-   ]
-  },
-  {
-   "id": "M4b",
-   "description": "slope cap removed from grid graph edges",
-   "file": "analogforge/science/routing/grid_graph.py",
-   "old": "if cell_slope > slope_cap_deg + _SLOPE_TOL:",
-   "new": "if False:",
+   "id": "M4",
+   "description": "solver raster graph ignores its surface slope cap",
+   "file": "analogforge/science/routing/search.py",
+   "old": "slope_cap_deg=constraints.surface_slope_cap_deg if slope_cap_deg is None else slope_cap_deg,",
+   "new": "slope_cap_deg=90.0,",
    "tests": [
     "tests/integration/science/test_storylines.py",
     "tests/integration/science/test_perturbations.py"

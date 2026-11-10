@@ -39,17 +39,17 @@ class _Row:
 
 
 def _w1_for_window(
-    prep_s: Prepared | None, spec: WindowSpec, factor_ratio: int, target: Histogram | None, edges: tuple[float, ...]
+    prep_s: Prepared | None, spec: WindowSpec, fine_cell: float, target: Histogram | None, edges: tuple[float, ...]
 ) -> tuple[float | None, Histogram | None]:
-    if prep_s is None or target is None or factor_ratio < 1:
+    if prep_s is None or target is None:
         return None, None
-    n = spec.height
-    if spec.r0 % factor_ratio or spec.c0 % factor_ratio or n % factor_ratio:
-        return None, None
-    h = n // factor_ratio
-    r0, c0 = spec.r0 // factor_ratio, spec.c0 // factor_ratio
-    rs = (slice(r0, r0 + h), slice(c0, c0 + h))
-    if r0 + h > prep_s.grid.height or c0 + h > prep_s.grid.width:
+    ratio = prep_s.support_m / fine_cell
+    # Only complete coarse footprints contained in this window contribute.
+    r0, c0 = math.ceil(spec.r0 / ratio - 1e-9), math.ceil(spec.c0 / ratio - 1e-9)
+    r1 = math.floor((spec.r0 + spec.height) / ratio + 1e-9)
+    c1 = math.floor((spec.c0 + spec.width) / ratio + 1e-9)
+    rs = (slice(r0, r1), slice(c0, c1))
+    if r1 <= r0 or c1 <= c0 or r1 > prep_s.grid.height or c1 > prep_s.grid.width:
         return None, None
     valid = prep_s.surf.valid[rs]
     slope = prep_s.surf.slope_deg[rs]
@@ -72,10 +72,14 @@ def run_screen(env: OpEnv) -> OpOutcome:
     ref_set = cfg.candidates.reference_sets.get(inp.reference_set_id)
     if ref_set is None:
         raise OpBlocked(f"unknown reference_set_id {inp.reference_set_id!r}", detail_code="REFERENCE_SET_UNKNOWN")
-    known = {e.window_id for e in ref_set.entries}
     src = resolve_source(env, inp.source, roles=("EARTH_TERRAIN",))
+    # Practice window ids also occur in generated grids; those ids alone do not
+    # establish that real terrain is a known analog or a synthetic control.
+    known = {e.window_id for e in ref_set.entries if not e.synthetic or src.manifest.is_synthetic
+             and rs_cfg.kind == "FIXED_GRID"}
     cell = float(cfg.algorithms.grid.cell_size_m)
     prep = prepare(src.raster, cell, th.flat_gradient_tolerance)
+    cell = prep.support_m
     specs = region_windows(rs_cfg, prep.grid)
     stop_reason = "GRID_EXHAUSTED"
     limitations = [
@@ -90,18 +94,13 @@ def run_screen(env: OpEnv) -> OpOutcome:
     edges = tuple(float(e) for e in cfg.measurement_spec(catalog.MEASUREMENT_SPEC_EARTH).slope_hist_edges_deg)
     target = inp.target_histogram
     prep_s: Prepared | None = None
-    ratio = 0
     if target is None:
         limitations.append("No target slope histogram supplied: the distribution distance is unavailable.")
     elif target.support_scale_m < cell - 1e-9:
         limitations.append("Target support is finer than the Earth analysis cell; no upsampling, distance unavailable.")
     else:
-        ratio = round(target.support_scale_m / cell)
-        if abs(ratio * cell - target.support_scale_m) > 1e-6:
-            limitations.append("Target support is not a whole multiple of the analysis cell; distance unavailable.")
-            ratio = 0
-        else:
-            prep_s = prep if ratio == 1 else prepare(src.raster, target.support_scale_m, th.flat_gradient_tolerance)
+        prep_s = prep if abs(target.support_scale_m - cell) < 1e-9 else prepare(
+            src.raster, target.support_scale_m, th.flat_gradient_tolerance)
     bands: list[tuple[float, float]] = []
     for req in inp.requirements:
         b = req.parameters.slope_band_deg
@@ -139,7 +138,7 @@ def run_screen(env: OpEnv) -> OpOutcome:
             bk = (float(rq0.parameters.slope_band_deg[0]), float(rq0.parameters.slope_band_deg[1]))
             frac = f_bands.get(bk)
             deficits.append(max(0.0, rq0.lower - (frac if frac is not None else 0.0)))
-        w1, hist = _w1_for_window(prep_s, spec, ratio, target, edges)
+        w1, hist = _w1_for_window(prep_s, spec, cell, target, edges)
         rows.append(_Row(spec, False, None, summary.valid_fraction, f_bands, max(deficits, default=0.0), w1, hist))
 
     ranked = sorted(

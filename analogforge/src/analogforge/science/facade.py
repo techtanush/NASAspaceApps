@@ -152,12 +152,16 @@ class ScienceFacade:
         except ScienceError as exc:
             issue = ScienceIssue(code=exc.code, detail_code=exc.detail_code, message=exc.message)
             return self._envelope(request, cfg, algo, ComputationStatus.BLOCKED, [issue])
-        except ValidationError as exc:
-            issue = ScienceIssue(code="INPUT_INVALID", detail_code="MODEL_VALIDATION", message=str(exc)[:500])
+        except ValidationError:
+            issue = ScienceIssue(
+                code="INPUT_INVALID", detail_code="MODEL_VALIDATION",
+                message="Scientific inputs or outputs do not satisfy the typed contract.",
+            )
             return self._envelope(request, cfg, algo, ComputationStatus.BLOCKED, [issue])
         except Exception as exc:  # noqa: BLE001 - unexpected engine errors are FAILED results, never verdicts
             issue = ScienceIssue(
-                code="SYSTEM", detail_code=type(exc).__name__, message=f"unexpected engine error: {exc}"[:500]
+                code="SYSTEM", detail_code=type(exc).__name__,
+                message=f"Scientific computation failed ({type(exc).__name__}).",
             )
             return self._envelope(request, cfg, algo, ComputationStatus.FAILED, [issue])
 

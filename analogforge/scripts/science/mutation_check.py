@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# ruff: noqa: E501, S603, S607, S101
+# ruff: noqa: E501, S603, S607, S101, S314
 """Reusable mutation runner (guide 09 section 1).
 
 Mutants live in ``scripts/science/mutants.json``: ``{"mutants": [{id, description, file, old, new, tests}]}``.
@@ -19,6 +19,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import xml.etree.ElementTree as ET
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -48,6 +49,8 @@ def run_mutant(mutant: Mutant, timeout: int = 900) -> dict[str, object]:
     with tempfile.TemporaryDirectory(prefix="mutant-") as tmp:
         copy = Path(tmp) / "src"
         shutil.copytree(SRC, copy, ignore=shutil.ignore_patterns("__pycache__"))
+        if (ROOT / "config").is_dir():
+            shutil.copytree(ROOT / "config", Path(tmp) / "config")
         target = copy / mutant.file
         text = target.read_text(encoding="utf-8")
         if text.count(mutant.old) != 1:
@@ -56,17 +59,45 @@ def run_mutant(mutant: Mutant, timeout: int = 900) -> dict[str, object]:
                 "killed": False,
                 "error": f"old snippet occurs {text.count(mutant.old)} times (need exactly 1)",
             }
-        target.write_text(text.replace(mutant.old, mutant.new), encoding="utf-8")
         args = ["-x", "-q", "-p", "no:randomly", "-p", "no:cacheprovider", *mutant.tests]
         code = (
             "import sys; sys.dont_write_bytecode = True; sys.path.insert(0, sys.argv[1]); import pytest; "
             "sys.exit(pytest.main(sys.argv[2:]))"
         )
-        cmd = [sys.executable, "-c", code, str(copy), *args]
-        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=timeout, check=False)
-        tail = "\n".join((proc.stdout + proc.stderr).strip().splitlines()[-6:])
-        # exit 1 = tests failed (killed); 0 = survived; any other code is a harness problem, not a kill
-        return {**asdict(mutant), "killed": proc.returncode == 1, "exit_code": proc.returncode, "tail": tail}
+
+        def execute(stage: str) -> dict[str, object]:
+            junit = Path(tmp) / f"{stage}.xml"
+            cmd = [sys.executable, "-c", code, str(copy), *args, f"--junitxml={junit}"]
+            try:
+                proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=timeout, check=False)
+            except subprocess.TimeoutExpired:
+                return {"exit_code": None, "tests": 0, "failures": 0, "errors": 1, "skipped": 0, "tail": "TIMEOUT"}
+            counts = {"tests": 0, "failures": 0, "errors": 0, "skipped": 0}
+            if junit.is_file():
+                report = ET.parse(junit).getroot()
+                counts = {
+                    "tests": len(report.findall(".//testcase")),
+                    "failures": len(report.findall(".//failure")),
+                    "errors": len(report.findall(".//error")),
+                    "skipped": len(report.findall(".//skipped")),
+                }
+            output = proc.stdout + proc.stderr
+            tail = "\n".join(output.strip().splitlines()[-20:])
+            return {"exit_code": proc.returncode, **counts, "tail": tail}
+
+        baseline = execute("baseline")
+        if baseline["exit_code"] != 0 or baseline["tests"] == 0 or baseline["skipped"] != 0:
+            return {**asdict(mutant), "killed": False, "baseline": baseline, "error": "BASELINE_NOT_PASSED"}
+        target.write_text(text.replace(mutant.old, mutant.new), encoding="utf-8")
+        changed = execute("mutant")
+        # A setup/collection error or a skipped test is not evidence that the
+        # scientific invariant rejected the mutation. Only executed test failures count.
+        killed = (
+            changed["exit_code"] == 1 and changed["failures"] > 0
+            and changed["errors"] == 0 and changed["skipped"] == 0
+        )
+        return {**asdict(mutant), "killed": killed, "baseline": baseline,
+                "mutant": changed, "exit_code": changed["exit_code"], "tail": changed["tail"]}
 
 
 def main() -> int:

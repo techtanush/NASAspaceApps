@@ -82,7 +82,7 @@ def handle(
         body=body,
         artifact_sha256=SHA if artifact else None,
         algorithm_id=algorithm_id,
-        algorithm_version="1.0.0",
+        algorithm_version=CONFIG.algorithms.algorithm_lock.get(algorithm_id, "1.0.0"),
         parameters_sha256="b" * 64,
         comparison_scale_m=scale,
         metrics=list(metrics),

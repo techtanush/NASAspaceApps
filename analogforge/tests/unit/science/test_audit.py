@@ -80,7 +80,7 @@ def handle(
     body: str = "EARTH",
     metrics: list[MeasuredMetric] | None = None,
     art: str | None = H64,
-    version: str = "1.0.0",
+    version: str | None = None,
     limits: list[str] | None = None,
     hid: UUID | None = None,
 ) -> EvidenceHandle:
@@ -91,7 +91,7 @@ def handle(
         body=body,
         artifact_sha256=art,  # type: ignore[arg-type]
         algorithm_id=algo,
-        algorithm_version=version,
+        algorithm_version=CFG.algorithms.algorithm_lock.get(algo, "1.0.0") if version is None else version,
         parameters_sha256=H64,
         comparison_scale_m=scale,
         metrics=metrics if metrics is not None else [metric()],

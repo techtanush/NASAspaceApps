@@ -6,10 +6,12 @@ compatibility functions and packages the result as evidence plus a canonical-JSO
 
 from __future__ import annotations
 
+from typing import cast
+
 import numpy as np
 
 from analogforge.ports import catalog
-from analogforge.ports.common import EvidenceRef
+from analogforge.ports.common import Body, EvidenceRef
 from analogforge.ports.science import ComputationStatus, EvidenceHandle
 from analogforge.ports.science_payloads import (
     AnalyzeCandidatePayload,
@@ -26,7 +28,7 @@ from analogforge.science.compatibility import assess_compatibility
 from analogforge.science.features.coverage import QUALITY_NO_FULL_SUPPORT, QUALITY_OK
 from analogforge.science.features.histogram import area_weighted_histogram, to_port_histogram
 from analogforge.science.features.slope import analyze_surface
-from analogforge.science.geometry import PixelGeometry, frame_from_crs_wkt, unwrap_bbox, xy_to_lonlat
+from analogforge.science.geometry import AnalysisGridSpec, PixelGeometry, frame_from_crs_wkt, unwrap_bbox, xy_to_lonlat
 from analogforge.science.ops.base import (
     OpBlocked,
     OpEnv,
@@ -35,6 +37,7 @@ from analogforge.science.ops.base import (
     json_artifact,
 )
 from analogforge.science.raster.normalize import aggregate_blocks
+from analogforge.science.raster.source import coarsen_metric_grid
 from analogforge.science.raster.store import decode_analysis_grid
 
 NPZ = "application/x-npz"
@@ -105,16 +108,22 @@ def histogram_and_coverage_at_support(
     cell = grid.meta.cell_size_m
     ratio = support_m / cell
     factor = round(ratio)
-    if factor < 1 or abs(ratio - factor) > 1e-6:
+    if ratio < 1 - 1e-9:
         return None
     edges = tuple(float(e) for e in env.cfg.measurement_spec(catalog.MEASUREMENT_SPEC_EARTH).slope_hist_edges_deg)
-    if factor == 1:
+    if abs(ratio - 1) < 1e-9:
         data = area_weighted_histogram(grid.slope_deg, grid.valid, cell * cell, edges)
         if data.valid_area_m2 <= 0:
             return None
         return to_port_histogram(data, support_scale_m=support_m), float(np.count_nonzero(grid.valid)) / grid.valid.size
     usable = grid.land & ((grid.quality == QUALITY_OK) | (grid.quality == QUALITY_NO_FULL_SUPPORT))
-    mean, ok = aggregate_blocks(grid.elevation_m, usable, factor)
+    if abs(ratio - factor) < 1e-9:
+        mean, ok = aggregate_blocks(grid.elevation_m, usable, factor)
+    else:
+        meta = grid.meta
+        spec = AnalysisGridSpec(cast(Body, meta.body), meta.crs_wkt, meta.origin_x_m, meta.origin_y_m,
+                                cell, meta.width, meta.height)
+        _, mean, ok = coarsen_metric_grid(spec, grid.elevation_m, ~usable, support_m)
     surf = analyze_surface(mean, PixelGeometry.north_up(support_m), nodata=~ok)
     valid = np.asarray(surf.valid, dtype=bool)
     eligible = max(0, valid.shape[0] - 2) * max(0, valid.shape[1] - 2)

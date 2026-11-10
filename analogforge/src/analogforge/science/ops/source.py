@@ -16,6 +16,7 @@ import yaml
 
 from analogforge.ports.common import Body, RuntimeMode
 from analogforge.ports.datasets import DatasetManifest
+from analogforge.ports.hashing import bytes_sha256
 from analogforge.ports.science import EvidenceDraft
 from analogforge.ports.science_payloads import SourceSelector
 from analogforge.science.datasets.ingest import (
@@ -24,8 +25,9 @@ from analogforge.science.datasets.ingest import (
     ingest_local_dataset,
     source_evidence_draft,
 )
-from analogforge.science.geometry import AnalysisGridSpec
 from analogforge.science.ops.base import OpBlocked, OpEnv
+from analogforge.science.raster.normalized import decode_source
+from analogforge.science.raster.project import project_source
 from analogforge.science.raster.source import SourceRaster, read_gdal_raster
 
 _GENERATED: dict[str, Path] = {}
@@ -36,7 +38,7 @@ class ResolvedSource:
     raster: SourceRaster
     dataset_id: str
     manifest: DatasetManifest
-    ingest: IngestResult
+    ingest: IngestResult | None
     draft: EvidenceDraft
     root: Path
 
@@ -46,7 +48,7 @@ class ResolvedSource:
 
     @property
     def product_id(self) -> str | None:
-        return self.ingest.product_id
+        return self.draft.dataset_product_id
 
 
 def _fixture_root(env: OpEnv, fixture_id: str) -> Path:
@@ -123,12 +125,22 @@ def _water(manifest: DatasetManifest, root: Path, shape: tuple[int, int]) -> np.
             code="SOURCE_CONTENT_INVALID",
             detail_code="MASK_SHAPE",
         )
+    primary = read_gdal_raster(root / manifest.primary_file, manifest.band, manifest.variable)
+    if raw.crs_wkt != primary.crs_wkt or not np.allclose(
+        raw.geotransform, primary.geotransform, rtol=0, atol=1e-8
+    ):
+        raise OpBlocked(
+            "Water mask is not registered to the source raster",
+            code="SOURCE_CONTENT_INVALID", detail_code="MASK_GRID_MISMATCH",
+        )
     return np.asarray(raw.values > 0, dtype=bool)
 
 
 def resolve_source(
     env: OpEnv, selector: SourceSelector, *, roles: tuple[str, ...], mode: RuntimeMode | None = None
 ) -> ResolvedSource:
+    if selector.kind == "ADAPTER_EVIDENCE":
+        return _resolve_evidence(env, selector, roles)
     dataset_id, root = dataset_root(env, selector)
     raw = read_manifest(root)
     try:
@@ -149,28 +161,12 @@ def resolve_source(
             code="SOURCE_CONTENT_INVALID", detail_code="METADATA_INCOMPLETE",
         )  # fmt: skip
     r = result.raster
-    gt = r.geotransform
-    if r.crs_wkt is None or gt[2] != 0.0 or gt[4] != 0.0 or gt[5] >= 0.0 or abs(abs(gt[5]) - gt[1]) > 1e-6 * gt[1]:
-        raise OpBlocked(
-            "only north-up square-cell projected rasters are supported",
-            code="UNSUPPORTED_CRS",
-            detail_code="GRID_UNSUPPORTED",
-        )
-    height, width = r.values.shape
-    grid = AnalysisGridSpec(manifest.body, r.crs_wkt, gt[0], gt[3], gt[1], width, height)
     water = _water(manifest, root, r.values.shape)
-    values = np.where(r.missing, np.nan, r.values)
-    raster = SourceRaster(
-        grid=grid,
-        values=values,
-        nodata=np.asarray(r.missing, dtype=bool),
-        native_resolution_m=gt[1],
-        support_scale_m=gt[1],
-        vertical_reference=manifest.vertical_reference,
-        water=water,
-        product_id=result.product_id,
-        synthetic=manifest.is_synthetic,
+    assert result.payload is not None and result.payload.bbox_lonlat is not None
+    raster = project_source(
+        r, manifest, result.payload.bbox_lonlat, water=water,
         source_hashes=tuple(sorted(result.file_hashes.values())),
+        product_id=result.product_id, check=env.check,
     )
     draft = source_evidence_draft(
         result,
@@ -180,6 +176,40 @@ def resolve_source(
         seed=env.seed,
     )
     return ResolvedSource(raster, dataset_id, manifest, result, draft, root)
+
+
+def _resolve_evidence(env: OpEnv, selector: SourceSelector, roles: tuple[str, ...]) -> ResolvedSource:
+    handles = [env.handle(evidence_id) for evidence_id in selector.evidence_ids]
+    candidates = [h for h in handles if h.artifact_media_type == "application/x-npz" and h.kind == "SOURCE"]
+    if len(candidates) != 1:
+        raise OpBlocked("One normalized source raster is required", detail_code="NORMALIZED_SOURCE_REQUIRED")
+    handle = candidates[0]
+    if handle.mode != env.request.mode:
+        raise OpBlocked("Source evidence mode differs from the request", detail_code="MODE_MISMATCH")
+    data = env.artifact_path(handle).read_bytes()
+    if bytes_sha256(data) != handle.artifact_sha256:
+        raise OpBlocked("Normalized source bytes differ from their checksum", code="SOURCE_CHECKSUM_MISMATCH")
+    decoded = decode_source(data)
+    meta, manifest = decoded.meta, decoded.meta.manifest
+    if manifest.body != handle.body or manifest.role not in roles:
+        raise OpBlocked("Normalized source body or role does not match its authorized use", detail_code="ROLE_MISMATCH")
+    if (env.mode == "live" and manifest.is_synthetic) or (env.mode == "synthetic" and not manifest.is_synthetic):
+        raise OpBlocked("Source provenance is incompatible with this mode", detail_code="MODE_MISMATCH")
+    raster = project_source(
+        decoded.raster, manifest, meta.bbox_lonlat, water=decoded.water,
+        source_hashes=tuple(sorted(meta.file_hashes.values())), product_id=manifest.product_identity.product_id,
+        check=env.check,
+    )
+    params = env.params_hash("ingest-local-dataset", {"normalized_source": handle.artifact_sha256})
+    draft = EvidenceDraft(
+        local_key="source-" + manifest.dataset_id, kind="SOURCE", body=manifest.body,
+        parent_evidence_ids=[handle.evidence_id], license_note=manifest.license_note,
+        dataset_product_id=manifest.product_identity.product_id, dataset_version=manifest.product_identity.version,
+        algorithm_id="ingest-local-dataset", algorithm_version=env.algorithm_version("ingest-local-dataset"),
+        parameters_sha256=params, native_resolution_m=raster.native_resolution_m,
+        limitations=[manifest.citation, "Reused immutable normalized source; original byte hashes retained."],
+    )
+    return ResolvedSource(raster, manifest.dataset_id, manifest, None, draft, env.scratch)
 
 
 def find_bound_dataset(env: OpEnv, role: str, body: str) -> str | None:
@@ -192,3 +222,12 @@ def find_bound_dataset(env: OpEnv, role: str, body: str) -> str | None:
         if raw.get("role") == role and raw.get("body") == body:
             return dataset_id
     return None
+
+
+def source_limitations(manifest: DatasetManifest) -> list[str]:
+    """Retain actual attribution through the frozen evidence-handle limitation field."""
+    return [
+        "Source citation: " + manifest.citation,
+        "Source license: " + manifest.license_note,
+        "Source provenance: " + ("SYNTHETIC" if manifest.is_synthetic else "REAL_SOURCE"),
+    ]

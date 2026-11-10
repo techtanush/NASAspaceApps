@@ -258,7 +258,8 @@ def nominal_posting_m(body: Body, crs: CRS | None, gt: GeoTransform, height: int
     if crs is None:
         return None
     if crs.is_projected:
-        return max(abs(gt[1]), abs(gt[5]))
+        ux, uy = (float(axis.unit_conversion_factor) for axis in crs.axis_info[:2])
+        return max(math.hypot(gt[1] * ux, gt[4] * uy), math.hypot(gt[2] * ux, gt[5] * uy))
     lon_c, lat_c = gt[0] + 0.5 * width * gt[1], gt[3] + 0.5 * height * gt[5]
     geod = body_geometry(body).geod()
     _, _, dx = geod.inv(lon_c, lat_c, lon_c + abs(gt[1]), lat_c)

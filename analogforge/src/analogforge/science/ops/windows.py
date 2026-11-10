@@ -7,8 +7,9 @@ from dataclasses import dataclass
 
 from pyproj import CRS
 
+from analogforge.ports.domain_models import AreaOfInterest
 from analogforge.science.config import ScienceConfig, SearchRegionSet
-from analogforge.science.geometry import AnalysisGridSpec
+from analogforge.science.geometry import AnalysisGridSpec, frame_from_crs_wkt, lonlat_to_xy, unwrap_bbox
 from analogforge.science.ops.base import OpBlocked
 
 
@@ -36,21 +37,25 @@ def _epsg(grid: AnalysisGridSpec) -> int | None:
 def _make(
     rs: SearchRegionSet, grid: AnalysisGridSpec, window_id: str, row: int, col: int, nc: bool, r0: int, c0: int
 ) -> WindowSpec:
-    n = rs.window_cells
+    n = rs.window_cells if rs.kind == "FIXED_GRID" else max(3, int(rs.window_cells * rs.cell_size_m / grid.cell_size_m))
     inside = 0 <= r0 and 0 <= c0 and r0 + n <= grid.height and c0 + n <= grid.width
     return WindowSpec(window_id, row, col, r0, c0, n, n, nc, inside)
 
 
 def region_windows(rs: SearchRegionSet, grid: AnalysisGridSpec) -> list[WindowSpec]:
     """All windows of a region set on ``grid`` in declaration order (fixed) or NW row-major order (generated)."""
-    if abs(grid.cell_size_m - rs.cell_size_m) > 1e-6 * rs.cell_size_m:
+    if (rs.kind == "FIXED_GRID" and abs(grid.cell_size_m - rs.cell_size_m) > 1e-6 * rs.cell_size_m
+            or rs.kind == "GENERATED_GRID" and grid.cell_size_m < rs.cell_size_m - 1e-6):
         raise OpBlocked(
             f"source cell {grid.cell_size_m} m differs from the region-set cell {rs.cell_size_m} m",
             code="SCALE_INCOMPATIBLE",
             detail_code="CELL_MISMATCH",
         )
     out: list[WindowSpec] = []
-    n = rs.window_cells
+    if rs.kind == "GENERATED_GRID" and rs.window_cells * rs.cell_size_m < 3 * grid.cell_size_m:
+        raise OpBlocked("Source is too coarse for three cells within the configured window",
+                        code="SCALE_INCOMPATIBLE", detail_code="WINDOW_SUPPORT_TOO_COARSE")
+    n = rs.window_cells if rs.kind == "FIXED_GRID" else max(3, int(rs.window_cells * rs.cell_size_m / grid.cell_size_m))
     if rs.kind == "FIXED_GRID":
         assert rs.sw_easting_m is not None and rs.north_northing_m is not None
         if _epsg(grid) != rs.crs_epsg:
@@ -74,10 +79,19 @@ def region_windows(rs: SearchRegionSet, grid: AnalysisGridSpec) -> list[WindowSp
     return out
 
 
-def find_window(cfg: ScienceConfig, window_id: str, grid: AnalysisGridSpec) -> WindowSpec:
+def find_window(
+    cfg: ScienceConfig, window_id: str, grid: AnalysisGridSpec, aoi: AreaOfInterest | None = None,
+) -> WindowSpec:
     """The window with this id in the first region set that defines it on ``grid`` (fixed sets first)."""
     sets = sorted(cfg.candidates.search_region_sets.items(), key=lambda kv: (kv[1].kind != "FIXED_GRID", kv[0]))
     last: OpBlocked | None = None
+    centre = None
+    if aoi is not None:
+        if aoi.body != grid.body:
+            raise OpBlocked("Candidate AOI body differs from its terrain source", detail_code="BODY_MISMATCH")
+        west, south, east, north = unwrap_bbox(tuple(aoi.bbox), aoi.longitude_convention)  # type: ignore[arg-type]
+        frame = frame_from_crs_wkt(grid.body, grid.crs_wkt)
+        centre = lonlat_to_xy(frame, (west + east) / 2, (south + north) / 2)
     for _, rs in sets:
         pattern = re.compile(
             "^" + re.escape(rs.id_pattern).replace(r"\{row\}", r"\d+").replace(r"\{col\}", r"\d+") + "$"
@@ -87,6 +101,12 @@ def find_window(cfg: ScienceConfig, window_id: str, grid: AnalysisGridSpec) -> W
         try:
             for w in region_windows(rs, grid):
                 if w.window_id == window_id:
+                    if centre is not None:
+                        x = grid.origin_x_m + (w.c0 + w.width / 2) * grid.cell_size_m
+                        y = grid.origin_y_m - (w.r0 + w.height / 2) * grid.cell_size_m
+                        if (abs(x - float(centre[0])) > grid.cell_size_m / 2
+                                or abs(y - float(centre[1])) > grid.cell_size_m / 2):
+                            continue
                     return w
         except OpBlocked as exc:
             last = exc
