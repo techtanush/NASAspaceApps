@@ -62,12 +62,14 @@ async function beginLoadedCohort(page,{width,height,theme,density}){
 export const reports=[];
 export const manifest=[];
 const hash=b=>createHash('sha256').update(b).digest('hex');
-export async function auditPage(page,name,{theme='dark',density='default',width=1440,height=900,focus=true,spacing=false,anchor=null,scrollToEnd=[]}={}){
+export async function auditPage(page,name,{theme='dark',density='default',width=1440,height=900,focus=true,spacing=false,anchor=null,scrollToEnd=[],expectedHeading=null}={}){
  // Release the preceding frame's decoded screenshot buffers on memory-constrained runners.
  if(typeof globalThis.gc==='function')globalThis.gc();
+ await page.waitForLoadState('load');
  const measureLoad=['S01','S06','S07','S10','S12'].some(prefix=>name.startsWith(prefix));
  if(measureLoad)await beginLoadedCohort(page,{width,height,theme,density});else{await page.evaluate(()=>{window.__auditMeasureCLS=false;});await page.setViewportSize({width,height});}
  await page.evaluate(()=>{if(!document.querySelector('[role=dialog]')&&document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo(0,0);for(const element of document.querySelectorAll('*')){const style=getComputedStyle(element);if(/auto|scroll/.test(style.overflow+style.overflowX+style.overflowY)){element.scrollTop=0;if(element.matches('.run-tabs')){const active=element.querySelector('[aria-current=page]');if(active)element.scrollLeft+=active.getBoundingClientRect().left-element.getBoundingClientRect().left;}else element.scrollLeft=0;}}});
+ if(expectedHeading){const actual=await page.locator('main h1').innerText();if(actual!==expectedHeading)throw new Error(`Expected ${expectedHeading} after navigation; observed ${actual}`);}
  // Use the application's preference controls so header labels and effective styles agree.
  // DOM click preserves the focus of an already open nonmodal evidence drawer.
  for(const [id,attribute,value]of [['theme-toggle','data-theme-choice',theme],['density-toggle','data-density',density]]){

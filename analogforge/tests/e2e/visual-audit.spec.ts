@@ -7,6 +7,7 @@ import {auditPage,auditGlyphs,finishAudit,THRESHOLDS,COMPONENTS,reports,installA
 test('UIX-13 complete visual audit C01–C20',async({page})=>{
  test.setTimeout(3600000);page.setDefaultTimeout(15000);
  page.on('request',request=>{if(request.method()==='POST')console.log('audit mutation',new URL(request.url()).pathname);});page.on('response',response=>{if(response.request().method()==='POST')console.log('audit acknowledgement',response.status(),new URL(response.url()).pathname);});
+ page.on('framenavigated',frame=>{if(frame===page.mainFrame())console.log('audit navigation',frame.url());});
  const faults: string[]=[];const external:string[]=[];
  page.on('pageerror',e=>faults.push(e.message));page.on('console',m=>{if(['error','warning'].includes(m.type()))faults.push(m.text());});
  page.on('request',r=>{if(/^https?:/.test(r.url())&&new URL(r.url()).origin!==(process.env.E2E_BASE_URL||'http://127.0.0.1:5176'))external.push(r.url());});
@@ -17,9 +18,9 @@ test('UIX-13 complete visual audit C01–C20',async({page})=>{
   await expect(page.locator('main h1')).toBeVisible();await waitForAuditData(page);
   for(const [width,height]of THRESHOLDS.viewports)for(const theme of ['dark','light']){
    const densities=['S06','S07','S10'].includes(view)?['compact','default','comfortable']:['default'];
-   for(const density of densities)await auditPage(page,name,{width,height,theme,density,focus:true});
+   for(const density of densities)await auditPage(page,name,{width,height,theme,density,focus:true,expectedHeading:headings[view]});
    if(['S02','S04','S07','S12'].includes(view)){
-    await auditPage(page,name,{width,height,theme,density:'default',spacing:true,focus:false});
+    await auditPage(page,name,{width,height,theme,density:'default',spacing:true,focus:false,expectedHeading:headings[view]});
    }
   }
  };
@@ -119,7 +120,7 @@ test('UIX-13 complete visual audit C01–C20',async({page})=>{
   await page.goto(`/missions/${frozen.body.mission_id}/edit`);await expect(page.getByTestId('input-objective')).toHaveValue(frozen.body.objective);
   await page.getByTestId('input-objective').fill('New draft objective, requiring a separately accepted contract.');await expect(page.locator('[data-testid=save-indicator][data-save-state=saved]')).toBeVisible();await capture('S04-edited-draft');
   const unchanged=await api<typeof pinned.body>(page,`/runs/${conflictRun}`);expect(unchanged.body.mission_revision_id).toBe(pinned.body.mission_revision_id);expect(unchanged.body.rover_revision_id).toBe(pinned.body.rover_revision_id);
- }catch(error){crawlError=error;}finally{
+ }catch(error){crawlError=error;console.log('audit crawl error',error instanceof Error?error.stack:String(error));}finally{
   reports.push({screen:'crawl',findings:crawlError?[{check:'C12',message:String(crawlError)}]:[]});
   await page.waitForTimeout(60);reports.push({screen:'intentional-cancellations',findings:[],observed:auditCancellations(page)});
   reports.push({screen:'transport',findings:auditFailures(page)});
