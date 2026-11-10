@@ -326,7 +326,7 @@
   "decisions": "see team handoffs/ayan/DECISIONS.md",
   "ready_to_merge": false,
   "ready_to_merge_rule": "true only if every required catalog row is PASSED, kit_verify and ownership_check PASS, lint clean, self_audit complete, no hidden skips; BLOCKED_EXTERNAL allowed only for rows that require real network/credentials and have an offline PASSED equivalent",
-  "pushed_sha": null,
+  "pushed_sha": "1639f2e",
   "secrets_not_committed": true,
   "data_not_committed": true,
   "sci_tests_note": "architecture 29 SCI-xx ids were not individually mapped to tests; behaviours are covered by SCN rows but not claimed per SCI id",
