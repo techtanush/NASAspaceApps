@@ -92,3 +92,35 @@ Use aligned sequence/time/actor/summary rows and native details for less frequen
 ## Empty-table and rule wording scope
 
 Show the shared horizontal-scroll prompt only when the table both overflows and contains a substantive body row; aria-hidden loading placeholders are not data. Keep populated unknown-value rows inspectable. Retain captions, headers and keyboard scrolling. Rover list-field names use sentence case and comma-entry guidance moves to associated helper text, preserving the existing parser and saved arrays. Frozen benchmark rows use readable observable names and operator phrases; Rule details retains the exact requirement ID, operator, observable, accepted wording and note. Range limits display both bounds and nonnumeric rules are explicit. No contract data or comparison logic changes.
+
+
+## Fresh visual acceptance evidence
+
+Application source8d3c284 shares readable requirement/operator names across frozen benchmark previews, mission contracts and attempt results. Exact requirement, observable, constraint and metric identifiers and supplied raw rules remain in native details. Only display wording changes; supplied values, accepted limits, outcomes and API payloads are unchanged.
+
+The full audit retains its complete canonical screen/viewport/theme/density checks and locked thresholds. Supplemental frames scroll the actual UI to below-fold anchors and record the anchor in the manifest/catalog. They cover contract digest/acceptance, target chart/description/data and horizontal extent, each attempt, replanning, playback geometry/controls/readouts/samples, passport manifest/export controls/completed exports, invalid JSON, negative-mass validation and successful import preview. Downloads are real mock renderer responses, not screenshots used as proof of real-backend integration.
+
+A supplemental preflight detected four C05 overlap findings when center-scrolling deep playback samples also moved ancestor containers. Native nearest scrolling reveals the requested content without unnecessarily recentering every ancestor; the unchanged C05 checks pass in the repeated1440/390 dark/light case. No selector allow-list or threshold changed.
+
+A stable288px workspace reservation replaces384px. All four loading rows fit at1440/390 in both themes and all three densities, and the unchanged CLS smoke checks pass. This removes96px of unused reservation while keeping data arrival stable. Real-backend MRG-03 remains the merging agent's work. Fresh reviewer reports are recorded verbatim after the complete audit.
+
+
+## Printed page numbering found during image review
+
+Rendering the actual print artifact exposed a body pseudo-element that printed page0 at the end. The previous automated print check covered mode/headline/digest placement and width, not real pagination; its passing result did not establish correct page numbers. Source3f1da3c removes that pseudo-element and uses native @page bottom-center page/pages counters. The mobile layout/print regression passes, and extracted text from all12 pages confirms one matching pageNof12 footer per page; the first rendered page was inspected. The full audit was restarted on the corrected source. PDF-review tooling is isolated under out and does not change runtime dependencies.
+
+
+## Complete audit findings and measured corrections
+
+The complete3f1da3c run produced497 reports and16 findings: four below-fold contract C05 header/control overlaps and12 S06 C11 shifts across1280/390 theme/density cohorts. It remains preserved as a failed run; no acceptance is claimed for it.
+
+Source3e17e2b lets non-run authoring headers scroll with their long pages rather than cover other controls. The eight focused scroll/keyboard frames pass C05/C07. Run headers retain their existing sticky treatment. Candidate identities reserve72px for rank and84px for screening status. Before reservation, Unknown-to-rank shrank about42px and changed flex wrapping; the full report recorded CLS up to0.066. After reservation all12 focused load cohorts measure CLS0.000, retain40/60 and two complete mobile rows, and have zero findings. Real held/released screening evidence under expanded text spacing measures Unknown68.984px and Shortlisted83.172px; both now fit their slots. Permanent regressions cover the measured failures. No threshold or skip changed.
+
+
+## Round7 reviewer findings drive Round8 presentation fixes
+
+Independent Round7 reports are retained verbatim; no score is rewritten. The chart wrapper now has a real available-width/min-width contract so prose wraps while only the SVG scrolls. C05 additionally checks narrative glyph containment in the visible chart frame; this strengthens the existing check. A dedicated390/1440 dark/light spacing regression passes.
+
+Attempt benchmarks reserve a readable text column on phones, use signed margins, readable metric aliases and deduplicated explanations. Raw identifiers, rules and diagnostics remain in details. Replanning shows Before/After parsed only from supplied change records, with explicit missing-data wording if no structured comparison exists. Print expands substantive disclosures and restores their screen states, shows actual run/contract/rover/UTC metadata and per-candidate supplied measurement/support/evidence, and associates every numbered page with a defined manifest prefix. Static export hashes print only when actually available; other states remain explicit. No API data, scientific verdict or accepted operand is recomputed.
+
+The21-page focused print probe confirms expanded provenance/assumptions, actual measurements, static header metadata, matching numbered/digest footers and an Attempts heading sharing its page with Attempt1. New print-only formatting avoids hidden frozen hooks; the original visibility assertions remain intact. The golden export journey and mobile/layout probes pass after that correction. Fresh complete audit and new independent reviewers remain required.

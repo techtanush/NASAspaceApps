@@ -2390,3 +2390,420 @@ The broader smoke test also caught a homepage layout shift from the preceding fo
 ## Requested empty-table / rover / benchmark follow-up
 
 Implementation verification on ed7ab5b/8bce5d3: empty and placeholder-only tables no longer show scroll instructions; populated overflow still does. Sensors, Capabilities and Assumptions now have short sentence-case labels and associated comma-entry helper text. Benchmark headers use readable observable labels, rules use phrases such as At least, and exact identifiers remain in Rule details. The phone screenshot and browser checks preserve initial PROVE IT access, expose the original rule data on request and verify saved rover arrays. This is scoped implementation verification, not a new independent rubric score or overall design acceptance. Evidence: analogforge/out/table-labels-*.
+
+
+## Round 7 — complete below-fold evidence and fresh independent reviews
+
+Reviewed application source `3e17e2bc7b7a6d0a916fa55c4643484e2df602f6`. Complete UIX-13 command passed497 reports with0findings and0skips. Frozen packet: `analogforge/out/visual-review7-complete`,512images including all12rendered print pages; additional extracted footer check makes498packet reports. Machine success does not override the following independent failures.
+
+Fresh reviewers were spawned without conversation history and told not to read source, tests, memory, handoffs, previous reports or other reviewer results. Their effective task prompts and reports follow verbatim.
+
+### Mission-operations HMI — prompt
+
+```text
+Review the current AnalogForge images independently. Your only evaluation inputs are:
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/architecture files/41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/out/visual-review7-complete/screens.md and its listed images (relative filenames resolve beside the catalog; component-guide images use their listed absolute paths).
+The catalog contains canonical page-origin views, intentionally scrolled supplemental views, and rendered PDF pages. Use these together to assess full components; distinguish viewport crops from text clipped inside its owning element.
+Read the standard including the 12-criterion rubric in section20 and prohibited items X-01 through X-29. Open actual images with view_image. Inspect the state families and sample both themes, desktop/mobile and other viewports/densities; use the supplementary below-fold frames and full component-guide parts. State what you inspected. Do not read source, tests, memory, handoffs or previous reviews, and do not contact other reviewers.
+Score all12 criteria honestly from0 to4 with file-specific evidence. Acceptance requires every score>=3, mean>=3.5 and no open prohibited-item findings; do not aim for or force acceptance. Give at least five concrete defects, ordered by severity, OR an explicit evidenced statement that fewer than five exist. Each actual defect needs screenshot filename, semantic selector, severity and proposed fix. Distinguish confirmed visible defects from behavior not verifiable in a screenshot; do not invent behavioral failures. Clearly identified synthetic practice data and developer component specimens should be evaluated as such, without implying real-backend validation.
+Return a full Markdown report with the12 scored rows, calculated mean, defects, X-item findings and acceptance decision. Also write a JSON object with keys scores (12 integers in rubric order), mean, open_prohibited (array of confirmed open X findings), status (PASS/FAIL), inspected_images. Do not modify application code or screenshots.
+
+Persona: Mission-operations HMI reviewer using ISA-101/Open MCT discipline: prioritize status hierarchy, scan efficiency, density and operational confidence.
+Write your report to /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/out/review7/hmi.md and JSON to /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/out/review7/hmi.json. Then send a concise result to the parent.
+```
+
+### Mission-operations HMI — report verbatim
+
+# Independent mission-operations HMI review — frozen review 7
+
+**Decision: FAIL. Mean 41 / 12 = 3.4167 / 4.** Every criterion is at least 3, but the required mean of 3.5 is not met. No confirmed open X-01–X-29 finding is established by these screenshots. The actionable issues below still prevent a strong operational-confidence assessment.
+
+## Scope and evidence limits
+
+Inputs were architecture 41, including §20 and X-01–X-29, and the frozen `visual-review7-complete/screens.md` catalog and named images only. Actual images were opened with `view_image`. No source, tests, memory, handoffs, or earlier reviews were consulted. This is a visual review, not validation of a backend, measurements, exports, keyboard behavior, or scientific results.
+
+I sampled S01–S12, mission edits, rover conflict/import/validation, empty/loading/error/disabled states, the evidence and operations drawers, shortcut/body-change dialogs, supplemental chart/attempt/replan/playback/passport views, all 12 rendered PDF pages, and both parts of the dark compact and light comfortable component guide. Viewports sampled were 1920, 1440, 1280, 1024, 768 and 390 pixels wide; default, compact and comfortable density were represented. The guide's miniature specimens and synthetic practice content are evaluated as specimens and synthetic content. Example labels in the developer guide are not alleged X-09 product placeholders.
+
+The scrolled images deliberately crop content at the viewport boundaries. The matrix/chart explicitly advertise horizontal scrolling. Those crops are not counted as clipped text inside an owning component. The page-4 PDF was reopened at original detail; its requirement identifiers and table edges are intact.
+
+## Rubric
+
+| # | Criterion | Score | File-specific evidence and assessment |
+|---|---|---:|---|
+| 1 | Hierarchy: status loudest | 3 | `S07-1440-dark-default.png` keeps lifecycle and latest-test result separate and uses clear cell verdicts. `S11-1440-dark-default.png` preserves a useful failed/failed/passed headline. Operational hierarchy is sound, but large accepted-experiment/receipt blocks require substantial traversal to compare attempts. |
+| 2 | Restraint: colour only for state | 4 | `S09-composite-1440-dark-default.png` reserves violet/slate for Gap/Unknown; `S10-1440-light-default.png` has one strong primary action. Neutral mode badges in both themes do not imply a verdict. No decorative surfaces were found. |
+| 3 | Typography: scale, alignment, numerals | 4 | `review-attempt-1-benchmarks-1440-dark-default.png` has aligned mono quantities and adjacent units; `passport-print-page-09.png` is legible with clear hierarchy. `S03-390-dark-default.png` keeps unit suffixes readable. Font hosting and computed sizes cannot be certified from pixels. |
+| 4 | Density and spacing rhythm | 3 | `S07-768-dark-default.png` retains orderly dense rows and a pinned requirement column. `review-attempt-2-1440-light-default.png` devotes five full-width rows to opaque receipt links; print page 4 leaves an orphan Attempts heading. Space is disciplined but not consistently efficient. |
+| 5 | Tables: scannable, aligned, units | 3 | Matrix values/support/stage are well associated in `S07-1440-dark-default.png`; benchmark tables show rule/value/margin/result. Positive margin notation omits the required sign; the print qualification summary on pages 2–4 is a verdict/reference inventory rather than the specified measured-value/unit evidence table. |
+| 6 | Designed empty/error/loading/disabled states | 4 | `loading-missions-390-light-default.png` pairs scoped text with table skeletons; `error-rover-import-1440-dark-default.png` explains parse failure, retained profile, and recovery. `S11-1440-dark-default.png` and `review-attempt-3-1440-dark-default.png` explain disabled actions. |
+| 7 | Plain and precise copy | 3 | `S06-1280-light-default.png` explicitly rejects similarity-score interpretation. `S12-390-light-default.png` limits physical claims. Repeated failure strings and raw identifiers in `review-attempt-2-1440-light-default.png` / PDF page 8 weaken plain-language scanning. |
+| 8 | Consistency across screens | 4 | `S05-1440-dark-default.png`, `S10-1440-light-default.png`, and `S08-rover-conflict-390-light-default.png` share shell, badges, borders, typography, and controls. Full component-guide parts maintain the same language at compact/comfortable density. |
+| 9 | Map and chart integrity | 3 | `review-target-chart-right-1440-light-default.png` completes the chart range, labels limits, and uses an honest zero baseline; the adjacent data table is present. `S06-1280-light-default.png` explains offline geometry and carries scale/attribution. Route plot and telemetry distinguish display geometry from modeled measurements. Small-screen chart reading still requires horizontal traversal. |
+| 10 | Accessibility feel | 3 | `evidence-drawer-1440-light-default.png`, `operations-drawer-390-dark-default.png`, and `change-body-dialog-390-light-default.png` show strong visible focus and readable controls. Shape-plus-word verdicts remain intelligible independent of colour. Static print retains collapsed disclosure indicators; keyboard reach, accessible names, focus return, contrast ratios and reduced motion are not verified. |
+| 11 | Crew-member credibility | 3 | `review-passport-manifest-1440-dark-default.png` explicitly labels blueprint fixture hashes and limits. PDF page 1 includes mode, qualified scope, assurance and digest. However recorded assumptions and provenance remain collapsed in the print artifact, which materially weakens offline review. This is a presentation issue, not an allegation that synthetic data pretends to be real. |
+| 12 | Absence of X items | 4 | Inspected pages and full guide parts show flat restrained surfaces, consistent glyphs, honest Unknown/Gap states, and no deceptive gauges or branding. No confirmed X finding; code-only and behavioral prohibitions are outside screenshot verification. |
+
+## Confirmed defects, ordered by severity
+
+Selectors below are semantic targets, not claims about source class names unless supplied by the catalog.
+
+1. **Medium — print disclosure content is not made self-contained.** Files: `passport-print-page-01.png`, `passport-print-page-05.png`, `passport-print-page-07.png`, `passport-print-page-09.png`. Semantic selector: `Analog Passport > Scope and validation provenance`, and `Attempts > Recorded test assumptions / Rule details` disclosure summaries. The static pages preserve closed triangles and headings without their bodies. Across the full 12-page artifact, these associated disclosure bodies are not rendered as expanded sections. A paper reviewer cannot inspect the named assumptions using the printed control. Fix: emit expanded static content for scope/provenance, assumptions and rule details in print, remove disclosure affordances, and preserve their association with the attempt/requirement. Relevant standard: §17, print has no interactive elements and defends claims with assumptions.
+
+2. **Medium — qualification summary lacks the specified measured-value/unit association in print.** Files: `passport-print-page-02.png`, `passport-print-page-03.png`, `passport-print-page-04.png`. Semantic selector: `Analog Passport > Requirement evidence summary > candidate result rows`. Rows present verdict, candidate and an unlabeled short reference; slope qualification rows do not include the measured quantity/unit/support that led to Pass/Fail. Later attempt measurements address route tests, not the missing per-candidate slope values. Fix: include measured value, unit, support and explicitly identified evidence reference for each applicable candidate/requirement, retaining Unknown/Gap as words. Relevant standard: §17 requirement table and §8 measurement formatting.
+
+3. **Low — failure explanation repeats itself and exposes an untranslated code.** Files: `review-attempt-2-1440-light-default.png`, `passport-print-page-06.png`, `passport-print-page-08.png`. Semantic selector: `Attempts > failure explanation paragraph`. Visible text includes `EXPOSURE_SHORTFALL: EXPOSURE_SHORTFALL` and `Unreachable slope band enclosed by water moat: Unreachable slope band enclosed by water moat`. This adds no evidence and slows scanning. Fix: show one concise human explanation, with a separately labeled diagnostic code only when useful. Relevant standard: §14 plain engineering copy. This is not claimed as an all-caps-paragraph X finding.
+
+4. **Low — margins omit explicit positive direction.** Files: `review-attempt-1-benchmarks-1440-dark-default.png`, `passport-print-page-09.png`. Semantic selector: `Attempt benchmarks > Margin / unit cells`. The passing surplus appears as `50 m` and `78.3 %` rather than a signed margin. The adjacent result helps interpretation, so the value is not misleading, but rapid scan consistency with `−100 m` suffers. Fix: render `+50 m` and a correctly labeled positive battery-reserve margin with pass direction, using the shared margin formatter. Relevant standard: §8 signed unit and direction word.
+
+5. **Low — replan comparison is prose rather than the specified paired comparison.** Files: `review-attempt-3-1440-dark-default.png`, `review-replan-390-light-default.png`, `passport-print-page-10.png`. Semantic selector: `Replanning within the accepted contract > Changed elements`. Before/after strategy and candidate appear in arrow-separated prose. This works for one difference but does not provide the prescribed two-column review pattern. Fix: use labeled Before/After rows with the changed field and keep the pinned-threshold statement immediately adjacent; stack the columns on mobile. Relevant standard: §10 S10/S11.
+
+6. **Low — orphan section heading in print.** File: `passport-print-page-04.png`. Semantic selector: `Analog Passport > Attempts heading`. The heading ends page 4 while its first attempt begins page 5. Fix: keep the heading with the first attempt heading/summary using print page-break control. This is a pagination defect, not clipped or missing text.
+
+## X-01–X-29 disposition
+
+**Confirmed open prohibited findings: none.** This statement applies to the reviewed pixels, not a source or behavioral audit.
+
+| Items | Disposition |
+|---|---|
+| X-01–X-08 | No emoji, decorative gradients/glass/glow, large rounded styling, marketing hero, decorative space imagery or feature-card layouts observed. Component-guide specimen cells are developer documentation, not a feature grid. |
+| X-09 | No product placeholder defect confirmed. Named synthetic practice presets and explicitly illustrative developer specimens are intentional, explained content. |
+| X-10–X-12 | Numeric alignment and legibility look disciplined. Exact tabular font features, computed pixel sizes/line heights/contrast require other evidence. No prohibited all-caps paragraph confirmed. |
+| X-13 | Forms and selects have coherent styled borders/fills; static pictures cannot establish their implementation. No confidently unstyled browser control is filed. |
+| X-14 | Scoped loading text accompanies skeletons. Whether a skeleton resolves cannot be established from a still. |
+| X-15 | Important results appear in persistent banners/attempt rows; no result toast observed. |
+| X-16–X-18 | Appropriate drawer/dialog roles are visually represented; focus rings and glyphs are consistent. Accessible names/tooltips cannot be fully certified. |
+| X-19–X-20 | No fake similarity gauge, radar/donut, tilted/parallax or carousel presentation observed. Autoplay cannot be tested by stills. |
+| X-21–X-22 | Spacing/typefaces look consistent; exact grid measurements, loaded fonts and CDN requests are not verified. |
+| X-23–X-24 | No insignia, official endorsement or hype observed; no-endorsement and synthetic limitations are explicit. |
+| X-25 | Layout shift and resorting require temporal evidence; no failure invented. |
+| X-26 | Intentional labeled table/chart scrollers and deliberate supplemental viewport crops were not mistaken for clipping. No confirmed owning-element clipped/overlapping text found in inspected images. |
+| X-27–X-28 | Dark surfaces are blue-grey rather than stark black/white; one consistent visual language spans views and themes. |
+| X-29 | Source colour-literal prohibition is not assessable from screenshots; not claimed verified or violated. |
+
+## Inspected images
+
+- `S01-1440-dark-default.png`
+- `S07-1440-dark-default.png`
+- `S10-1440-light-default.png`
+- `S02-1024-light-default-spacing.png`
+- `S03-390-dark-default.png`
+- `S04-edited-draft-1440-dark-default.png`
+- `S05-1440-dark-default.png`
+- `S06-1280-light-default.png`
+- `S08-rover-conflict-390-light-default.png`
+- `S09-composite-1440-dark-default.png`
+- `S11-1440-dark-default.png`
+- `evidence-drawer-1440-light-default.png`
+- `operations-drawer-390-dark-default.png`
+- `shortcut-dialog-1440-dark-default.png`
+- `S12-390-light-default.png`
+- `review-target-chart-right-1440-light-default.png`
+- `review-target-chart-data-390-dark-default.png`
+- `review-attempt-1-benchmarks-1440-dark-default.png`
+- `review-attempt-2-1440-light-default.png`
+- `review-attempt-3-1440-dark-default.png`
+- `review-replan-390-light-default.png`
+- `review-playback-route-1440-dark-default.png`
+- `review-playback-measurements-390-light-default.png`
+- `loading-missions-390-light-default.png`
+- `error-rover-import-1440-dark-default.png`
+- `review-rover-validation-error-390-dark-default.png`
+- `review-rover-import-valid-final-rows-1440-light-default.png`
+- `review-passport-manifest-1440-dark-default.png`
+- `review-passport-export-controls-390-light-default.png`
+- `change-body-dialog-390-light-default.png`
+- `S07-768-dark-default.png`
+- `S01-1920-light-default.png`
+- `passport-print-page-01.png`
+- `passport-print-page-02.png`
+- `passport-print-page-03.png`
+- `passport-print-page-04.png`
+- `passport-print-page-05.png`
+- `passport-print-page-06.png`
+- `passport-print-page-07.png`
+- `passport-print-page-08.png`
+- `passport-print-page-09.png`
+- `passport-print-page-10.png`
+- `passport-print-page-11.png`
+- `passport-print-page-12.png`
+- `/Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-dark-compact-part-1.png`
+- `/Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-dark-compact-part-2.png`
+- `/Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-light-comfortable-part-1.png`
+- `/Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-light-comfortable-part-2.png`
+
+Acceptance calculation: minimum score = 3; sum = 41; mean = 3.4166666667; confirmed open prohibited count = 0. **FAIL because mean < 3.5.**
+
+
+### Accessibility and typography — prompt
+
+```text
+Review the current AnalogForge images independently. Your only evaluation inputs are:
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/architecture files/41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/out/visual-review7-complete/screens.md and its listed images (relative filenames resolve beside the catalog; component-guide images use their listed absolute paths).
+The catalog contains canonical page-origin views, intentionally scrolled supplemental views, and rendered PDF pages. Use these together to assess full components; distinguish viewport crops from text clipped inside its owning element.
+Read the standard including the 12-criterion rubric in section20 and prohibited items X-01 through X-29. Open actual images with view_image. Inspect the state families and sample both themes, desktop/mobile and other viewports/densities; use the supplementary below-fold frames and full component-guide parts. State what you inspected. Do not read source, tests, memory, handoffs or previous reviews, and do not contact other reviewers.
+Score all12 criteria honestly from0 to4 with file-specific evidence. Acceptance requires every score>=3, mean>=3.5 and no open prohibited-item findings; do not aim for or force acceptance. Give at least five concrete defects, ordered by severity, OR an explicit evidenced statement that fewer than five exist. Each actual defect needs screenshot filename, semantic selector, severity and proposed fix. Distinguish confirmed visible defects from behavior not verifiable in a screenshot; do not invent behavioral failures. Clearly identified synthetic practice data and developer component specimens should be evaluated as such, without implying real-backend validation.
+Return a full Markdown report with the12 scored rows, calculated mean, defects, X-item findings and acceptance decision. Also write a JSON object with keys scores (12 integers in rubric order), mean, open_prohibited (array of confirmed open X findings), status (PASS/FAIL), inspected_images. Do not modify application code or screenshots.
+
+Persona: Accessibility and typography reviewer: prioritize legibility, focus appearance, numerals/units, association, spacing and responsive evidence.
+Write your report to /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/out/review7/accessibility.md and JSON to /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/out/review7/accessibility.json. Then send a concise result to the parent.
+```
+
+### Accessibility and typography — report verbatim
+
+# Independent accessibility and typography review — review 7
+
+**Decision: FAIL.** Scores total **39/48**, mean **3.25/4**. Criterion 12 is below 3 and one confirmed prohibited finding remains open. The threshold is every criterion ≥3, mean ≥3.5, and no open X finding.
+
+## Scope and limits
+
+Evaluation inputs were architecture41 and the frozen `visual-review7-complete/screens.md` catalog plus the 38 actual images listed below, opened with `view_image`. No source, tests, memory, handoffs or previous reviews were consulted. Sampling covers S01–S12, empty/loading/error/disabled states, changed draft, rover conflict and valid import, both themes, desktop 1440/1920, 1024, tablet 768 and mobile 390; compact/default/comfortable densities; dialogs, both drawers, below-fold components, chart data, playback, export digests, full guide parts spanning the component inventory, and PDF pages 1/6/12.
+
+This is a visual review, not WCAG certification. Screenshots cannot establish DOM semantics, accessible names, keyboard reachability, focus restoration, live-region behavior, tooltips, network provenance, actual downloads, computed font sizes/contrast, reduced motion, or layout stability. The visible close-button focus rings and component focus specimen are positive evidence of appearance only. The images clearly identify mock/synthetic practice data; neither their charts nor the developer specimens are treated as real-backend or scientific validation.
+
+## Rubric
+
+| # | Criterion | Score | File-specific evidence |
+|---|---|---:|---|
+| 1 | Hierarchy | 4 | `S11-390-light-default.png` cleanly separates Completed lifecycle, latest modeled PASS, explicit modeling limitation and attempt-level FAIL. `S08-rover-conflict-1440-light-default.png` places a labeled FAIL beside the declared/required slope comparison. |
+| 2 | Restraint | 4 | `S09-composite-768-dark-default.png` uses neutral chrome with Unknown/Gap state accents; `S10-1440-dark-compact.png` reserves filled accent for PROVE IT. No decorative imagery or effects observed. |
+| 3 | Typography | 3 | `S03-1440-light-default.png` has clear labels, mono right-aligned quantities and adjacent units. `review-attempt-1-benchmarks-390-light-default.png` wraps the constraint into an excessively narrow text strip (D2); positive margins lack the specified sign (D3). |
+| 4 | Density and spacing | 3 | `S07-1024-dark-compact.png` maintains orderly dense rows, and `S06-390-dark-comfortable.png` expands controls. Mobile benchmark wording becomes a long stack (D2), while chart description fails reflow (D1). |
+| 5 | Tables | 3 | `review-target-chart-data-1440-dark-default.png` retains a real-looking numeric data table with a unit-bearing header; `review-rover-import-valid-final-rows-390-light-default.png` keeps labels, values and validation associated. Benchmark text-column allocation needs improvement (D2). |
+| 6 | Designed states | 4 | `loading-missions-390-dark-default.png` combines row-shaped skeletons with scoped text; `error-rover-import-1440-dark-default.png` names parse failure and remediation; `S11-390-light-default.png` explains the disabled PROVE IT action. |
+| 7 | Copy | 3 | `review-passport-manifest-1440-dark-default.png` explicitly disclaims real execution and identifies synthetic identifiers. `passport-print-page-06.png` still exposes the compressed labels “Unique exposure m:R-EXPOSURE” and “Reserve pct” (D4). |
+| 8 | Consistency | 4 | `S05-1440-light-default.png`, `S10-1440-dark-compact.png`, `S12-1440-light-default.png` and both inspected full guide parts retain a coherent shell, badges, headings, dividers and neutral control language. |
+| 9 | Map and chart integrity | 3 | `S05-1440-light-default.png` supplies units, thresholds, support, synthetic label and adjacent data; `review-playback-route-1440-dark-default.png` labels modeled playback with numbered markers. Chart has a labeled intentional horizontal viewport, but mobile explanatory prose also overflows (D1). |
+| 10 | Accessibility feel | 3 | `evidence-drawer-390-light-default.png`, `change-body-dialog-390-dark-default.png` and `shortcut-dialog-1440-light-default.png` show conspicuous focus rings; status words accompany distinct glyphs in the guide. Mobile prose reflow is deficient (D1). Full keyboard and contrast compliance remain unverified. |
+| 11 | Crew trust / credibility | 3 | `S12-1440-light-default.png` and `passport-print-page-01.png` explicitly qualify claims and preserve mode and digest; `S08-rover-conflict-1440-light-default.png` distinguishes declared capability from observation. Unsigned margins and compressed print labels reduce immediate interpretation (D3/D4). |
+| 12 | Absence of X items | 2 | X-26 remains visibly open for mobile histogram narrative in `review-target-chart-390-dark-default.png` and `review-target-chart-right-390-light-default.png`; see D1. Other appearance-level prohibitions were not observed in this sample. |
+
+## Confirmed defects, ordered by severity
+
+Semantic selectors below identify visible components; they are not claims about source CSS classes.
+
+| ID | Severity | Screenshot | Semantic selector | Visible defect and proposed fix |
+|---|---|---|---|---|
+| D1 | Medium; open X-26 | `review-target-chart-390-dark-default.png`; `review-target-chart-right-390-light-default.png` | Slope histogram → summary paragraph; accepted-contract-threshold paragraph | At 390 px the narrative is visibly cut off on the right. For example the threshold sentence ends visually at “lower…” and subsequent text remains outside the column. The paragraph is above the intentionally wide SVG; intentional scrolling of chart bins does not justify clipping its prose. Keep summaries and threshold explanations outside the SVG overflow container, constrain them to available inline width, and allow ordinary word wrapping. Retain horizontal chart scrolling only where labeled. |
+| D2 | Medium | `review-attempt-1-benchmarks-390-light-default.png` | Attempt 1 benchmarks → Constraint / rule column | “Unique slope exposure / At least 100 m unique exposure in [12,18] deg” occupies roughly eleven short lines while numbers and verdict remain spread across the other columns. This is readable but makes scanning and comparing a requirement unnecessarily laborious. At narrow widths use stacked labeled rows or preserve a meaningful minimum text-column width with an explicitly labeled table scroller. |
+| D3 | Low | `review-attempt-benchmarks-right-1440-dark-default.png` | Attempt 3 benchmarks → Margin / unit cells | Positive passing margins show `50 m` and `78.3 %`, without the required `+` sign; the direction must be inferred from the result. Render `+50 m` and `+78.3 %` and maintain a textual pass/fail association, as required by §8. |
+| D4 | Low | `passport-print-page-06.png` | Attempt metric table → Metric row labels | The print labels `Unique exposure m:R-EXPOSURE` and `Reserve pct` expose compact machine-style naming, including a unit fused to an identifier. This weakens plain-language reading and unit association. Use “Unique slope exposure” and “Battery reserve”, keep the requirement identifier on a separate labeled line, and put units beside values or in an explicit unit heading. |
+
+**Fewer than five concrete defects were confirmed in this sample: four.** The evidence does not justify inventing a fifth. Cropping at the top/bottom of supplementary scrolled views, and partial last rows at normal viewport edges, are not owning-element clipping. The matrix and wide chart SVG explicitly advertise horizontal scrolling, so their offscreen columns/bins are not automatically X-26 failures. Hashes wrap fully in the inspected mobile export frame. The guide’s “Example” labels are explicit developer component specimens, not product placeholder data.
+
+## Prohibited-item accounting
+
+- **Confirmed open:** X-26, limited to D1’s clipped/reflow-deficient mobile narrative.
+- **No visible occurrence in inspected images:** X-01–X-08, X-12, X-14–X-16, X-18–X-20, X-23–X-24, X-27–X-28. The mock banner, synthetic disclaimers, neutral modes and labeled scientific plots are appropriate here.
+- **No confirmed open finding, but screenshots cannot prove full compliance:** X-09 (developer specimen copy is contextualized), X-10 (numerals appear consistently spaced, computed tabular feature unknown), X-11 (text appears legible; exact size/contrast not measured), X-13 (controls look styled; primitive implementation unknown), X-17 (icon buttons exist; accessible names/tooltips unverified), X-21 (exact CSS grid spacing unknown), X-22 (appearance is coherent; font inventory/network unknown), X-25 (dynamic stability unobservable), X-29 (source-only rule).
+
+PDF page 1 visibly contains mode, headline, manifest digest and page number; pages 6 and 12 remain light and readable. Printed disclosure markers are visible, but static screenshots alone do not establish interactive PDF controls, so no behavioral defect is asserted. No claim is made that all twelve PDF pages were exhaustively reviewed.
+
+## Inspected images
+
+- `S01-1440-dark-default.png`
+- `S02-390-light-default-spacing.png`
+- `S03-1440-light-default.png`
+- `S07-1024-dark-compact.png`
+- `S04-edited-draft-1440-dark-default-spacing.png`
+- `S05-1440-light-default.png`
+- `S06-390-dark-comfortable.png`
+- `evidence-drawer-390-light-default.png`
+- `S08-rover-conflict-1440-light-default.png`
+- `S09-composite-768-dark-default.png`
+- `S10-1440-dark-compact.png`
+- `S11-390-light-default.png`
+- `loading-missions-390-dark-default.png`
+- `review-rover-validation-error-390-light-default.png`
+- `error-rover-import-1440-dark-default.png`
+- `change-body-dialog-390-dark-default.png`
+- `shortcut-dialog-1440-light-default.png`
+- `operations-drawer-1440-dark-default.png`
+- `S12-1440-light-default.png`
+- `passport-print-page-01.png`
+- `passport-print-page-06.png`
+- `passport-print-page-12.png`
+- `review-target-chart-right-390-light-default.png`
+- `review-target-chart-data-1440-dark-default.png`
+- `review-attempt-benchmarks-right-1440-dark-default.png`
+- `review-playback-measurements-390-light-default.png`
+- `review-passport-export-json-390-dark-default.png`
+- `review-rover-import-valid-final-rows-390-light-default.png`
+- `review-target-chart-description-390-light-default.png`
+- `review-target-chart-right-1440-light-default.png`
+- `review-playback-route-1440-dark-default.png`
+- `review-attempt-1-benchmarks-390-light-default.png`
+- `review-passport-manifest-1440-dark-default.png`
+- `review-target-chart-390-dark-default.png`
+- `S07-390-light-comfortable.png`
+- `S09-1920-light-default.png`
+- `/Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-dark-compact-part-1.png`
+- `/Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-light-comfortable-part-2.png`
+
+
+### Hostile slop detector — prompt
+
+```text
+Review the current AnalogForge images independently. Your only evaluation inputs are:
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/architecture files/41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/out/visual-review7-complete/screens.md and its listed images (relative filenames resolve beside the catalog; component-guide images use their listed absolute paths).
+The catalog contains canonical page-origin views, intentionally scrolled supplemental views, and rendered PDF pages. Use these together to assess full components; distinguish viewport crops from text clipped inside its owning element.
+Read the standard including the 12-criterion rubric in section20 and prohibited items X-01 through X-29. Open actual images with view_image. Inspect the state families and sample both themes, desktop/mobile and other viewports/densities; use the supplementary below-fold frames and full component-guide parts. State what you inspected. Do not read source, tests, memory, handoffs or previous reviews, and do not contact other reviewers.
+Score all12 criteria honestly from0 to4 with file-specific evidence. Acceptance requires every score>=3, mean>=3.5 and no open prohibited-item findings; do not aim for or force acceptance. Give at least five concrete defects, ordered by severity, OR an explicit evidenced statement that fewer than five exist. Each actual defect needs screenshot filename, semantic selector, severity and proposed fix. Distinguish confirmed visible defects from behavior not verifiable in a screenshot; do not invent behavioral failures. Clearly identified synthetic practice data and developer component specimens should be evaluated as such, without implying real-backend validation.
+Return a full Markdown report with the12 scored rows, calculated mean, defects, X-item findings and acceptance decision. Also write a JSON object with keys scores (12 integers in rubric order), mean, open_prohibited (array of confirmed open X findings), status (PASS/FAIL), inspected_images. Do not modify application code or screenshots.
+
+Persona: Hostile slop detector: seek templated, decorative, inconsistent or misleading presentation; explicitly account for X-01 through X-29 and say no open findings only if supported.
+Write your report to /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/out/review7/slop.md and JSON to /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/out/review7/slop.json. Then send a concise result to the parent.
+```
+
+### Hostile slop detector — report verbatim
+
+# AnalogForge frozen visual review 7 — hostile slop detector
+
+**Decision: FAIL. Scores: 3, 4, 3, 3, 4, 4, 3, 4, 3, 3, 3, 2. Mean: 39 / 12 = 3.25.** The required minimum per criterion is 3 and mean is 3.5. Criterion 12 is below 3 and X-26 remains open.
+
+## Scope and method
+
+Only architecture 41 and the frozen screenshot catalog/images named by the assigned prompt were used. I opened 55 actual images with view_image. This is a visual review, not a source or behavior audit. Semantic selectors below describe visibly identifiable elements; they are not claims about uninspected DOM implementation.
+
+Coverage includes S01–S12; empty, loading, import error, valid import, edited draft, rover conflict, completed and preliminary states; evidence and operations drawers; destructive confirmation and shortcut dialogs; contract/acceptance, chart/data, benchmark, replan, route playback and export supplements; both themes; widths 390, 768, 1024, 1280, 1440 and 1920; component-guide default, compact and comfortable specimens across both themes; and every one of the twelve print pages.
+
+Synthetic practice labeling is clear. Component-guide examples are developer specimens, not production placeholder defects. A rendered PASS or hash is not evidence of a real backend, scientific validity, or an executed rover test. This review does not make those claims.
+
+## Rubric
+
+| # | Criterion | Score / 4 | File-specific evidence and limits |
+|---|---|---:|---|
+| 1 | Hierarchy — status loudest | 3 | S07-1440-dark-default.png has distinct qualification badges/edges; S11-1440-light-default.png keeps lifecycle and latest modeled result separate. On passport-print-page-01.png, the main qualification headline dominates the smaller LIMITED warning and omits expanded scope context. |
+| 2 | Restraint — colour only for state | 4 | S09-composite-1440-light-default.png uses neutral chrome, semantic GAP/UNKNOWN, and one accent action. S10-1440-dark-default.png reserves the prominent accent for PROVE IT. No gratuitous decorative colour observed. |
+| 3 | Typography — scale, alignment, numerals | 3 | S03-1440-light-default.png and review-attempt-benchmarks-right-1440-light-default.png show aligned numeric quantities with units. review-target-chart-right-390-light-default.png cuts narrative lines at the owning region's right edge. Exact computed fonts and minimum sizes cannot be certified from screenshots. |
+| 4 | Density and spacing rhythm | 3 | S07-1280-dark-default.png packs ordered, readable cells; mobile route samples fit in review-playback-samples-390-light-default.png. passport-print-page-04.png strands the Attempts heading and page 10 has a large nearly empty remainder. |
+| 5 | Tables — scan, alignment, units | 4 | S08-rover-conflict-1440-dark-default.png separates declared/required/server verdict. review-attempt-benchmarks-right-1440-light-default.png aligns measured values, margins and results. Print pages 2–4 repeat headers and preserve rows. Labelled internal matrix overflow is intentional and is not a page-overflow defect. |
+| 6 | Designed states | 4 | loading-missions-390-dark-default.png uses scoped retrieval text and skeleton rows; error-rover-import-1440-light-default.png states cause and recovery; review-acceptance-controls-1440-dark-default.png explains disabled acceptance; S11-1440-light-default.png explains unavailable PROVE IT. Timing and actual resolution remain unverified. |
+| 7 | Copy — precise, plain, no hype | 3 | S05-1440-dark-default.png rejects similarity interpretation, S10 states modeled rather than physical execution, and review-passport-manifest-390-light-default.png explicitly identifies fixture IDs. Print pages 6 and 8 duplicate failure descriptions and page 6 exposes an unexplained machine code twice. |
+| 8 | Cross-screen consistency | 4 | S04-1440-dark-default.png, S07-1440-dark-default.png and S12-1440-dark-default.png share chrome, typography, borders and status badges; light screens preserve the same language. Full guide parts show the same components across density variants. |
+| 9 | Map and chart integrity | 3 | S05 and review-target-chart-data-1440-dark-default.png expose support, synthetic origin, units, thresholds and exact data. Playback is explicitly a coordinate plot, not terrain imagery. Chart prose overflows on mobile; route endpoint labels are small in the mobile frame. No fake likeness gauge observed. |
+| 10 | Accessibility feel | 3 | evidence-drawer-1440-dark-default.png, operations-drawer-390-light-default.png and shortcut-dialog-1440-light-default.png show clear focus outlines. Mobile controls enlarge and statuses retain words/shapes. Chart narrative clips, and printed closed disclosures carry an interaction affordance into paper. Keyboard traversal, names and contrast ratios are not certified. |
+| 11 | Crew credibility | 3 | S12-1440-dark-default.png and the manifest supplement visibly distinguish qualification, assurance and unknown clearance. Clear synthetic provenance avoids false real-world confidence. Print context/disclosure omissions and duplicated failure copy leave the packet short of shift-ready confidence. |
+| 12 | Absence of X-xx slop | 2 | One confirmed visual X-26 finding: mobile histogram explanatory prose clips in review-target-chart-right-390-light-default.png. No claim is made that screenshot-only review proves code-only bans or temporal behavior. |
+
+## Confirmed defects, ordered by severity
+
+1. **High — explanatory chart prose clips horizontally.** Screenshot: review-target-chart-right-390-light-default.png. Semantic selector: Target evidence > Slope histogram > text summary and accepted-threshold paragraphs. Lines visibly end mid-sentence at the right panel edge (e.g. the highest/lowest summary and accepted threshold text). This is inside the owning narrative block, not a below-fold viewport crop. The separate instruction concerns chart bins/labels/reference lines; explanatory prose should not require horizontal exploration. **Fix:** keep prose at available inline width and wrap; put only the SVG in the labelled horizontal scroller. **X-26.**
+
+2. **High — printed evidence scope and assumptions remain collapsed.** Screenshots: passport-print-page-01.png (Scope and validation provenance), passport-print-page-05.png, passport-print-page-07.png and passport-print-page-09.png (Recorded test assumptions; Rule details). Semantic selector: printed passport > details/summary for scope, recorded assumptions and benchmark rules. Closed triangular disclosure labels remain on paper without their content. There is no way to expand them in this artifact. This is visible print incompleteness, not an assertion about whether the browser can expand them. **Fix:** render substantive disclosure content expanded in the print/export document and remove disclosure affordances. Standard §§1, 17.
+
+3. **Medium — print header hides run context and required identifying metadata.** Screenshot: passport-print-page-01.png, with date only appearing on passport-print-page-12.png. Semantic selector: printed passport > header band / Run context. The header prints a “+ Run context” control, but shows no rover revision, run revision or UTC date alongside the contract revision. **Fix:** replace the collapsed run-context control with static run/contract/rover revision and UTC date in the printed header. Standard §17. The visible missing context is the defect; no claim about the hidden control's runtime behavior is needed.
+
+4. **Medium — footer lacks digest for page association.** Screenshots: passport-print-page-02.png through passport-print-page-12.png. Semantic selector: printed passport > running page footer. Footers show product and page n of 12, without the required digest. A detached page loses its cryptographic packet association. **Fix:** print the manifest digest (or an explicitly defined compact digest with full value on page 1) in each running footer. Standard §17.
+
+5. **Low — duplicated failure text and raw diagnostic copy.** Screenshots: passport-print-page-06.png (“EXPOSURE_SHORTFALL: EXPOSURE_SHORTFALL”) and passport-print-page-08.png (“Unreachable slope band enclosed by water moat” repeated on the same paragraph). Semantic selector: printed passport > attempts > failure diagnosis paragraph. **Fix:** show a single plain-language failure description and, when useful, one separately labelled reason code. Do not concatenate a code/message pair when both resolve to the same string. Standard §14.
+
+6. **Low — orphaned section heading in print.** Screenshot: passport-print-page-04.png. Semantic selector: printed passport > Attempts heading. “Attempts” sits alone below the requirement table; the first attempt starts on page 5. This is a complete PDF page, not a viewport crop. **Fix:** keep headings with the first substantive rows and avoid the stranded heading. Standard §§5, 17.
+
+7. **Low — positive benchmark margins omit explicit sign/direction.** Screenshots: review-attempt-benchmarks-right-1440-light-default.png and passport-print-page-09.png. Semantic selector: Attempt 3 benchmarks > Margin / unit cells. Positive values read “50 m” and “78.3 %”, without the explicit plus sign/direction contract in §8. Result badges help interpretation, so this is not a false-result claim. **Fix:** use signed margins, e.g. “+50 m (pass)” or a clearly labelled headroom direction.
+
+## X-01 through X-29 accounting
+
+“No visible finding” below is bounded to the inspected images. “Unverifiable” is not a confirmed violation or a passing source audit.
+
+| Item | Result | Evidence / limitation |
+|---|---|---|
+| X-01 emoji | No visible finding | S01–S12 and guide status inventory use line icons/shapes; invisible alt/test/fixture strings unverified. |
+| X-02 gradients | No visible finding | Flat surfaces in both themes; scientific swatches are legitimate data encodings. |
+| X-03 glassmorphism | No visible finding | Drawer/dialog panels visibly opaque; dimmed dialog backdrop is not a blurred glass panel. |
+| X-04 glow/neon | No visible finding | Focus outlines are normal rings, not decorative neon halos. |
+| X-05 large radii/pills | No visible finding | Rectilinear panels/buttons/badges throughout; exact CSS radii unverified. |
+| X-06 hero/marketing | No visible finding | S01 opens directly to missions and investigations. |
+| X-07 space decoration | No visible finding | Planetary views are labelled geometry/data, not decorative planet pictures. |
+| X-08 feature card grids | No visible finding | Work screens use tables and panels. The guide grid inventories developer specimens; it is not a product feature grid. |
+| X-09 placeholder labels | No open finding | Named practice presets and guide “Example” specimens are explicitly synthetic/developer content. They are not passed off as real evidence. |
+| X-10 non-tabular table digits | No visible finding; computed property unverified | Aligned mono-looking quantities in benchmark and rover tables. |
+| X-11 tiny/low contrast text | No confirmed finding | Body and quantity text appear readable at original viewport sizes. Exact 12 px/LH/AA values cannot be asserted from resized image previews. |
+| X-12 shouty paragraphs | No confirmed X finding | Status/requirement identifiers are allowed short labels or codes. Duplicate reason code is a copy defect listed above, not evidence of an all-caps prose paragraph. Text-spacing override intentionally widens spacing. |
+| X-13 browser primitives | No confirmed finding | Inputs/file controls share styled boxes; native implementation/focus origin cannot be determined from images. Range-control appearance alone does not establish unstyled implementation. |
+| X-14 unscoped loading | No visible finding; temporal part unverified | Loading missions has scope and skeleton rows. Cannot observe whether a skeleton resolves or elapsed timing. |
+| X-15 results as toast | No visible finding | Test/export results appear persistently. Guide toast says view preference saved, a permitted minor confirmation. |
+| X-16 inappropriate modals | No visible finding | Change-body confirmation is destructive; shortcuts dialog is expressly specified in §13. Evidence/operations use drawers. No nested modal visible. |
+| X-17 unlabeled icons | No confirmed finding; accessible names unverified | Close/copy buttons are recognizable; screenshots cannot establish aria-label/tooltips. Standalone glyph specimen is intentional developer inventory. |
+| X-18 mixed icons | No visible finding | Consistent line icons plus the prescribed custom status silhouettes. |
+| X-19 fake scientific viz | No visible finding | Histogram and exact data table; no similarity percentage badge, radar or likeness gauge. |
+| X-20 parallax/carousels | No static visible finding; motion unverified | No tilted/3D or carousel composition. |
+| X-21 off-grid spacing | No confirmed finding; computed geometry unverified | Broad visual rhythm consistent; screenshot sampling cannot establish every margin token. |
+| X-22 fonts/CDN | No visible display/script-font finding; source/network unverified | UI and mono type categories look consistent. Cannot certify font count or CDN absence. |
+| X-23 NASA branding | No visible finding | Plain text attribution, explicit no-endorsement language, no insignia. |
+| X-24 hype | No visible finding | Neutral modeled/synthetic/unknown wording across work screens and passport. |
+| X-25 shifts/reordering | Unverifiable from static frames | No temporal assertion made. |
+| X-26 clipping/overflow | **OPEN** | Mobile chart narrative cuts at right boundary in review-target-chart-right-390-light-default.png. Matrix/table horizontal scrollers and below-fold supplemental cuts are not counted as defects. |
+| X-27 pure black/white dark | No visible finding | Dark screens use visibly blue-grey canvas/surfaces and off-white text. Exact token literals unverified. |
+| X-28 different screen languages | No visible finding | One recognizable shell/table/badge/drawer design across inspected screens. Print appropriately becomes a light document. |
+| X-29 colour literals in source | Unverifiable | Source inspection is outside the assigned review inputs. |
+
+## Acceptance and limits
+
+FAIL. This is generally restrained engineering presentation, not a marketing template. That does not erase the concrete responsive and print defects. All scores must be at least 3, the mean at least 3.5, and there must be no open prohibited findings; this review misses all three conditions.
+
+The screenshots cannot verify keyboard operation, accessible naming, responsive scroll reachability, live backend behavior, hashes, font loading, source tokens, animation, CLS, or resolution of loading states. No behavior failures were inferred from the absence of those proofs.
+
+## Images actually opened
+
+- S01-1440-dark-default.png
+- S01-1920-light-default.png
+- S02-390-light-default.png
+- S03-1440-light-default.png
+- S04-1440-dark-default.png
+- S04-edited-draft-768-light-default-spacing.png
+- S05-1440-dark-default.png
+- S06-1024-light-default.png
+- S07-1440-dark-default.png
+- S07-1280-dark-default.png
+- S08-390-dark-default.png
+- S08-rover-conflict-1440-dark-default.png
+- S09-768-dark-default.png
+- S09-composite-1440-light-default.png
+- S10-1440-dark-default.png
+- S11-1440-light-default.png
+- S12-1440-dark-default.png
+- evidence-drawer-1440-dark-default.png
+- operations-drawer-390-light-default.png
+- shortcut-dialog-1440-light-default.png
+- change-body-dialog-390-dark-default.png
+- review-target-chart-description-390-light-default.png
+- review-target-chart-right-390-light-default.png
+- review-target-chart-1440-light-default.png
+- review-target-chart-data-1440-dark-default.png
+- review-attempt-benchmarks-right-1440-light-default.png
+- review-replan-390-dark-default.png
+- review-playback-route-1440-dark-default.png
+- review-playback-controls-390-light-default.png
+- review-playback-samples-390-light-default.png
+- review-passport-manifest-390-light-default.png
+- review-passport-export-html-390-dark-default.png
+- loading-missions-390-dark-default.png
+- error-rover-import-1440-light-default.png
+- review-rover-import-valid-final-rows-390-dark-default.png
+- review-contract-digest-390-light-default.png
+- review-acceptance-controls-1440-dark-default.png
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-dark-default-part-1.png
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-dark-default-part-2.png
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-light-compact-part-1.png
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-light-comfortable-part-2.png
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-dark-compact-part-2.png
+- /Users/aradhyamishra/Documents/Codex/2026-11-08/chec/work/NASAspaceApps/analogforge/apps/web/docs/design-review/styleguide-dark-comfortable-part-1.png
+- passport-print-page-01.png
+- passport-print-page-02.png
+- passport-print-page-03.png
+- passport-print-page-04.png
+- passport-print-page-05.png
+- passport-print-page-06.png
+- passport-print-page-07.png
+- passport-print-page-08.png
+- passport-print-page-09.png
+- passport-print-page-10.png
+- passport-print-page-11.png
+- passport-print-page-12.png
+
+
+
+Round7 remains FAILED: HMI41/48=3.4167, accessibility39/48=3.25, slop39/48=3.25. Accessibility/slop confirm open X-26 in mobile chart prose. Remaining findings are addressed in the next source/review round; no scores are changed or waived.

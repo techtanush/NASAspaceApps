@@ -4,7 +4,7 @@
   "branch": "aradhya/frontend-experience",
   "template_note": "Observed frontend branch evidence. Generated reports are under analogforge/out; real-backend integration is a separate merging-agent gate.",
   "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
-  "tested_commit_sha": "8bce5d3356e4e3b96968e70a91f9122efb056b97",
+  "tested_commit_sha": "3e17e2bc7b7a6d0a916fa55c4643484e2df602f6",
   "kit_version": "1.0.0",
   "kit_verify": {
     "status": "PASSED",
@@ -101,8 +101,8 @@
       "evidence": "150/150 token checks; supplied files and generated CSS identical."
     },
     "UIX-13": {
-      "status": "NOT_RUN",
-      "evidence": "Latest full audit passed on4c801f4 and is retained at out/visual-before-three-layout-fixes/report.json. The current user-requested layout follow-up has focused passing checks; no current full audit pass is inferred."
+      "status": "PASSED",
+      "evidence": "Complete497-report audit on3e17e2b:0findings/0skips; out/visual-review7-complete/report.json additionally includes verified PDF page numbering."
     }
   },
   "journeys_mock_mode": {
@@ -339,8 +339,13 @@
     },
     "tokens_css_identical": "PASSED",
     "visual_audit": {
-      "status": "NOT_RUN",
-      "note": "Full all-screen audit not rerun for this narrowly requested follow-up. The focused suite and the retained full baseline are recorded separately."
+      "status": "PASSED",
+      "source": "3e17e2bc7b7a6d0a916fa55c4643484e2df602f6",
+      "reports": 497,
+      "findings": 0,
+      "skipped_checks": 0,
+      "output_file": "out/visual-review7-complete/report.json",
+      "packet_images": 512
     },
     "styleguide": "PASSED",
     "design_review": {
@@ -413,6 +418,19 @@
             "accessibility": 3.1666666666666665,
             "slop": 3.1666666666666665
           }
+        },
+        {
+          "round": 7,
+          "source": "3e17e2bc7b7a6d0a916fa55c4643484e2df602f6",
+          "status": "FAILED",
+          "means": {
+            "hmi": 3.4166666666666665,
+            "accessibility": 3.25,
+            "slop": 3.25
+          },
+          "open_visual_X_findings": [
+            "X-26 mobile chart narrative"
+          ]
         }
       ],
       "final_scores": {
@@ -421,35 +439,35 @@
             3,
             4,
             4,
-            2,
             3,
             3,
             4,
+            3,
             4,
             3,
             3,
             3,
             4
           ],
-          "mean": 3.3333333333333335,
+          "mean": 3.4166666666666665,
           "status": "FAILED"
         },
         "accessibility": {
           "scores": [
+            4,
+            4,
+            3,
+            3,
+            3,
+            4,
             3,
             4,
             3,
             3,
             3,
-            3,
-            3,
-            4,
-            3,
-            3,
-            3,
-            3
+            2
           ],
-          "mean": 3.1666666666666665,
+          "mean": 3.25,
           "status": "FAILED"
         },
         "slop": {
@@ -457,26 +475,26 @@
             3,
             4,
             3,
-            2,
             3,
-            3,
+            4,
+            4,
             3,
             4,
             3,
             3,
             3,
-            4
+            2
           ],
-          "mean": 3.1666666666666665,
+          "mean": 3.25,
           "status": "FAILED"
         }
       },
       "review_file": "team handoffs/aradhya/DESIGN-REVIEW.md",
-      "last_reviewed_source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
-      "follow_up_note": "The three user-selected findings are addressed and tested on8ca8769. Historical reports/scores remain unchanged; no new overall review or acceptance is claimed."
+      "last_reviewed_source": "3e17e2bc7b7a6d0a916fa55c4643484e2df602f6",
+      "follow_up_note": "Round7 fresh screenshot reviews remain failed. Round8 presentation corrections are implemented and undergoing focused verification; no new acceptance is claimed."
     },
     "slop_findings_open": [
-      "Prior mobile caption concern is addressed by the focused follow-up. Fresh overall visual acceptance is not performed; other historical review findings remain outside this request."
+      "X-26 mobile chart explanatory prose confirmed in Round7; implemented reflow correction awaits the next complete audit and fresh review."
     ],
     "fonts_self_hosted": true,
     "external_requests_seen": 0,
@@ -637,7 +655,7 @@
     "contracts/algorithm-ids.json": "50f6e6578608cc13fc3914b15ee07a7fde162acb9790f599570e6e4d659f424e",
     "apps/web/src/generated/schema.d.ts": "d97d037c94674696ed365f9780517a480e63fb8b7a1e00056b11f17de265796b"
   },
-  "current_verification_source": "8bce5d3356e4e3b96968e70a91f9122efb056b97",
+  "current_verification_source": "3e17e2bc7b7a6d0a916fa55c4643484e2df602f6",
   "browser_delivery": {
     "source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
     "tests_passed": 33,
@@ -647,7 +665,7 @@
     "output_file": "out/e2e-results-visual-complete-r6.json",
     "note": "This33-test full-suite result belongs to4c801f4. Current focused results are under design.requested_layout_fixes."
   },
-  "completion_scope": "Three requested layout fixes completed and verified. Other visual-review items and real-backend integration remain outside this follow-up.",
+  "completion_scope": "Expanded visual catalog complete on3e17e2b; fresh Round7 review failed and is preserved verbatim. Round8 fixes are in progress. Real-backend MRG-03 belongs to the merging agent.",
   "real_backend_validation": {
     "status": "BLOCKED_ENVIRONMENT",
     "owner": "merging agent MRG-03",
