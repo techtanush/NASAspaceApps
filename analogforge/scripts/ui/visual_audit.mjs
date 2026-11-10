@@ -188,6 +188,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
    if(!result||overlay&&!result.inDialog||seen.has(result.focusID))break;seen.add(result.focusID);if(!result.ring)findings.push({check:'C07',selector:result.id,message:'Missing focus ring'});else if(result.ringContrast<THRESHOLDS.largeContrast-.01)findings.push({check:'C07',selector:result.id,message:'Focus contrast '+result.ringContrast.toFixed(2)});if(result.covered)findings.push({check:'C07',selector:result.id,message:'Focus obscured '+JSON.stringify({rect:result.rect,hit:result.hit})});
   }
  }
+ if(findings.length)console.log('audit findings',JSON.stringify({screen:name,width,height,theme,density,findings}));
  const filename=`${name}-${width}-${theme}-${density}${spacing?'-spacing':''}.png`;mkdirSync(resolve(root,'out/visual'),{recursive:true});writeFileSync(resolve(root,'out/visual',filename),screenshot);manifest.push({file:filename,screen:name,theme,density,width,height,sha256:hash(screenshot),...(anchor?{anchor,scrollToEnd}: {})});
  reports.push({screen:name,width,height,theme,density,findings,layoutShifts:facts.layoutShifts});if(spacingStyle)await spacingStyle.evaluate(node=>node.remove());return findings;
 }
