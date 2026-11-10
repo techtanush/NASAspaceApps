@@ -25,15 +25,27 @@ PDS_HOST = "pds-geosciences.wustl.edu"
 # Unverified configuration proposals (no live server was contacted); override via ``sources=``.
 DEFAULT_SOURCES: dict[str, PdsSource] = {
     MOLA_ADAPTER_ID: PdsSource(
-        adapter_id=MOLA_ADAPTER_ID, body="MARS", product_id="MOLA_MEGDR_TOPOGRAPHY", version=None, host=PDS_HOST,
+        adapter_id=MOLA_ADAPTER_ID,
+        body="MARS",
+        product_id="MOLA_MEGDR_TOPOGRAPHY",
+        version=None,
+        host=PDS_HOST,
         index_label_url=f"https://{PDS_HOST}/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/index/index.lbl",
-        base_url=f"https://{PDS_HOST}/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/", longitude_domain="ZERO_360",
-        native_resolution_m=463.0),
+        base_url=f"https://{PDS_HOST}/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/",
+        longitude_domain="ZERO_360",
+        native_resolution_m=463.0,
+    ),
     LOLA_ADAPTER_ID: PdsSource(
-        adapter_id=LOLA_ADAPTER_ID, body="MOON", product_id="LOLA_GDR", version=None, host=PDS_HOST,
+        adapter_id=LOLA_ADAPTER_ID,
+        body="MOON",
+        product_id="LOLA_GDR",
+        version=None,
+        host=PDS_HOST,
         index_label_url=f"https://{PDS_HOST}/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/index/index.lbl",
-        base_url=f"https://{PDS_HOST}/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/", longitude_domain="ZERO_360",
-        native_resolution_m=None),
+        base_url=f"https://{PDS_HOST}/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/",
+        longitude_domain="ZERO_360",
+        native_resolution_m=None,
+    ),
 }
 
 
@@ -44,22 +56,39 @@ def default_policy() -> HttpPolicy:
 def source_for(adapter_id: str, sources: dict[str, PdsSource] | None = None) -> PdsSource:
     source = (sources or DEFAULT_SOURCES).get(adapter_id)
     if source is None:
-        raise AdapterError("UNSUPPORTED_PRODUCT", f"unknown PDS adapter {adapter_id!r}",
-                   detail_code="UNSUPPORTED_FORMAT")
+        raise AdapterError(
+            "UNSUPPORTED_PRODUCT", f"unknown PDS adapter {adapter_id!r}", detail_code="UNSUPPORTED_FORMAT"
+        )
     return source
 
 
-def discover(request: ResolveCoverageInput, client: httpx.Client | None, *, policy: HttpPolicy | None = None,
-             sources: dict[str, PdsSource] | None = None, max_products: int = 100) -> list[CoverageSelection]:
+def discover(
+    request: ResolveCoverageInput,
+    client: httpx.Client | None,
+    *,
+    policy: HttpPolicy | None = None,
+    sources: dict[str, PdsSource] | None = None,
+    max_products: int = 100,
+) -> list[CoverageSelection]:
     source = source_for(request.adapter_id, sources)
     if request.aoi.body != source.body:
-        raise AdapterError("UNSUPPORTED_PRODUCT", f"{source.product_id} is a {source.body} product; AOI body is "
-                           f"{request.aoi.body}", detail_code="BODY_MISMATCH")
+        raise AdapterError(
+            "UNSUPPORTED_PRODUCT",
+            f"{source.product_id} is a {source.body} product; AOI body is {request.aoi.body}",
+            detail_code="BODY_MISMATCH",
+        )
     if client is None:
-        return [CoverageSelection(selection_key=f"{source.adapter_id}:offline", adapter_id=source.adapter_id,
-                                  product_id=source.product_id, version=source.version, access_state="UNAVAILABLE",
-                                  native_resolution_m=source.native_resolution_m,
-                                  notes=["no HTTP client supplied (offline mode)"])]
+        return [
+            CoverageSelection(
+                selection_key=f"{source.adapter_id}:offline",
+                adapter_id=source.adapter_id,
+                product_id=source.product_id,
+                version=source.version,
+                access_state="UNAVAILABLE",
+                native_resolution_m=source.native_resolution_m,
+                notes=["no HTTP client supplied (offline mode)"],
+            )
+        ]
     http = SafeHttp(client, policy or replace(default_policy(), allowed_hosts=frozenset({source.host})))
     return discover_in_index(http, source, request, max_products=max_products)
 
@@ -70,11 +99,13 @@ def _data_reference(label_bytes_path: Path) -> str:
     return pds3.data_file_name(pds3.load_label(label_bytes_path))
 
 
-def fetch_pds_products(http: SafeHttp, source: PdsSource, selection: CoverageSelection, scratch: Path
-                       ) -> list[AcquiredAsset]:
+def fetch_pds_products(
+    http: SafeHttp, source: PdsSource, selection: CoverageSelection, scratch: Path
+) -> list[AcquiredAsset]:
     if selection.adapter_id != source.adapter_id:
-        raise AdapterError("UNSUPPORTED_PRODUCT", f"selection belongs to {selection.adapter_id}",
-                           detail_code="ADAPTER_MISMATCH")
+        raise AdapterError(
+            "UNSUPPORTED_PRODUCT", f"selection belongs to {selection.adapter_id}", detail_code="ADAPTER_MISMATCH"
+        )
     if selection.access_state == "NO_COVERAGE" or not selection.granule_ids:
         raise AdapterError("NO_COVERAGE", "selection lists no products", detail_code="NO_GRANULES")
     if selection.access_state == "UNSUPPORTED":
@@ -97,17 +128,30 @@ def fetch_pds_products(http: SafeHttp, source: PdsSource, selection: CoverageSel
     return out
 
 
-def _asset(source: PdsSource, selection: CoverageSelection, rel: str, sha256: str, size: int, url: str, *,
-           role: str) -> AcquiredAsset:
+def _asset(
+    source: PdsSource, selection: CoverageSelection, rel: str, sha256: str, size: int, url: str, *, role: str
+) -> AcquiredAsset:
     return AcquiredAsset(
-        adapter_id=source.adapter_id, product_id=source.product_id, version=selection.version, granule_id=rel,
-        source_uri=redact_url(url), sha256=sha256, size_bytes=size,
+        adapter_id=source.adapter_id,
+        product_id=source.product_id,
+        version=selection.version,
+        granule_id=rel,
+        source_uri=redact_url(url),
+        sha256=sha256,
+        size_bytes=size,
         validation_status="PENDING",  # PDS archives supply no per-file checksum we can compare against here
-        artifact_key=f"source-bytes:{source.adapter_id}:{role}:{rel}")
+        artifact_key=f"source-bytes:{source.adapter_id}:{role}:{rel}",
+    )
 
 
-def fetch(selection: CoverageSelection, client: httpx.Client | None, scratch: Path, *,
-          policy: HttpPolicy | None = None, sources: dict[str, PdsSource] | None = None) -> list[AcquiredAsset]:
+def fetch(
+    selection: CoverageSelection,
+    client: httpx.Client | None,
+    scratch: Path,
+    *,
+    policy: HttpPolicy | None = None,
+    sources: dict[str, PdsSource] | None = None,
+) -> list[AcquiredAsset]:
     source = source_for(selection.adapter_id, sources)
     if client is None:
         raise AdapterError("SOURCE_UNAVAILABLE", "no HTTP client supplied", detail_code="OFFLINE")

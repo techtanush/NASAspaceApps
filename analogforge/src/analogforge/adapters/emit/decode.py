@@ -37,12 +37,16 @@ def _variable(root: Any, path: str) -> Any:
     parts = [p for p in path.split("/") if p]
     for group in parts[:-1]:
         if group not in node.groups:
-            raise AdapterError("UNSUPPORTED_PRODUCT", f"group {group!r} of variable path {path!r} not found",
-                               detail_code="UNSUPPORTED_FORMAT")
+            raise AdapterError(
+                "UNSUPPORTED_PRODUCT",
+                f"group {group!r} of variable path {path!r} not found",
+                detail_code="UNSUPPORTED_FORMAT",
+            )
         node = node.groups[group]
     if not parts or parts[-1] not in node.variables:
-        raise AdapterError("UNSUPPORTED_PRODUCT", f"variable path {path!r} not found in the product",
-                           detail_code="UNSUPPORTED_FORMAT")
+        raise AdapterError(
+            "UNSUPPORTED_PRODUCT", f"variable path {path!r} not found in the product", detail_code="UNSUPPORTED_FORMAT"
+        )
     return node.variables[parts[-1]]
 
 
@@ -59,8 +63,9 @@ def _dictionary(root: Any, group: str) -> dict[int, str]:
         return {}
     idx = np.asarray(grp.variables["index"][...]).astype(int).tolist()
     names = np.asarray(grp.variables["name"][...]).tolist()
-    return {int(i): (n.decode("utf-8") if isinstance(n, bytes) else str(n)).strip()
-            for i, n in zip(idx, names, strict=True)}
+    return {
+        int(i): (n.decode("utf-8") if isinstance(n, bytes) else str(n)).strip() for i, n in zip(idx, names, strict=True)
+    }
 
 
 def decode(path: Path, params: EmitDecodeParams | None = None) -> DecodedRaster:
@@ -68,16 +73,20 @@ def decode(path: Path, params: EmitDecodeParams | None = None) -> DecodedRaster:
     try:
         handle = h5netcdf.File(str(path), "r")
     except (OSError, ValueError) as exc:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"{path.name} is not a readable NetCDF/HDF5 file",
-                           detail_code="BAD_ARCHIVE") from exc
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", f"{path.name} is not a readable NetCDF/HDF5 file", detail_code="BAD_ARCHIVE"
+        ) from exc
     with handle as root:
         ids_raw, fill = _read(root, f"{prm.group_prefix}_mineral_id")
         if ids_raw.ndim != 2:
-            raise AdapterError("SOURCE_CONTENT_INVALID", "mineral id variable is not two-dimensional",
-                               detail_code="SHAPE_MISMATCH")
-        notes = [WGS84_NOTE,
-                 "Mineral ids are categorical (nearest-neighbour semantics only); 'no identification' is not proof "
-                 "of absence without the product's documented detection limits."]
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID", "mineral id variable is not two-dimensional", detail_code="SHAPE_MISMATCH"
+            )
+        notes = [
+            WGS84_NOTE,
+            "Mineral ids are categorical (nearest-neighbour semantics only); 'no identification' is not proof "
+            "of absence without the product's documented detection limits.",
+        ]
         valid = np.ones(ids_raw.shape, dtype=bool)
         if fill is not None:
             valid &= ids_raw != np.asarray(fill).reshape(-1)[0]
@@ -90,16 +99,19 @@ def decode(path: Path, params: EmitDecodeParams | None = None) -> DecodedRaster:
             mask = _read(root, prm.mask_variable)[0]
         if mask is not None:
             if mask.shape != ids_raw.shape:
-                raise AdapterError("SOURCE_CONTENT_INVALID", "mask shape differs from the id raster",
-                                   detail_code="SHAPE_MISMATCH")
+                raise AdapterError(
+                    "SOURCE_CONTENT_INVALID", "mask shape differs from the id raster", detail_code="SHAPE_MISMATCH"
+                )
             bad = np.isin(mask, list(prm.mask_bad_values)) if prm.mask_bad_values is not None else mask != 0
             valid &= ~bad
             notes.append("Quality mask applied before any statistic.")
         else:
             notes.append("No quality mask supplied; valid retrieval reflects the fill value only.")
         aux: dict[str, NDArray[Any]] = {}
-        for key, var_path in (("band_depth", f"{prm.group_prefix}_band_depth"),
-                              ("band_depth_unc", f"{prm.group_prefix}_band_depth_unc")):
+        for key, var_path in (
+            ("band_depth", f"{prm.group_prefix}_band_depth"),
+            ("band_depth_unc", f"{prm.group_prefix}_band_depth_unc"),
+        ):
             try:
                 arr, arr_fill = _read(root, var_path)
             except AdapterError:
@@ -122,13 +134,25 @@ def decode(path: Path, params: EmitDecodeParams | None = None) -> DecodedRaster:
         notes.append(f"Ids absent from the product dictionary: {unknown}.")
     identified = valid & ~np.isin(data, list(prm.no_identification_ids))
     meta = RasterMetadata(
-        adapter_id="earth_emit_l2bmin_v001", body="EARTH", quantity="mineral_id", units="categorical",
-        vertical_reference=None, crs_wkt=None, transform=None, width=ids_raw.shape[1], height=ids_raw.shape[0],
-        pixel_registration="SENSOR_GEOMETRY_NOT_ORTHORECTIFIED", nodata_raw=float(np.asarray(fill).reshape(-1)[0])
-        if fill is not None else None, product_id=root_attrs.get("title") or path.stem, notes=tuple(notes),
-        attributes={"valid_retrieval_fraction": f"{float(valid.mean()):.12g}",
-                    "identified_fraction": f"{float(identified.mean()):.12g}", "variable_group": prm.group_prefix,
-                    **{f"nc_{k}": v for k, v in sorted(root_attrs.items())}},
+        adapter_id="earth_emit_l2bmin_v001",
+        body="EARTH",
+        quantity="mineral_id",
+        units="categorical",
+        vertical_reference=None,
+        crs_wkt=None,
+        transform=None,
+        width=ids_raw.shape[1],
+        height=ids_raw.shape[0],
+        pixel_registration="SENSOR_GEOMETRY_NOT_ORTHORECTIFIED",
+        nodata_raw=float(np.asarray(fill).reshape(-1)[0]) if fill is not None else None,
+        product_id=root_attrs.get("title") or path.stem,
+        notes=tuple(notes),
+        attributes={
+            "valid_retrieval_fraction": f"{float(valid.mean()):.12g}",
+            "identified_fraction": f"{float(identified.mean()):.12g}",
+            "variable_group": prm.group_prefix,
+            **{f"nc_{k}": v for k, v in sorted(root_attrs.items())},
+        },
     )
     return DecodedRaster(data=data, valid=valid, metadata=meta, aux=aux, dictionary=dictionary)
 
@@ -144,8 +168,11 @@ def retrieval_in_bbox(raster: DecodedRaster, bbox: Sequence[float]) -> Retrieval
     """Valid-retrieval fraction inside a lon/lat box (west, south, east, north; -180..180) using the
     geolocation arrays. An empty intersection yields ``fraction=None`` rather than 0."""
     if "lat" not in raster.aux or "lon" not in raster.aux:
-        raise AdapterError("SOURCE_CONTENT_INVALID", "geolocation arrays are required for AOI statistics",
-                           detail_code="METADATA_INCOMPLETE")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            "geolocation arrays are required for AOI statistics",
+            detail_code="METADATA_INCOMPLETE",
+        )
     west, south, east, north = (float(v) for v in bbox)
     lat, lon = raster.aux["lat"], raster.aux["lon"]
     inside = (lat >= south) & (lat <= north)

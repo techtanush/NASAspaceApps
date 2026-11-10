@@ -59,6 +59,8 @@ def geographic_wkt(name: str, a_radius_m: float, b_radius_m: float | None = None
     a = float(a_radius_m)
     b = float(b_radius_m if b_radius_m is not None else a_radius_m)
     ell = f'ELLIPSOID["{name} ellipsoid",{a:.6f},{(a / (a - b)) if a != b else 0:.12g},LENGTHUNIT["metre",1]]'
-    return (f'GEOGCRS["{name} geographic",DATUM["{name} datum",{ell}],PRIMEM["Reference Meridian",0],'
-            'CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1]],AXIS["latitude",north,ORDER[2]],'
-            'ANGLEUNIT["degree",0.0174532925199433]]')
+    return (
+        f'GEOGCRS["{name} geographic",DATUM["{name} datum",{ell}],PRIMEM["Reference Meridian",0],'
+        'CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1]],AXIS["latitude",north,ORDER[2]],'
+        'ANGLEUNIT["degree",0.0174532925199433]]'
+    )

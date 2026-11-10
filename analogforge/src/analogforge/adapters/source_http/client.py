@@ -135,18 +135,26 @@ class SafeHttp:
         parts = urlsplit(url)
         host = (parts.hostname or "").lower()
         if parts.scheme != "https" and not (self._policy.allow_insecure and parts.scheme == "http"):
-            raise AdapterError("SOURCE_CONTENT_INVALID", f"refusing non-https URL scheme for {redact_url(url)}",
-                               detail_code="INSECURE_SCHEME")
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID",
+                f"refusing non-https URL scheme for {redact_url(url)}",
+                detail_code="INSECURE_SCHEME",
+            )
         if parts.username or parts.password:
-            raise AdapterError("SOURCE_CONTENT_INVALID", "URLs with embedded credentials are refused",
-                               detail_code="URL_CREDENTIALS")
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID", "URLs with embedded credentials are refused", detail_code="URL_CREDENTIALS"
+            )
         if host not in self._policy.allowed_hosts:
-            raise AdapterError("SOURCE_CONTENT_INVALID", f"host {host!r} is not on the adapter allow-list",
-                               detail_code="HOST_NOT_ALLOWED")
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID",
+                f"host {host!r} is not on the adapter allow-list",
+                detail_code="HOST_NOT_ALLOWED",
+            )
         return host
 
-    def _open(self, url: str, params: Mapping[str, Any] | None,
-              headers: Mapping[str, str] | None) -> tuple[httpx.Response, tuple[str, ...]]:
+    def _open(
+        self, url: str, params: Mapping[str, Any] | None, headers: Mapping[str, str] | None
+    ) -> tuple[httpx.Response, tuple[str, ...]]:
         """Send one GET following redirects manually; returns an open streamed response."""
         policy = self._policy
         initial_host = self._check_host(url)
@@ -155,8 +163,9 @@ class SafeHttp:
         hosts: list[str] = [initial_host]
         for hop in range(policy.max_redirects + 1):
             host = self._check_host(current)
-            request = self._client.build_request("GET", current, params=params if hop == 0 else None,
-                                                 headers=dict(headers) if headers else None)
+            request = self._client.build_request(
+                "GET", current, params=params if hop == 0 else None, headers=dict(headers) if headers else None
+            )
             send_auth: Any = httpx.USE_CLIENT_DEFAULT
             if host not in credential_hosts:
                 for name in ("authorization", "cookie", "proxy-authorization"):
@@ -168,14 +177,16 @@ class SafeHttp:
             except httpx.TimeoutException as exc:
                 raise AdapterError("TOOL_TIMEOUT", f"timeout contacting {host}", transient=True) from exc
             except httpx.RequestError as exc:
-                raise AdapterError("SOURCE_UNAVAILABLE", f"transport error contacting {host}: {type(exc).__name__}",
-                                   transient=True) from exc
+                raise AdapterError(
+                    "SOURCE_UNAVAILABLE", f"transport error contacting {host}: {type(exc).__name__}", transient=True
+                ) from exc
             if response.status_code in _REDIRECTS:
                 location = response.headers.get("location")
                 response.close()
                 if not location:
-                    raise AdapterError("SOURCE_CONTENT_INVALID", "redirect without Location header",
-                                       detail_code="BAD_REDIRECT")
+                    raise AdapterError(
+                        "SOURCE_CONTENT_INVALID", "redirect without Location header", detail_code="BAD_REDIRECT"
+                    )
                 current = urljoin(str(request.url), location)
                 hosts.append((urlsplit(current).hostname or "").lower())
                 continue
@@ -190,23 +201,37 @@ class SafeHttp:
         response.close()
         where = redact_url(url)
         if status in (401, 403):
-            raise AdapterError("PROVIDER_AUTH_FAILED", f"authentication required or rejected by {where}",
-                               detail_code="AUTH_REQUIRED")
+            raise AdapterError(
+                "PROVIDER_AUTH_FAILED", f"authentication required or rejected by {where}", detail_code="AUTH_REQUIRED"
+            )
         if status == 429:
-            raise AdapterError("PROVIDER_RATE_LIMITED", f"rate limited by {where}", transient=True,
-                               retry_after=retry_after)
+            raise AdapterError(
+                "PROVIDER_RATE_LIMITED", f"rate limited by {where}", transient=True, retry_after=retry_after
+            )
         if status in _TRANSIENT_STATUS:
-            raise AdapterError("SOURCE_UNAVAILABLE", f"HTTP {status} from {where}", detail_code=f"HTTP_{status}",
-                               transient=True, retry_after=retry_after)
+            raise AdapterError(
+                "SOURCE_UNAVAILABLE",
+                f"HTTP {status} from {where}",
+                detail_code=f"HTTP_{status}",
+                transient=True,
+                retry_after=retry_after,
+            )
         if status in (404, 410):
             raise AdapterError("SOURCE_UNAVAILABLE", f"{where} not found", detail_code="NOT_FOUND", retryable=False)
-        raise AdapterError("SOURCE_UNAVAILABLE", f"HTTP {status} from {where}", detail_code=f"HTTP_{status}",
-                           retryable=False)
+        raise AdapterError(
+            "SOURCE_UNAVAILABLE", f"HTTP {status} from {where}", detail_code=f"HTTP_{status}", retryable=False
+        )
 
     # ------------------------------------------------------------------ small bodies
-    def get_bytes(self, url: str, *, params: Mapping[str, Any] | None = None,
-                  headers: Mapping[str, str] | None = None, max_bytes: int | None = None,
-                  allow_html: bool = False) -> FetchedBytes:
+    def get_bytes(
+        self,
+        url: str,
+        *,
+        params: Mapping[str, Any] | None = None,
+        headers: Mapping[str, str] | None = None,
+        max_bytes: int | None = None,
+        allow_html: bool = False,
+    ) -> FetchedBytes:
         limit = max_bytes if max_bytes is not None else self._policy.max_metadata_bytes
 
         def attempt() -> FetchedBytes:
@@ -222,37 +247,53 @@ class SafeHttp:
                     for chunk in response.iter_bytes(_CHUNK):
                         total += len(chunk)
                         if total > limit:
-                            raise AdapterError("RESOURCE_LIMIT",
-                                               f"{redact_url(url)} exceeds {limit} byte metadata limit")
+                            raise AdapterError(
+                                "RESOURCE_LIMIT", f"{redact_url(url)} exceeds {limit} byte metadata limit"
+                            )
                         chunks.append(chunk)
                 except httpx.RequestError as exc:
                     raise AdapterError("SOURCE_UNAVAILABLE", "connection dropped mid-body", transient=True) from exc
                 body = b"".join(chunks)
-                if not allow_html and (looks_like_html(body[:512])
-                                       or response.headers.get("content-type", "").lower().startswith("text/html")):
-                    raise AdapterError("SOURCE_CONTENT_INVALID", f"{redact_url(url)} returned an HTML page",
-                                       detail_code="HTML_LOGIN_PAGE")
-                return FetchedBytes(body, {k.lower(): v for k, v in response.headers.items()},
-                                    redact_url(str(response.url)))
+                if not allow_html and (
+                    looks_like_html(body[:512])
+                    or response.headers.get("content-type", "").lower().startswith("text/html")
+                ):
+                    raise AdapterError(
+                        "SOURCE_CONTENT_INVALID",
+                        f"{redact_url(url)} returned an HTML page",
+                        detail_code="HTML_LOGIN_PAGE",
+                    )
+                return FetchedBytes(
+                    body, {k.lower(): v for k, v in response.headers.items()}, redact_url(str(response.url))
+                )
             finally:
                 response.close()
 
         return self._with_retries(attempt)
 
-    def get_json(self, url: str, *, params: Mapping[str, Any] | None = None,
-                 headers: Mapping[str, str] | None = None) -> tuple[Any, Mapping[str, str]]:
+    def get_json(
+        self, url: str, *, params: Mapping[str, Any] | None = None, headers: Mapping[str, str] | None = None
+    ) -> tuple[Any, Mapping[str, str]]:
         fetched = self.get_bytes(url, params=params, headers=headers)
         try:
             return json.loads(fetched.content), fetched.headers
         except (ValueError, UnicodeDecodeError) as exc:
-            raise AdapterError("SOURCE_CONTENT_INVALID", f"{redact_url(url)} did not return JSON",
-                               detail_code="NOT_JSON") from exc
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID", f"{redact_url(url)} did not return JSON", detail_code="NOT_JSON"
+            ) from exc
 
     # ------------------------------------------------------------------ large bodies
-    def download(self, url: str, dest: Path, *, expected: ExpectedChecksum | None = None,
-                 max_bytes: int | None = None, accept_content_types: tuple[str, ...] | None = None,
-                 expected_magic: bytes | None = None,
-                 headers: Mapping[str, str] | None = None) -> DownloadResult:
+    def download(
+        self,
+        url: str,
+        dest: Path,
+        *,
+        expected: ExpectedChecksum | None = None,
+        max_bytes: int | None = None,
+        accept_content_types: tuple[str, ...] | None = None,
+        expected_magic: bytes | None = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> DownloadResult:
         """Stream ``url`` to ``dest`` atomically with every safety check; a partial file never survives."""
         limit = max_bytes if max_bytes is not None else self._policy.max_download_bytes
         dest.parent.mkdir(parents=True, exist_ok=True)
@@ -265,12 +306,22 @@ class SafeHttp:
                 ctype = response.headers.get("content-type")
                 base_type = (ctype or "").split(";")[0].strip().lower()
                 if base_type == "text/html" and not (accept_content_types and "text/html" in accept_content_types):
-                    raise AdapterError("SOURCE_CONTENT_INVALID", f"{redact_url(url)} returned an HTML page",
-                                       detail_code="HTML_LOGIN_PAGE")
-                if (accept_content_types and base_type
-                        and base_type not in accept_content_types and base_type not in _BINARY_FALLBACK_TYPES):
-                    raise AdapterError("SOURCE_CONTENT_INVALID", f"unexpected content type {base_type!r}",
-                                       detail_code="CONTENT_TYPE_UNEXPECTED")
+                    raise AdapterError(
+                        "SOURCE_CONTENT_INVALID",
+                        f"{redact_url(url)} returned an HTML page",
+                        detail_code="HTML_LOGIN_PAGE",
+                    )
+                if (
+                    accept_content_types
+                    and base_type
+                    and base_type not in accept_content_types
+                    and base_type not in _BINARY_FALLBACK_TYPES
+                ):
+                    raise AdapterError(
+                        "SOURCE_CONTENT_INVALID",
+                        f"unexpected content type {base_type!r}",
+                        detail_code="CONTENT_TYPE_UNEXPECTED",
+                    )
                 declared = response.headers.get("content-length")
                 declared_len = int(declared) if declared and declared.isdigit() else None
                 if declared_len is not None and declared_len > limit:
@@ -284,11 +335,14 @@ class SafeHttp:
                         for chunk in response.iter_bytes(_CHUNK):
                             if not head:
                                 head = chunk[:512]
-                                if looks_like_html(head) and not (accept_content_types
-                                                                  and "text/html" in accept_content_types):
-                                    raise AdapterError("SOURCE_CONTENT_INVALID",
-                                                       f"{redact_url(url)} returned an HTML page",
-                                                       detail_code="HTML_LOGIN_PAGE")
+                                if looks_like_html(head) and not (
+                                    accept_content_types and "text/html" in accept_content_types
+                                ):
+                                    raise AdapterError(
+                                        "SOURCE_CONTENT_INVALID",
+                                        f"{redact_url(url)} returned an HTML page",
+                                        detail_code="HTML_LOGIN_PAGE",
+                                    )
                             total += len(chunk)
                             if total > limit:
                                 raise AdapterError("RESOURCE_LIMIT", f"download exceeds {limit} byte limit")
@@ -299,26 +353,35 @@ class SafeHttp:
                     raise AdapterError("SOURCE_UNAVAILABLE", "connection dropped mid-body", transient=True) from exc
                 encoded = response.headers.get("content-encoding", "identity").lower() != "identity"
                 if declared_len is not None and not encoded and declared_len != total:
-                    raise AdapterError("SOURCE_CONTENT_INVALID",
-                                       f"truncated transfer: declared {declared_len} bytes, received {total}",
-                                       detail_code="TRUNCATED_TRANSFER", transient=True)
+                    raise AdapterError(
+                        "SOURCE_CONTENT_INVALID",
+                        f"truncated transfer: declared {declared_len} bytes, received {total}",
+                        detail_code="TRUNCATED_TRANSFER",
+                        transient=True,
+                    )
                 if total == 0:
                     raise AdapterError("SOURCE_CONTENT_INVALID", "empty response body", detail_code="EMPTY_BODY")
                 if expected_magic is not None and not head.startswith(expected_magic):
-                    raise AdapterError("SOURCE_CONTENT_INVALID", "content does not start with the expected signature",
-                                       detail_code="MAGIC_MISMATCH")
+                    raise AdapterError(
+                        "SOURCE_CONTENT_INVALID",
+                        "content does not start with the expected signature",
+                        detail_code="MAGIC_MISMATCH",
+                    )
                 digest = sha.hexdigest()
                 verified = False
                 if expected is not None:
                     actual = digest if expected.algorithm == "sha256" else md5.hexdigest()
                     if actual != expected.value.strip().lower():
-                        raise AdapterError("SOURCE_CHECKSUM_MISMATCH",
-                                           f"{expected.algorithm} mismatch for {redact_url(url)}; bytes quarantined",
-                                           detail_code="CHECKSUM_MISMATCH")
+                        raise AdapterError(
+                            "SOURCE_CHECKSUM_MISMATCH",
+                            f"{expected.algorithm} mismatch for {redact_url(url)}; bytes quarantined",
+                            detail_code="CHECKSUM_MISMATCH",
+                        )
                     verified = True
                 part.replace(dest)
-                return DownloadResult(dest, digest, total, ctype, redact_url(url), redact_url(str(response.url)),
-                                      hosts, verified)
+                return DownloadResult(
+                    dest, digest, total, ctype, redact_url(url), redact_url(str(response.url)), hosts, verified
+                )
             finally:
                 response.close()
                 part.unlink(missing_ok=True)

@@ -10,9 +10,18 @@ from numpy.typing import NDArray
 
 from analogforge.adapters.source_http.errors import AdapterError
 
-_UNIT_TO_METRES = {"m": 1.0, "meter": 1.0, "meters": 1.0, "metre": 1.0, "metres": 1.0,
-                   "km": 1000.0, "kilometer": 1000.0, "kilometers": 1000.0, "kilometre": 1000.0,
-                   "kilometres": 1000.0}
+_UNIT_TO_METRES = {
+    "m": 1.0,
+    "meter": 1.0,
+    "meters": 1.0,
+    "metre": 1.0,
+    "metres": 1.0,
+    "km": 1000.0,
+    "kilometer": 1000.0,
+    "kilometers": 1000.0,
+    "kilometre": 1000.0,
+    "kilometres": 1000.0,
+}
 _UNIT_TO_KELVIN = {"k": 0.0, "kelvin": 0.0, "kelvins": 0.0}
 
 
@@ -50,20 +59,29 @@ class ProductImage:
 def safe_sibling(label_path: Path, name: str) -> Path:
     """Resolve a data-file name from a label next to it, refusing traversal and absolute paths."""
     if not name or "\\" in name or name.startswith("/") or ".." in Path(name).parts:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"unsafe data file reference {name!r} in label",
-                           detail_code="ARCHIVE_PATH_TRAVERSAL")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            f"unsafe data file reference {name!r} in label",
+            detail_code="ARCHIVE_PATH_TRAVERSAL",
+        )
     target = (label_path.parent / name).resolve()
     root = label_path.parent.resolve()
     if root not in target.parents:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"data file {name!r} escapes the label directory",
-                           detail_code="ARCHIVE_PATH_TRAVERSAL")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            f"data file {name!r} escapes the label directory",
+            detail_code="ARCHIVE_PATH_TRAVERSAL",
+        )
     if not target.is_file():
         # Case-insensitive fallback: PDS archives mix upper/lower case between label and file names.
         for candidate in sorted(root.iterdir()):
             if candidate.name.lower() == Path(name).name.lower() and candidate.is_file():
                 return candidate
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"data file {name!r} referenced by the label is missing",
-                           detail_code="METADATA_INCOMPLETE")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            f"data file {name!r} referenced by the label is missing",
+            detail_code="METADATA_INCOMPLETE",
+        )
     return target
 
 
@@ -71,16 +89,20 @@ def read_array(path: Path, dtype: str, lines: int, samples: int, offset_bytes: i
     expected = lines * samples * np.dtype(dtype).itemsize
     actual = path.stat().st_size - offset_bytes
     if actual != expected:
-        raise AdapterError("SOURCE_CONTENT_INVALID",
-                           f"{path.name}: data region is {actual} bytes, label implies {expected} "
-                           f"({lines} x {samples} x {np.dtype(dtype).itemsize})", detail_code="SHAPE_MISMATCH")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            f"{path.name}: data region is {actual} bytes, label implies {expected} "
+            f"({lines} x {samples} x {np.dtype(dtype).itemsize})",
+            detail_code="SHAPE_MISMATCH",
+        )
     with path.open("rb") as handle:
         handle.seek(offset_bytes)
         return np.frombuffer(handle.read(expected), dtype=dtype).reshape(lines, samples)
 
 
-def scale_once(raw: NDArray[np.generic], scale: float, offset: float,
-               missing: tuple[float, ...]) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+def scale_once(
+    raw: NDArray[np.generic], scale: float, offset: float, missing: tuple[float, ...]
+) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
     """Apply ``raw * scale + offset`` exactly once; missing raw samples become NaN (never 0)."""
     bad = np.zeros(raw.shape, dtype=bool)
     for constant in missing:

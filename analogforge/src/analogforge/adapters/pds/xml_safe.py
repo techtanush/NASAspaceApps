@@ -19,13 +19,17 @@ def parse_xml_file(path: Path) -> ET.Element:
         raise AdapterError("RESOURCE_LIMIT", f"{path.name} exceeds the label size limit", detail_code="LABEL_TOO_LARGE")
     data = path.read_bytes()
     if _FORBIDDEN.search(data):
-        raise AdapterError("SOURCE_CONTENT_INVALID", "XML DTD / entity declarations are not permitted in labels",
-                           detail_code="XML_DTD_FORBIDDEN")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            "XML DTD / entity declarations are not permitted in labels",
+            detail_code="XML_DTD_FORBIDDEN",
+        )
     try:
         return ET.fromstring(data)  # noqa: S314 - DTD/entities rejected above
     except ET.ParseError as exc:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"{path.name} is not well-formed XML",
-                           detail_code="LABEL_PARSE_ERROR") from exc
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", f"{path.name} is not well-formed XML", detail_code="LABEL_PARSE_ERROR"
+        ) from exc
 
 
 def local(tag: str) -> str:

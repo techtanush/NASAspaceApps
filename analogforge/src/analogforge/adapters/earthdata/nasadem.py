@@ -44,8 +44,9 @@ def parse_tile_name(name: str) -> tuple[int, int]:
     """Return (lat0, lon0) of the south-west corner encoded in a tile name like ``n30w100``."""
     match = TILE_RE.search(name)
     if match is None:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"cannot read tile corner from name {name!r}",
-                           detail_code="METADATA_INCOMPLETE")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", f"cannot read tile corner from name {name!r}", detail_code="METADATA_INCOMPLETE"
+        )
     lat = int(match.group(2)) * (1 if match.group(1).lower() == "n" else -1)
     lon = int(match.group(4)) * (1 if match.group(3).lower() == "e" else -1)
     return lat, lon
@@ -55,15 +56,20 @@ def _read_samples(path: Path, dtype: str, expected_samples: int | None) -> NDArr
     size = path.stat().st_size
     itemsize = np.dtype(dtype).itemsize
     if size % itemsize:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"{path.name}: size {size} is not a multiple of {itemsize}",
-                           detail_code="SHAPE_MISMATCH")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            f"{path.name}: size {size} is not a multiple of {itemsize}",
+            detail_code="SHAPE_MISMATCH",
+        )
     count = size // itemsize
     n = math.isqrt(count)
     allowed = STANDARD_SAMPLES if expected_samples is None else frozenset({expected_samples})
     if n * n != count or n not in allowed:
-        raise AdapterError("SOURCE_CONTENT_INVALID",
-                           f"{path.name}: {count} samples is not a square tile of {sorted(allowed)} samples per side",
-                           detail_code="SHAPE_MISMATCH")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            f"{path.name}: {count} samples is not a square tile of {sorted(allowed)} samples per side",
+            detail_code="SHAPE_MISMATCH",
+        )
     return np.fromfile(path, dtype=dtype).reshape(n, n)
 
 
@@ -82,8 +88,11 @@ def decode(path: Path, params: NasademParams | None = None) -> DecodedRaster:
         files = [path] + [p for p in path.parent.iterdir() if p.stem.lower() == path.stem.lower() and p != path]
     hgt_files = sorted(p for p in files if p.suffix.lower() == ".hgt")
     if len(hgt_files) != 1:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"expected exactly one .hgt member, found {len(hgt_files)}",
-                           detail_code="METADATA_INCOMPLETE")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            f"expected exactly one .hgt member, found {len(hgt_files)}",
+            detail_code="METADATA_INCOMPLETE",
+        )
     hgt = hgt_files[0]
     lat0, lon0 = parse_tile_name(hgt.stem)
     raw = _read_samples(hgt, ">i2", prm.expected_samples)
@@ -112,11 +121,20 @@ def decode(path: Path, params: NasademParams | None = None) -> DecodedRaster:
     aux["land"] = valid & ~water
     step = 1.0 / (n - 1)
     meta = RasterMetadata(
-        adapter_id=prm.adapter_id, body="EARTH", quantity="orthometric_height", units="m",
-        vertical_reference=VERTICAL_REFERENCE, crs_wkt=WGS84_WKT,
-        transform=(step, 0.0, lon0 - step / 2, 0.0, -step, lat0 + 1 + step / 2), width=n, height=n,
-        pixel_registration="CELL_CENTER_AT_INTEGER_DEGREE", longitude_domain="NEG180_180",
-        nodata_raw=float(HGT_VOID), product_id=hgt.stem.lower(), notes=tuple(notes),
+        adapter_id=prm.adapter_id,
+        body="EARTH",
+        quantity="orthometric_height",
+        units="m",
+        vertical_reference=VERTICAL_REFERENCE,
+        crs_wkt=WGS84_WKT,
+        transform=(step, 0.0, lon0 - step / 2, 0.0, -step, lat0 + 1 + step / 2),
+        width=n,
+        height=n,
+        pixel_registration="CELL_CENTER_AT_INTEGER_DEGREE",
+        longitude_domain="NEG180_180",
+        nodata_raw=float(HGT_VOID),
+        product_id=hgt.stem.lower(),
+        notes=tuple(notes),
         attributes={"tile_lat0": str(lat0), "tile_lon0": str(lon0), "samples_per_side": str(n)},
     )
     return DecodedRaster(data=data, valid=valid, metadata=meta, aux=aux)
@@ -126,17 +144,21 @@ def mosaic(tiles: list[DecodedRaster]) -> DecodedRaster:
     """Merge adjoining tiles de-duplicating shared border samples; report disagreements, never hide them."""
     if not tiles:
         raise AdapterError("NO_COVERAGE", "no tiles to mosaic", detail_code="NO_GRANULES")
-    ordered = sorted(tiles, key=lambda t: (t.metadata.product_id or ""))
+    ordered = sorted(tiles, key=lambda t: t.metadata.product_id or "")
     n = ordered[0].metadata.width
     keys: set[tuple[int, int]] = set()
     for tile in ordered:
         if tile.metadata.width != n or tile.metadata.height != n:
-            raise AdapterError("SOURCE_CONTENT_INVALID", "tiles of differing sample counts cannot be mosaicked",
-                               detail_code="SHAPE_MISMATCH")
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID",
+                "tiles of differing sample counts cannot be mosaicked",
+                detail_code="SHAPE_MISMATCH",
+            )
         key = (int(tile.metadata.attributes["tile_lat0"]), int(tile.metadata.attributes["tile_lon0"]))
         if key in keys:
-            raise AdapterError("SOURCE_CONTENT_INVALID", f"duplicate tile {tile.metadata.product_id}",
-                               detail_code="DUPLICATE_TILE")
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID", f"duplicate tile {tile.metadata.product_id}", detail_code="DUPLICATE_TILE"
+            )
         keys.add(key)
     lat_min = min(k[0] for k in keys)
     lat_max = max(k[0] for k in keys)
@@ -176,21 +198,36 @@ def mosaic(tiles: list[DecodedRaster]) -> DecodedRaster:
         covered[region] = True
     base = ordered[0].metadata
     step = 1.0 / step_n
-    notes = [*base.notes, f"Mosaic of {len(ordered)} tile(s); {deduplicated} shared border sample(s) de-duplicated.",
-             "Tile precedence is deterministic: lexicographic tile name; first valid sample wins."]
+    notes = [
+        *base.notes,
+        f"Mosaic of {len(ordered)} tile(s); {deduplicated} shared border sample(s) de-duplicated.",
+        "Tile precedence is deterministic: lexicographic tile name; first valid sample wins.",
+    ]
     if mismatched:
         notes.append(f"{mismatched} shared sample(s) disagreed between tiles; first tile retained.")
     aux: dict[str, NDArray[np.generic]] = {"water": water, "land": valid & ~water, "covered": covered}
     if has_num:
         aux["num"] = num
     meta = RasterMetadata(
-        adapter_id=base.adapter_id, body="EARTH", quantity=base.quantity, units="m",
-        vertical_reference=base.vertical_reference, crs_wkt=base.crs_wkt,
-        transform=(step, 0.0, lon_min - step / 2, 0.0, -step, lat_max + 1 + step / 2), width=cols, height=rows,
-        pixel_registration=base.pixel_registration, longitude_domain="NEG180_180", nodata_raw=base.nodata_raw,
-        product_id=None, notes=tuple(notes),
-        attributes={"tiles": ",".join(t.metadata.product_id or "" for t in ordered),
-                    "seam_mismatch_cells": str(mismatched), "seam_deduplicated_samples": str(deduplicated),
-                    "samples_per_side": str(n)},
+        adapter_id=base.adapter_id,
+        body="EARTH",
+        quantity=base.quantity,
+        units="m",
+        vertical_reference=base.vertical_reference,
+        crs_wkt=base.crs_wkt,
+        transform=(step, 0.0, lon_min - step / 2, 0.0, -step, lat_max + 1 + step / 2),
+        width=cols,
+        height=rows,
+        pixel_registration=base.pixel_registration,
+        longitude_domain="NEG180_180",
+        nodata_raw=base.nodata_raw,
+        product_id=None,
+        notes=tuple(notes),
+        attributes={
+            "tiles": ",".join(t.metadata.product_id or "" for t in ordered),
+            "seam_mismatch_cells": str(mismatched),
+            "seam_deduplicated_samples": str(deduplicated),
+            "samples_per_side": str(n),
+        },
     )
     return DecodedRaster(data=data, valid=valid, metadata=meta, aux=aux)

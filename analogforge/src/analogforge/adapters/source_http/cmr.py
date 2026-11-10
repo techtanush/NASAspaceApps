@@ -70,17 +70,27 @@ def parse_umm_item(item: dict[str, Any]) -> CmrGranule:
     concept = meta.get("concept-id")
     ur = umm.get("GranuleUR")
     if not isinstance(concept, str) or not isinstance(ur, str):
-        raise AdapterError("SOURCE_CONTENT_INVALID", "CMR item lacks concept-id or GranuleUR",
-                           detail_code="METADATA_INCOMPLETE")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", "CMR item lacks concept-id or GranuleUR", detail_code="METADATA_INCOMPLETE"
+        )
     boxes: list[Box] = []
     geometry = ((umm.get("SpatialExtent") or {}).get("HorizontalSpatialDomain") or {}).get("Geometry") or {}
     for rect in geometry.get("BoundingRectangles") or []:
         try:
-            boxes.append((float(rect["WestBoundingCoordinate"]), float(rect["SouthBoundingCoordinate"]),
-                          float(rect["EastBoundingCoordinate"]), float(rect["NorthBoundingCoordinate"])))
+            boxes.append(
+                (
+                    float(rect["WestBoundingCoordinate"]),
+                    float(rect["SouthBoundingCoordinate"]),
+                    float(rect["EastBoundingCoordinate"]),
+                    float(rect["NorthBoundingCoordinate"]),
+                )
+            )
         except (KeyError, TypeError, ValueError) as exc:
-            raise AdapterError("SOURCE_CONTENT_INVALID", f"granule {ur} has a malformed bounding rectangle",
-                               detail_code="METADATA_INCOMPLETE") from exc
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID",
+                f"granule {ur} has a malformed bounding rectangle",
+                detail_code="METADATA_INCOMPLETE",
+            ) from exc
     by_name: dict[str, dict[str, Any]] = {}
     arch = (umm.get("DataGranule") or {}).get("ArchiveAndDistributionInformation") or []
     for entry in arch:
@@ -96,14 +106,22 @@ def parse_umm_item(item: dict[str, Any]) -> CmrGranule:
         name = urlsplit(url).path.rsplit("/", 1)[-1]
         entry = by_name.get(name, {})
         size = entry.get("SizeInBytes")
-        downloads.append(CmrDownload(url, name, int(size) if isinstance(size, int) and size >= 0 else None,
-                                     _checksum(entry)))
+        downloads.append(
+            CmrDownload(url, name, int(size) if isinstance(size, int) and size >= 0 else None, _checksum(entry))
+        )
     return CmrGranule(concept, ur, tuple(boxes), tuple(sorted(downloads, key=lambda d: d.url)))
 
 
-def search_granules(http: SafeHttp, *, short_name: str, version: str, bounding_boxes: Sequence[str],
-                    page_size: int = DEFAULT_PAGE_SIZE, max_pages: int = DEFAULT_MAX_PAGES,
-                    base_url: str = CMR_GRANULES_URL) -> CmrSearchResult:
+def search_granules(
+    http: SafeHttp,
+    *,
+    short_name: str,
+    version: str,
+    bounding_boxes: Sequence[str],
+    page_size: int = DEFAULT_PAGE_SIZE,
+    max_pages: int = DEFAULT_MAX_PAGES,
+    base_url: str = CMR_GRANULES_URL,
+) -> CmrSearchResult:
     """Search granules for each bounding box; merge, de-duplicate, sort deterministically, cap and disclose."""
     found: dict[str, CmrGranule] = {}
     hits_total = 0
@@ -115,15 +133,21 @@ def search_granules(http: SafeHttp, *, short_name: str, version: str, bounding_b
         collected_here = 0
         hits_here: int | None = None
         for _ in range(max_pages):
-            params: dict[str, Any] = {"short_name": short_name, "version": version, "bounding_box": bounding_box,
-                                      "page_size": page_size, "sort_key[]": "producer_granule_id"}
+            params: dict[str, Any] = {
+                "short_name": short_name,
+                "version": version,
+                "bounding_box": bounding_box,
+                "page_size": page_size,
+                "sort_key[]": "producer_granule_id",
+            }
             headers = {"CMR-Search-After": search_after} if search_after else None
             payload, response_headers = http.get_json(base_url, params=params, headers=headers)
             pages += 1
             items = payload.get("items") if isinstance(payload, dict) else None
             if not isinstance(items, list):
-                raise AdapterError("SOURCE_CONTENT_INVALID", "CMR response has no items list",
-                                   detail_code="METADATA_INCOMPLETE")
+                raise AdapterError(
+                    "SOURCE_CONTENT_INVALID", "CMR response has no items list", detail_code="METADATA_INCOMPLETE"
+                )
             for item in items:
                 granule = parse_umm_item(item)
                 found.setdefault(granule.concept_id, granule)
@@ -155,8 +179,9 @@ def lookup_granule(http: SafeHttp, concept_id: str, base_url: str = CMR_GRANULES
         raise AdapterError("NO_COVERAGE", f"granule {concept_id} not found in CMR", detail_code="NO_GRANULES")
     granule = parse_umm_item(items[0])
     if granule.concept_id != concept_id:
-        raise AdapterError("SOURCE_CONTENT_INVALID", "CMR returned a different granule than requested",
-                           detail_code="GRANULE_MISMATCH")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", "CMR returned a different granule than requested", detail_code="GRANULE_MISMATCH"
+        )
     return granule
 
 
@@ -169,20 +194,35 @@ def asset_directory(scratch: Path, adapter_id: str, granule_ur: str) -> Path:
     return path
 
 
-def fetch_cmr_assets(http: SafeHttp, selection: CoverageSelection, scratch: Path, *, adapter_id: str,
-                     product_id: str, suffixes: tuple[str, ...], accept_content_types: tuple[str, ...] | None,
-                     expected_magic: bytes | None, max_bytes: int | None = None) -> list[AcquiredAsset]:
+def fetch_cmr_assets(
+    http: SafeHttp,
+    selection: CoverageSelection,
+    scratch: Path,
+    *,
+    adapter_id: str,
+    product_id: str,
+    suffixes: tuple[str, ...],
+    accept_content_types: tuple[str, ...] | None,
+    expected_magic: bytes | None,
+    max_bytes: int | None = None,
+) -> list[AcquiredAsset]:
     """Resolve each selected granule's download through CMR (never an agent-supplied URL) and fetch it."""
     if selection.adapter_id != adapter_id:
-        raise AdapterError("UNSUPPORTED_PRODUCT", f"selection belongs to {selection.adapter_id}, not {adapter_id}",
-                           detail_code="ADAPTER_MISMATCH")
+        raise AdapterError(
+            "UNSUPPORTED_PRODUCT",
+            f"selection belongs to {selection.adapter_id}, not {adapter_id}",
+            detail_code="ADAPTER_MISMATCH",
+        )
     if selection.access_state == "NO_COVERAGE":
         raise AdapterError("NO_COVERAGE", "selection has no coverage", detail_code="NO_GRANULES")
     if selection.access_state == "UNSUPPORTED":
         raise AdapterError("UNSUPPORTED_PRODUCT", "selection is unsupported", detail_code="UNSUPPORTED_FORMAT")
     if not http.has_credentials:
-        raise AdapterError("PROVIDER_AUTH_FAILED", "Earthdata credentials are required to download granules",
-                           detail_code="AUTH_REQUIRED")
+        raise AdapterError(
+            "PROVIDER_AUTH_FAILED",
+            "Earthdata credentials are required to download granules",
+            detail_code="AUTH_REQUIRED",
+        )
     if not selection.granule_ids:
         raise AdapterError("NO_COVERAGE", "selection lists no granules", detail_code="NO_GRANULES")
     assets: list[AcquiredAsset] = []
@@ -190,23 +230,41 @@ def fetch_cmr_assets(http: SafeHttp, selection: CoverageSelection, scratch: Path
         granule = lookup_granule(http, concept_id)
         candidates = [d for d in granule.downloads if d.name.lower().endswith(suffixes)]
         if not candidates:
-            raise AdapterError("UNSUPPORTED_PRODUCT", f"granule {granule.granule_ur} has no {'/'.join(suffixes)} file",
-                               detail_code="UNSUPPORTED_FORMAT")
+            raise AdapterError(
+                "UNSUPPORTED_PRODUCT",
+                f"granule {granule.granule_ur} has no {'/'.join(suffixes)} file",
+                detail_code="UNSUPPORTED_FORMAT",
+            )
         chosen = candidates[0]
         directory = asset_directory(scratch, adapter_id, granule.granule_ur)
-        result = http.download(chosen.url, directory / chosen.name, expected=chosen.checksum,
-                               max_bytes=max_bytes, accept_content_types=accept_content_types,
-                               expected_magic=expected_magic)
+        result = http.download(
+            chosen.url,
+            directory / chosen.name,
+            expected=chosen.checksum,
+            max_bytes=max_bytes,
+            accept_content_types=accept_content_types,
+            expected_magic=expected_magic,
+        )
         if chosen.size_bytes is not None and chosen.size_bytes != result.size_bytes:
             result.path.unlink(missing_ok=True)
-            raise AdapterError("SOURCE_CONTENT_INVALID",
-                               f"size {result.size_bytes} differs from provider-declared {chosen.size_bytes}",
-                               detail_code="SIZE_MISMATCH")
-        assets.append(AcquiredAsset(
-            adapter_id=adapter_id, product_id=product_id, version=selection.version, granule_id=concept_id,
-            source_uri=redact_url(chosen.url), sha256=result.sha256, size_bytes=result.size_bytes,
-            validation_status="VERIFIED" if result.provider_checksum_verified else "PENDING",
-            artifact_key=f"source-bytes:{adapter_id}:{granule.granule_ur}"))
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID",
+                f"size {result.size_bytes} differs from provider-declared {chosen.size_bytes}",
+                detail_code="SIZE_MISMATCH",
+            )
+        assets.append(
+            AcquiredAsset(
+                adapter_id=adapter_id,
+                product_id=product_id,
+                version=selection.version,
+                granule_id=concept_id,
+                source_uri=redact_url(chosen.url),
+                sha256=result.sha256,
+                size_bytes=result.size_bytes,
+                validation_status="VERIFIED" if result.provider_checksum_verified else "PENDING",
+                artifact_key=f"source-bytes:{adapter_id}:{granule.granule_ur}",
+            )
+        )
     return assets
 
 
@@ -214,44 +272,98 @@ def selection_key(adapter_id: str, bbox: Sequence[float], ids: Sequence[str]) ->
     return f"{adapter_id}:{canonical_sha256({'bbox': list(bbox), 'ids': list(ids)})[:16]}"
 
 
-def empty_selection(adapter_id: str, product_id: str | None, version: str | None, request: ResolveCoverageInput,
-                    state: str, note: str, native_resolution_m: float | None) -> CoverageSelection:
-    return CoverageSelection.model_validate({
-        "selection_key": selection_key(adapter_id, request.aoi.bbox, []), "adapter_id": adapter_id,
-        "product_id": product_id, "version": version, "granule_ids": [], "access_state": state,
-        "coverage_fraction": 0.0 if state == "NO_COVERAGE" else None,
-        "native_resolution_m": native_resolution_m, "notes": [note]})
+def empty_selection(
+    adapter_id: str,
+    product_id: str | None,
+    version: str | None,
+    request: ResolveCoverageInput,
+    state: str,
+    note: str,
+    native_resolution_m: float | None,
+) -> CoverageSelection:
+    return CoverageSelection.model_validate(
+        {
+            "selection_key": selection_key(adapter_id, request.aoi.bbox, []),
+            "adapter_id": adapter_id,
+            "product_id": product_id,
+            "version": version,
+            "granule_ids": [],
+            "access_state": state,
+            "coverage_fraction": 0.0 if state == "NO_COVERAGE" else None,
+            "native_resolution_m": native_resolution_m,
+            "notes": [note],
+        }
+    )
 
 
-def discover_cmr_selection(client: httpx.Client | None, policy: HttpPolicy, request: ResolveCoverageInput, *,
-                           adapter_id: str, short_name: str, version: str, product_id: str,
-                           native_resolution_m: float | None, page_size: int = DEFAULT_PAGE_SIZE,
-                           max_pages: int = DEFAULT_MAX_PAGES) -> CoverageSelection:
+def discover_cmr_selection(
+    client: httpx.Client | None,
+    policy: HttpPolicy,
+    request: ResolveCoverageInput,
+    *,
+    adapter_id: str,
+    short_name: str,
+    version: str,
+    product_id: str,
+    native_resolution_m: float | None,
+    page_size: int = DEFAULT_PAGE_SIZE,
+    max_pages: int = DEFAULT_MAX_PAGES,
+) -> CoverageSelection:
     """One deterministic selection for the AOI. Metadata search is public; ``AUTH_REQUIRED`` is reported when the
     injected client carries no credential (downloads need one). Truncation by the page cap is disclosed."""
     if client is None:
-        return empty_selection(adapter_id, product_id, version, request, "UNAVAILABLE",
-                               "no HTTP client supplied (offline mode)", native_resolution_m)
+        return empty_selection(
+            adapter_id,
+            product_id,
+            version,
+            request,
+            "UNAVAILABLE",
+            "no HTTP client supplied (offline mode)",
+            native_resolution_m,
+        )
     http = SafeHttp(client, policy)
     result = search_granules(
-        http, short_name=short_name, version=version, page_size=page_size, max_pages=max_pages,
-        bounding_boxes=to_cmr_bounding_boxes(request.aoi.bbox, request.aoi.longitude_convention))
+        http,
+        short_name=short_name,
+        version=version,
+        page_size=page_size,
+        max_pages=max_pages,
+        bounding_boxes=to_cmr_bounding_boxes(request.aoi.bbox, request.aoi.longitude_convention),
+    )
     if not result.granules:
-        return empty_selection(adapter_id, product_id, version, request, "NO_COVERAGE",
-                               "no granules intersect the AOI (NO_GRANULES)", native_resolution_m)
+        return empty_selection(
+            adapter_id,
+            product_id,
+            version,
+            request,
+            "NO_COVERAGE",
+            "no granules intersect the AOI (NO_GRANULES)",
+            native_resolution_m,
+        )
     ids = [g.concept_id for g in result.granules]
     pieces = split_bbox(request.aoi.bbox, request.aoi.longitude_convention, "NEG180_180")
-    notes = [f"{len(ids)} granule(s) found; coverage_fraction is planar-degree footprint overlap, "
-             "not valid-pixel coverage."]
+    notes = [
+        f"{len(ids)} granule(s) found; coverage_fraction is planar-degree footprint overlap, not valid-pixel coverage."
+    ]
     if result.truncated:
         total = result.hits if result.hits is not None else "unknown"
-        notes.append(f"DISCOVERY_TRUNCATED: results capped at {len(ids)} of {total} granules; "
-                     "coverage_fraction is a lower bound.")
+        notes.append(
+            f"DISCOVERY_TRUNCATED: results capped at {len(ids)} of {total} granules; "
+            "coverage_fraction is a lower bound."
+        )
     state = "AVAILABLE" if has_credentials(client) else "AUTH_REQUIRED"
     if state == "AUTH_REQUIRED":
         notes.append("File download requires an Earthdata Login credential supplied through the HTTP client.")
-    return CoverageSelection.model_validate({
-        "selection_key": selection_key(adapter_id, request.aoi.bbox, ids), "adapter_id": adapter_id,
-        "product_id": product_id, "version": version, "granule_ids": ids, "access_state": state,
-        "coverage_fraction": coverage_fraction(pieces, [b for g in result.granules for b in g.boxes]),
-        "native_resolution_m": native_resolution_m, "notes": notes})
+    return CoverageSelection.model_validate(
+        {
+            "selection_key": selection_key(adapter_id, request.aoi.bbox, ids),
+            "adapter_id": adapter_id,
+            "product_id": product_id,
+            "version": version,
+            "granule_ids": ids,
+            "access_state": state,
+            "coverage_fraction": coverage_fraction(pieces, [b for g in result.granules for b in g.boxes]),
+            "native_resolution_m": native_resolution_m,
+            "notes": notes,
+        }
+    )

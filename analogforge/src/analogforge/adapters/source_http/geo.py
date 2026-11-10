@@ -17,8 +17,9 @@ def validate_bbox(bbox: Sequence[float]) -> Box:
         raise AdapterError("NO_COVERAGE", "bbox must be [west, south, east, north]", detail_code="INPUT_INVALID")
     west, south, east, north = (float(v) for v in bbox)
     if not (-90.0 <= south < north <= 90.0):
-        raise AdapterError("NO_COVERAGE", "bbox latitudes must satisfy -90 <= south < north <= 90",
-                           detail_code="INPUT_INVALID")
+        raise AdapterError(
+            "NO_COVERAGE", "bbox latitudes must satisfy -90 <= south < north <= 90", detail_code="INPUT_INVALID"
+        )
     return west, south, east, north
 
 

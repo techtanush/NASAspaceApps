@@ -27,8 +27,9 @@ def _bad(message: str, detail: str) -> AdapterError:
     return AdapterError("SOURCE_CONTENT_INVALID", message, detail_code=detail)
 
 
-def safe_extract_zip(archive: Path, dest_dir: Path, limits: ArchiveLimits | None = None, *,
-                     extract: bool = True) -> list[Path]:
+def safe_extract_zip(
+    archive: Path, dest_dir: Path, limits: ArchiveLimits | None = None, *, extract: bool = True
+) -> list[Path]:
     """Extract ``archive`` into the empty-or-new ``dest_dir``; return members sorted by name.
 
     Rejected: absolute paths, ``..`` components, backslash paths, symlinks / device files, nested archives,
@@ -50,15 +51,20 @@ def safe_extract_zip(archive: Path, dest_dir: Path, limits: ArchiveLimits | None
     with zf:
         infos = [i for i in zf.infolist() if not i.is_dir()]
         if len(infos) > lim.max_members:
-            raise AdapterError("RESOURCE_LIMIT", f"archive has {len(infos)} members (limit {lim.max_members})",
-                               detail_code="ARCHIVE_MEMBER_LIMIT")
+            raise AdapterError(
+                "RESOURCE_LIMIT",
+                f"archive has {len(infos)} members (limit {lim.max_members})",
+                detail_code="ARCHIVE_MEMBER_LIMIT",
+            )
         archive_size = max(archive.stat().st_size, 1)
         declared = sum(i.file_size for i in infos)
         budget = min(lim.max_total_bytes, int(lim.max_expansion_ratio * archive_size))
         if declared > budget:
-            raise AdapterError("RESOURCE_LIMIT",
-                               f"archive would expand to {declared} bytes (limit {budget}; "
-                               f"ratio cap {lim.max_expansion_ratio:g}x)", detail_code="ARCHIVE_EXPANSION_LIMIT")
+            raise AdapterError(
+                "RESOURCE_LIMIT",
+                f"archive would expand to {declared} bytes (limit {budget}; ratio cap {lim.max_expansion_ratio:g}x)",
+                detail_code="ARCHIVE_EXPANSION_LIMIT",
+            )
         seen: set[str] = set()
         targets: list[tuple[zipfile.ZipInfo, Path]] = []
         for info in infos:
@@ -100,9 +106,11 @@ def safe_extract_zip(archive: Path, dest_dir: Path, limits: ArchiveLimits | None
                         while chunk := src.read(_COPY_CHUNK):
                             written += len(chunk)
                             if written > budget:
-                                raise AdapterError("RESOURCE_LIMIT",
-                                                   "archive expansion exceeded limit while extracting",
-                                                   detail_code="ARCHIVE_EXPANSION_LIMIT")
+                                raise AdapterError(
+                                    "RESOURCE_LIMIT",
+                                    "archive expansion exceeded limit while extracting",
+                                    detail_code="ARCHIVE_EXPANSION_LIMIT",
+                                )
                             if dst is not None:
                                 dst.write(chunk)
                     finally:

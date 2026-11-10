@@ -10,8 +10,15 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from analogforge.adapters.source_http.errors import AdapterError
 
 REQUIRED_FOR_QUANTITATIVE = (
-    "body", "horizontal_reference", "vertical_reference", "vertical_units", "acquisition_time", "cell_support_m",
-    "provenance", "rights_declaration", "stated_uncertainty_m",
+    "body",
+    "horizontal_reference",
+    "vertical_reference",
+    "vertical_units",
+    "acquisition_time",
+    "cell_support_m",
+    "provenance",
+    "rights_declaration",
+    "stated_uncertainty_m",
 )
 
 
@@ -44,5 +51,8 @@ def load_metadata(path: Path) -> SurveyMetadata:
     try:
         return SurveyMetadata.model_validate(json.loads(path.read_text(encoding="utf-8")))
     except (OSError, ValueError, ValidationError) as exc:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"{path.name} is not a valid survey metadata file",
-                           detail_code="METADATA_INCOMPLETE") from exc
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            f"{path.name} is not a valid survey metadata file",
+            detail_code="METADATA_INCOMPLETE",
+        ) from exc

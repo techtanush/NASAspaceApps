@@ -51,8 +51,9 @@ class IndexEntry:
 
 def validate_relative(path: str) -> str:
     if not _SAFE_REL.match(path) or ".." in path.split("/") or "//" in path:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"unsafe product path {path!r}",
-                   detail_code="ARCHIVE_PATH_TRAVERSAL")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", f"unsafe product path {path!r}", detail_code="ARCHIVE_PATH_TRAVERSAL"
+        )
     return path
 
 
@@ -67,17 +68,20 @@ def parse_index(label_text: str, table_text: str, columns: IndexColumns) -> list
     try:
         label = pvl.loads(label_text)
     except Exception as exc:  # noqa: BLE001 - any parser error means the index label is unusable
-        raise AdapterError("SOURCE_CONTENT_INVALID", "index label could not be parsed",
-                           detail_code="LABEL_PARSE_ERROR") from exc
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", "index label could not be parsed", detail_code="LABEL_PARSE_ERROR"
+        ) from exc
     table = label.get("INDEX_TABLE") or label.get("TABLE")
     if table is None:
-        raise AdapterError("UNSUPPORTED_PRODUCT", "index label has no INDEX_TABLE object",
-                   detail_code="UNSUPPORTED_FORMAT")
+        raise AdapterError(
+            "UNSUPPORTED_PRODUCT", "index label has no INDEX_TABLE object", detail_code="UNSUPPORTED_FORMAT"
+        )
     rows = _num(table.get("ROWS"))
     row_bytes = _num(table.get("ROW_BYTES"))
     if rows is None or row_bytes is None:
-        raise AdapterError("SOURCE_CONTENT_INVALID", "index label lacks ROWS/ROW_BYTES",
-                   detail_code="METADATA_INCOMPLETE")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", "index label lacks ROWS/ROW_BYTES", detail_code="METADATA_INCOMPLETE"
+        )
     spans: dict[str, tuple[int, int]] = {}
     for key, value in table.items():
         if key == "COLUMN" and hasattr(value, "get"):
@@ -89,17 +93,22 @@ def parse_index(label_text: str, table_text: str, columns: IndexColumns) -> list
     needed = (columns.file, columns.min_lat, columns.max_lat, columns.west, columns.east)
     missing = [c for c in needed if c not in spans]
     if missing:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"index table lacks columns {missing}",
-                   detail_code="METADATA_INCOMPLETE")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", f"index table lacks columns {missing}", detail_code="METADATA_INCOMPLETE"
+        )
     lines = [ln for ln in table_text.splitlines() if ln.strip()]
     if len(lines) != int(rows):
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"index table has {len(lines)} rows, label declares {int(rows)}",
-                           detail_code="SHAPE_MISMATCH")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            f"index table has {len(lines)} rows, label declares {int(rows)}",
+            detail_code="SHAPE_MISMATCH",
+        )
     entries: list[IndexEntry] = []
     for line in lines:
         if len(line.rstrip("\r\n")) < max(end for _, end in spans.values()):
-            raise AdapterError("SOURCE_CONTENT_INVALID", "index row shorter than its columns",
-                       detail_code="SHAPE_MISMATCH")
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID", "index row shorter than its columns", detail_code="SHAPE_MISMATCH"
+            )
 
         def cell(name: str, row: str = line) -> str:
             a, b = spans[name]
@@ -109,8 +118,9 @@ def parse_index(label_text: str, table_text: str, columns: IndexColumns) -> list
             south, north = float(cell(columns.min_lat)), float(cell(columns.max_lat))
             west, east = float(cell(columns.west)), float(cell(columns.east))
         except ValueError as exc:
-            raise AdapterError("SOURCE_CONTENT_INVALID", "index row has non-numeric bounds",
-                               detail_code="METADATA_INCOMPLETE") from exc
+            raise AdapterError(
+                "SOURCE_CONTENT_INVALID", "index row has non-numeric bounds", detail_code="METADATA_INCOMPLETE"
+            ) from exc
         entries.append(IndexEntry(validate_relative(cell(columns.file)), (west, south, east, north)))
     return entries
 
@@ -122,21 +132,29 @@ def _pieces_for(box: Box) -> list[Box]:
     return [box]
 
 
-def discover_in_index(http: SafeHttp, source: PdsSource, request: ResolveCoverageInput, *,
-                      max_products: int = 100, extra_notes: tuple[str, ...] = ()) -> list[CoverageSelection]:
+def discover_in_index(
+    http: SafeHttp,
+    source: PdsSource,
+    request: ResolveCoverageInput,
+    *,
+    max_products: int = 100,
+    extra_notes: tuple[str, ...] = (),
+) -> list[CoverageSelection]:
     label_bytes = http.get_bytes(source.index_label_url)
     label_text = label_bytes.content.decode("utf-8", errors="replace")
     try:
         parsed = pvl.loads(label_text)
     except Exception as exc:  # noqa: BLE001 - any parser error means the index label is unusable
-        raise AdapterError("SOURCE_CONTENT_INVALID", "index label could not be parsed",
-                           detail_code="LABEL_PARSE_ERROR") from exc
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", "index label could not be parsed", detail_code="LABEL_PARSE_ERROR"
+        ) from exc
     pointer = parsed.get("^INDEX_TABLE") or parsed.get("^TABLE")
     if isinstance(pointer, (list, tuple)):
         pointer = pointer[0] if pointer else None
     if not isinstance(pointer, str):
-        raise AdapterError("SOURCE_CONTENT_INVALID", "index label has no table pointer",
-                   detail_code="METADATA_INCOMPLETE")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", "index label has no table pointer", detail_code="METADATA_INCOMPLETE"
+        )
     table_url = source.index_label_url.rsplit("/", 1)[0] + "/" + validate_relative(pointer)
     table = http.get_bytes(table_url)
     entries = parse_index(label_text, table.content.decode("utf-8", errors="replace"), source.columns)
@@ -148,20 +166,38 @@ def discover_in_index(http: SafeHttp, source: PdsSource, request: ResolveCoverag
             hits.append(entry)
     key_base = {"bbox": list(request.aoi.bbox), "adapter": source.adapter_id}
     if not hits:
-        return [CoverageSelection(
-            selection_key=f"{source.adapter_id}:{canonical_sha256({**key_base, 'ids': []})[:16]}",
-            adapter_id=source.adapter_id, product_id=source.product_id, version=source.version, granule_ids=[],
-            access_state="NO_COVERAGE", coverage_fraction=0.0, native_resolution_m=source.native_resolution_m,
-            notes=["no indexed product intersects the AOI (NO_GRANULES)", *extra_notes])]
+        return [
+            CoverageSelection(
+                selection_key=f"{source.adapter_id}:{canonical_sha256({**key_base, 'ids': []})[:16]}",
+                adapter_id=source.adapter_id,
+                product_id=source.product_id,
+                version=source.version,
+                granule_ids=[],
+                access_state="NO_COVERAGE",
+                coverage_fraction=0.0,
+                native_resolution_m=source.native_resolution_m,
+                notes=["no indexed product intersects the AOI (NO_GRANULES)", *extra_notes],
+            )
+        ]
     capped = hits[:max_products]
     fraction = coverage_fraction(aoi_pieces, [b for e in capped for b in _pieces_for(e.box)])
     notes = [f"{len(capped)} product(s) matched; coverage_fraction is planar-degree footprint overlap.", *extra_notes]
     if len(hits) > len(capped):
-        notes.append(f"DISCOVERY_TRUNCATED: results capped at {len(capped)} of {len(hits)} matching products; "
-                     "coverage_fraction is a lower bound.")
+        notes.append(
+            f"DISCOVERY_TRUNCATED: results capped at {len(capped)} of {len(hits)} matching products; "
+            "coverage_fraction is a lower bound."
+        )
     ids = [e.path for e in capped]
-    return [CoverageSelection(
-        selection_key=f"{source.adapter_id}:{canonical_sha256({**key_base, 'ids': ids})[:16]}",
-        adapter_id=source.adapter_id, product_id=source.product_id, version=source.version, granule_ids=ids,
-        access_state="AVAILABLE", coverage_fraction=fraction, native_resolution_m=source.native_resolution_m,
-        notes=notes)]
+    return [
+        CoverageSelection(
+            selection_key=f"{source.adapter_id}:{canonical_sha256({**key_base, 'ids': ids})[:16]}",
+            adapter_id=source.adapter_id,
+            product_id=source.product_id,
+            version=source.version,
+            granule_ids=ids,
+            access_state="AVAILABLE",
+            coverage_fraction=fraction,
+            native_resolution_m=source.native_resolution_m,
+            notes=notes,
+        )
+    ]

@@ -42,8 +42,9 @@ def _bounds_lonlat(path: Path) -> tuple[float, float, float, float]:
                 raise AdapterError("UNSUPPORTED_CRS", f"{path.name} has no CRS", detail_code="METADATA_INCOMPLETE")
             west, south, east, north = transform_bounds(src.crs, "EPSG:4326", *src.bounds)
     except rasterio.errors.RasterioError as exc:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"{path.name} is not a readable GeoTIFF",
-                           detail_code="BAD_ARCHIVE") from exc
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", f"{path.name} is not a readable GeoTIFF", detail_code="BAD_ARCHIVE"
+        ) from exc
     return float(west), float(south), float(east), float(north)
 
 
@@ -51,13 +52,15 @@ def _upload_id(upload: UserSurveyUpload) -> str:
     return f"survey-{file_sha256(upload.path)[:16]}"
 
 
-def discover(request: ResolveCoverageInput, client: httpx.Client | None = None, *,
-             uploads: Sequence[UserSurveyUpload] = ()) -> list[CoverageSelection]:
+def discover(
+    request: ResolveCoverageInput, client: httpx.Client | None = None, *, uploads: Sequence[UserSurveyUpload] = ()
+) -> list[CoverageSelection]:
     """Select registered uploads that intersect the AOI. ``client`` is accepted for interface symmetry and unused."""
     del client
     if request.adapter_id != USER_SURVEY_ADAPTER_ID:
-        raise AdapterError("UNSUPPORTED_PRODUCT", f"unknown adapter {request.adapter_id!r}",
-                           detail_code="UNSUPPORTED_FORMAT")
+        raise AdapterError(
+            "UNSUPPORTED_PRODUCT", f"unknown adapter {request.adapter_id!r}", detail_code="UNSUPPORTED_FORMAT"
+        )
     if request.aoi.body != "EARTH":
         raise AdapterError("UNSUPPORTED_PRODUCT", "user surveys are Earth-only", detail_code="BODY_MISMATCH")
     pieces = split_bbox(request.aoi.bbox, request.aoi.longitude_convention, "NEG180_180")
@@ -67,29 +70,54 @@ def discover(request: ResolveCoverageInput, client: httpx.Client | None = None, 
         if frac > 0:
             hits.append((_upload_id(upload), upload, frac))
     if not hits:
-        return [empty_selection(USER_SURVEY_ADAPTER_ID, PRODUCT_ID, None, request, "NO_COVERAGE",
-                                "no registered user survey intersects the AOI (NO_GRANULES)", None)]
+        return [
+            empty_selection(
+                USER_SURVEY_ADAPTER_ID,
+                PRODUCT_ID,
+                None,
+                request,
+                "NO_COVERAGE",
+                "no registered user survey intersects the AOI (NO_GRANULES)",
+                None,
+            )
+        ]
     out: list[CoverageSelection] = []
     for uid, upload, frac in sorted(hits, key=lambda h: h[0]):
         missing = upload.metadata.missing_fields()
         notes = ["USER-SUPPLIED data; not NASA evidence."]
         if missing:
             notes.append(f"Preview only: quantitative use blocked until {', '.join(missing)} are declared.")
-        out.append(CoverageSelection.model_validate({
-            "selection_key": selection_key(USER_SURVEY_ADAPTER_ID, request.aoi.bbox, [uid]),
-            "adapter_id": USER_SURVEY_ADAPTER_ID, "product_id": PRODUCT_ID, "version": None, "granule_ids": [uid],
-            "access_state": "AVAILABLE", "coverage_fraction": frac,
-            "native_resolution_m": upload.metadata.cell_support_m, "notes": notes}))
+        out.append(
+            CoverageSelection.model_validate(
+                {
+                    "selection_key": selection_key(USER_SURVEY_ADAPTER_ID, request.aoi.bbox, [uid]),
+                    "adapter_id": USER_SURVEY_ADAPTER_ID,
+                    "product_id": PRODUCT_ID,
+                    "version": None,
+                    "granule_ids": [uid],
+                    "access_state": "AVAILABLE",
+                    "coverage_fraction": frac,
+                    "native_resolution_m": upload.metadata.cell_support_m,
+                    "notes": notes,
+                }
+            )
+        )
     return out
 
 
-def fetch(selection: CoverageSelection, client: httpx.Client | None, scratch: Path, *,
-          uploads: Sequence[UserSurveyUpload] = ()) -> list[AcquiredAsset]:
+def fetch(
+    selection: CoverageSelection,
+    client: httpx.Client | None,
+    scratch: Path,
+    *,
+    uploads: Sequence[UserSurveyUpload] = (),
+) -> list[AcquiredAsset]:
     """Copy selected uploads into ``scratch`` (hash-verified); no network."""
     del client
     if selection.adapter_id != USER_SURVEY_ADAPTER_ID:
-        raise AdapterError("UNSUPPORTED_PRODUCT", f"selection belongs to {selection.adapter_id}",
-                           detail_code="ADAPTER_MISMATCH")
+        raise AdapterError(
+            "UNSUPPORTED_PRODUCT", f"selection belongs to {selection.adapter_id}", detail_code="ADAPTER_MISMATCH"
+        )
     if not selection.granule_ids:
         raise AdapterError("NO_COVERAGE", "selection lists no uploads", detail_code="NO_GRANULES")
     by_id = {_upload_id(u): u for u in uploads}
@@ -109,13 +137,22 @@ def fetch(selection: CoverageSelection, client: httpx.Client | None, scratch: Pa
         digest = file_sha256(dest)
         if not digest.startswith(uid.removeprefix("survey-")):
             dest.unlink(missing_ok=True)
-            raise AdapterError("SOURCE_CHECKSUM_MISMATCH", "upload changed while being copied",
-                               detail_code="CHECKSUM_MISMATCH")
-        assets.append(AcquiredAsset(
-            adapter_id=USER_SURVEY_ADAPTER_ID, product_id=PRODUCT_ID, version=None, granule_id=uid,
-            source_uri=f"user-upload:{uid}/{upload.path.name}", sha256=digest, size_bytes=size,
-            validation_status="PENDING" if upload.metadata.missing_fields() else "VERIFIED",
-            artifact_key=f"source-bytes:{USER_SURVEY_ADAPTER_ID}:{uid}"))
+            raise AdapterError(
+                "SOURCE_CHECKSUM_MISMATCH", "upload changed while being copied", detail_code="CHECKSUM_MISMATCH"
+            )
+        assets.append(
+            AcquiredAsset(
+                adapter_id=USER_SURVEY_ADAPTER_ID,
+                product_id=PRODUCT_ID,
+                version=None,
+                granule_id=uid,
+                source_uri=f"user-upload:{uid}/{upload.path.name}",
+                sha256=digest,
+                size_bytes=size,
+                validation_status="PENDING" if upload.metadata.missing_fields() else "VERIFIED",
+                artifact_key=f"source-bytes:{USER_SURVEY_ADAPTER_ID}:{uid}",
+            )
+        )
     return assets
 
 
@@ -135,13 +172,17 @@ def decode(path: Path, params: SurveyDecodeParams) -> DecodedRaster:
     md = params.metadata
     issues = [f"missing:{f}" for f in md.missing_fields()]
     if md.body is not None and md.body.upper() != "EARTH":
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"user surveys are Earth-only; declared body {md.body!r}",
-                           detail_code="BODY_MISMATCH")
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID",
+            f"user surveys are Earth-only; declared body {md.body!r}",
+            detail_code="BODY_MISMATCH",
+        )
     try:
         src = rasterio.open(path)
     except rasterio.errors.RasterioError as exc:
-        raise AdapterError("SOURCE_CONTENT_INVALID", f"{path.name} is not a readable GeoTIFF",
-                           detail_code="BAD_ARCHIVE") from exc
+        raise AdapterError(
+            "SOURCE_CONTENT_INVALID", f"{path.name} is not a readable GeoTIFF", detail_code="BAD_ARCHIVE"
+        ) from exc
     with src:
         if src.crs is None:
             raise AdapterError("UNSUPPORTED_CRS", f"{path.name} has no CRS", detail_code="METADATA_INCOMPLETE")
@@ -170,8 +211,9 @@ def decode(path: Path, params: SurveyDecodeParams) -> DecodedRaster:
         factor_v = _FEET[unit]
         notes.append(f"Vertical values converted from {unit} to metres (x{factor_v:.7f}).")
     elif unit and unit not in _METRES:
-        raise AdapterError("UNSUPPORTED_PRODUCT", f"unsupported vertical unit {md.vertical_units!r}",
-                           detail_code="UNSUPPORTED_FORMAT")
+        raise AdapterError(
+            "UNSUPPORTED_PRODUCT", f"unsupported vertical unit {md.vertical_units!r}", detail_code="UNSUPPORTED_FORMAT"
+        )
     data = np.where(valid, band * factor_v, np.nan)
     declared = md.cell_support_m
     if pixel_m is not None and declared is not None and abs(pixel_m - declared) > 0.05 * declared:
@@ -181,10 +223,21 @@ def decode(path: Path, params: SurveyDecodeParams) -> DecodedRaster:
     if not allowed:
         notes.append("Preview only: quantitative qualification is prohibited (" + ", ".join(issues) + ").")
     meta = RasterMetadata(
-        adapter_id=USER_SURVEY_ADAPTER_ID, body="EARTH", quantity="elevation", units="m",
-        vertical_reference=md.vertical_reference, crs_wkt=crs_wkt, transform=affine, width=width, height=height,
-        pixel_registration="GDAL_PIXEL_EDGE", nodata_raw=float(nodata) if nodata is not None else None,
-        product_id=path.stem, notes=tuple(notes), quantitative_use_allowed=allowed, issues=tuple(issues),
+        adapter_id=USER_SURVEY_ADAPTER_ID,
+        body="EARTH",
+        quantity="elevation",
+        units="m",
+        vertical_reference=md.vertical_reference,
+        crs_wkt=crs_wkt,
+        transform=affine,
+        width=width,
+        height=height,
+        pixel_registration="GDAL_PIXEL_EDGE",
+        nodata_raw=float(nodata) if nodata is not None else None,
+        product_id=path.stem,
+        notes=tuple(notes),
+        quantitative_use_allowed=allowed,
+        issues=tuple(issues),
         attributes={k: str(v) for k, v in md.model_dump().items() if v is not None},
     )
     return DecodedRaster(data=data, valid=valid, metadata=meta)
