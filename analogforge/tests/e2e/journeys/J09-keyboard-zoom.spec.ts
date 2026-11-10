@@ -18,6 +18,9 @@ test('J09b 200 percent zoom reflow retains primary actions and keyboard focus', 
   const context = await browser.newContext({ viewport: { width: 720, height: 450 }, deviceScaleFactor: 2, baseURL: process.env.E2E_BASE_URL || 'http://127.0.0.1:5176' });
   const page = await context.newPage();
   try {
+    // This extra context must own focus for native keyboard-triggered file selection.
+    await page.bringToFront();
+    await expect.poll(()=>page.evaluate(()=>document.hasFocus())).toBe(true);
     await keyboardMission(page);
     expect(await page.evaluate(() => devicePixelRatio)).toBe(2);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
