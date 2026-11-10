@@ -1,0 +1,433 @@
+{
+  "accepted_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
+  "algorithm_config_sha256": "6a8b8b21c4f40dc0fe9d2f7d8931caaaeb7706ca951e45aebd57136e564e863e",
+  "assurance_policy_note": "The integrated application's accepted assurance-policy lock is not present in this science-only branch; null is intentional.",
+  "blockers": [
+    "Real NASA credentials/products and independent source controls were not supplied or acquired; live servers not attempted.",
+    "Full joint SCI publication/UI cases require the integrated application."
+  ],
+  "candidate_config_sha256": "c87c35bb5cd1d59570730de2cfc4b067cc05f8ad7dc8581008af3b72546c6604",
+  "controls": {
+    "ancestry_or_selection_limitations": [
+      "Practice controls are designed synthetic fixtures; no real held-out validation split.",
+      "NASA DEM/SRTM shared-ancestry guard tested, not independent real observations."
+    ],
+    "held_out_ids": [],
+    "manifest_sha256": null,
+    "mission_sensitivity_evidence": [],
+    "negative_control_evidence": [],
+    "positive_control_evidence": [],
+    "status": "NOT_RUN",
+    "tuning_ids": []
+  },
+  "created_at": "2026-11-10T07:10:03.053407+00:00",
+  "integrity_tests": [
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Science subchecks executed; joint publication/UI/immutable application enforcement is not executed on this branch."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "NOT_RUN",
+      "test_id": "SCI-01",
+      "test_path": [
+        "test_dataset_validation",
+        "test_review_source_pipeline"
+      ]
+    },
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": 0,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Offline science-owned integrity invariant executed; does not validate a real NASA product."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "PASSED",
+      "test_id": "SCI-02",
+      "test_path": [
+        "test_geometry",
+        "test_dataset_validation"
+      ]
+    },
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Science subchecks executed; joint publication/UI/immutable application enforcement is not executed on this branch."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "NOT_RUN",
+      "test_id": "SCI-03",
+      "test_path": [
+        "test_geometry",
+        "test_truth_table"
+      ]
+    },
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Science subchecks executed; joint publication/UI/immutable application enforcement is not executed on this branch."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "NOT_RUN",
+      "test_id": "SCI-04",
+      "test_path": [
+        "test_features",
+        "test_verifier_independence",
+        "test_perturbations"
+      ]
+    },
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Science subchecks executed; joint publication/UI/immutable application enforcement is not executed on this branch."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "NOT_RUN",
+      "test_id": "SCI-05",
+      "test_path": [
+        "test_optional_layers",
+        "test_truth_table",
+        "test_review_source_pipeline"
+      ]
+    },
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Science subchecks executed; joint publication/UI/immutable application enforcement is not executed on this branch.",
+        "Nominal/unknown-uncertainty statements are checked. Quantified straddling interval propagation is not implemented or certified by this branch."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "NOT_RUN",
+      "test_id": "SCI-06",
+      "test_path": [
+        "test_audit",
+        "test_comparison"
+      ]
+    },
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Science subchecks executed; joint publication/UI/immutable application enforcement is not executed on this branch."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "NOT_RUN",
+      "test_id": "SCI-07",
+      "test_path": [
+        "test_energy",
+        "test_storylines"
+      ]
+    },
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": 0,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Offline science-owned integrity invariant executed; does not validate a real NASA product."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "PASSED",
+      "test_id": "SCI-08",
+      "test_path": [
+        "test_audit"
+      ]
+    },
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Science subchecks executed; joint publication/UI/immutable application enforcement is not executed on this branch."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "NOT_RUN",
+      "test_id": "SCI-09",
+      "test_path": [
+        "test_verifier_independence",
+        "test_search_limits"
+      ]
+    },
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Science subchecks executed; joint publication/UI/immutable application enforcement is not executed on this branch."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "NOT_RUN",
+      "test_id": "SCI-10",
+      "test_path": [
+        "test_graph_oracle",
+        "test_storylines"
+      ]
+    },
+    {
+      "command": null,
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": null,
+      "notes": [
+        "Application/publication/UI ownership; unrun in this science-only worktree."
+      ],
+      "status": "NOT_RUN",
+      "test_id": "SCI-11",
+      "test_path": null
+    },
+    {
+      "command": null,
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": null,
+      "notes": [
+        "Application/publication/UI ownership; unrun in this science-only worktree."
+      ],
+      "status": "NOT_RUN",
+      "test_id": "SCI-12",
+      "test_path": null
+    },
+    {
+      "command": null,
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": null,
+      "notes": [
+        "Application/publication/UI ownership; unrun in this science-only worktree."
+      ],
+      "status": "NOT_RUN",
+      "test_id": "SCI-13",
+      "test_path": null
+    },
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Science subchecks executed; joint publication/UI/immutable application enforcement is not executed on this branch."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "NOT_RUN",
+      "test_id": "SCI-14",
+      "test_path": [
+        "test_screening",
+        "test_perturbations"
+      ]
+    },
+    {
+      "command": null,
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": null,
+      "notes": [
+        "Application/publication/UI ownership; unrun in this science-only worktree."
+      ],
+      "status": "NOT_RUN",
+      "test_id": "SCI-15",
+      "test_path": null
+    },
+    {
+      "command": null,
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": null,
+      "notes": [
+        "Application/publication/UI ownership; unrun in this science-only worktree."
+      ],
+      "status": "NOT_RUN",
+      "test_id": "SCI-16",
+      "test_path": null
+    },
+    {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": "synthetic/replay",
+      "notes": [
+        "Science subchecks executed; joint publication/UI/immutable application enforcement is not executed on this branch."
+      ],
+      "offline_evidence": "review-2026-11-09/science-seed2.xml",
+      "offline_science_subchecks": "PASSED",
+      "status": "NOT_RUN",
+      "test_id": "SCI-17",
+      "test_path": [
+        "test_determinism",
+        "test_review_source_pipeline"
+      ]
+    },
+    {
+      "command": null,
+      "evidence_ids": [],
+      "exit_code": null,
+      "mode": null,
+      "notes": [
+        "Application/publication/UI ownership; unrun in this science-only worktree."
+      ],
+      "status": "NOT_RUN",
+      "test_id": "SCI-18",
+      "test_path": null
+    }
+  ],
+  "limitations": [
+    "Offline S0/S1 scope only; real NASA S2/S3/S4 product/comparative/experiment validation remains unrun.",
+    "FETCH_SOURCE raw assets still require product-specific decoding and validated manifest ingestion before ADAPTER_EVIDENCE analysis.",
+    "Optional mineral sources must align in CRS/grid before co-located metrics are credited; otherwise retained but unused.",
+    "Thermal variable/local-time/season interpretation remains unresolved for qualification; optional display is not thermal equivalence.",
+    "Energy-only INCONCLUSIVE inference uses a summary lacking issue codes; non-energy DATA with unknown reserve can be indistinguishable.",
+    "Connected-zone cap remains the configured default because AnalyzeCandidateInput has no rover; actual rover feasibility requires route search.",
+    "Actual NASA endpoint/product defaults unverified against live servers; no model or browser/application integration was run here.",
+    "No calibrated physical response, real held-out split or quantified interval propagation is demonstrated."
+  ],
+  "live_model": {
+    "receipts": [],
+    "status": "NOT_RUN"
+  },
+  "lock_inputs": {
+    "dataset_policy_sha256": "config/datasets.yaml",
+    "schema_sha256": "contracts/domain.schema.json",
+    "science_port_sha256": "src/analogforge/ports/science.py"
+  },
+  "locks": {
+    "acquired_manifest_sha256": null,
+    "algorithm_lock_sha256": "e373b0a8d971e405a800d379fe214a60b7c4bf72f1d24a66ffd859256bf29023",
+    "assurance_policy_sha256": null,
+    "dataset_policy_sha256": "9c055ffeeb39ec34274ef4a0da863c7e5555c77236fdf33dd748f51bd33dc5e5",
+    "schema_sha256": "cd051f476020752eca804d65ee2bb693c39109523a2d3bd69f49f3e923c6ecdf",
+    "science_port_sha256": "db5a08e1cd74c9e78aa4d12895e9f2c38b76067c280b3141fa54a3a6de149b47"
+  },
+  "note": "Observed contributor-scope report. No synthetic result, mock transport or decoded fixture counts as S2-S5.",
+  "permitted_release_claims": [
+    "Offline typed contracts and analytic science oracles pass on the tested SHA.",
+    "Synthetic source-to-science, mock adapters and independent route verification execute reproducibly."
+  ],
+  "prohibited_or_unproven_claims": [
+    "Validated actual NASA products or live NASA endpoints",
+    "Real Earth\u2013Moon/Mars comparative validation",
+    "Field-safe rover operation or physical validation",
+    "Full integrated application/model/browser acceptance",
+    "Quantified robust-pass interval propagation"
+  ],
+  "published_examples": {
+    "limited_unknown": [],
+    "rejected_claim_audits": [],
+    "supported_negative": [],
+    "supported_positive": [],
+    "ui_export_comparisons": []
+  },
+  "ready_for_declared_scope": true,
+  "schema_version": "1.0",
+  "scientific_gate_catalog_sha256": "a8db66d44553bbb767b4bd5dce99480edab9867a917c68f94d7d35685435ae8d",
+  "scope": "ayan_offline_science_library_S0_S1",
+  "source_paths": {
+    "Earth": {
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": [],
+      "notes": [
+        "Format-faithful synthetic fixtures execute; actual source acquisition/control-pixel validation remains unrun."
+      ],
+      "status": "NOT_RUN"
+    },
+    "Mars": {
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": [],
+      "notes": [
+        "Format-faithful synthetic fixtures execute; actual source acquisition/control-pixel validation remains unrun."
+      ],
+      "status": "NOT_RUN"
+    },
+    "Moon": {
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": [],
+      "notes": [
+        "Format-faithful synthetic fixtures execute; actual source acquisition/control-pixel validation remains unrun."
+      ],
+      "status": "NOT_RUN"
+    }
+  },
+  "status_vocabulary": [
+    "NOT_RUN",
+    "PASSED",
+    "FAILED",
+    "BLOCKED_EXTERNAL",
+    "SKIPPED",
+    "NOT_IMPLEMENTED"
+  ],
+  "tested_commit_sha": "3e5d1b93e3e6c22a8c67af1a31d0e2f45efe5dde",
+  "validation_levels": {
+    "S0": {
+      "evidence": [
+        "review-2026-11-09/science-seed2.xml",
+        "review-2026-11-09/kit.xml"
+      ],
+      "status": "PASSED"
+    },
+    "S1": {
+      "evidence": [
+        "review-2026-11-09/science-seed2.xml",
+        "review-2026-11-09/kit.xml"
+      ],
+      "status": "PASSED"
+    },
+    "S2": {
+      "evidence": [],
+      "notes": [
+        "No actual acquired/independently inspected NASA product or real comparative modeled experiment executed."
+      ],
+      "status": "NOT_RUN"
+    },
+    "S3": {
+      "evidence": [],
+      "notes": [
+        "No actual acquired/independently inspected NASA product or real comparative modeled experiment executed."
+      ],
+      "status": "NOT_RUN"
+    },
+    "S4": {
+      "evidence": [],
+      "notes": [
+        "No actual acquired/independently inspected NASA product or real comparative modeled experiment executed."
+      ],
+      "status": "NOT_RUN"
+    },
+    "S5": {
+      "evidence": [],
+      "status": "NOT_IMPLEMENTED"
+    }
+  }
+}

@@ -356,3 +356,6 @@
   config; ops pass the request config). `energy_defaults` are NOT applied silently (a rover without a model stays ENERGY_UNCALIBRATED); DESIGN_BENCHMARK
   quotes them as an "ASSUMED earth-simple-v1 proposal (not applied)" limitation, so they appear in the constraints hash. Config values reach
   `parameters_sha256` through the facade's existing `algorithm_config_sha256`. Tests: `tests/unit/science/test_routing_config.py`.
+# Post-push review update — 9 November 2026
+
+The later [review findings](REVIEW-FINDINGS.md), [facade contract](API-FACADE.md), [status](STATUS.json) and [evidence packet](review-2026-11-09/README.md) supersede historical statements below that geographic source processing, normalized ADAPTER_EVIDENCE reuse or optional-source display are unavailable. The original 17/17 mutation result is not reliable certification; the current gate verifies all 16 required behaviors with passing baselines. Frozen contracts, tolerances and the raw-download/normalized-ingestion boundary remain in force. Current readiness covers offline S0/S1 contributor gates; real NASA and integrated release scope remain unrun.
