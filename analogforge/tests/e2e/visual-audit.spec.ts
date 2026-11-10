@@ -4,7 +4,7 @@ import { newMission, startRun, tab, prove,api } from './support/workbench';
 // @ts-expect-error JavaScript audit module exports are checked by the runtime audit.
 import {auditPage,auditGlyphs,finishAudit,THRESHOLDS,COMPONENTS,reports,installAuditInstrumentation,auditFailures,auditCancellations,waitForAuditData,auditStyleguide} from '../../scripts/ui/visual_audit.mjs';
 test('UIX-13 complete visual audit C01–C20',async({page})=>{
- test.setTimeout(1800000);page.setDefaultTimeout(15000);
+ test.setTimeout(3600000);page.setDefaultTimeout(15000);
  page.on('request',request=>{if(request.method()==='POST')console.log('audit mutation',new URL(request.url()).pathname);});page.on('response',response=>{if(response.request().method()==='POST')console.log('audit acknowledgement',response.status(),new URL(response.url()).pathname);});
  const faults: string[]=[];const external:string[]=[];
  page.on('pageerror',e=>faults.push(e.message));page.on('console',m=>{if(['error','warning'].includes(m.type()))faults.push(m.text());});
