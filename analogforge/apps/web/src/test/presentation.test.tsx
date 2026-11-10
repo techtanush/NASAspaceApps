@@ -26,9 +26,9 @@ describe('FE-002, FE-009: truthful presentation', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByText('Review')).toHaveFocus();
   });
-  it('nonmodal evidence closes when focus moves outside, preserving the new keyboard target',async()=>{
+  it('nonmodal evidence persists outside focus until explicitly dismissed',async()=>{
     function Harness(){const [open,setOpen]=useState(false);return <><Button onClick={()=>setOpen(true)}>Inspect evidence</Button><Button>Continue working</Button><Drawer title="Evidence scope" open={open} onOpenChange={setOpen}><p>Frozen receipt.</p></Drawer></>;}
-    const user=userEvent.setup();render(<Harness/>);await user.click(screen.getByText('Inspect evidence'));expect(screen.getByRole('dialog',{name:'Evidence scope'})).toBeVisible();screen.getByText('Continue working').focus();await waitFor(()=>expect(screen.queryByRole('dialog')).not.toBeInTheDocument());expect(screen.getByText('Continue working')).toHaveFocus();await user.click(screen.getByText('Inspect evidence'));await user.keyboard('{Escape}');expect(screen.getByText('Inspect evidence')).toHaveFocus();
+    const user=userEvent.setup();render(<Harness/>);await user.click(screen.getByText('Inspect evidence'));expect(screen.getByRole('dialog',{name:'Evidence scope'})).toBeVisible();screen.getByText('Continue working').focus();expect(screen.getByRole('dialog',{name:'Evidence scope'})).toBeVisible();expect(screen.getByText('Continue working')).toHaveFocus();await user.keyboard('{Escape}');await waitFor(()=>expect(screen.queryByRole('dialog')).not.toBeInTheDocument());expect(screen.getByText('Inspect evidence')).toHaveFocus();
   });
 });
 
