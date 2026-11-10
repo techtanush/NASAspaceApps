@@ -16,7 +16,6 @@ from analogforge.science.ops.source import find_bound_dataset, resolve_source
 from analogforge.science.ops.terrain import (
     band_metrics,
     band_pairs,
-    clean_aspect,
     hist_of,
     metric,
     prepare,
@@ -74,7 +73,7 @@ def run_analyze(env: OpEnv) -> OpOutcome:
         valid=valid,
         land=land,
         slope_deg=slope,
-        aspect_deg=clean_aspect(surf.aspect_deg[rs]),
+        aspect_deg=surf.aspect_deg[rs],
         quality=quality,
         source_evidence_ids=(src.draft.local_key,),
         algorithm_id=algo,

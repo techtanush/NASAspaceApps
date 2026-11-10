@@ -24,7 +24,7 @@ from analogforge.ports.science import (
 )
 from support.registrar_stub import Registered, register
 
-KIT = Path(__file__).resolve().parents[1] / "fixtures" / "kit"
+KIT = Path(__file__).resolve().parents[2] / "kit"
 WORKSPACE = uuid.UUID("00000000-0000-4000-8000-000000000001")
 STAMP = datetime(2026, 11, 5, tzinfo=UTC)
 _counter = {"n": 0}

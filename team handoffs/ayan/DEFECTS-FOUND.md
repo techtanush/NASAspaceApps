@@ -6,3 +6,5 @@ violating the documented `[0, 360)` range; `raster.store.build_analysis_grid` th
 Reproduction: analyse window `grid-r2c2` of the default practice grid through `ANALYZE_CANDIDATE` (before the workaround it came back
 `BLOCKED SOURCE_CONTENT_INVALID`). Workaround: `science/ops/terrain.py::clean_aspect` folds values `>= 360` back by 360 before building the grid.
 Proper fix (owner of `features/slope.py`): `aspect = np.where(aspect >= 360.0, 0.0, aspect)` after the modulo.
+
+**RESOLVED**: the fix is applied at the source in `aspect_from_gradient` (regression test `test_d01_aspect_never_rounds_up_to_360` in `tests/unit/science/test_features.py`) and the `clean_aspect` workaround has been removed from `ops/`.

@@ -157,8 +157,3 @@ def aoi_for_bounds(
         crs_wkt=None,
         vertical_datum=vertical_datum,
     )
-
-
-def clean_aspect(aspect: FloatArray) -> FloatArray:
-    """Fold aspect values that round to exactly 360.0 back to 0 (``-1e-15 % 360.0 == 360.0`` in floating point)."""
-    return np.asarray(np.where(aspect >= 360.0, aspect - 360.0, aspect), dtype=np.float64)

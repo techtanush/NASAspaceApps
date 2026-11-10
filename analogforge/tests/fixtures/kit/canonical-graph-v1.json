@@ -1,0 +1,113 @@
+{
+  "fixture_id": "unique-exposure-fail-repair-v1",
+  "mode": "synthetic",
+  "resource_provider": "TEST_ONLY_MOCK_GRAPH",
+  "nodes": [
+    "S",
+    "A",
+    "B",
+    "C",
+    "W1",
+    "W2"
+  ],
+  "edges": [
+    {
+      "a": "S",
+      "b": "A",
+      "length_m": 20,
+      "surface_slope_deg": 10,
+      "mock_energy_wh": 1
+    },
+    {
+      "a": "A",
+      "b": "W1",
+      "length_m": 20,
+      "surface_slope_deg": 10,
+      "mock_energy_wh": 1
+    },
+    {
+      "a": "W1",
+      "b": "W2",
+      "length_m": 20,
+      "surface_slope_deg": 10,
+      "mock_energy_wh": 1
+    },
+    {
+      "a": "S",
+      "b": "B",
+      "length_m": 50,
+      "surface_slope_deg": 15,
+      "mock_energy_wh": 2
+    },
+    {
+      "a": "B",
+      "b": "C",
+      "length_m": 50,
+      "surface_slope_deg": 15,
+      "mock_energy_wh": 2
+    },
+    {
+      "a": "C",
+      "b": "W1",
+      "length_m": 50,
+      "surface_slope_deg": 15,
+      "mock_energy_wh": 2
+    }
+  ],
+  "tasks": {
+    "W1": 10,
+    "W2": 10
+  },
+  "constraints": {
+    "required_task_ids": [
+      "W1",
+      "W2"
+    ],
+    "start": "S",
+    "return_to": "S",
+    "max_slope_deg": 18,
+    "minimum_unique_exposure_m": 100,
+    "slope_band_deg": [
+      12,
+      18
+    ],
+    "max_distance_m": 400,
+    "max_undirected_edge_traversals": 2,
+    "battery_wh": 1800,
+    "min_reserve_pct": 20
+  },
+  "attempts": [
+    {
+      "route": [
+        "S",
+        "A",
+        "W1",
+        "W2",
+        "W1",
+        "A",
+        "S"
+      ],
+      "expected_length_m": 120,
+      "expected_energy_wh": 26,
+      "expected_unique_exposure_m": 0,
+      "expected_outcome": "FAIL"
+    },
+    {
+      "route": [
+        "S",
+        "B",
+        "C",
+        "W1",
+        "W2",
+        "W1",
+        "C",
+        "B",
+        "S"
+      ],
+      "expected_length_m": 340,
+      "expected_energy_wh": 34,
+      "expected_unique_exposure_m": 150,
+      "expected_outcome": "PASS"
+    }
+  ]
+}

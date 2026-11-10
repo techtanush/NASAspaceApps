@@ -55,5 +55,5 @@ result = svc.execute(request, context)      # ScienceComputationResult
 
 ## Tests
 `tests/contracts/science/test_port_conformance.py`, `tests/integration/science/test_{screening,truth_table,storylines,perturbations,optional_layers,determinism,cancellation,budgets}.py`,
-`tests/unit/science/test_import_hygiene.py`; helpers `tests/support/{registrar_stub,builders,graph_flow,practice}.py`; scripts `scripts/science/{forbidden_scan,mutation_check,run_oracles}.py`
+`tests/unit/science/test_import_hygiene.py`; helpers `tests/fixtures/science/support/{registrar_stub,builders,graph_flow,practice}.py` (importable as `support` via per-directory `tests/*/science/conftest.py`); scripts `scripts/science/{forbidden_scan,mutation_check,run_oracles}.py`
 (+`mutants.json`).

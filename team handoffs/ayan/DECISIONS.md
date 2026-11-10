@@ -226,3 +226,15 @@
   read per-group coordinate variables), `mock-nasa-bad-no-crs` declares `epsg: 32612` in its manifest while the file has no CRS (the ingest FAILs
   `crs_resolved` for the missing file CRS), pixel registration CORNER for area-referenced GeoTIFF/ASCII fixtures and UNKNOWN where ambiguous.
 * F-07 Mars strips have 4 kink columns that mix neighbouring slopes; measured fractions (0.42/0.30/0.19/0.087) are within the +-0.03 allowance.
+
+## Ownership / test layout (closing pass)
+* O-01 Contradiction: guide 08 calls `registrar_stub` and the other helpers "under `tests/support/` yours", but `team coordination/contracts/ownership.json`
+  assigns `analogforge/tests/conftest.py` and `analogforge/tests/support/` to Tanush, so `check_branch_ownership.py --person ayan` failed. The registry
+  was NOT edited. The helpers moved to the Ayan-owned `tests/fixtures/science/support/` (package `support`; `builders.KIT` now resolves to
+  `tests/fixtures/kit`), the shared `tests/conftest.py` was deleted and replaced by one `conftest.py` per `tests/{unit,integration,contracts,property,replay}/science/`
+  that puts `tests/fixtures/science` on `sys.path`. `forbidden_scan.py` scans `tests/fixtures/science` instead of `tests/support`.
+* O-02 `analogforge/out/` (generated oracle/forbidden/mutation JSON and junit XML) is never committed. `analogforge/.gitignore` is a frozen kit file so it
+  cannot list `out/`; the clone-local `.git/info/exclude` carries `analogforge/out/` so `git ls-files --others --exclude-standard` (used by the
+  ownership check) does not see it. Scripts keep writing to `analogforge/out/`.
+* O-03 D-01 (aspect == 360.0) fixed in `features/slope.py`; the facade workaround `clean_aspect` was removed.
+* O-04 New: `tests/property/science/test_properties.py` (cross-cutting properties) and `scripts/science/validate_sources.py` (+ `tests/integration/science/test_validate_sources.py`).

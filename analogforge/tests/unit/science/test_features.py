@@ -601,3 +601,13 @@ def test_zone_band_areas_respect_half_open_bands_and_the_final_inclusive_band() 
     assert exclusive[0].band_area_m2["12-18"] == 2 * 100.0  # 12.0 and 15.0 only: 18.0 belongs to the next band
     assert inclusive[0].band_area_m2["12-18"] == 4 * 100.0  # the final capped band keeps its upper endpoint
     assert Band(12.0, 18.0).contains(np.array([18.0, 17.9999])).tolist() == [False, True]
+
+
+def test_d01_aspect_never_rounds_up_to_360() -> None:
+    """D-01: a tiny negative angle must not become exactly 360.0 after the modulo; range is [0, 360)."""
+    dz_dx = np.array([1e-20, 1e-17, -1e-17, 0.0, 1.0])
+    dz_dy = np.array([-1.0, -1.0, -1.0, -1.0, 0.0])
+    aspect = aspect_from_gradient(dz_dx, dz_dy)
+    finite = aspect[np.isfinite(aspect)]
+    assert finite.size == 5 and float(finite.min()) >= 0.0 and float(finite.max()) < 360.0
+    assert float(aspect[0]) == 0.0

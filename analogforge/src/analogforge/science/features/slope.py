@@ -102,6 +102,7 @@ def aspect_from_gradient(
     """Downslope azimuth clockwise from north in ``[0, 360)``; NaN where the gradient is flat or undefined."""
     with np.errstate(invalid="ignore"):
         aspect = np.degrees(np.arctan2(-dz_dx, -dz_dy)) % 360.0
+        aspect = np.where(aspect >= 360.0, 0.0, aspect)  # D-01: -1e-15 % 360.0 rounds up to exactly 360.0
         flat = ~(np.hypot(dz_dx, dz_dy) > flat_gradient_tolerance)
     aspect = np.asarray(aspect, dtype=np.float64)
     aspect[flat] = np.nan

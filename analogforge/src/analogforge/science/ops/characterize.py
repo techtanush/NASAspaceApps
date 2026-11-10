@@ -24,7 +24,6 @@ from analogforge.science.geometry import (
 from analogforge.science.ops.base import OpBlocked, OpEnv, OpOutcome, bytes_artifact, derived_evidence, json_artifact
 from analogforge.science.ops.source import find_bound_dataset, resolve_source
 from analogforge.science.ops.terrain import (
-    clean_aspect,
     hist_of,
     metric,
     prepare,
@@ -133,7 +132,7 @@ def run_characterize(env: OpEnv) -> OpOutcome:
         valid=valid,
         land=surf.land[rs],
         slope_deg=slope,
-        aspect_deg=clean_aspect(surf.aspect_deg[rs]),
+        aspect_deg=surf.aspect_deg[rs],
         quality=quality,
         source_evidence_ids=(src.draft.local_key,),
         algorithm_id=algo,

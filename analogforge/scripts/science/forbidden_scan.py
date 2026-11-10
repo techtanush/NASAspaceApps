@@ -33,7 +33,7 @@ TEST_PATHS = [
     "tests/integration/science",
     "tests/replay/science",
     "tests/contracts/science",
-    "tests/support",
+    "tests/fixtures/science",
     "scripts/science",
 ]
 WORD_PATTERNS = {

@@ -1,0 +1,153 @@
+{
+  "name": "Practice lunar surface operations and thermal test",
+  "objective": "Test rover surface operations on south-polar lunar terrain, including cold-trap thermal conditions, under lunar gravity and vacuum.",
+  "target": {
+    "body": "MOON",
+    "bbox": [
+      -10.0,
+      -89.5,
+      10.0,
+      -87.5
+    ],
+    "longitude_convention": "NEG180_180",
+    "latitude_type": "PLANETOCENTRIC",
+    "crs_wkt": null,
+    "vertical_datum": "SYNTHETIC_MOON_REFERENCE_SPHERE_1737400M"
+  },
+  "requirements": [
+    {
+      "id": "R-SLOPE-AVAILABILITY",
+      "label": "At least 5% of valid candidate area lies in the 12-18 deg slope band",
+      "dimension": "TERRAIN",
+      "observable": "slope_band_area_fraction",
+      "operator": "GTE",
+      "lower": 0.05,
+      "upper": null,
+      "unit": "fraction",
+      "mandatory": true,
+      "weight": 1,
+      "evidence_scope": "terrain_model",
+      "minimum_support_scale_m": null,
+      "maximum_support_scale_m": 60,
+      "origin": "PROPOSED_DEFAULT",
+      "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+      "parameters": {
+        "slope_band_deg": [
+          12,
+          18
+        ],
+        "exposure_counting": null,
+        "task_ids": [],
+        "co_location_group": null,
+        "comparison_rule_id": "slope-band-area-fraction-v1",
+        "temporal_support": null
+      }
+    },
+    {
+      "id": "R-TARGET-SLOPE-CONTEXT",
+      "label": "Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support",
+      "dimension": "TERRAIN",
+      "observable": "slope_distribution_w1_deg",
+      "operator": "LTE",
+      "lower": null,
+      "upper": 6.0,
+      "unit": "deg",
+      "mandatory": false,
+      "weight": 1,
+      "evidence_scope": "regional_context",
+      "minimum_support_scale_m": 480,
+      "maximum_support_scale_m": 1000,
+      "origin": "PROPOSED_DEFAULT",
+      "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+      "parameters": {
+        "slope_band_deg": null,
+        "exposure_counting": null,
+        "task_ids": [],
+        "co_location_group": null,
+        "comparison_rule_id": "slope-w1-common-support-v1",
+        "temporal_support": null
+      }
+    },
+    {
+      "id": "R-THERMAL",
+      "label": "Surface temperature minimum at or below 120 K (multi-year minimum)",
+      "dimension": "THERMAL",
+      "observable": "surface_temperature_min_k",
+      "operator": "LTE",
+      "lower": null,
+      "upper": 120,
+      "unit": "K",
+      "mandatory": true,
+      "weight": 1,
+      "evidence_scope": "regional_context",
+      "minimum_support_scale_m": null,
+      "maximum_support_scale_m": 250,
+      "origin": "PROPOSED_DEFAULT",
+      "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+      "parameters": {
+        "slope_band_deg": null,
+        "exposure_counting": null,
+        "task_ids": [],
+        "co_location_group": null,
+        "comparison_rule_id": "thermal-min-compatible-quantity-v1",
+        "temporal_support": "multi-year minimum"
+      }
+    },
+    {
+      "id": "R-GRAVITY",
+      "label": "Lunar gravity (1.62 m/s2)",
+      "dimension": "GRAVITY",
+      "observable": "planetary_gravity",
+      "operator": "NOT_NATURALLY_REPRODUCIBLE",
+      "lower": null,
+      "upper": null,
+      "unit": "m/s2",
+      "mandatory": false,
+      "weight": 1,
+      "evidence_scope": "field_validation",
+      "minimum_support_scale_m": null,
+      "maximum_support_scale_m": null,
+      "origin": "PROPOSED_DEFAULT",
+      "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+      "parameters": {
+        "slope_band_deg": null,
+        "exposure_counting": null,
+        "task_ids": [],
+        "co_location_group": null,
+        "comparison_rule_id": null,
+        "temporal_support": null
+      }
+    },
+    {
+      "id": "R-VACUUM",
+      "label": "Hard vacuum",
+      "dimension": "ATMOSPHERE",
+      "observable": "planetary_atmosphere",
+      "operator": "NOT_NATURALLY_REPRODUCIBLE",
+      "lower": null,
+      "upper": null,
+      "unit": "Pa",
+      "mandatory": false,
+      "weight": 1,
+      "evidence_scope": "field_validation",
+      "minimum_support_scale_m": null,
+      "maximum_support_scale_m": null,
+      "origin": "PROPOSED_DEFAULT",
+      "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+      "parameters": {
+        "slope_band_deg": null,
+        "exposure_counting": null,
+        "task_ids": [],
+        "co_location_group": null,
+        "comparison_rule_id": null,
+        "temporal_support": null
+      }
+    }
+  ],
+  "assumptions": [
+    "All lunar and Earth terrain in this scenario is synthetic practice data; no Diviner or Earth thermal source is configured, so thermal must be UNKNOWN."
+  ],
+  "forbidden_actions": [
+    "Relax accepted requirements during replanning"
+  ]
+}
