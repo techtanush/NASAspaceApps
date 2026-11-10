@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { newMission, startRun, tab, prove,api } from './support/workbench';
+import {readFileSync} from 'node:fs';
+import { newMission, startRun, tab, prove,api,fixture } from './support/workbench';
 // The implementation is shared with the command-line audit and imports no application code.
 // @ts-expect-error JavaScript audit module exports are checked by the runtime audit.
 import {auditPage,auditGlyphs,finishAudit,THRESHOLDS,COMPONENTS,reports,installAuditInstrumentation,auditFailures,auditCancellations,waitForAuditData,auditStyleguide,captureStyleguide} from '../../scripts/ui/visual_audit.mjs';
@@ -22,6 +23,14 @@ test('UIX-13 complete visual audit C01–C20',async({page})=>{
    }
   }
  };
+ const evidence=async(name:string,anchor:string,scrollToEnd:string[]=[])=>{
+  console.log('audit review evidence',name);
+  for(const width of [1440,390])for(const theme of ['dark','light']){
+   const height=width===390?844:900;
+   await auditPage(page,name,{width,height,theme,density:'default',focus:false,anchor,scrollToEnd});
+   await expect(page.locator(anchor).first()).toBeInViewport();
+  }
+ };
  const captureOverlay=async(name:string,title:string,open:()=>Promise<void>)=>{
   for(const [width,height]of THRESHOLDS.viewports)for(const theme of ['dark','light']){
    await page.setViewportSize({width,height});await open();await expect(page.getByRole('dialog',{name:title,exact:true})).toBeVisible();
@@ -36,13 +45,38 @@ test('UIX-13 complete visual audit C01–C20',async({page})=>{
   await page.goto('/?mockLatency=300');await capture('S01');
   await page.getByTestId('btn-new-mission').click();await capture('S02');await captureOverlay('change-body-dialog','Change target body',async()=>{await page.locator('[data-testid=radio-body][data-body=MOON]').click();});
   await page.goto('/rovers');await capture('S03');
-  await newMission(page);await capture('S04');await page.getByTestId('btn-start-run').click();await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state','AWAITING_REVIEW');
-  for(const [screen,name]of [['S05','target'],['S06','analogs'],['S07','qualification'],['S08','compatibility'],['S09','portfolio'],['S10','test-lab']]){await tab(page,name);await capture(screen);if(name==='analogs'){const candidate=page.getByTestId('candidate-row').first();await candidate.getByTestId('btn-select-candidate').click();await expect(candidate).toHaveAttribute('data-selected','true');}if(screen==='S09'){await page.getByTestId('btn-build-portfolio').click();await expect(page.getByTestId('portfolio-row').first()).toBeVisible();await capture('S09-composite');}if(screen==='S07'){
+  await newMission(page);await capture('S04');await evidence('review-contract-digest','[data-region=fingerprint] .hash-group');await evidence('review-acceptance-controls','[data-region=run-configuration] .actions');await page.getByTestId('btn-start-run').click();await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state','AWAITING_REVIEW');
+  for(const [screen,name]of [['S05','target'],['S06','analogs'],['S07','qualification'],['S08','compatibility'],['S09','portfolio'],['S10','test-lab']]){await tab(page,name);await capture(screen);if(screen==='S05'){await evidence('review-target-chart-description','.target-histogram .chart .section-heading');await evidence('review-target-chart','[data-testid=target-panel] .target-histogram .chart-plot-scroll');await evidence('review-target-chart-right','[data-testid=target-panel] .target-histogram .chart-plot-scroll',['.target-histogram .chart-plot-scroll']);await evidence('review-target-chart-data','.target-histogram .table-frame');}if(screen==='S10'){await evidence('review-benchmark-rules','.accepted-benchmarks');}if(name==='analogs'){const candidate=page.getByTestId('candidate-row').first();await candidate.getByTestId('btn-select-candidate').click();await expect(candidate).toHaveAttribute('data-selected','true');}if(screen==='S09'){await page.getByTestId('btn-build-portfolio').click();await expect(page.getByTestId('portfolio-row').first()).toBeVisible();await capture('S09-composite');}if(screen==='S07'){
    await captureOverlay('evidence-drawer','Evidence receipt',async()=>{const cell=page.getByTestId('qual-cell').first();const details=cell.locator('details');if(!await details.evaluate(node=>(node as HTMLDetailsElement).open))await details.locator('summary').click();const link=details.getByTestId('evidence-link').first();const evidenceId=await link.getAttribute('data-evidence-id');await link.click();await expect(page.getByTestId('evidence-drawer').getByText(evidenceId!,{exact:true})).toBeVisible();});
    await captureOverlay('operations-drawer','Operations timeline',async()=>{await page.getByRole('button',{name:'Open operations',exact:true}).click();await expect(page.getByTestId('operation-row').first()).toBeVisible();});
    await captureOverlay('shortcut-dialog','Keyboard shortcuts',async()=>{await page.getByRole('button',{name:'Keyboard shortcuts',exact:true}).click();});
   }}
-  await prove(page);await expect(page.getByTestId('attempt-row')).toHaveCount(3);await capture('S11');await tab(page,'passport');await expect(page.getByTestId('manifest-digest')).toBeVisible();await capture('S12');
+  await prove(page);await expect(page.getByTestId('attempt-row')).toHaveCount(3);await capture('S11');
+  await evidence('review-attempt-1','[data-testid=attempt-row]:nth-child(1) .attempt-header');
+  await evidence('review-attempt-1-benchmarks','[data-testid=attempt-row]:nth-child(1) .table-frame');
+  await evidence('review-attempt-2','[data-testid=attempt-row]:nth-child(2) .attempt-header');
+  await evidence('review-attempt-2-benchmarks','[data-testid=attempt-row]:nth-child(2) .table-frame');
+  await evidence('review-attempt-3','[data-testid=attempt-row]:nth-child(3) .attempt-header');
+  await evidence('review-attempt-benchmarks','[data-testid=attempt-row]:nth-child(3) .table-frame');
+  await evidence('review-attempt-benchmarks-right','[data-testid=attempt-row]:nth-child(3) .table-frame',['[data-testid=attempt-row]:nth-child(3) .table-scroll']);
+  await evidence('review-replan','[data-testid=attempt-row]:nth-child(3) [data-testid=replan-diff]');
+  await expect(page.getByTestId('route-playback')).toBeVisible();
+  await evidence('review-playback-route','[data-testid=route-playback] .route-geometry');
+  await page.getByTestId('route-playback').getByRole('button',{name:'Next sample',exact:true}).click();
+  await expect(page.getByTestId('route-playback').getByText(/^Telemetry sample 2 of/)).toBeVisible();
+  await evidence('review-playback-controls','[data-testid=route-playback] .actions');
+  await evidence('review-playback-measurements','[data-testid=route-playback] .readout-list');
+  await evidence('review-playback-samples','[data-testid=route-playback] .table-frame');
+  await tab(page,'passport');await expect(page.getByTestId('manifest-digest')).toBeVisible();await capture('S12');
+  await evidence('review-passport-manifest','.passport-manifest');
+  await evidence('review-passport-export-controls','.export-bar');
+  for(const format of ['html','json','csv']){
+   const download=page.waitForEvent('download');await page.locator(`[data-testid=export-btn][data-format=${format}]`).click();
+   await (await download).saveAs(`../../out/visual/review-passport.${format}`);
+   await expect(page.locator(`[data-testid=export-status][data-format=${format}]`)).toHaveAttribute('data-state','ready');
+   await expect(page.locator(`[data-testid=file-digest][data-format=${format}]`)).toBeVisible();
+   await evidence(`review-passport-export-${format}`,`.export-row:has([data-testid=export-btn][data-format=${format}])`);
+  }
   await page.emulateMedia({reducedMotion:'reduce'});const motion=await page.evaluate(()=>[...document.querySelectorAll('*')].filter(e=>{const s=getComputedStyle(e);return [...s.transitionDuration.split(','),...s.animationDuration.split(',')].some(v=>parseFloat(v)>.001)}).map(e=>e.tagName));reports.push({screen:'reduced-motion',findings:motion.map((m:string)=>({check:'C16',message:m}))});await page.emulateMedia({reducedMotion:'no-preference'});
   await page.setViewportSize({width:794,height:1123});await page.emulateMedia({media:'print'});await page.evaluate(()=>{scrollTo(0,0);for(const node of document.querySelectorAll('*')){node.scrollTop=0;node.scrollLeft=0;}});const print=await page.evaluate(()=>({mode:!!document.querySelector('[data-testid=mode-badge]'),digest:!!document.querySelector('[data-testid=manifest-digest]'),color:getComputedStyle(document.documentElement).getPropertyValue('--canvas').trim(),width:document.documentElement.scrollWidth,viewport:innerWidth,firstPage:[document.querySelector('[data-testid=passport-view] [data-testid=mode-badge]'),document.querySelector('[data-testid=passport-view] h2'),document.querySelector('[data-testid=manifest-digest]')].map(node=>{if(!node)return null;const bounds=node.getBoundingClientRect();return {top:bounds.top,bottom:bounds.bottom};})}));reports.push({screen:'print',findings:(!print.mode||!print.digest||print.width>print.viewport||print.color.toLowerCase()!=='#f4f6f9'||print.firstPage.some((bounds:{top:number;bottom:number}|null)=>!bounds||bounds.top<0||bounds.bottom>986.46))?[{check:'C17',message:JSON.stringify(print)}]:[]});await page.pdf({path:'../../out/visual/passport.pdf',format:'A4',margin:{top:'18mm',bottom:'18mm',left:'18mm',right:'18mm'}});await page.emulateMedia({media:'screen'});
   await page.goto('/__styleguide');await expect(page.locator('main h1')).toHaveText('Component styleguide');await auditGlyphs(page);await auditStyleguide(page);
@@ -66,7 +100,15 @@ test('UIX-13 complete visual audit C01–C20',async({page})=>{
    await page.goto('/rovers');await expect(page.locator('main h1')).toHaveText('Rover library');
    await page.getByTestId('file-rover-import').setInputFiles({name:'invalid-rover.json',mimeType:'application/json',buffer:Buffer.from('{')});
    await expect(page.locator('[data-testid=error-panel][data-error-code=VALIDATION_ERROR]')).toBeVisible();
-   await auditPage(page,'error-rover-import',{width,height,theme,density:'default',focus:true});
+   await auditPage(page,'error-rover-import',{width,height,theme,density:'default',focus:true,anchor:'[data-testid=error-panel]'});
+   const invalid=JSON.parse(readFileSync(fixture('rovers/ares-1.json'),'utf8'));invalid.mass_kg=-3;
+   await page.getByTestId('file-rover-import').setInputFiles({name:'invalid-mass-rover.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(invalid))});
+   await expect(page.locator('[data-testid=rover-field-error][data-field=mass_kg]')).toBeVisible();
+   await auditPage(page,'review-rover-validation-error',{width,height,theme,density:'default',focus:false,anchor:'[data-testid=rover-field-error][data-field=mass_kg]'});
+   await page.getByTestId('file-rover-import').setInputFiles(fixture('rovers/ares-1.json'));
+   await expect(page.getByTestId('rover-import-preview')).toBeVisible();
+   await auditPage(page,'review-rover-import-valid',{width,height,theme,density:'default',focus:false,anchor:'[data-testid=rover-import-preview]'});
+   await auditPage(page,'review-rover-import-valid-final-rows',{width,height,theme,density:'default',focus:false,anchor:'[data-testid=rover-import-preview] tbody tr:last-child'});
   }
   // J05 and J10 visual states retain the same accepted run while exposing a conflicting rover and a new draft.
   const conflictRun=await startRun(page,{rover:'practice-lite'});await tab(page,'analogs');

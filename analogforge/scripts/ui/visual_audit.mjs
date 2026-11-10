@@ -62,7 +62,7 @@ async function beginLoadedCohort(page,{width,height,theme,density}){
 export const reports=[];
 export const manifest=[];
 const hash=b=>createHash('sha256').update(b).digest('hex');
-export async function auditPage(page,name,{theme='dark',density='default',width=1440,height=900,focus=true,spacing=false}={}){
+export async function auditPage(page,name,{theme='dark',density='default',width=1440,height=900,focus=true,spacing=false,anchor=null,scrollToEnd=[]}={}){
  // Release the preceding frame's decoded screenshot buffers on memory-constrained runners.
  if(typeof globalThis.gc==='function')globalThis.gc();
  const measureLoad=['S01','S06','S07','S10','S12'].some(prefix=>name.startsWith(prefix));
@@ -76,6 +76,11 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
  await page.evaluate(({theme,density})=>{document.documentElement.dataset.theme=theme; document.documentElement.dataset.density=density;},{theme,density});
  await page.evaluate(()=>document.fonts.ready);
  const spacingStyle=spacing?await page.addStyleTag({content:'*{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}p{margin-bottom:2em!important}'}):null;
+ // Supplemental review frames retain the real viewport and scroll the real UI;
+ // canonical all-screen captures above still start at the normal page origin.
+ if(anchor)await page.locator(anchor).first().evaluate(node=>node.scrollIntoView({block:'nearest',inline:'nearest'}));
+ for(const selector of scrollToEnd)await page.locator(selector).first().evaluate(node=>{node.scrollLeft=node.scrollWidth;});
+ await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
  const screenshot=await page.screenshot();
  const png=PNG.sync.read(screenshot);
  const facts=await page.evaluate(({limits,spacing,width,requiredHooks})=>{
@@ -176,7 +181,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
    if(!result||overlay&&!result.inDialog||seen.has(result.focusID))break;seen.add(result.focusID);if(!result.ring)findings.push({check:'C07',selector:result.id,message:'Missing focus ring'});else if(result.ringContrast<THRESHOLDS.largeContrast-.01)findings.push({check:'C07',selector:result.id,message:'Focus contrast '+result.ringContrast.toFixed(2)});if(result.covered)findings.push({check:'C07',selector:result.id,message:'Focus obscured '+JSON.stringify({rect:result.rect,hit:result.hit})});
   }
  }
- const filename=`${name}-${width}-${theme}-${density}${spacing?'-spacing':''}.png`;mkdirSync(resolve(root,'out/visual'),{recursive:true});writeFileSync(resolve(root,'out/visual',filename),screenshot);manifest.push({file:filename,screen:name,theme,density,width,height,sha256:hash(screenshot)});
+ const filename=`${name}-${width}-${theme}-${density}${spacing?'-spacing':''}.png`;mkdirSync(resolve(root,'out/visual'),{recursive:true});writeFileSync(resolve(root,'out/visual',filename),screenshot);manifest.push({file:filename,screen:name,theme,density,width,height,sha256:hash(screenshot),...(anchor?{anchor,scrollToEnd}: {})});
  reports.push({screen:name,width,height,theme,density,findings,layoutShifts:facts.layoutShifts});if(spacingStyle)await spacingStyle.evaluate(node=>node.remove());return findings;
 }
 export async function auditStyleguide(page){
@@ -205,7 +210,7 @@ export async function captureStyleguide(page,{theme,density,directory=resolve(ro
  return captures;
 }
 export function finishAudit(){
- mkdirSync(resolve(root,'out/visual'),{recursive:true});const findings=reports.flatMap(r=>r.findings.map(f=>({...f,screen:r.screen,viewport:r.width,theme:r.theme})));writeFileSync(resolve(root,'out/visual/report.json'),JSON.stringify({status:findings.length?'FAIL':'PASS',thresholds:THRESHOLDS,skipped_checks:0,reports,findings},null,2));writeFileSync(resolve(root,'out/visual/manifest.json'),JSON.stringify(manifest,null,2));writeFileSync(resolve(root,'out/visual/screens.md'),'# Visual review catalog\n\n| File | Screen | Viewport | Theme | Density |\n|---|---|---|---|---|\n'+manifest.map(x=>`| ${x.file} | ${x.screen} | ${x.width}×${x.height} | ${x.theme} | ${x.density} |`).join('\n')+'\n');return findings;
+ mkdirSync(resolve(root,'out/visual'),{recursive:true});const findings=reports.flatMap(r=>r.findings.map(f=>({...f,screen:r.screen,viewport:r.width,theme:r.theme})));writeFileSync(resolve(root,'out/visual/report.json'),JSON.stringify({status:findings.length?'FAIL':'PASS',thresholds:THRESHOLDS,skipped_checks:0,reports,findings},null,2));writeFileSync(resolve(root,'out/visual/manifest.json'),JSON.stringify(manifest,null,2));writeFileSync(resolve(root,'out/visual/screens.md'),'# Visual review catalog\n\n| File | Screen | Viewport | Theme | Density | Scroll target |\n|---|---|---|---|---|---|\n'+manifest.map(x=>`| ${x.file} | ${x.screen} | ${x.width}×${x.height} | ${x.theme} | ${x.density} | ${x.anchor??'Page origin / full guide part'} |`).join('\n')+'\n');return findings;
 }
 export function auditProduction(){
  const dist=resolve(root,'apps/web/dist');const findings=[];const urls=new Set();
