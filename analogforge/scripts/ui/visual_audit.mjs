@@ -114,7 +114,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
     // CSS Typed OM preserves auto/percentage/flex-derived dimensions. Only explicit pixel sizes are grid-constrained.
     for(const prop of ['width','height']){const v=e.computedStyleMap?.().get(prop);if(v?.unit==='px'&&v.value!==0&&Math.abs(v.value/4-Math.round(v.value/4))>.01)add('C04',e,`${prop}=${v.value}`);}
    }
-   if(e.matches('button,input:not([type=hidden]),select,textarea,a[href],[role=button],[role=tab],[role=combobox]')){
+   if(e.matches('button,input:not([type=hidden]),select,textarea,a[href],summary,[role=button],[role=tab],[role=combobox],[role=option],[role=checkbox],[role=switch]')){
     const min=width<=390?limits.touchTarget:limits.target;
     if(r.width<min-.5||r.height<min-.5)add('C06',e,`Target ${r.width.toFixed(1)}×${r.height.toFixed(1)} < ${min}`);
    }
@@ -133,7 +133,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
    for(const attr of hook.required_attributes)if(!element.getAttribute(attr))add('C05',element,'Required hook attribute missing: '+attr);
   }
   if(document.documentElement.scrollWidth>innerWidth)add('C05',document.documentElement,'Page overflow');
-  const interactive=all.filter(e=>visible(e)&&e.matches('button,input:not([type=hidden]),select,textarea,a[href],[role=button],[role=tab],[role=combobox]'));
+  const interactive=all.filter(e=>visible(e)&&e.matches('button,input:not([type=hidden]),select,textarea,a[href],summary,[role=button],[role=tab],[role=combobox],[role=option],[role=checkbox],[role=switch]'));
   const interactiveBoxes=interactive.map(element=>paintedRect(element));
   for(let i=0;i<interactive.length;i++)for(let j=i+1;j<interactive.length;j++){const a=interactive[i],b=interactive[j];if(a.contains(b)||b.contains(a)||a.closest('[role=dialog]')!==b.closest('[role=dialog]'))continue;const x=interactiveBoxes[i],y=interactiveBoxes[j];if(x.right<=x.left||y.right<=y.left||x.bottom<=x.top||y.bottom<=y.top)continue;if(Math.min(x.right,y.right)-Math.max(x.left,y.left)>2&&Math.min(x.bottom,y.bottom)-Math.max(x.top,y.top)>2)add('C05',a,'Interactive overlap '+(b.id||b.tagName));}
   if(document.querySelectorAll('main h1').length!==1)add('C13',document.body,'Exactly one h1 required');
