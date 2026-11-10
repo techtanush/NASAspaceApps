@@ -107,7 +107,12 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
      text.push({x:box.x,y:box.y,w:box.width,h:box.height,fg,min,text:node.textContent,selector:e.getAttribute('data-testid')||e.tagName.toLowerCase(),overCanvas});
     }
     if(/\b(NaN|undefined|null|\[object Object\])\b/.test(nodes.map(n=>n.textContent).join(' ')))add('C09',e,'Invalid rendered value');
-    if(e.scrollWidth>e.clientWidth+1&&s.display!=='inline'&&!e.closest('[data-overflow="intentional"]'))add('C05',e,`Text overflow ${e.scrollWidth}/${e.clientWidth}`);
+    if(e instanceof SVGTextElement){
+     // SVG scroll metrics use incompatible glyph/layout coordinate spaces in Chromium.
+     // Measure actual transformed glyph bounds against the SVG clipping viewport instead.
+     const viewport=e.ownerSVGElement?.getBoundingClientRect();
+     if(viewport&&(r.left<viewport.left-1||r.right>viewport.right+1||r.top<viewport.top-1||r.bottom>viewport.bottom+1))add('C05',e,`SVG text clipped ${JSON.stringify({text:e.textContent,glyph:r.toJSON(),viewport:viewport.toJSON()})}`);
+    }else if(e.scrollWidth>e.clientWidth+1&&s.display!=='inline'&&!e.closest('[data-overflow="intentional"]'))add('C05',e,`Text overflow ${e.scrollWidth}/${e.clientWidth}`);
    }
    if(e.matches('[class*="panel"],[class*="card"],td,th,button,input,select,[role="tab"],[role="row"]')){
     for(const prop of ['paddingTop','paddingRight','paddingBottom','paddingLeft','marginTop','marginRight','marginBottom','marginLeft','gap','rowGap','columnGap']){const v=parseFloat(s[prop]);if(Number.isFinite(v)&&v!==0&&Math.abs(v/4-Math.round(v/4))>.01)add('C04',e,`${prop}=${v}`);}
