@@ -28,3 +28,10 @@ Source `8ca8769` addresses the three explicitly requested issues. The phone shel
 TypeScript, ESLint, production build and84 frontend tests pass. The selected browser batch passed10 of11 cases; the zoom case hit a native filechooser timeout. Its manually created browser tab now explicitly owns focus before keyboard interaction, and the unchanged keyboard/zoom assertions pass three consecutive repetitions. The scoped mobile, caption, passport, accessibility, export, print and WebGL checks pass. All12 component-guide images were refreshed. Logs and screenshots are under out/three-layouts-* and out/visual.
 
 The prior complete visual baseline is retained under out/visual-before-three-layout-fixes. This follow-up does not claim a new full visual review, resolution of other findings, or real-backend verification. Overall merge readiness remains false.
+
+
+## Candidate readability, loading rows and preset follow-up
+
+Source35077fb keeps the desktop40/60 list/map split and makes Origin/Window visible inside each candidate row without horizontal scrolling. Bounds/access remain in the row disclosure. Both pending workspace tables reserve four complete skeleton rows across both themes, three densities and phone/desktop widths; loaded tables release the extra reservation. Practice links wrap in a compact desktop panel and use a collapsed phone disclosure.
+
+Verified84 frontend unit tests, TypeScript, ESLint, production build, ownership and forbidden scan. All4 selected browser cases pass, including keyboard/200% zoom and the previous mobile/caption/passport regression. The focused visual report has22 reports and zero findings. Evidence: analogforge/out/list-loading-presets-* and out/visual. This is scoped verification, not a new full audit or independent rubric review. Overall merge readiness remains false; main is untouched.

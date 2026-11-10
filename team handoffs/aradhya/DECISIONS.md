@@ -77,3 +77,8 @@ The final source passes build, all33 browser tests,84 frontend tests,131 Python 
 ## Three-layout scope
 
 The user explicitly selected mobile work area, matrix caption and passport association. Only these layouts, the shared caption primitive, and focused regression coverage were changed. Native table captions remain available to assistive technology; a wrapping visible caption labels the independently scrolling data region. The phone shell uses the actual remaining flex viewport rather than a hard-coded header offset. Ancillary metadata/cursor/actions and workspace links remain reachable in context; 44px touch targets remain. Passport row groups preserve every assessment and immutable identifier. An explicit browser-tab focus assertion stabilizes native keyboard file selection in the separate zoom context; no functional assertion or timeout was weakened.
+
+
+## Candidate metadata and workspace compactness
+
+Move origin/window from horizontal columns into always-visible row metadata while retaining screening rank/status, map key, actual server values and selection acknowledgement. Keep the prescribed desktop40/60 split. Reserve loading height only while requests are pending, then release unused space. Presets retain every scenario link and use native responsive disclosure. The focused browser assertions cover four-row containment, metadata text containment, split ratio, preset toggling and selection, alongside the previous mobile layout and keyboard/zoom checks. No scientific verdict or API contract changed.

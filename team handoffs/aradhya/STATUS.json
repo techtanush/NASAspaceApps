@@ -4,7 +4,7 @@
   "branch": "aradhya/frontend-experience",
   "template_note": "Observed frontend branch evidence. Generated reports are under analogforge/out; real-backend integration is a separate merging-agent gate.",
   "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
-  "tested_commit_sha": "8ca87694c0c3cdd86cabf107c40b493bb2777466",
+  "tested_commit_sha": "35077fbb92572d112df2749e1160c5c2b0c7e1e1",
   "kit_version": "1.0.0",
   "kit_verify": {
     "status": "PASSED",
@@ -70,7 +70,7 @@
     },
     "UIX-05": {
       "status": "PASSED",
-      "evidence": "84 frontend tests in19files pass on8ca8769; out/three-layouts-unit.log."
+      "evidence": "84 frontend tests in 19 files pass on35077fb; out/list-loading-presets-unit.log."
     },
     "UIX-06": {
       "status": "PASSED",
@@ -528,6 +528,26 @@
       "focused_visual_reports": 15,
       "focused_visual_findings": 0,
       "full_visual_review_rerun": false
+    },
+    "requested_list_loading_presets_fixes": {
+      "source": "35077fbb92572d112df2749e1160c5c2b0c7e1e1",
+      "status": "PASSED",
+      "items": [
+        "Always-visible origin and window metadata wraps within candidate rows; desktop list/map remains40/60. Bounds and access remain available in a native disclosure.",
+        "Both loading tables reserve space for four complete skeleton rows at390/1440px, both themes and all three densities; loaded tables release extra space.",
+        "Practice presets use a compact wrapping desktop strip and a collapsed mobile disclosure with unchanged scenario links."
+      ],
+      "frontend_tests_passed": 84,
+      "browser_cases_passed": 4,
+      "browser_evidence": "out/list-loading-presets-browser-final.log",
+      "focused_visual_reports": 22,
+      "focused_visual_findings": 0,
+      "typecheck": "PASSED",
+      "lint": "PASSED",
+      "build": "PASSED",
+      "ownership": "PASSED",
+      "forbidden_scan": "PASSED",
+      "full_visual_review_rerun": false
     }
   },
   "science_presentation_evidence": {
@@ -574,7 +594,7 @@
     "contracts/algorithm-ids.json": "50f6e6578608cc13fc3914b15ee07a7fde162acb9790f599570e6e4d659f424e",
     "apps/web/src/generated/schema.d.ts": "d97d037c94674696ed365f9780517a480e63fb8b7a1e00056b11f17de265796b"
   },
-  "current_verification_source": "8ca87694c0c3cdd86cabf107c40b493bb2777466",
+  "current_verification_source": "35077fbb92572d112df2749e1160c5c2b0c7e1e1",
   "browser_delivery": {
     "source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
     "tests_passed": 33,
