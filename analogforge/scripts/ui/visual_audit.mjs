@@ -151,6 +151,13 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
   }
   // Scientific text must stay in its owning column even when its own box expands.
   for(const node of document.querySelectorAll('.qual-verdict .quantity,.run-metadata>summary>span')){if(!visible(node))continue;const owner=node.closest('td')??node.closest('summary');if(!owner)continue;const range=document.createRange();range.selectNodeContents(node);const bounds=range.getBoundingClientRect(),cell=owner.getBoundingClientRect();if(bounds.left<cell.left-1||bounds.right>cell.right+1)add('C05',node,'Text crosses its owning cell or control boundary');}
+  // Plot bins may scroll; their explanatory prose must remain readable in the visible column.
+  for(const node of document.querySelectorAll('.chart>.helper')){
+   if(!visible(node))continue;const owner=paintedRect(node.closest('.chart'));
+   if(owner.right<=owner.left||owner.bottom<=owner.top)continue;
+   const range=document.createRange();range.selectNodeContents(node);const text=range.getBoundingClientRect();
+   if(text.left<owner.left-1||text.right>owner.right+1)add('C05',node,'Chart narrative crosses its visible chart frame');
+  }
   if(document.documentElement.scrollWidth>innerWidth)add('C05',document.documentElement,'Page overflow');
   const interactive=all.filter(e=>visible(e)&&e.matches('button,input:not([type=hidden]),select,textarea,a[href],summary,[role=button],[role=tab],[role=combobox],[role=option],[role=checkbox],[role=switch]'));
   const interactiveBoxes=interactive.map(element=>paintedRect(element));
