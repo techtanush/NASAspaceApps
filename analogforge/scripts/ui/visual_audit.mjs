@@ -91,6 +91,11 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
   const ratio=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
   for(const e of all.filter(visible)){
    const s=getComputedStyle(e),r=e.getBoundingClientRect();
+   if(e.matches('input[placeholder],textarea[placeholder]')&&!e.value&&e.getAttribute('placeholder')){
+    const placeholder=getComputedStyle(e,'::placeholder');let parent=e,bg=[0,0,0,0];while(parent){const c=rgb(getComputedStyle(parent).backgroundColor);if(c.length<4||c[3]===1){bg=c;break;}parent=parent.parentElement;}
+    const color=rgb(placeholder.color),alpha=(color[3]??1)*Number(placeholder.opacity);const fg=color.slice(0,3).map((channel,index)=>channel*alpha+bg[index]*(1-alpha));
+    if(bg[3]!==0&&ratio(fg,bg)<limits.contrast-.01)add('C03',e,`Placeholder contrast ${ratio(fg,bg).toFixed(2)} < ${limits.contrast}`);
+   }
    const nodes=[...e.childNodes].filter(n=>n.nodeType===Node.TEXT_NODE&&n.textContent.trim());
    if(nodes.length){
     const family=s.fontFamily.split(',')[0].replace(/["']/g,'').trim(); if(!['Inter','Inter Variable','IBM Plex Mono'].includes(family))add('C01',e,`Font ${family}`);

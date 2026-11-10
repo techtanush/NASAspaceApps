@@ -3,9 +3,9 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { Copy, X, ChevronDown, Info, AlertTriangle } from 'lucide-react';
+import { Copy, X, ChevronDown, Info, AlertTriangle, Circle, Pause, Triangle } from 'lucide-react';
 import type { components } from '../../generated/schema';
-import { quantity as formatQuantity } from '../../format/quantity';
+import { quantity as formatQuantity,quantityRange } from '../../format/quantity';
 import { scaleBand, scaleLinear } from 'd3-scale';
 import designTokens from '../../../design/tokens.json';
 
@@ -34,8 +34,8 @@ export function Button({ variant = 'secondary', size, className = '',disabledRea
   const reasonId=useId();const button=<button type="button" className={`button ${className}`} data-variant={variant} data-size={size} {...props} aria-describedby={[props['aria-describedby'],props.disabled&&disabledReason?reasonId:undefined].filter(Boolean).join(' ')||undefined}/>;
   return props.disabled&&disabledReason?<span className="disabled-action">{button}<span id={reasonId} className="helper">{disabledReason}</span></span>:button;
 }
-export function IconButton({ label, children, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & {label:string}) {
-  return <Button className="icon-button" aria-label={label} title={label} {...props}>{children}</Button>;
+export function IconButton({ label, children, className='', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & {label:string;disabledReason?:string}) {
+  return <Button className={`icon-button ${className}`} aria-label={label} title={label} {...props}>{children}</Button>;
 }
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) { return <input {...props}/>; }
 export function NumberInput(props: InputHTMLAttributes<HTMLInputElement>) { return <Input type="number" step="any" {...props}/>; }
@@ -82,12 +82,13 @@ export function Timestamp({value}:{value:string}) { return <time className="mono
 export function Mono({children}:{children:ReactNode}) { return <span className="mono">{children}</span>; }
 export function Hash({value,testid,format}:{value:string;testid?:string;format?:string}) { return <code className="hash" data-testid={testid} data-format={format}>{value}</code>; }
 export function CopyHash({value,kind='evidence',testid,format}:{value:string;kind?:string;testid?:string;format?:string}) {
-  const [copied,setCopied] = useState(false);const [unavailable,setUnavailable]=useState(false);
+  const [copied,setCopied] = useState(false);const [unavailable,setUnavailable]=useState(false);const identifier=kind==='metric'||kind==='evidence-id';const copyLabel=identifier?'Copy identifier':'Copy full hash';const copiedLabel=identifier?'Identifier copied':'Hash copied';
   const copy=async()=>{try{if(!navigator.clipboard)throw new Error('Clipboard unavailable');await navigator.clipboard.writeText(value);setCopied(true);setUnavailable(false);}catch{setUnavailable(true);}};
-  return <span className="hash-group"><Hash value={value} testid={testid} format={format}/><IconButton label={copied?'Hash copied':'Copy full hash'} data-testid="copy-hash" data-hash-kind={kind} onClick={()=>{void copy();}}><Copy size={16}/></IconButton><span className={unavailable?'helper':'sr-only'} role="status">{unavailable?'Clipboard unavailable. Select and copy the full digest.':copied?'Hash copied':''}</span></span>;
+  return <span className="hash-group"><Hash value={value} testid={testid} format={format}/><IconButton label={copied?copiedLabel:copyLabel} data-testid="copy-hash" data-hash-kind={kind} onClick={()=>{void copy();}}><Copy size={16}/></IconButton><span className={unavailable?'helper':'sr-only'} role="status">{unavailable?'Clipboard unavailable. Select and copy the full digest.':copied?copiedLabel:''}</span></span>;
 }
 export function RevisionBadge({label,revision}:{label:string;revision:number|string}) { return <span className="revision-badge">{label} rev <Mono>{revision}</Mono></span>; }
-export function ConnectionIndicator({connection}:{connection:string}) { return <span className="connection" data-testid="connection-indicator" data-connection={connection}><span className="connection-dot" aria-hidden="true"/>{connection==='paused'?'Updates paused':connection}</span>; }
+export function ConnectionIndicator({connection}:{connection:string}) {const Glyph=connection==='connected'?Circle:connection==='paused'?Pause:Triangle;return <span className="connection" data-testid="connection-indicator" data-connection={connection}><Glyph size={12} strokeWidth={1.5} fill={connection==='connected'?'currentColor':'none'} aria-hidden="true"/>{connection==='paused'?'Updates paused':connection}</span>;}
+
 export function Dialog({title,description,trigger,children,open,onOpenChange,testid}:{title:string;description?:string;trigger?:ReactNode;children:ReactNode;open?:boolean;onOpenChange?:(open:boolean)=>void;testid?:string}) {
   const opener=useRef<HTMLElement|null>(null);const wasOpen=useRef(false);if(open&&!wasOpen.current)opener.current=document.activeElement as HTMLElement|null;wasOpen.current=!!open;
   return <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>{trigger && <DialogPrimitive.Trigger asChild>{trigger}</DialogPrimitive.Trigger>}<DialogPrimitive.Portal><DialogPrimitive.Overlay className="overlay"/><DialogPrimitive.Content onCloseAutoFocus={event=>{if(!trigger&&opener.current){event.preventDefault();opener.current.focus();}}} className="dialog" aria-describedby={description?undefined:undefined} data-testid={testid}><div className="section-heading"><DialogPrimitive.Title>{title}</DialogPrimitive.Title><DialogPrimitive.Close asChild><IconButton label="Close dialog"><X size={16}/></IconButton></DialogPrimitive.Close></div><DialogPrimitive.Description className={description?'helper':'sr-only'}>{description ?? title}</DialogPrimitive.Description>{children}</DialogPrimitive.Content></DialogPrimitive.Portal></DialogPrimitive.Root>;
@@ -114,7 +115,8 @@ export function VisuallyHidden({children}:{children:ReactNode}) { return <span c
 export function ScaleBar({text}:{text:string}) { return <div className="scale-bar mono">{text}</div>; }
 export function CoordinateReadout({text}:{text:string}) { return <div className="coordinate-readout mono">{text}</div>; }
 export function Attribution({children}:{children:ReactNode}) { return <small className="attribution">{children}</small>; }
-export function Legend({items,unit}:{items:{label:string;color?:string;lower?:number|null;upper?:number|null}[];unit?:string}) { return <ul className="legend" aria-label="Layer legend">{items.map(item=><li key={item.label}>{item.color&&<span className="legend-swatch" style={{backgroundColor:item.color}} aria-hidden="true"/>}{item.label}{('lower'in item||'upper'in item)&&<> · <Quantity value={item.lower} unit={unit}/>–<Quantity value={item.upper} unit={unit}/></>}</li>)}</ul>; }
+export function Legend({items,unit}:{items:{label:string;color?:string;lower?:number|null;upper?:number|null}[];unit?:string}) {return <ul className="legend" aria-label="Layer legend">{items.map(item=><li key={item.label} title={item.label}>{item.color&&<span className="legend-swatch" style={{backgroundColor:item.color}} aria-hidden="true"/>}{typeof item.lower==='number'&&typeof item.upper==='number'?<span className="quantity">{quantityRange(item.lower,item.upper,unit??'')}</span>:item.label}</li>)}</ul>;}
+
 export function LayerPanel({layers,onChange}:{layers:{id:string;name:string;visible:boolean}[];onChange:(id:string,visible:boolean)=>void}) { return <fieldset className="layer-panel"><legend>Display layers</legend>{layers.map(layer=><label key={layer.id}><input type="checkbox" checked={layer.visible} onChange={event=>onChange(layer.id,event.target.checked)}/>{layer.name}</label>)}</fieldset>; }
 export function Chart({title,values,unit,kind='histogram',xLabel='Bin',thresholds=[]}:{title:string;values:{label:string;value:number|null;lower?:number;upper?:number}[];unit:string;kind?:'histogram'|'line'|'bar';xLabel?:string;thresholds?:{value:number;label:string}[]}) {
  const [view,setView]=useState('Chart');const plot=useRef<HTMLDivElement>(null);const [plotOverflow,setPlotOverflow]=useState(false);useEffect(()=>{const node=plot.current;if(!node)return;const update=()=>setPlotOverflow(node.scrollWidth>node.clientWidth+1);update();if(typeof ResizeObserver==='undefined'){window.addEventListener('resize',update);return()=>window.removeEventListener('resize',update);}const observer=new ResizeObserver(update);observer.observe(node);return()=>observer.disconnect();},[view]);
