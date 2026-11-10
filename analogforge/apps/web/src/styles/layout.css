@@ -22,3 +22,5 @@
 @media(max-width:767px){.run-metadata>summary{padding:4px;gap:4px;font-size:13px}.run-metadata>summary::before{margin-right:0}.run-metadata>summary .mode-badge{font-size:12px}}
 
 @media(max-width:767px){.run-layout{display:grid;height:calc(100dvh - 164px);grid-template-rows:auto auto minmax(0,1fr) auto;gap:8px}.run-working-area{overflow:auto;padding:4px;scroll-padding:16px}.run-layout>.operations-bar{position:relative;bottom:auto}}
+/* Long authoring pages scroll naturally; their controls must not pass under header controls. */
+@media screen{[data-testid=app-shell]:not(:has(.run-layout))>.app-header{position:relative;top:auto}}
