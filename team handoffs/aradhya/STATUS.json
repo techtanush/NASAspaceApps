@@ -4,7 +4,7 @@
   "branch": "aradhya/frontend-experience",
   "template_note": "Observed frontend branch evidence. Generated reports are under analogforge/out; real-backend integration is a separate merging-agent gate.",
   "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
-  "tested_commit_sha": "bb6af30a005e32c56cfc4bf0f6eaac6dc5953a1b",
+  "tested_commit_sha": "8bce5d3356e4e3b96968e70a91f9122efb056b97",
   "kit_version": "1.0.0",
   "kit_verify": {
     "status": "PASSED",
@@ -70,7 +70,7 @@
     },
     "UIX-05": {
       "status": "PASSED",
-      "evidence": "87 frontend tests in20 files pass onbb6af30; out/operations-charts-unit.log."
+      "evidence": "87 frontend tests in20 files pass; out/table-labels-unit.log. Application changes ed7ab5b, final browser assertion correction8bce5d3."
     },
     "UIX-06": {
       "status": "PASSED",
@@ -567,6 +567,30 @@
       "ownership": "PASSED",
       "forbidden_scan": "PASSED",
       "full_visual_review_rerun": false
+    },
+    "requested_empty_table_rover_benchmark_fixes": {
+      "source": "8bce5d3356e4e3b96968e70a91f9122efb056b97",
+      "application_source": "ed7ab5bc6db11b8deb92e89efdc26c4b46973113",
+      "status": "PASSED",
+      "items": [
+        "Overflow instructions require a substantive body row; empty and skeleton-only tables omit them. Populated overflowing tables retain instructions and keyboard scrolling.",
+        "Sensors, Capabilities and Assumptions use sentence case with separately associated comma-entry helper text. Saving preserves parsed arrays.",
+        "Benchmark rows use readable observable names and comparison phrases; exact requirement IDs, operators, observables and accepted wording remain in Rule details. Both range bounds and nonnumeric rules display explicitly."
+      ],
+      "frontend_tests_passed": 87,
+      "browser_cases_verified": 4,
+      "browser_evidence": [
+        "out/table-labels-browser.log:3 passed; mobile exact-text selector failed because the rule cell includes contextual slope-band text",
+        "out/table-labels-mobile.log:corrected cell-scoped phrase assertion passes; all original mobile/caption/passport assertions retained"
+      ],
+      "latest_focused_visual_reports": 10,
+      "latest_focused_visual_findings": 0,
+      "typecheck": "PASSED",
+      "lint": "PASSED",
+      "build": "PASSED",
+      "ownership": "PASSED",
+      "forbidden_scan": "PASSED",
+      "full_visual_review_rerun": false
     }
   },
   "science_presentation_evidence": {
@@ -613,7 +637,7 @@
     "contracts/algorithm-ids.json": "50f6e6578608cc13fc3914b15ee07a7fde162acb9790f599570e6e4d659f424e",
     "apps/web/src/generated/schema.d.ts": "d97d037c94674696ed365f9780517a480e63fb8b7a1e00056b11f17de265796b"
   },
-  "current_verification_source": "bb6af30a005e32c56cfc4bf0f6eaac6dc5953a1b",
+  "current_verification_source": "8bce5d3356e4e3b96968e70a91f9122efb056b97",
   "browser_delivery": {
     "source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
     "tests_passed": 33,

@@ -2385,3 +2385,8 @@ The reported compact histogram first-tick misalignment was inspected before chan
 Timeline sequence, full UTC timestamp, explicit Actor unknown and summary share a scan row on desktop and a compact two-column arrangement on mobile. Native disclosure preserves event type/state and evidence links. The chart's visible description now explains monotonic direction/endpoints, equal values or highest/lowest bins with units. Missing values explicitly prevent a complete-trend claim. SVG accessible descriptions reference the same visible summary.
 
 The broader smoke test also caught a homepage layout shift from the preceding follow-up's loading reservation collapsing. Keep that reservation stable across pending/resolved states; this preserves all four skeleton rows and avoids moving the preset strip when data settles. No threshold or CLS assertion was changed.
+
+
+## Requested empty-table / rover / benchmark follow-up
+
+Implementation verification on ed7ab5b/8bce5d3: empty and placeholder-only tables no longer show scroll instructions; populated overflow still does. Sensors, Capabilities and Assumptions now have short sentence-case labels and associated comma-entry helper text. Benchmark headers use readable observable labels, rules use phrases such as At least, and exact identifiers remain in Rule details. The phone screenshot and browser checks preserve initial PROVE IT access, expose the original rule data on request and verify saved rover arrays. This is scoped implementation verification, not a new independent rubric score or overall design acceptance. Evidence: analogforge/out/table-labels-*.

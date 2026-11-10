@@ -87,3 +87,8 @@ Move origin/window from horizontal columns into always-visible row metadata whil
 ## Compact events and data-derived chart prose
 
 Use aligned sequence/time/actor/summary rows and native details for less frequently needed event type/state/evidence. Preserve complete timestamps and explicit missing actor identity. Chart prose is derived solely from supplied plotted values and units; unknown bins block a continuous-trend assertion. Associate the SVG with the visible description. Verify screenshot allegations before changing geometry: no A-specific compact tick defect was reproduced, so scales and anchors are unchanged. Stable workspace table reservation corrects the prior loading-to-empty CLS regression discovered by the smoke test.
+
+
+## Empty-table and rule wording scope
+
+Show the shared horizontal-scroll prompt only when the table both overflows and contains a substantive body row; aria-hidden loading placeholders are not data. Keep populated unknown-value rows inspectable. Retain captions, headers and keyboard scrolling. Rover list-field names use sentence case and comma-entry guidance moves to associated helper text, preserving the existing parser and saved arrays. Frozen benchmark rows use readable observable names and operator phrases; Rule details retains the exact requirement ID, operator, observable, accepted wording and note. Range limits display both bounds and nonnumeric rules are explicit. No contract data or comparison logic changes.
