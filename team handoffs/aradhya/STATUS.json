@@ -4,7 +4,7 @@
   "branch": "aradhya/frontend-experience",
   "template_note": "Observed frontend branch evidence. Generated reports are under analogforge/out; real-backend integration is a separate merging-agent gate.",
   "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
-  "tested_commit_sha": null,
+  "tested_commit_sha": "4c801f40ca86751fc16f0557d14bd0d160892a34",
   "kit_version": "1.0.0",
   "kit_verify": {
     "status": "PASSED",
@@ -15,16 +15,20 @@
     "node": "22.21.1",
     "pnpm": "10.22.0",
     "python": "3.12.13",
-    "playwright_browser": "Installed Google Chrome headless; launch passed",
+    "playwright_browser": "Matching Playwright Chromium141.0.7390.37, build1194; full visual sweep passed.",
     "notes": [
-      "Use PATH /Users/aradhyamishra/.npm/_npx/35c91942bfecc55d/node_modules/.bin for pinned Node and pnpm. No browser download needed."
+      "Run browser and unit gates serially on this low-disk Mac. Prior parallel attempt hit ENOSPC on generated fixture output; the serial clean rerun passed77/77.",
+      "A system sleep interrupted an overnight clean build-guard test. An unchanged serial rerun under temporary caffeinate passed80/80; no timeout threshold was relaxed.",
+      "Pinned Node22/pnpm10 PATH is required on this Mac. Playwright prefers its matching Chromium when installed and retains Chrome as a fallback. Optional headless-shell download was unnecessary because the full Chromium binary launched successfully.",
+      "Worker registration failed below1GiB free even with a fresh server and an HTTP200 worker file. After clearing regenerable compiler/shader caches, the unchanged b96462a source passed16 navigations over1.6minutes with no page errors. Final complete30-test gate is running serially with CI=1.",
+      "Round5 resolved a development-worker teardown/update race by retaining its inactive registration. Previous disk-only hypothesis was insufficient. New rapid16-navigation regression passes; production continues to exclude the worker. Dependencies were moved back from the verification checkout to the original workspace and original typecheck,lint and84 frontend tests pass."
     ]
   },
   "ownership_check": {
     "status": "PASSED",
     "exit_code": 0,
     "base": "origin/main",
-    "output_file": "analogforge/out/ownership-final.log"
+    "output_file": "out/ownership-r6.log"
   },
   "catalog": {
     "KIT-01": {
@@ -58,18 +62,23 @@
       "evidence": "AJV validates every operation/script; independent Python jsonschema validates exported observed responses and scientific artifact schemas."
     },
     "UIX-04": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "expected": 81,
+      "implemented": 81,
+      "asserted_visible_with_attributes": 81,
+      "evidence": "80 hooks appear in out/hooks-visual-complete-r6-0.json; passing J04 separately asserts visible rover-field-error[data-field=mass_kg] before replacement clears it. Together all 81 frozen hooks are covered."
     },
     "UIX-05": {
       "status": "PASSED",
-      "evidence": "71 executed frontend tests include immutability, status semantics, no optimistic science, request retries, revision conflict, source display, playback and component keyboard behavior."
+      "evidence": "84 frontend tests in 19 files pass on the final application source. See out/unit-r6-final.log."
     },
     "UIX-06": {
       "status": "PASSED",
       "evidence": "8 stream tests plus hook isolation/reconciliation tests."
     },
     "UIX-07": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "Final UIX-07 passes at 1440, 900 and 390 CSS px, including keyboard focus, 200% reflow, reduced motion and text spacing. No critical/serious axe findings."
     },
     "UIX-08": {
       "status": "PASSED",
@@ -84,30 +93,33 @@
       "evidence": "Production mock builds fail with MOCK_BUILD_FORBIDDEN; normal build excludes worker, preview banner and styleguide."
     },
     "UIX-11": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "WebGL-disabled browser preserved candidate list/matrix/benchmarks and actual JSON export; latest full gate repeats it."
     },
     "UIX-12": {
       "status": "PASSED",
       "evidence": "150/150 token checks; supplied files and generated CSS identical."
     },
     "UIX-13": {
-      "status": "NOT_RUN"
+      "status": "PASSED",
+      "evidence": "The complete 33-test gate passes on 4c801f4 with zero failed, skipped or flaky tests. The visual report contains 407 reports and 409 screenshots, including the permanent spacing regression and 12 complete guide parts, with zero findings and zero skipped checks.",
+      "output_file": "out/visual/report.json"
     }
   },
   "journeys_mock_mode": {
-    "J01": "NOT_RUN",
-    "J02": "NOT_RUN",
-    "J03": "NOT_RUN",
-    "J04": "NOT_RUN",
-    "J05": "NOT_RUN",
-    "J06": "NOT_RUN",
-    "J07": "NOT_RUN",
-    "J08": "NOT_RUN",
-    "J09": "NOT_RUN",
-    "J10": "NOT_RUN",
-    "J11": "NOT_RUN",
-    "J12": "NOT_RUN",
-    "J13": "NOT_RUN"
+    "J01": "PASSED",
+    "J02": "PASSED",
+    "J03": "PASSED",
+    "J04": "PASSED",
+    "J05": "PASSED",
+    "J06": "PASSED",
+    "J07": "PASSED",
+    "J08": "PASSED",
+    "J09": "PASSED",
+    "J10": "PASSED",
+    "J11": "PASSED",
+    "J12": "PASSED",
+    "J13": "PASSED"
   },
   "journeys_real_mode": "BLOCKED_ENVIRONMENT (belongs to the merging agent; real-mode assertions present behind isMock())",
   "status_values": [
@@ -119,18 +131,18 @@
     "NOT_RUN"
   ],
   "sci_tests": {
-    "SCI-03": "NOT_RUN",
-    "SCI-05": "NOT_RUN",
-    "SCI-10": "NOT_RUN",
-    "SCI-13": "NOT_RUN",
-    "SCI-15": "NOT_RUN",
-    "SCI-16": "NOT_RUN",
-    "SCI-18": "NOT_RUN"
+    "SCI-03": "PASSED",
+    "SCI-05": "PASSED",
+    "SCI-10": "PASSED",
+    "SCI-13": "PASSED",
+    "SCI-15": "PASSED",
+    "SCI-16": "PASSED",
+    "SCI-18": "PASSED"
   },
   "testids": {
-    "expected": null,
-    "implemented": null,
-    "asserted_by_playwright": null
+    "expected": 81,
+    "implemented": 81,
+    "asserted_by_playwright": 81
   },
   "renderer": {
     "fixtures": 9,
@@ -141,14 +153,15 @@
     "tamper_cases_rejected": 27
   },
   "accessibility": {
-    "axe_critical_serious": null,
+    "axe_critical_serious": 0,
     "viewports": [
       1440,
       900,
       390
     ],
-    "keyboard_only": "NOT_RUN",
-    "zoom_200": "NOT_RUN"
+    "keyboard_only": "PASSED",
+    "zoom_200": "PASSED",
+    "zoom_method": "720 CSS px viewport and deviceScaleFactor2 represent1440px at200%reflow"
   },
   "self_audit": {
     "forbidden_scan": {
@@ -156,11 +169,20 @@
       "findings": 0
     },
     "mutation_check": {
-      "status": "NOT_RUN",
+      "status": "PASSED",
       "mutants": 36,
-      "killed": null
+      "killed": 36,
+      "complete_catalog": true,
+      "command": ".venv/bin/python scripts/ui/mutation_check.py --json out/mutations-final.json",
+      "output_file": "out/mutations-r6-final.json",
+      "note": "All 36 required deliberate mutants were killed by their intended assertions on the final application source; infrastructure failures do not count.",
+      "source": "4c801f40ca86751fc16f0557d14bd0d160892a34"
     },
-    "truthfulness_proof": {},
+    "truthfulness_proof": {
+      "status_words_and_glyphs": "out/truth-statuses-visual-complete-clean-0.json and styleguide-glyphs C08 report; PASS/PARTIAL/FAIL/GAP/UNKNOWN/PENDING have distinct words, data-status and glyphs.",
+      "outcomes": "J01 PASS/FAIL and J03/J06 INCONCLUSIVE asserted; rendered status DOM dumps preserved.",
+      "no_similarity_percentage": "Manual search of out/truth-rendered-visual-release-clean-0.json: observed percentages are explicit requirement coverage/modelled reserve and their metrics; no Mars similarity/match/readiness percentages. Dump contains rendered J01 authoring, target, candidates, qualification, compatibility, attempts and passport text."
+    },
     "adversarial_reviewers": [
       {
         "role": "renderer attacker",
@@ -208,9 +230,47 @@
     "final_truth_checks": {
       "clean_rebuild": {
         "status": "PASSED",
-        "commit": "106c91d",
-        "method": "fresh local clone with no node_modules/dist/out; offline frozen-lockfile install, tsc, ESLint,71 frontend tests,128 Python tests, production build",
-        "browser_gate": "NOT_RUN"
+        "commit": "4c801f40ca86751fc16f0557d14bd0d160892a34",
+        "method": "Frozen-lock dependencies installed in a separate checkout and restored to the original workspace. Final original-workspace TypeScript, ESLint, 84 frontend tests, 131 Python tests, production build and complete 33-test browser gate pass.",
+        "browser_gate": "PASSED",
+        "python_environment": "Existing Python3.12 virtualenv reused with PYTHONPATH pointing to the clean checkout; Python source/tests are from the clean checkout."
+      },
+      "fixture_export_reproducibility": {
+        "status": "PASSED",
+        "runs": 2,
+        "files": 4,
+        "evidence": "out/fixture-before.sha256 and out/fixture-after.sha256 identical"
+      },
+      "runtime_hook_visibility": "80 hooks in the final aggregate dump plus the explicit visible rover-field-error[data-field=mass_kg] assertion in passing J04; all81 required hooks are covered.",
+      "multi_run_and_scenario_regressions": {
+        "status": "PASSED",
+        "evidence": "handlers.test.ts run-scoped lists; presentation.test.tsx asynchronous scenario retention; J11/J12 targeted browser pass followed by current full gate."
+      },
+      "reload_checkpoint": {
+        "status": "PASSED",
+        "evidence": "handlers.test.ts persisted awaiting-review regression: old order saves stage5 and fails; fixed order saves stage6, review ID/event sequence unchanged after restore."
+      },
+      "drawer_lifecycle": {
+        "status": "PASSED",
+        "evidence": "out/layout-cycle.log:13focusedvisualcohorts plusJ01 pass; audit waits for real dialog teardown before reopening."
+      },
+      "command_effects": {
+        "evidence": "tests/e2e/journeys/J01\u2013J13 and contract-edges.spec.ts",
+        "observed": [
+          "author/accept/start",
+          "select candidate/filter/sort",
+          "edit immutable mission/rover revision",
+          "build portfolio",
+          "approve/reject scoped review",
+          "retry blocked dependency",
+          "cancel",
+          "prove/replan/playback",
+          "export HTML/JSON/CSV",
+          "open/close evidence/operations/help",
+          "theme/density",
+          "offline/reconnect/reload",
+          "import validation errors"
+        ]
       }
     }
   },
@@ -264,12 +324,13 @@
   "known_limitations": [
     "Real-backend MRG-03 journeys and live dataset/model credentials are unavailable in this frontend-only environment.",
     "Synthetic preview and fixture results establish presentation/contract behavior only, not real mission or physical rover validation.",
-    "Vite reports a large application chunk; no deployment or production traffic performance claim is made."
+    "Vite reports a large application chunk; no deployment or production traffic performance claim is made.",
+    "Independent visual acceptance remains failed; see the complete reviewer reports. Build and functional test success does not waive this gate."
   ],
   "decisions": "see team handoffs/aradhya/DECISIONS.md",
   "ready_to_merge": false,
   "ready_to_merge_rule": "true only if every UIX row (UIX-01..13) and DR-01..04 is PASSED, J01-J13 pass in mock mode with 0 skipped, kit_verify and ownership_check PASS, lint/typecheck clean, self_audit complete, no hidden skips",
-  "pushed_sha": null,
+  "pushed_sha": "4c801f40ca86751fc16f0557d14bd0d160892a34",
   "secrets_not_committed": true,
   "build_output_not_committed": true,
   "design": {
@@ -279,8 +340,8 @@
     },
     "tokens_css_identical": "PASSED",
     "visual_audit": {
-      "status": "NOT_RUN",
-      "screens": null,
+      "status": "PASSED",
+      "screens": 409,
       "viewports": [
         1920,
         1440,
@@ -293,22 +354,215 @@
         "dark",
         "light"
       ],
-      "findings": null,
-      "skipped_checks": null
+      "findings": 0,
+      "skipped_checks": 0,
+      "reports": 407,
+      "output_file": "out/visual/report.json"
     },
-    "styleguide": "NOT_RUN",
+    "styleguide": "PASSED",
     "design_review": {
-      "DR-01": "NOT_RUN",
-      "DR-02": "NOT_RUN",
-      "DR-03": "NOT_RUN",
-      "DR-04": "NOT_RUN",
-      "rounds": [],
-      "final_scores": {},
+      "DR-01": "PASSED",
+      "DR-02": "FAILED",
+      "DR-03": "FAILED",
+      "DR-04": "PASSED",
+      "rounds": [
+        {
+          "round": 1,
+          "source": "8f3d883",
+          "status": "FAILED",
+          "means": {
+            "hmi": 2.42,
+            "accessibility": 2.67,
+            "slop": 2.25
+          }
+        },
+        {
+          "round": 2,
+          "source": "f2f088d",
+          "status": "FAILED",
+          "means": {
+            "hmi": 2.5833333333333335,
+            "accessibility": 2.75,
+            "slop": 2.5833333333333335
+          }
+        },
+        {
+          "round": 3,
+          "source": "49372f1",
+          "status": "FAILED",
+          "means": {
+            "hmi": 3.0833333333333335,
+            "accessibility": 3.0833333333333335,
+            "slop": 3.0
+          }
+        },
+        {
+          "round": 4,
+          "source": "b96462a",
+          "status": "FAILED",
+          "means": {
+            "hmi": 3.25,
+            "accessibility": 3.3333333333333335,
+            "slop": 3.3333333333333335
+          },
+          "all_individual_scores_at_least": 3,
+          "open_visual_X_findings": 0
+        },
+        {
+          "round": 5,
+          "source": "6ad0e65",
+          "status": "FAILED",
+          "means": {
+            "hmi": 3.25,
+            "accessibility": 3.0833333333333335,
+            "slop": 3.25
+          },
+          "open_visual_X_findings": [
+            "X-26 text-spacing ownership"
+          ]
+        },
+        {
+          "round": 6,
+          "source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
+          "status": "FAILED",
+          "means": {
+            "hmi": 3.3333333333333335,
+            "accessibility": 3.1666666666666665,
+            "slop": 3.1666666666666665
+          }
+        }
+      ],
+      "final_scores": {
+        "hmi": {
+          "scores": [
+            3,
+            4,
+            4,
+            2,
+            3,
+            3,
+            4,
+            4,
+            3,
+            3,
+            3,
+            4
+          ],
+          "mean": 3.3333333333333335,
+          "status": "FAILED"
+        },
+        "accessibility": {
+          "scores": [
+            3,
+            4,
+            3,
+            3,
+            3,
+            3,
+            3,
+            4,
+            3,
+            3,
+            3,
+            3
+          ],
+          "mean": 3.1666666666666665,
+          "status": "FAILED"
+        },
+        "slop": {
+          "scores": [
+            3,
+            4,
+            3,
+            2,
+            3,
+            3,
+            3,
+            4,
+            3,
+            3,
+            3,
+            4
+          ],
+          "mean": 3.1666666666666665,
+          "status": "FAILED"
+        }
+      },
       "review_file": "team handoffs/aradhya/DESIGN-REVIEW.md"
     },
-    "slop_findings_open": null,
+    "slop_findings_open": [
+      "Accessibility reviewer retains an X-26 concern for the mobile text-spacing matrix caption. Other remaining visual findings and their scope are recorded in DESIGN-REVIEW.md."
+    ],
     "fonts_self_hosted": true,
-    "external_requests_seen": null,
-    "third_party_licences_recorded": true
-  }
+    "external_requests_seen": 0,
+    "third_party_licences_recorded": true,
+    "styleguide_artifacts": {
+      "files": 12,
+      "max_bytes": 283202,
+      "native_resolution": true,
+      "parts_per_theme_density": 2,
+      "overlap_px": 48,
+      "complete_coverage": true
+    }
+  },
+  "science_presentation_evidence": {
+    "SCI-03": [
+      "J01 R-CLEARANCE and compatibility UNKNOWN",
+      "test_html::test_complete_and_safe",
+      "test_csv::test_metric_mappings_and_evidence_scoping"
+    ],
+    "SCI-05": [
+      "J01 optional UNKNOWN/GAP matrix rows",
+      "J03 unknown thermal and limited exports",
+      "J11 TARGET_EVIDENCE_MISSING mineral rows"
+    ],
+    "SCI-10": [
+      "J01 all3immutableattempts and file/manifest checks",
+      "J08b reload retains result identities",
+      "J10 accepted revision and rover remain pinned",
+      "test_html::test_complete_and_safe"
+    ],
+    "SCI-13": [
+      "J01 synthetic badge/exports",
+      "test_json::test_sci13_mode_labels_are_preserved_without_promoting_validation[synthetic/replay/live]",
+      "Authored mode inputs are not live-execution evidence."
+    ],
+    "SCI-15": [
+      "J01 visible FAIL/UNKNOWN/GAP and critic history",
+      "J03 and J06 no hidden unknown energy/thermal",
+      "test_html::test_perturbed_content_is_preserved"
+    ],
+    "SCI-16": [
+      "J03 site-only LIMITED exports",
+      "test_html::test_cover_headlines supported-negative ALLOWED fixture",
+      "test_json::test_json_structure"
+    ],
+    "SCI-18": [
+      "test_errors::test_errors",
+      "test_errors::test_stale_or_wrong_context_assurance_is_refused",
+      "interaction.test.tsx unreadable audit shows INCOMPLETE without qualified headline"
+    ]
+  },
+  "source_schema_sha256": {
+    "contracts/openapi.bundled.json": "e12d367326e478ca7fe60fb10f6d482991e6569863b0e9952c6a0a3327a63756",
+    "contracts/ui-testids.json": "a949e002c4e5ea91bd30c2c94ae735ecf828f38f899e3aacd52ca95d06a21a21",
+    "contracts/algorithm-ids.json": "50f6e6578608cc13fc3914b15ee07a7fde162acb9790f599570e6e4d659f424e",
+    "apps/web/src/generated/schema.d.ts": "d97d037c94674696ed365f9780517a480e63fb8b7a1e00056b11f17de265796b"
+  },
+  "current_verification_source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
+  "browser_delivery": {
+    "source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
+    "tests_passed": 33,
+    "tests_failed": 0,
+    "tests_skipped": 0,
+    "flaky": 0,
+    "output_file": "out/e2e-results-visual-complete-r6.json"
+  },
+  "completion_scope": "Build and functional tests completed; independent visual acceptance and real-backend integration are not approved.",
+  "real_backend_validation": {
+    "status": "BLOCKED_ENVIRONMENT",
+    "owner": "merging agent MRG-03",
+    "reason": "This branch does not contain the combined platform/science backend or live dataset/model credentials. Mock journeys and fixture exports do not verify that integration."
+  },
+  "pushed_sha_note": "Verified application source SHA. The subsequent handoff commit changes documentation and permitted component-guide images only."
 }

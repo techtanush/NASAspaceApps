@@ -1,24 +1,22 @@
 # Aradhya frontend handoff
 
-Implementation checkpoint: `106c91d` on `aradhya/frontend-experience`, based on `36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0`.
+Application source `4c801f40ca86751fc16f0557d14bd0d160892a34` on `aradhya/frontend-experience` builds and passes functional verification. Independent visual acceptance remains failed, so `ready_to_merge` is false.
 
-The branch implements S01–S12, the component styleguide, typed API/session transport, revision-safe commands, SSE recovery, a persistent synthetic preview, planetary and Earth display panels, and the pure Python passport renderer. Development exports call the real renderer. The production build rejects mock mode and excludes the worker and styleguide.
+Verified on the final application source:
 
-Observed checks at this checkpoint:
+- 33 browser tests pass, with zero failures, skips or flaky results. This includes J01–J13, reload/reconnect recovery, keyboard use, 200% reflow, declared unknown rover values, scientific display, rapid worker reloads, and WebGL-disabled exports.
+- 84 frontend tests in 19 files and 131 Python kit/renderer/contract tests pass.
+- TypeScript, ESLint, Ruff and strict mypy pass. Production builds reject mock mode and exclude the mock worker and component guide.
+- All 36 required mutations are detected by their intended assertions. Export verification accepts 27 files and rejects 27 tampered files.
+- The automated visual report has 407 reports and 409 screenshots with zero findings or skipped checks. Direct text-range assertions now protect matrix value ownership and Run context under expanded spacing.
+- Frozen-kit verification, branch ownership and all 150 token checks pass. The supplied contract/design assets remain unchanged.
 
-- 128 Python kit/renderer/contract tests pass.
-- 71 frontend unit tests and the dedicated 3-test client/mock contract suite pass.
-- TypeScript, ESLint, Ruff and strict mypy pass.
-- Production build and production resource audit pass.
-- Frozen kit verification and branch ownership pass.
-- Tokens pass 150/150; generated CSS and API client regenerate identically.
-- Export self-test verifies 27 files and rejects 27 tampered files.
-- A fresh clone with no node_modules/dist/out installs with the frozen lockfile. Its Python suite passes 128 tests; remaining clean-clone results are recorded in STATUS when complete.
+The branch implements S01–S12, authenticated workspace bootstrap, typed API transport, revision-safe commands, SSE recovery/replay, a persistent synthetic preview, Earth/planetary displays and the pure Python passport renderer. Development exports call that renderer. The preview worker survives document replacement without an unregister/update race. Selecting Known for an absent optional measurement never inserts zero. Saved times come from the API; absent actor/duration information remains Unknown.
 
-Independent adversarial reviews found and prompted fixes for canonical JSON validation, dangling evidence references, SVG processing instructions, stale assurance binding, event replay/reload isolation, publication single-flight, scientific mock truth, asynchronous heading focus, field labels and drawer behavior. Five independent truth attacks pass after the fixes. Renderer attacks now raise typed errors for malformed/noncanonical manifests, unresolved evidence, unsafe SVG and stale audit identity; 50 supplied attempts remain visible.
+Three fresh image reviewers inspected the exact final captures. Their means were HMI 3.333, accessibility 3.167 and slop 3.167, below the required 3.5. Remaining findings concern mobile density, caption/table presentation and other visual details. All six rounds are preserved verbatim in DESIGN-REVIEW.md; no pass is inferred from automated checks.
 
-The final serial browser gate, full visual audit, full 36-mutant catalog and three fresh design reviews are in progress. STATUS.json remains the authoritative completion record. All reports are generated beneath analogforge/out and excluded from Git; the six permitted styleguide screenshots are committed.
+The component guide has 12 native-resolution images, two contiguous parts per theme/density with 48 px overlap. The largest is 283,202 bytes; together they show the complete guides. Other screenshots and reports remain under analogforge/out and are excluded from Git.
 
-Real backend journeys belong to the merging agent's MRG-03 gate. This branch has no real backend, dataset credentials or physical rover evidence. Synthetic success is not a claim of scientific validation or production readiness.
+Original-workspace dependencies are restored. The final checks use Node 22.21.1, pnpm 10.22.0, Python 3.12.13 and matching Playwright Chromium. No other owner's implementation or frozen architecture/kit files were changed. Main was not modified.
 
-See DECISIONS.md for frozen-contract contradictions and audit measurement decisions. No other owner's implementation or frozen architecture/kit source was changed.
+Real-backend MRG-03 validation remains the merging agent's integration gate. The synthetic preview and fixture exports establish frontend/contract behavior, not live terrain, model access, physical rover validation or production readiness.
