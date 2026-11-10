@@ -39,7 +39,7 @@ from analogforge.science.hashing_utils import array_sha256, parameters_sha256
 from analogforge.science.provenance import evidence_draft, synthetic_product_id
 from analogforge.science.raster.mosaic import Tile, mosaic_tiles
 from analogforge.science.raster.normalize import normalize_elevation
-from analogforge.science.raster.source import RawRaster, native_cell_size_m, read_gdal_raster
+from analogforge.science.raster.source import RawRaster, native_cell_size_m, projected_posting_m, read_gdal_raster
 
 FloatArray = NDArray[np.float64]
 BoolArray = NDArray[np.bool_]
@@ -258,8 +258,7 @@ def nominal_posting_m(body: Body, crs: CRS | None, gt: GeoTransform, height: int
     if crs is None:
         return None
     if crs.is_projected:
-        ux, uy = (float(axis.unit_conversion_factor) for axis in crs.axis_info[:2])
-        return max(math.hypot(gt[1] * ux, gt[4] * uy), math.hypot(gt[2] * ux, gt[5] * uy))
+        return projected_posting_m(crs, gt, height, width)
     lon_c, lat_c = gt[0] + 0.5 * width * gt[1], gt[3] + 0.5 * height * gt[5]
     geod = body_geometry(body).geod()
     _, _, dx = geod.inv(lon_c, lat_c, lon_c + abs(gt[1]), lat_c)

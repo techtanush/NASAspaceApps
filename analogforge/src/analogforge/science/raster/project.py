@@ -10,28 +10,30 @@ from rasterio.warp import reproject
 
 from analogforge.ports.datasets import DatasetManifest
 from analogforge.science.datasets.ingest import NormalizedRaster
-from analogforge.science.errors import RasterError
+from analogforge.science.errors import GeometryError, RasterError
 from analogforge.science.geometry import (
+    DEFAULT_MAX_LINEAR_DISTORTION,
     AnalysisGridSpec,
     BBox,
     LongitudeConvention,
     assert_crs_matches_body,
     bbox_to_projected_bounds,
     projected_frame_for_aoi,
+    validate_projection_distortion,
 )
 from analogforge.science.raster.source import BoolArray, RawRaster, SourceRaster, resample_to_grid
 
 MAX_PROJECTED_CELLS = 64_000_000
 
 
-def physical_support(raster: NormalizedRaster, crs: CRS) -> float:
+def physical_support(raster: NormalizedRaster, crs: CRS, *, ground_distances: bool = False) -> float:
     """Largest native pixel-axis spacing (metres), sampled across geographic latitude."""
     gt = raster.geotransform
-    if crs.is_projected:
+    if crs.is_projected and not ground_distances:
         factors = [float(axis.unit_conversion_factor) for axis in crs.axis_info[:2]]
         return float(max(np.hypot(gt[1] * factors[0], gt[4] * factors[1]),
                          np.hypot(gt[2] * factors[0], gt[5] * factors[1])))
-    if not crs.is_geographic:
+    if not crs.is_geographic and not crs.is_projected:
         raise RasterError("Source CRS is neither geographic nor projected", code="UNSUPPORTED_CRS")
     rows, cols = raster.values.shape
     rr, cc = np.meshgrid(np.linspace(0.5, rows - 0.5, 5), np.linspace(0.5, cols - 0.5, 5))
@@ -41,8 +43,14 @@ def physical_support(raster: NormalizedRaster, crs: CRS) -> float:
     if geod is None:
         raise RasterError("Geographic source has no resolved body geometry", code="UNSUPPORTED_CRS")
     sizes = []
+    geographic = Transformer.from_crs(crs, crs.geodetic_crs, always_xy=True) if crs.is_projected else None
     for dx, dy in ((gt[1], gt[4]), (gt[2], gt[5])):
-        _, _, distances = geod.inv(x, y, x + dx, np.clip(y + dy, -90, 90))
+        if geographic is None:
+            lon, lat, lon2, lat2 = x, y, x + dx, np.clip(y + dy, -90, 90)
+        else:
+            lon, lat = geographic.transform(x, y)
+            lon2, lat2 = geographic.transform(x + dx, y + dy)
+        _, _, distances = geod.inv(lon, lat, lon2, lat2)
         sizes.append(float(np.max(distances)))
     return max(sizes)
 
@@ -56,25 +64,37 @@ def project_source(
     source_hashes: tuple[str, ...] = (),
     product_id: str | None = None,
     check: Callable[[], None],
+    max_linear_distortion: float = DEFAULT_MAX_LINEAR_DISTORTION,
 ) -> SourceRaster:
     if raster.crs_wkt is None:
         raise RasterError("Source CRS is missing", code="UNSUPPORTED_CRS")
     assert_crs_matches_body(manifest.body, raster.crs_wkt)
     crs = CRS.from_wkt(raster.crs_wkt)
+    convention: LongitudeConvention = "ZERO_360" if max(bbox[0], bbox[2]) > 180 else "NEG180_180"
+    source_frame_valid = True
+    if crs.is_projected:
+        try:
+            validate_projection_distortion(manifest.body, raster.crs_wkt, bbox, convention,
+                                           max_linear_distortion=max_linear_distortion)
+        except GeometryError as exc:
+            if exc.detail_code != "DISTORTION_EXCEEDED":
+                raise
+            source_frame_valid = False
     gt = raster.geotransform
     height, width = raster.values.shape
-    native = float(physical_support(raster, crs))
+    native = float(physical_support(raster, crs, ground_distances=not source_frame_valid))
     if not np.isfinite(native) or native <= 0:
         raise RasterError("Native physical support is unresolved", code="UNSUPPORTED_CRS")
     metric = crs.is_projected and all(abs(axis.unit_conversion_factor - 1) < 1e-12 for axis in crs.axis_info[:2])
-    direct = metric and gt[2] == 0 and gt[4] == 0 and gt[5] < 0 and abs(gt[1] + gt[5]) < 1e-6 * gt[1]
+    direct = (source_frame_valid and metric and gt[2] == 0 and gt[4] == 0
+              and gt[5] < 0 and abs(gt[1] + gt[5]) < 1e-6 * gt[1])
     if direct:
         grid = AnalysisGridSpec(manifest.body, raster.crs_wkt, gt[0], gt[3], gt[1], width, height)
         values = np.where(raster.missing, np.nan, raster.values)
         missing = np.asarray(raster.missing, dtype=bool)
     else:
-        convention: LongitudeConvention = "ZERO_360" if max(bbox[0], bbox[2]) > 180 else "NEG180_180"
-        frame = projected_frame_for_aoi(manifest.body, bbox, convention)
+        frame = projected_frame_for_aoi(manifest.body, bbox, convention,
+                                        max_linear_distortion=max_linear_distortion)
         xmin, ymin, xmax, ymax = bbox_to_projected_bounds(frame, bbox, convention)
         cell = float(np.ceil(native))
         x0, y0 = np.floor(xmin / cell) * cell, np.ceil(ymax / cell) * cell

@@ -167,6 +167,7 @@ def resolve_source(
         r, manifest, result.payload.bbox_lonlat, water=water,
         source_hashes=tuple(sorted(result.file_hashes.values())),
         product_id=result.product_id, check=env.check,
+        max_linear_distortion=env.cfg.algorithms.thresholds.max_linear_distortion,
     )
     draft = source_evidence_draft(
         result,
@@ -199,6 +200,7 @@ def _resolve_evidence(env: OpEnv, selector: SourceSelector, roles: tuple[str, ..
         decoded.raster, manifest, meta.bbox_lonlat, water=decoded.water,
         source_hashes=tuple(sorted(meta.file_hashes.values())), product_id=manifest.product_identity.product_id,
         check=env.check,
+        max_linear_distortion=env.cfg.algorithms.thresholds.max_linear_distortion,
     )
     params = env.params_hash("ingest-local-dataset", {"normalized_source": handle.artifact_sha256})
     draft = EvidenceDraft(

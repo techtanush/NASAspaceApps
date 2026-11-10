@@ -15,6 +15,7 @@ from pathlib import Path
 import numpy as np
 import rasterio
 from numpy.typing import NDArray
+from pyproj import CRS, Transformer
 from rasterio.enums import Resampling
 from rasterio.errors import RasterioError
 from rasterio.transform import Affine
@@ -110,17 +111,41 @@ class SourceRaster:
         )
 
 
+def projected_posting_m(
+    crs: CRS, gt: tuple[float, float, float, float, float, float], height: int, width: int,
+) -> float:
+    """Projected pixel spacing in physical metres; resolve materially distorted map units geodesically."""
+    ux, uy = (float(axis.unit_conversion_factor) for axis in crs.axis_info[:2])
+    nominal = max(math.hypot(gt[1] * ux, gt[4] * uy), math.hypot(gt[2] * ux, gt[5] * uy))
+    rr, cc = np.meshgrid(np.linspace(.5, height - .5, 5), np.linspace(.5, width - .5, 5))
+    xx, yy = gt[0] + cc * gt[1] + rr * gt[2], gt[3] + cc * gt[4] + rr * gt[5]
+    inverse = Transformer.from_crs(crs, crs.geodetic_crs, always_xy=True)
+    lon, lat = inverse.transform(xx, yy)
+    geod = crs.get_geod()
+    if geod is None:
+        raise RasterError("Projected source has no resolved body geometry", code="UNSUPPORTED_CRS")
+    spacings = []
+    for dx, dy in ((gt[1], gt[4]), (gt[2], gt[5])):
+        lon2, lat2 = inverse.transform(xx + dx, yy + dy)
+        _, _, distance = geod.inv(lon, lat, lon2, lat2)
+        spacings.append(float(np.max(distance)))
+    physical = max(spacings)
+    if not math.isfinite(physical) or physical <= 0:
+        raise RasterError("Projected source ground spacing is unresolved", code="UNSUPPORTED_CRS")
+    # Preserve declared map spacing when its discrepancy is within the baseline
+    # projection policy. Material distortion must never change native support
+    # between ingestion evidence and subsequent metric normalization.
+    return nominal if nominal > 0 and abs(physical / nominal - 1) <= .01 else physical
+
+
 def native_cell_size_m(raw: RawRaster, body: Body) -> float:
     """Conservative native pixel-axis spacing in metres over the source footprint."""
     a, b, d, e = raw.geotransform[1], raw.geotransform[2], raw.geotransform[4], raw.geotransform[5]
     if raw.crs_wkt is None:
         raise RasterError("raster has no CRS", code="UNSUPPORTED_CRS")
-    from pyproj import CRS  # local import keeps module import light
-
     crs = CRS.from_wkt(raw.crs_wkt)
     if crs.is_projected:
-        ux, uy = (float(axis.unit_conversion_factor) for axis in crs.axis_info[:2])
-        return float(max(math.hypot(a * ux, d * uy), math.hypot(b * ux, e * uy)))
+        return projected_posting_m(crs, raw.geotransform, *raw.values.shape)
     height, width = raw.values.shape
     x0, y0 = raw.geotransform[0], raw.geotransform[3]
     rr, cc = np.meshgrid(np.linspace(.5, height - .5, 5), np.linspace(.5, width - .5, 5))

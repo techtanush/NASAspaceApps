@@ -240,6 +240,44 @@ def test_water_mask_registration_is_checked_before_science(tmp_path: Path) -> No
     assert any(issue.detail_code == "MASK_GRID_MISMATCH" for issue in result.issues)
 
 
+def test_metric_units_do_not_waive_ground_distance_distortion(tmp_path: Path) -> None:
+    from analogforge.ports.science_payloads import ScreenCandidatesInput
+    from analogforge.science.config import load_config
+    from analogforge.science.geometry import validate_projection_distortion
+    from analogforge.science.ops.base import OpEnv
+    from analogforge.science.ops.source import resolve_source
+
+    ctx = make_practice_context(tmp_path)
+    dataset = "practice-earth-grid-v1"
+    root = ctx.dataset_roots[dataset]
+    manifest = yaml.safe_load((root / "manifest.yaml").read_text())
+    manifest["crs"] = {"epsg": 3857}
+    manifest["declared_native_resolution_m"] = 20.6
+    for item in manifest["files"]:
+        with rasterio.open(root / item["path"], "r+") as image:
+            image.crs = "EPSG:3857"
+            image.transform = rasterio.Affine(60, 0, 500000, 0, -60, 11068715)  # about 70 N
+        item["sha256"] = None
+    (root / "manifest.yaml").write_text(yaml.safe_dump(manifest))
+    inputs = ScreenCandidatesInput(
+        search_region_set_id="local-dataset-grid-v1", source=SourceSelector(kind="LOCAL_DATASET", dataset_id=dataset),
+        target_metrics=[], target_histogram=None, requirements=load_mission("mission-mars-mobility").requirements,
+        max_detailed=6, reference_set_id=catalog.REFERENCE_SET_PRACTICE,
+    )
+    result, _ = run(create_science_service(), inputs, ctx, datasets=[dataset])
+    assert result.status.value == "SUCCEEDED" and result.payload is not None, result.issues
+    source = resolve_source(OpEnv(make_request(inputs, datasets=[dataset]), ctx, load_config()),
+                            inputs.source, roles=("EARTH_TERRAIN",))
+    assert "Pseudo-Mercator" not in source.raster.grid.crs_wkt
+    # At 70 N, a 60 map-metre posting is about 20 ground metres. The
+    # destination must use ground spacing, not preserve the distorted 60 m.
+    assert 19 < source.raster.native_resolution_m < 22
+    assert source.ingest is not None and source.ingest.payload is not None
+    assert source.ingest.payload.native_resolution_m == pytest.approx(source.raster.native_resolution_m, rel=1e-9)
+    validate_projection_distortion("EARTH", source.raster.grid.crs_wkt,
+                                   tuple(result.payload.search_extent.bbox))
+
+
 def test_whole_planet_aoi_is_bounded_before_large_allocation(tmp_path: Path) -> None:
     ctx = make_practice_context(tmp_path)
     target = mars_target_aoi().model_copy(update={"bbox": [-180, -89, 180, 89]})

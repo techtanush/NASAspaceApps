@@ -378,6 +378,21 @@ def frame_from_crs_wkt(body: Body, crs_wkt: str) -> ProjectedFrame:
     )
 
 
+def validate_projection_distortion(
+    body: Body, crs_wkt: str, bbox: BBox, convention: LongitudeConvention = "NEG180_180", *,
+    max_linear_distortion: float = DEFAULT_MAX_LINEAR_DISTORTION,
+) -> ProjectedFrame:
+    """Check a source projection over its actual extent before treating map metres as ground metres."""
+    frame = frame_from_crs_wkt(body, crs_wkt)
+    distortion = _frame_distortion(body, crs_wkt, unwrap_bbox(bbox, convention))
+    if distortion > max_linear_distortion:
+        raise GeometryError(
+            "Source projection exceeds the allowed ground-distance distortion; use an appropriate local source grid.",
+            detail_code="DISTORTION_EXCEEDED",
+        )
+    return ProjectedFrame(frame.body, frame.kind, frame.crs_wkt, frame.epsg, distortion)
+
+
 # --------------------------------------------------------------------------- coordinate transforms
 def lonlat_to_xy(
     frame: ProjectedFrame, lon: FloatArray | float, lat: FloatArray | float
