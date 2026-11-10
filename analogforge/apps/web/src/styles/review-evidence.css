@@ -1,0 +1,30 @@
+/* Review fixes: evidence receipts have one vertical scrolling surface. */
+[data-testid=evidence-drawer] .evidence-receipt-body{display:flex;flex-direction:column;gap:16px;flex:0 0 auto;min-height:0}
+[data-testid=evidence-drawer] .evidence-receipt-body>.table-scroll{flex:0 0 auto;overflow-x:auto;overflow-y:visible;max-height:none}
+[data-testid=evidence-drawer] .evidence-receipt-body table{table-layout:fixed;width:100%}
+[data-testid=evidence-drawer] .evidence-receipt-body th,[data-testid=evidence-drawer] .evidence-receipt-body td{overflow-wrap:anywhere;white-space:normal}
+[data-testid=evidence-drawer] .evidence-receipt-body th:first-child{width:48%}
+[data-testid=evidence-drawer]>.section-heading,[data-testid=evidence-drawer]>.helper{flex-shrink:0}
+.qual-scan{gap:8px;min-width:176px}
+.qual-verdict{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.qual-verdict>.quantity{white-space:nowrap}
+.qual-scan details{margin-top:4px}
+.qual-scan details[open]{display:flex;flex-direction:column;gap:8px}
+.candidate-summary{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.candidate-counts{display:flex;flex-wrap:wrap;gap:4px 8px;font-size:12px;line-height:16px}
+.candidate-counts>span{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.candidate-counts svg{width:12px;height:12px}
+[data-testid=qual-cell]{border-left:3px solid var(--state-pending)}
+[data-testid=qual-cell][data-status=PASS]{border-left-color:var(--state-pass)}
+[data-testid=qual-cell][data-status=FAIL]{border-left-color:var(--state-fail)}
+[data-testid=qual-cell][data-status=PARTIAL]{border-left-color:var(--state-partial)}
+[data-testid=qual-cell][data-status=GAP]{border-left-color:var(--state-gap)}
+[data-testid=qual-cell][data-status=UNKNOWN]{border-left-color:var(--state-unknown)}
+.failure-count{display:inline-block;margin:4px 16px 4px 0}
+.qual-table tfoot{background:var(--surface-2);font-size:13px}
+.workspace-time{white-space:nowrap;overflow-wrap:normal;word-break:normal}
+.workspace-loading-cell{height:var(--row-h-default);padding:8px 12px}
+.workspace-loading-line{display:block;min-width:48px;height:16px;background:var(--surface-3)}
+
+.qualification-tools{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.matrix-label-narrow{display:none}
+@media(max-width:767px){.qualification-tools{gap:8px;flex-wrap:nowrap}.qualification-tools>.segmented{gap:4px;flex-shrink:0}.qualification-tools .button{padding-left:8px;padding-right:8px;font-size:13px}.qualification-tools>.inline-fields{gap:4px;flex-wrap:nowrap;font-size:12px}.matrix-label-wide{display:none}.matrix-label-narrow{display:inline}}
