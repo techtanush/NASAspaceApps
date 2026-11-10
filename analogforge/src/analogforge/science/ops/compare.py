@@ -37,6 +37,7 @@ from analogforge.science.raster.normalize import aggregate_blocks
 from analogforge.science.raster.store import decode_analysis_grid
 
 NPZ = "application/x-npz"
+TARGET_POLICIES = frozenset({"slope-w1-common-support-v1", "mineral-presence-v1", "thermal-min-v1"})
 
 
 def _handles(env: OpEnv, ids: list[object]) -> tuple[EvidenceHandle, ...]:
@@ -70,7 +71,13 @@ def histogram_at_support(env: OpEnv, handle: EvidenceHandle, support_m: float) -
     valid = np.asarray(surf.valid, dtype=bool)
     slope = np.where(valid, surf.slope_deg, 0.0)
     data = area_weighted_histogram(slope, valid, support_m * support_m, edges)
-    return to_port_histogram(data, support_scale_m=support_m) if data.valid_area_m2 > 0 else None
+    if data.valid_area_m2 <= 0:
+        # no coarse cell has full support: an explicit empty histogram (the policy reports INSUFFICIENT_VALID_DATA)
+        return Histogram(
+            metric_id="surface_slope_deg", unit="deg", edges=list(edges),
+            area_fraction=[0.0] * (len(edges) - 1), valid_area_m2=0.0, support_scale_m=support_m,
+        )  # fmt: skip
+    return to_port_histogram(data, support_scale_m=support_m)
 
 
 def _candidate_histogram(env: OpEnv, handles: tuple[EvidenceHandle, ...], target: Histogram | None) -> Histogram | None:
@@ -95,6 +102,9 @@ def run_compare(env: OpEnv) -> OpOutcome:
     algo = catalog.ALGORITHM_IDS["COMPARE_REQUIREMENT"]
     target_handles = _handles(env, list(inp.target_evidence_ids))
     cand_handles = _handles(env, list(inp.candidate_evidence_ids))
+    if inp.observable_policy_id not in TARGET_POLICIES:
+        # Policies that never read the planetary side must not be judged on its body (valid_bodies lists EARTH only).
+        target_handles = ()
     target_hist = _target_histogram(env, target_handles)
     cand_hist = _candidate_histogram(env, cand_handles, target_hist)
     outcome = compare_requirement(
@@ -111,7 +121,7 @@ def run_compare(env: OpEnv) -> OpOutcome:
     params = env.params_hash(algo, env.operation_params())
     payload = outcome.to_payload(EvidenceRef(local_key="comparison"))
     art = json_artifact(env, params_sha=params, key="comparison-json", name="comparison.json", payload=payload)
-    parents = sorted({h.evidence_id for h in (*target_handles, *cand_handles)}, key=str)
+    parents = sorted({h.evidence_id for h in (*_handles(env, list(inp.target_evidence_ids)), *cand_handles)}, key=str)
     req_art = json_artifact(
         env, params_sha=params, key="requirement-json", name="requirement.json", payload=inp.requirement
     )

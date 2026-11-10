@@ -115,8 +115,9 @@ def test_thresholds_are_read_from_yaml(tmp_path: Path) -> None:
 
 def test_unknown_region_set_and_reference_set_are_blocked(screened) -> None:  # type: ignore[no-untyped-def]
     flow, target, _ = screened
-    from analogforge.ports.science_payloads import ScreenCandidatesInput
     from support.practice import local
+
+    from analogforge.ports.science_payloads import ScreenCandidatesInput
 
     mission = load_mission("mission-mars-mobility")
     base = dict(source=local("practice-earth-grid-v1"), target_metrics=target.metrics, target_histogram=target.slope_histogram, requirements=mission.requirements, max_detailed=6)

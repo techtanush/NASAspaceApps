@@ -5,7 +5,7 @@
 Mutants live in ``scripts/science/mutants.json``: ``{"mutants": [{id, description, file, old, new, tests}]}``.
 Each names a source file (relative to ``src/``), an exact ``old`` snippet (must occur exactly once), its replacement
 and the test selection that must FAIL.  The mutant is applied to a temporary copy of ``src`` that shadows the real
-package through ``PYTHONPATH``; the real tree is never modified.  A surviving mutant (tests still pass) is a missing
+package through ``sys.path``; the real tree is never modified.  A surviving mutant (tests still pass) is a missing
 or weak test.
 
 ``--only M4`` runs one mutant; ``--json`` writes the report.  Exit 0 only if every selected mutant was killed.
@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import shutil
 import subprocess
 import sys
@@ -58,11 +57,13 @@ def run_mutant(mutant: Mutant, timeout: int = 900) -> dict[str, object]:
                 "error": f"old snippet occurs {text.count(mutant.old)} times (need exactly 1)",
             }
         target.write_text(text.replace(mutant.old, mutant.new), encoding="utf-8")
-        env = dict(os.environ)
-        env["PYTHONPATH"] = f"{copy}{os.pathsep}{env.get('PYTHONPATH', '')}"
-        env["PYTHONDONTWRITEBYTECODE"] = "1"
-        cmd = [sys.executable, "-m", "pytest", "-x", "-q", "-p", "no:randomly", "-p", "no:cacheprovider", *mutant.tests]
-        proc = subprocess.run(cmd, cwd=ROOT, env=env, capture_output=True, text=True, timeout=timeout, check=False)
+        args = ["-x", "-q", "-p", "no:randomly", "-p", "no:cacheprovider", *mutant.tests]
+        code = (
+            "import sys; sys.dont_write_bytecode = True; sys.path.insert(0, sys.argv[1]); import pytest; "
+            "sys.exit(pytest.main(sys.argv[2:]))"
+        )
+        cmd = [sys.executable, "-c", code, str(copy), *args]
+        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=timeout, check=False)
         tail = "\n".join((proc.stdout + proc.stderr).strip().splitlines()[-6:])
         # exit 1 = tests failed (killed); 0 = survived; any other code is a harness problem, not a kill
         return {**asdict(mutant), "killed": proc.returncode == 1, "exit_code": proc.returncode, "tail": tail}

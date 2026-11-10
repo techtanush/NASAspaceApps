@@ -129,3 +129,25 @@ def test_synthetic_run_opens_no_socket(monkeypatch: pytest.MonkeyPatch, tmp_path
     result, _ = run(create_science_service(), inp, make_context(tmp_path))
     assert result.status.value == "SUCCEEDED" and attempts == []
     assert make_context(tmp_path).http_client() is None
+
+
+def test_network_adapters_are_blocked_in_synthetic_mode_without_touching_sockets(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from analogforge.ports.science_payloads import ResolveCoverageInput
+
+    def blocked(*a: object, **k: object) -> None:
+        raise AssertionError("network access attempted in synthetic mode")
+
+    monkeypatch.setattr(socket, "socket", blocked)
+    monkeypatch.setattr(socket, "create_connection", blocked)
+    mission = load_mission("mission-mars-mobility")
+    inp = ResolveCoverageInput(
+        subject_kind="CANDIDATE",
+        aoi=mission.target.model_copy(update={"body": "EARTH"}),
+        adapter_id="earth_nasadem_hgt_v001",
+        measurement_kinds=["TERRAIN"],
+    )
+    result, _ = run(create_science_service(), inp, make_context(tmp_path), check_registrar=False)
+    assert result.status.value == "BLOCKED" and result.payload is None
+    assert result.issues[0].code == "UNSUPPORTED_PRODUCT"

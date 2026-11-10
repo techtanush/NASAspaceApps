@@ -113,7 +113,7 @@ def run_analyze(env: OpEnv) -> OpOutcome:
             metrics.append(
                 metric(
                     "mineral_valid_fraction",
-                    mvf,
+                    mvf if mvf > 0.0 else None,  # no retrieval in the window is unknown, never a zero
                     "fraction",
                     cell,
                     mvf,

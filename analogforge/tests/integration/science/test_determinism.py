@@ -1,4 +1,4 @@
-# ruff: noqa: E501, S603, S607, S101
+# ruff: noqa: E501, E402, S603, S607, S101
 """SCN-20: identical requests give identical payload JSON and artifact SHA-256 (elapsed fields excluded)."""
 
 from __future__ import annotations
@@ -77,3 +77,61 @@ def test_different_inputs_change_hashes(tmp_path: Path) -> None:
     b = svc.execute(make_request(_design("EXPOSURE_COVERAGE")), make_context(tmp_path / "b"))
     assert a.parameters_sha256 != b.parameters_sha256
     assert a.artifacts[0].sha256 != b.artifacts[0].sha256
+
+
+# --------------------------------------------------------------------------- the practice flow
+from support.practice import (  # noqa: E402
+    Flow,  # noqa: E402
+    candidate_ref,
+    characterize_mars,
+    make_practice_context,
+    prove,
+    screen,
+    service,
+)
+
+
+def _flow(tmp: Path) -> tuple[Flow, object, list[ScienceComputationResult]]:
+    from support import builders
+
+    builders._counter["n"] = 0  # same request ids => same registrar-allocated evidence UUIDs in both runs
+    ctx = make_practice_context(tmp)
+    flow = Flow(service(), ctx)
+    target, _ = characterize_mars(flow)
+    sc = screen(flow, target)
+    att, _ = prove(flow, sc, catalog.WINDOW_B_CORRIDOR, load_rover("ares-1"), "EXPOSURE_COVERAGE", 1)
+    return flow, sc, [*flow.results, *att.results.values()]
+
+
+def test_practice_flow_is_identical_across_runs_and_directories(tmp_path: Path) -> None:
+    _, _, one = _flow(tmp_path / "one")
+    _, _, two = _flow(tmp_path / "two" / "deeper")
+    assert len(one) == len(two) >= 6
+    for a, b in zip(one, two, strict=True):
+        assert a.operation == b.operation
+        pa = _no_elapsed(json.loads(canonical_json_bytes(a.payload))) if a.payload is not None else None
+        pb = _no_elapsed(json.loads(canonical_json_bytes(b.payload))) if b.payload is not None else None
+        assert pa == pb, a.operation
+        assert [(x.local_key, x.sha256, x.size_bytes) for x in a.artifacts] == [(x.local_key, x.sha256, x.size_bytes) for x in b.artifacts], a.operation
+        assert a.parameters_sha256 == b.parameters_sha256 and a.input_sha256 != "" and a.status == b.status
+        assert [e.parameters_sha256 for e in a.evidence_drafts] == [e.parameters_sha256 for e in b.evidence_drafts]
+    # the analysis grid in particular is byte-identical
+    grids = [x.sha256 for r in one for x in r.artifacts if x.role.value == "ANALYSIS_GRID"]
+    assert grids and grids == [x.sha256 for r in two for x in r.artifacts if x.role.value == "ANALYSIS_GRID"]
+
+
+def test_seed_changes_the_hashes_but_not_the_science(tmp_path: Path) -> None:
+    from support.builders import make_request
+
+    from analogforge.ports.science import ScienceOptions
+
+    flow, sc, _ = _flow(tmp_path)
+    from support.practice import local
+
+    from analogforge.ports.science_payloads import AnalyzeCandidateInput
+
+    inp = AnalyzeCandidateInput(candidate=candidate_ref(sc, catalog.WINDOW_B_CORRIDOR), source=local("practice-earth-grid-v1"), measurement_spec_id=catalog.MEASUREMENT_SPEC_EARTH)  # type: ignore[arg-type]
+    r0 = flow.svc.execute(make_request(inp, datasets=["practice-earth-grid-v1"]), flow.ctx)
+    r1 = flow.svc.execute(make_request(inp, datasets=["practice-earth-grid-v1"], options=ScienceOptions(seed=7)), flow.ctx)
+    assert r0.parameters_sha256 != r1.parameters_sha256
+    assert _no_elapsed(json.loads(canonical_json_bytes(r0.payload))) == _no_elapsed(json.loads(canonical_json_bytes(r1.payload)))

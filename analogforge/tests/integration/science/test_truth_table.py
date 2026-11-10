@@ -60,6 +60,8 @@ def independent_w1(grid_path: Path, target_fractions: list[float], support_m: fl
                 gx[r, c] = (blk[:, 2].sum() - blk[:, 0].sum()) / (6.0 * support_m)
                 gy[r, c] = (blk[0, :].sum() - blk[2, :].sum()) / (6.0 * support_m)
     slope = np.degrees(np.arctan(np.hypot(gx, gy)))[valid]
+    if slope.size == 0:
+        return float("nan")  # no coarse cell has full support
     counts, _ = np.histogram(slope, bins=EDGES)
     frac = counts / counts.sum()
     return float(wasserstein_distance(CENTRES, CENTRES, frac, target_fractions))
@@ -109,11 +111,16 @@ def test_target_context_row_follows_independent_w1(table) -> None:  # type: igno
     for w, path in grids.items():
         r = rows[w]["R-TARGET-SLOPE-CONTEXT"]
         w1 = independent_w1(path, list(target.slope_histogram.area_fraction), 480.0)
+        if np.isnan(w1):  # the island window has no 480 m cell with a full 3x3 neighbourhood: honest UNKNOWN
+            assert (r.proposed_status, r.reason_code) == ("UNKNOWN", "INSUFFICIENT_VALID_DATA")
+            assert r.measured_value is None
+            seen.add("NO_DATA")
+            continue
         assert r.measured_unit == "deg" and r.comparison_scale_m == 480.0
         assert r.measured_value == pytest.approx(w1, abs=1e-9)
         assert (r.proposed_status == "PASS") == (w1 <= 6.0)
         seen.add(r.proposed_status)
-    assert "PASS" in seen or "FAIL" in seen  # at least decided rows exist
+    assert "PASS" in seen and "NO_DATA" in seen
 
 
 def test_route_dependent_rows_are_preliminary_unknown(table) -> None:  # type: ignore[no-untyped-def]
