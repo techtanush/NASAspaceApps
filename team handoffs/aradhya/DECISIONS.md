@@ -82,3 +82,8 @@ The user explicitly selected mobile work area, matrix caption and passport assoc
 ## Candidate metadata and workspace compactness
 
 Move origin/window from horizontal columns into always-visible row metadata while retaining screening rank/status, map key, actual server values and selection acknowledgement. Keep the prescribed desktop40/60 split. Reserve loading height only while requests are pending, then release unused space. Presets retain every scenario link and use native responsive disclosure. The focused browser assertions cover four-row containment, metadata text containment, split ratio, preset toggling and selection, alongside the previous mobile layout and keyboard/zoom checks. No scientific verdict or API contract changed.
+
+
+## Compact events and data-derived chart prose
+
+Use aligned sequence/time/actor/summary rows and native details for less frequently needed event type/state/evidence. Preserve complete timestamps and explicit missing actor identity. Chart prose is derived solely from supplied plotted values and units; unknown bins block a continuous-trend assertion. Associate the SVG with the visible description. Verify screenshot allegations before changing geometry: no A-specific compact tick defect was reproduced, so scales and anchors are unchanged. Stable workspace table reservation corrects the prior loading-to-empty CLS regression discovered by the smoke test.

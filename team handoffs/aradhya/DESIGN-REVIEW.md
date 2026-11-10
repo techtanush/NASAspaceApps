@@ -2374,3 +2374,14 @@ Build and functional verification pass. Independent visual acceptance does not p
 ## User-selected follow-up: mobile space, matrix caption, passport grouping
 
 Source8ca8769 resolves these three requested findings with focused geometric/browser assertions and visual inspection: two complete mobile candidate/matrix rows; a visible experiment action; accessible folded context/actions; a caption whose glyphs remain inside the visible frame under text-spacing overrides and whose position is unchanged by horizontal table scrolling; and top-aligned requirement groups with one candidate assessment per compact subrow. Passport print width/digest placement and exports also pass. All other historical reviewer text and scores above remain unchanged. No overall design regrade is claimed.
+
+
+## Requested operations/chart follow-up: implementation verification
+
+Source bb6af30 addresses the requested event-row density and chart text descriptions. This section records implementation evidence; it is not a new independent rubric review and does not change historical scores.
+
+The reported compact histogram first-tick misalignment was inspected before changing chart code. The saved light/compact part2 places A at the center of its first bar. Live measurements show the same approximately0.497 CSS px tick-to-bar-center difference for A, B and C. The1SVG-unit inter-bar gap accounts for that common half-unit offset. All six theme/density cohorts retain the same result after the text-only chart change. The report's A-specific displacement is not reproduced; axis and bar geometry remain unchanged. Raw measurements: analogforge/out/operations-charts-alignment-before.log and operations-charts-guide-manifest.json. All12 guide images were refreshed at1440 CSS px, native resolution, two parts with48px overlap; maximum285331bytes.
+
+Timeline sequence, full UTC timestamp, explicit Actor unknown and summary share a scan row on desktop and a compact two-column arrangement on mobile. Native disclosure preserves event type/state and evidence links. The chart's visible description now explains monotonic direction/endpoints, equal values or highest/lowest bins with units. Missing values explicitly prevent a complete-trend claim. SVG accessible descriptions reference the same visible summary.
+
+The broader smoke test also caught a homepage layout shift from the preceding follow-up's loading reservation collapsing. Keep that reservation stable across pending/resolved states; this preserves all four skeleton rows and avoids moving the preset strip when data settles. No threshold or CLS assertion was changed.
