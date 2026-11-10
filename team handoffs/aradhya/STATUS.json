@@ -4,7 +4,7 @@
   "branch": "aradhya/frontend-experience",
   "template_note": "Observed frontend branch evidence. Generated reports are under analogforge/out; real-backend integration is a separate merging-agent gate.",
   "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
-  "tested_commit_sha": "4c801f40ca86751fc16f0557d14bd0d160892a34",
+  "tested_commit_sha": "8ca87694c0c3cdd86cabf107c40b493bb2777466",
   "kit_version": "1.0.0",
   "kit_verify": {
     "status": "PASSED",
@@ -70,7 +70,7 @@
     },
     "UIX-05": {
       "status": "PASSED",
-      "evidence": "84 frontend tests in 19 files pass on the final application source. See out/unit-r6-final.log."
+      "evidence": "84 frontend tests in19files pass on8ca8769; out/three-layouts-unit.log."
     },
     "UIX-06": {
       "status": "PASSED",
@@ -101,9 +101,8 @@
       "evidence": "150/150 token checks; supplied files and generated CSS identical."
     },
     "UIX-13": {
-      "status": "PASSED",
-      "evidence": "The complete 33-test gate passes on 4c801f4 with zero failed, skipped or flaky tests. The visual report contains 407 reports and 409 screenshots, including the permanent spacing regression and 12 complete guide parts, with zero findings and zero skipped checks.",
-      "output_file": "out/visual/report.json"
+      "status": "NOT_RUN",
+      "evidence": "Latest full audit passed on4c801f4 and is retained at out/visual-before-three-layout-fixes/report.json. The current user-requested layout follow-up has focused passing checks; no current full audit pass is inferred."
     }
   },
   "journeys_mock_mode": {
@@ -330,7 +329,7 @@
   "decisions": "see team handoffs/aradhya/DECISIONS.md",
   "ready_to_merge": false,
   "ready_to_merge_rule": "true only if every UIX row (UIX-01..13) and DR-01..04 is PASSED, J01-J13 pass in mock mode with 0 skipped, kit_verify and ownership_check PASS, lint/typecheck clean, self_audit complete, no hidden skips",
-  "pushed_sha": "4c801f40ca86751fc16f0557d14bd0d160892a34",
+  "pushed_sha": "8ca87694c0c3cdd86cabf107c40b493bb2777466",
   "secrets_not_committed": true,
   "build_output_not_committed": true,
   "design": {
@@ -340,24 +339,8 @@
     },
     "tokens_css_identical": "PASSED",
     "visual_audit": {
-      "status": "PASSED",
-      "screens": 409,
-      "viewports": [
-        1920,
-        1440,
-        1280,
-        1024,
-        768,
-        390
-      ],
-      "themes": [
-        "dark",
-        "light"
-      ],
-      "findings": 0,
-      "skipped_checks": 0,
-      "reports": 407,
-      "output_file": "out/visual/report.json"
+      "status": "NOT_RUN",
+      "note": "Full all-screen audit not rerun for this narrowly requested follow-up. The focused suite and the retained full baseline are recorded separately."
     },
     "styleguide": "PASSED",
     "design_review": {
@@ -488,21 +471,63 @@
           "status": "FAILED"
         }
       },
-      "review_file": "team handoffs/aradhya/DESIGN-REVIEW.md"
+      "review_file": "team handoffs/aradhya/DESIGN-REVIEW.md",
+      "last_reviewed_source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
+      "follow_up_note": "The three user-selected findings are addressed and tested on8ca8769. Historical reports/scores remain unchanged; no new overall review or acceptance is claimed."
     },
     "slop_findings_open": [
-      "Accessibility reviewer retains an X-26 concern for the mobile text-spacing matrix caption. Other remaining visual findings and their scope are recorded in DESIGN-REVIEW.md."
+      "Prior mobile caption concern is addressed by the focused follow-up. Fresh overall visual acceptance is not performed; other historical review findings remain outside this request."
     ],
     "fonts_self_hosted": true,
     "external_requests_seen": 0,
     "third_party_licences_recorded": true,
     "styleguide_artifacts": {
       "files": 12,
-      "max_bytes": 283202,
+      "max_bytes": 280809,
       "native_resolution": true,
       "parts_per_theme_density": 2,
       "overlap_px": 48,
       "complete_coverage": true
+    },
+    "previous_full_visual_audit": {
+      "status": "PASSED",
+      "screens": 409,
+      "viewports": [
+        1920,
+        1440,
+        1280,
+        1024,
+        768,
+        390
+      ],
+      "themes": [
+        "dark",
+        "light"
+      ],
+      "findings": 0,
+      "skipped_checks": 0,
+      "reports": 407,
+      "output_file": "out/visual-before-three-layout-fixes/report.json",
+      "source": "4c801f40ca86751fc16f0557d14bd0d160892a34"
+    },
+    "requested_layout_fixes": {
+      "source": "8ca87694c0c3cdd86cabf107c40b493bb2777466",
+      "status": "PASSED",
+      "items": [
+        "Mobile work area exposes at least two complete candidate/matrix rows; PROVE IT is in the initial phone viewport; context/actions remain accessible in disclosure.",
+        "Matrix captions wrap in the visible frame and do not move with horizontal data scrolling, including WCAG text spacing at375/390/768px.",
+        "Passport requirement headers top-align with the first candidate assessment; candidates use compact semantic subrows and row-group headers."
+      ],
+      "frontend_tests_passed": 84,
+      "browser_cases_verified": 11,
+      "browser_evidence": [
+        "out/three-layouts-verified.log:10 cases passed; zoom filechooser timed out",
+        "out/three-layouts-zoom-focused.log:zoom case passes3/3 with explicit tab focus"
+      ],
+      "print_evidence": "out/three-layouts-passport.pdf",
+      "focused_visual_reports": 15,
+      "focused_visual_findings": 0,
+      "full_visual_review_rerun": false
     }
   },
   "science_presentation_evidence": {
@@ -549,16 +574,17 @@
     "contracts/algorithm-ids.json": "50f6e6578608cc13fc3914b15ee07a7fde162acb9790f599570e6e4d659f424e",
     "apps/web/src/generated/schema.d.ts": "d97d037c94674696ed365f9780517a480e63fb8b7a1e00056b11f17de265796b"
   },
-  "current_verification_source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
+  "current_verification_source": "8ca87694c0c3cdd86cabf107c40b493bb2777466",
   "browser_delivery": {
     "source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
     "tests_passed": 33,
     "tests_failed": 0,
     "tests_skipped": 0,
     "flaky": 0,
-    "output_file": "out/e2e-results-visual-complete-r6.json"
+    "output_file": "out/e2e-results-visual-complete-r6.json",
+    "note": "This33-test full-suite result belongs to4c801f4. Current focused results are under design.requested_layout_fixes."
   },
-  "completion_scope": "Build and functional tests completed; independent visual acceptance and real-backend integration are not approved.",
+  "completion_scope": "Three requested layout fixes completed and verified. Other visual-review items and real-backend integration remain outside this follow-up.",
   "real_backend_validation": {
     "status": "BLOCKED_ENVIRONMENT",
     "owner": "merging agent MRG-03",

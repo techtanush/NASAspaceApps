@@ -2370,3 +2370,7 @@ Fix: render `Unique slope exposure ≥` and `Final battery reserve ≥` with the
 ## Current disposition
 
 Build and functional verification pass. Independent visual acceptance does not pass: HMI40/48, accessibility38/48, slop38/48. Remaining findings concern mobile information density, matrix caption presentation under spacing, passport table layout and other presentation details described verbatim above. DR-02 and DR-03 remain failed; ready_to_merge remains false. No visual acceptance or production-readiness claim is made.
+
+## User-selected follow-up: mobile space, matrix caption, passport grouping
+
+Source8ca8769 resolves these three requested findings with focused geometric/browser assertions and visual inspection: two complete mobile candidate/matrix rows; a visible experiment action; accessible folded context/actions; a caption whose glyphs remain inside the visible frame under text-spacing overrides and whose position is unchanged by horizontal table scrolling; and top-aligned requirement groups with one candidate assessment per compact subrow. Passport print width/digest placement and exports also pass. All other historical reviewer text and scores above remain unchanged. No overall design regrade is claimed.

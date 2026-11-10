@@ -20,3 +20,11 @@ The component guide has 12 native-resolution images, two contiguous parts per th
 Original-workspace dependencies are restored. The final checks use Node 22.21.1, pnpm 10.22.0, Python 3.12.13 and matching Playwright Chromium. No other owner's implementation or frozen architecture/kit files were changed. Main was not modified.
 
 Real-backend MRG-03 validation remains the merging agent's integration gate. The synthetic preview and fixture exports establish frontend/contract behavior, not live terrain, model access, physical rover validation or production readiness.
+
+## Requested three-layout follow-up
+
+Source `8ca8769` addresses the three explicitly requested issues. The phone shell folds metadata/actions/workspace links into Run context, removes duplicate view naming, uses a single44px operations row and fills the available viewport. At390px the focused test requires two complete candidate and matrix rows and an initially visible PROVE IT. Captions sit outside horizontal data scrolling and remain readable under expanded text spacing at375,390 and768px. Passport requirements now top-align with their first candidate result and use compact candidate subrows.
+
+TypeScript, ESLint, production build and84 frontend tests pass. The selected browser batch passed10 of11 cases; the zoom case hit a native filechooser timeout. Its manually created browser tab now explicitly owns focus before keyboard interaction, and the unchanged keyboard/zoom assertions pass three consecutive repetitions. The scoped mobile, caption, passport, accessibility, export, print and WebGL checks pass. All12 component-guide images were refreshed. Logs and screenshots are under out/three-layouts-* and out/visual.
+
+The prior complete visual baseline is retained under out/visual-before-three-layout-fixes. This follow-up does not claim a new full visual review, resolution of other findings, or real-backend verification. Overall merge readiness remains false.

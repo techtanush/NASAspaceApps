@@ -73,3 +73,7 @@ Area fractions are converted only for percentage display; underlying API values 
 ## Verified delivery boundary
 
 The final source passes build, all33 browser tests,84 frontend tests,131 Python tests,36 mutations and the automated visual checks. The six-round independent visual record does not meet the rubric; DR-02/DR-03 remain failed and ready_to_merge remains false. No threshold, score or remaining finding was waived or relabeled as passed. The handoff retains both the working functional result and the remaining visual/integration boundaries.
+
+## Three-layout scope
+
+The user explicitly selected mobile work area, matrix caption and passport association. Only these layouts, the shared caption primitive, and focused regression coverage were changed. Native table captions remain available to assistive technology; a wrapping visible caption labels the independently scrolling data region. The phone shell uses the actual remaining flex viewport rather than a hard-coded header offset. Ancillary metadata/cursor/actions and workspace links remain reachable in context; 44px touch targets remain. Passport row groups preserve every assessment and immutable identifier. An explicit browser-tab focus assertion stabilizes native keyboard file selection in the separate zoom context; no functional assertion or timeout was weakened.
