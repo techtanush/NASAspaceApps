@@ -67,7 +67,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
  if(typeof globalThis.gc==='function')globalThis.gc();
  const measureLoad=['S01','S06','S07','S10','S12'].some(prefix=>name.startsWith(prefix));
  if(measureLoad)await beginLoadedCohort(page,{width,height,theme,density});else{await page.evaluate(()=>{window.__auditMeasureCLS=false;});await page.setViewportSize({width,height});}
- await page.evaluate(()=>{if(!document.querySelector('[role=dialog]')&&document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo(0,0);for(const element of document.querySelectorAll('*')){const style=getComputedStyle(element);if(/auto|scroll/.test(style.overflow+style.overflowX+style.overflowY)){element.scrollTop=0;element.scrollLeft=0;}}});
+ await page.evaluate(()=>{if(!document.querySelector('[role=dialog]')&&document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo(0,0);for(const element of document.querySelectorAll('*')){const style=getComputedStyle(element);if(/auto|scroll/.test(style.overflow+style.overflowX+style.overflowY)){element.scrollTop=0;if(!element.matches('.run-tabs'))element.scrollLeft=0;}}});
  // Use the application's preference controls so header labels and effective styles agree.
  // DOM click preserves the focus of an already open nonmodal evidence drawer.
  for(const [id,attribute,value]of [['theme-toggle','data-theme-choice',theme],['density-toggle','data-density',density]]){
@@ -147,7 +147,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
   if(document.documentElement.scrollWidth>innerWidth)add('C05',document.documentElement,'Page overflow');
   const interactive=all.filter(e=>visible(e)&&e.matches('button,input:not([type=hidden]),select,textarea,a[href],summary,[role=button],[role=tab],[role=combobox],[role=option],[role=checkbox],[role=switch]'));
   const interactiveBoxes=interactive.map(element=>paintedRect(element));
-  for(let i=0;i<interactive.length;i++)for(let j=i+1;j<interactive.length;j++){const a=interactive[i],b=interactive[j];if(a.contains(b)||b.contains(a)||a.closest('[role=dialog]')!==b.closest('[role=dialog]'))continue;const x=interactiveBoxes[i],y=interactiveBoxes[j];if(x.right<=x.left||y.right<=y.left||x.bottom<=x.top||y.bottom<=y.top)continue;if(Math.min(x.right,y.right)-Math.max(x.left,y.left)>2&&Math.min(x.bottom,y.bottom)-Math.max(x.top,y.top)>2)add('C05',a,'Interactive overlap '+(b.id||b.tagName));}
+  for(let i=0;i<interactive.length;i++)for(let j=i+1;j<interactive.length;j++){const a=interactive[i],b=interactive[j];if(a.contains(b)||b.contains(a)||a.closest('[role=dialog]')!==b.closest('[role=dialog]'))continue;const x=interactiveBoxes[i],y=interactiveBoxes[j];if(x.right<=x.left||y.right<=y.left||x.bottom<=x.top||y.bottom<=y.top)continue;if(Math.min(x.right,y.right)-Math.max(x.left,y.left)>2&&Math.min(x.bottom,y.bottom)-Math.max(x.top,y.top)>2)add('C05',a,'Interactive overlap '+(b.id||b.tagName)+' '+a.outerHTML.slice(0,180)+' / '+b.outerHTML.slice(0,180));}
   if(document.querySelectorAll('main h1').length!==1)add('C13',document.body,'Exactly one h1 required');
   let previous=0;for(const h of all.filter(e=>visible(e)&&/^H[1-6]$/.test(e.tagName))){const level=Number(h.tagName[1]);if(previous&&level>previous+1)add('C13',h,'Heading level skipped');previous=level;}
   for(const region of document.querySelectorAll('[data-region]'))if([...region.querySelectorAll('[data-variant=primary]')].filter(visible).length>1)add('C13',region,'Multiple primary actions');
@@ -189,6 +189,18 @@ export async function auditGlyphs(page){
   for(let i=0;i<masks.length;i++)for(let j=i+1;j<masks.length;j++){const a=masks[i],b=masks[j];const intersection=a.pixels.filter((p,k)=>p&&b.pixels[k]).length,union=a.pixels.filter((p,k)=>p||b.pixels[k]).length;if(a.path===b.path||union&&intersection/union>.85)findings.push({check:'C08',message:`Indistinct ${a.state}/${b.state}`});}
   document.documentElement.style.filter='';return findings;
  });reports.push({screen:'styleguide-glyphs',findings:result});return result;
+}
+export async function captureStyleguide(page,{theme,density,directory=resolve(root,'apps/web/docs/design-review')}){
+ await page.evaluate(()=>document.fonts.ready);
+ const size=await page.evaluate(()=>({width:document.documentElement.clientWidth,height:Math.max(document.documentElement.scrollHeight,document.body.scrollHeight)}));
+ const midpoint=Math.floor(size.height/2),clips=[{x:0,y:0,width:size.width,height:Math.min(size.height,midpoint+24)},{x:0,y:Math.max(0,midpoint-24),width:size.width,height:size.height-Math.max(0,midpoint-24)}];
+ mkdirSync(directory,{recursive:true});const captures=[];
+ for(const [index,clip]of clips.entries()){
+  const file=resolve(directory,`styleguide-${theme}-${density}-part-${index+1}.png`),pixels=await page.screenshot({fullPage:true,clip,path:file});
+  if(pixels.length>400000)throw new Error(`Component guide part exceeds400KB: ${file} (${pixels.length} bytes)`);
+  const capture={file,screen:`styleguide-full-part-${index+1}`,theme,density,width:clip.width,height:clip.height,y:clip.y,full_height:size.height,sha256:hash(pixels),bytes:pixels.length};manifest.push(capture);captures.push(capture);
+ }
+ return captures;
 }
 export function finishAudit(){
  mkdirSync(resolve(root,'out/visual'),{recursive:true});const findings=reports.flatMap(r=>r.findings.map(f=>({...f,screen:r.screen,viewport:r.width,theme:r.theme})));writeFileSync(resolve(root,'out/visual/report.json'),JSON.stringify({status:findings.length?'FAIL':'PASS',thresholds:THRESHOLDS,skipped_checks:0,reports,findings},null,2));writeFileSync(resolve(root,'out/visual/manifest.json'),JSON.stringify(manifest,null,2));writeFileSync(resolve(root,'out/visual/screens.md'),'# Visual review catalog\n\n| File | Screen | Viewport | Theme | Density |\n|---|---|---|---|---|\n'+manifest.map(x=>`| ${x.file} | ${x.screen} | ${x.width}×${x.height} | ${x.theme} | ${x.density} |`).join('\n')+'\n');return findings;

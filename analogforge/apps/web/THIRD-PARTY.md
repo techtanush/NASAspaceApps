@@ -57,3 +57,5 @@ Runtime assets are installed locally and bundled. The application loads no font,
 | vitest | 3.2.4 | MIT | Build / test |
 
 The offline graticule is original display geometry. Practice fixtures are supplied by the repository. No NASA insignia or third-party imagery is included.
+
+The generated MSW development worker has a documented local lifecycle patch: CLIENT_CLOSED removes the closed client but retains the inactive registration. The existing zero-client fetch bypass remains unchanged. This prevents unregister/update races during document replacement; it changes no request handlers or scientific fixtures, and the worker remains excluded from production.

@@ -30,3 +30,5 @@
 
 .chart svg{max-width:720px}
 .analogs-list-pane .candidate-table table{width:600px;min-width:600px}.analogs-list-pane .candidate-table th:nth-child(1){width:40px;padding:8px 4px}.analogs-list-pane .candidate-table th:nth-child(2){width:120px}.analogs-list-pane .candidate-table th:nth-child(3){width:96px}.analogs-list-pane .candidate-table th:nth-child(4){width:80px;min-width:80px}.analogs-list-pane .candidate-table th:nth-child(5){width:104px}.analogs-list-pane .candidate-table th:nth-child(6){width:160px}.analogs-list-pane .candidate-table td:first-child{padding:8px 4px}.analogs-list-pane .candidate-table .button{white-space:nowrap;padding:4px}.planetary-interpretation .legend{gap:8px 12px}.planetary-interpretation .legend li{gap:8px}
+
+.map-selection-readout{display:block;margin-top:8px;color:var(--text-primary)}

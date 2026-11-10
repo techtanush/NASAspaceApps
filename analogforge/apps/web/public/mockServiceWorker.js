@@ -78,10 +78,12 @@ addEventListener('message', async function (event) {
         return client.id !== clientId
       })
 
-      // Unregister itself when there are no more clients
-      if (remainingClients.length === 0) {
-        self.registration.unregister()
-      }
+      // AnalogForge preview lifecycle patch: retain an inert registration when
+      // its last client closes. A new document can start while this message is
+      // processed; unregistering here races MSW's registration.update(). With
+      // zero active clients the fetch handler below already bypasses requests.
+      // Registration persistence is development-only; production excludes this file.
+      void remainingClients
 
       break
     }
