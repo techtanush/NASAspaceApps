@@ -12,4 +12,4 @@ input[type=range]{margin:0}
 
 input[type=number]{appearance:textfield}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{appearance:none;margin:0}
 
-a{display:inline-flex;align-items:center;min-height:24px;max-width:100%;overflow-wrap:anywhere}summary{min-height:24px;padding:4px 0;cursor:pointer}@media(pointer:coarse),(max-width:390px){a,summary{min-height:44px}}
+a{display:inline-flex;align-items:center;min-height:24px;min-width:24px;max-width:100%;overflow-wrap:anywhere}summary{min-height:24px;padding:4px 0;cursor:pointer}@media(pointer:coarse),(max-width:390px){a,summary{min-height:44px}a{min-width:44px}}
