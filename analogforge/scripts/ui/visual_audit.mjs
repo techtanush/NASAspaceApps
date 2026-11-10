@@ -67,7 +67,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
  if(typeof globalThis.gc==='function')globalThis.gc();
  const measureLoad=['S01','S06','S07','S10','S12'].some(prefix=>name.startsWith(prefix));
  if(measureLoad)await beginLoadedCohort(page,{width,height,theme,density});else{await page.evaluate(()=>{window.__auditMeasureCLS=false;});await page.setViewportSize({width,height});}
- await page.evaluate(()=>{if(!document.querySelector('[role=dialog]')&&document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo(0,0);for(const element of document.querySelectorAll('*')){const style=getComputedStyle(element);if(/auto|scroll/.test(style.overflow+style.overflowX+style.overflowY)){element.scrollTop=0;if(!element.matches('.run-tabs'))element.scrollLeft=0;}}});
+ await page.evaluate(()=>{if(!document.querySelector('[role=dialog]')&&document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo(0,0);for(const element of document.querySelectorAll('*')){const style=getComputedStyle(element);if(/auto|scroll/.test(style.overflow+style.overflowX+style.overflowY)){element.scrollTop=0;if(element.matches('.run-tabs')){const active=element.querySelector('[aria-current=page]');if(active)element.scrollLeft+=active.getBoundingClientRect().left-element.getBoundingClientRect().left;}else element.scrollLeft=0;}}});
  // Use the application's preference controls so header labels and effective styles agree.
  // DOM click preserves the focus of an already open nonmodal evidence drawer.
  for(const [id,attribute,value]of [['theme-toggle','data-theme-choice',theme],['density-toggle','data-density',density]]){
@@ -144,6 +144,8 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
    if(!visible(element))add('C05',element,'Required hook is hidden or zero-sized');
    for(const attr of hook.required_attributes)if(!element.getAttribute(attr))add('C05',element,'Required hook attribute missing: '+attr);
   }
+  // Scientific text must stay in its owning column even when its own box expands.
+  for(const node of document.querySelectorAll('.qual-verdict .quantity,.run-metadata>summary>span')){if(!visible(node))continue;const owner=node.closest('td')??node.closest('summary');if(!owner)continue;const range=document.createRange();range.selectNodeContents(node);const bounds=range.getBoundingClientRect(),cell=owner.getBoundingClientRect();if(bounds.left<cell.left-1||bounds.right>cell.right+1)add('C05',node,'Text crosses its owning cell or control boundary');}
   if(document.documentElement.scrollWidth>innerWidth)add('C05',document.documentElement,'Page overflow');
   const interactive=all.filter(e=>visible(e)&&e.matches('button,input:not([type=hidden]),select,textarea,a[href],summary,[role=button],[role=tab],[role=combobox],[role=option],[role=checkbox],[role=switch]'));
   const interactiveBoxes=interactive.map(element=>paintedRect(element));

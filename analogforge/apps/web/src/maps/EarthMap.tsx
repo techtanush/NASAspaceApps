@@ -34,7 +34,7 @@ export function EarthMap({candidates,selected,onSelect,layers=[]}:{candidates:Ca
     if(instance.getLayer('background'))instance.setPaintProperty('background','background-color',read('--map-water'));
     if(instance.getLayer('graticule'))instance.setPaintProperty('graticule','line-color',read('--map-graticule'));
     if(instance.getLayer('candidates'))instance.setPaintProperty('candidates','fill-color',['case',['boolean',['get','selected'],false],read('--surface-3'),read('--map-land')]);
-    if(instance.getLayer('candidate-outline'))instance.setPaintProperty('candidate-outline','line-color',['case',['boolean',['get','selected'],false],read('--accent'),read('--text-tertiary')]);
+    if(instance.getLayer('candidate-outline'))instance.setPaintProperty('candidate-outline','line-color',['case',['boolean',['get','selected'],false],read('--accent'),read('--accent')]);
    };
    instance.on('load',()=>{
     const meridians=Array.from({length:13},(_,i)=>({type:'Feature' as const,properties:{},geometry:{type:'LineString' as const,coordinates:[[-180+i*30,-80],[-180+i*30,80]]}}));
@@ -43,7 +43,7 @@ export function EarthMap({candidates,selected,onSelect,layers=[]}:{candidates:Ca
     instance.addLayer({id:'graticule',type:'line',source:'graticule',paint:{'line-color':styles.getPropertyValue('--map-graticule').trim(),'line-width':1}});
     instance.addSource('candidates',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
     instance.addLayer({id:'candidates',type:'fill',source:'candidates',paint:{'fill-color':styles.getPropertyValue('--map-land').trim(),'fill-opacity':1}});
-    instance.addLayer({id:'candidate-outline',type:'line',source:'candidates',paint:{'line-color':styles.getPropertyValue('--text-tertiary').trim(),'line-width':['case',['boolean',['get','selected'],false],3,2]}});
+    instance.addLayer({id:'candidate-outline',type:'line',source:'candidates',paint:{'line-color':styles.getPropertyValue('--accent').trim(),'line-width':['case',['boolean',['get','selected'],false],3,2]}});
     instance.on('click','candidates',event=>{const id=event.features?.[0]?.properties?.id;if(typeof id==='string')callback.current(id);});
     instance.on('mouseenter','candidates',()=>{instance.getCanvas().style.cursor='pointer';});instance.on('mouseleave','candidates',()=>{instance.getCanvas().style.cursor='';});
     instance.addControl(new maplibregl.ScaleControl({maxWidth:100,unit:'metric'}),'bottom-left');applyTheme();setCameraRevision(value=>value+1);
