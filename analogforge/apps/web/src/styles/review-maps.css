@@ -21,3 +21,5 @@
 
 .map-candidate-label{position:absolute;top:0;left:0}.map-region .maplibregl-ctrl-scale{white-space:nowrap}
 .analogs-workspace .map-region{height:320px}
+
+.coordinate-pair{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px;white-space:normal;overflow-wrap:normal;word-break:normal}
