@@ -24,13 +24,13 @@ from scipy import ndimage
 from analogforge.ports.hashing import canonical_sha256
 from analogforge.ports.science_payloads import ExposureSpec
 from analogforge.science.routing import (
-    EPS_LEN_M,
     GridArrays,
     RouteInputError,
     parse_raster_node_id,
     raster_node_id,
     undirected_edge_id,
 )
+from analogforge.science.routing.constraints import default_hazard_min_intersection_m
 from analogforge.science.routing.exposure import slope_in_band
 from analogforge.science.routing.supercover import supercover
 
@@ -153,7 +153,11 @@ def build_raster_graph(
     dilation_m: float = 0.0,
     blocked_edge_ids: Iterable[str] = (),
     check_cancelled: Callable[[], None] | None = None,
+    hazard_min_intersection_m: float | None = None,
 ) -> RouteGraph:
+    """``hazard_min_intersection_m`` (config ``thresholds.hazard_min_intersection_m``; ``None``: the repository
+    config) is the intersection length above which a cell counts for hazard slope and exposure."""
+    min_len = default_hazard_min_intersection_m() if hazard_min_intersection_m is None else hazard_min_intersection_m
     blocked = frozenset(blocked_edge_ids)
     passable = passable_mask(grid, dilation_m)
     slope = np.where(grid.valid, grid.slope_deg, np.inf)
@@ -193,7 +197,7 @@ def build_raster_graph(
                 if not grid.contains(hit.row, hit.col) or not passable[hit.row, hit.col]:
                     ok = False
                     break
-                if hit.length_m > EPS_LEN_M:
+                if hit.length_m > min_len:
                     cell_slope = float(slope[hit.row, hit.col])
                     if cell_slope > slope_cap_deg + _SLOPE_TOL:
                         ok = False

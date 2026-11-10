@@ -19,7 +19,7 @@ from analogforge.science.geometry import frame_from_crs_wkt, xy_to_lonlat
 from analogforge.science.ops.base import OpEnv, OpOutcome, derived_evidence, json_artifact
 from analogforge.science.raster.store import decode_analysis_grid
 from analogforge.science.routing import GridArrays, grid_arrays_from_analysis, load_grid_arrays
-from analogforge.science.routing.constraints import RouteDesignDefaults
+from analogforge.science.routing.constraints import RouteDesignDefaults, route_defaults_from_config
 from analogforge.science.routing.diagnose import diagnose_result
 from analogforge.science.routing.search import search_route
 from analogforge.science.routing.verify import verify_route
@@ -27,16 +27,11 @@ from analogforge.science.routing.waypoints import design_benchmark
 
 
 def _defaults(env: OpEnv) -> RouteDesignDefaults:
-    d, r = env.cfg.algorithms.design_defaults, env.cfg.algorithms.route_search
-    return RouteDesignDefaults(
-        max_route_m=float(d.max_route_m),
-        task_dwell_s=float(d.task_dwell_s),
-        max_expansions=r.max_expansions,
-        max_seconds=int(r.max_seconds),
-        max_labels_per_node=r.max_labels_per_node,
-        seed=env.seed,
-        footprint_dilation_m=float(d.footprint_dilation_m),
-    )
+    return route_defaults_from_config(env.cfg.algorithms, seed=env.seed)
+
+
+def _hazard_min(env: OpEnv) -> float:
+    return env.cfg.algorithms.thresholds.hazard_min_intersection_m
 
 
 def _constraint_grid(env: OpEnv, constraints: ConstraintsArtifact) -> GridArrays | None:
@@ -131,6 +126,7 @@ def run_search(env: OpEnv) -> OpOutcome:
         route_key="route",
         route_artifact_key="route",
         to_lonlat=_to_lonlat(c),
+        hazard_min_intersection_m=_hazard_min(env),
     )
     params = env.params_hash(algo, env.operation_params(), [inp.constraints_sha256])
     artifacts = []
@@ -184,6 +180,7 @@ def run_verify(env: OpEnv) -> OpOutcome:
         telemetry_artifact_key="telemetry",
         check_cancelled=env.check,
         to_lonlat=_to_lonlat(c),
+        hazard_min_intersection_m=_hazard_min(env),
     )
     params = env.params_hash(algo, env.operation_params(), [inp.constraints_sha256, inp.route_sha256])
     payload_art = json_artifact(
@@ -238,7 +235,12 @@ def run_diagnose(env: OpEnv) -> OpOutcome:
     algo = catalog.ALGORITHM_IDS["DIAGNOSE_RESULT"]
     grid = _constraint_grid(env, inp.constraints)
     out = diagnose_result(
-        inp, grid=grid, mode=env.request.mode, diagnosis_evidence_key="diagnosis", check_cancelled=env.check
+        inp,
+        grid=grid,
+        mode=env.request.mode,
+        diagnosis_evidence_key="diagnosis",
+        check_cancelled=env.check,
+        hazard_min_intersection_m=_hazard_min(env),
     )
     params = env.params_hash(algo, env.operation_params())
     art = json_artifact(env, params_sha=params, key="diagnosis-json", name="diagnosis.json", payload=out.payload)

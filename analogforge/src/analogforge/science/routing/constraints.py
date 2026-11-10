@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Final, NamedTuple, Protocol
 
 from analogforge.ports.common import RuntimeMode
@@ -32,6 +32,7 @@ from analogforge.ports.science_payloads import (
     TaskSpec,
     Waypoint,
 )
+from analogforge.science.config import AlgorithmsConfig, default_thresholds, load_config
 from analogforge.science.energy import JOULES_PER_WH, EnergyParams, edge_energy
 from analogforge.science.routing import RouteInputError
 
@@ -234,8 +235,44 @@ def validate_constraints(constraints: ConstraintsArtifact, *, mode: RuntimeMode)
 
 # ----------------------------------------------------------------------------------------------- design assembly
 @dataclass(frozen=True)
+class AutoWaypointRule:
+    """``design_defaults.auto_waypoints`` (auto-waypoints-v1): annulus fractions, band neighbourhood, tolerance."""
+
+    w1_min_edge_fraction: float = 0.15
+    w1_max_edge_fraction: float = 0.30
+    w2_min_from_w1_edge_fraction: float = 0.10
+    band_neighbourhood_cells: int = 5
+    tolerance_cells: float = 1.0
+
+
+@dataclass(frozen=True)
+class EnergyProposal:
+    """``energy_defaults``: the documented earth-simple-v1 PROPOSAL (assumed, uncalibrated).  It is never applied
+    silently; DESIGN_BENCHMARK quotes it as a limitation when the rover has no energy model of its own."""
+
+    rolling_coefficient: float = 0.06
+    drive_efficiency: float = 0.65
+    idle_power_w: float = 35.0
+    science_task_wh: float = 10.0
+    roughness_multiplier: float = 1.0
+    uncertainty_fraction: float = 0.25
+    calibration_status: str = "ASSUMED"
+    gravity_mps2: float = 9.80665
+
+    def describe(self) -> str:
+        return (
+            f"{self.calibration_status} earth-simple-v1 proposal (not applied): rolling_coefficient="
+            f"{self.rolling_coefficient:g}, drive_efficiency={self.drive_efficiency:g}, idle_power_w="
+            f"{self.idle_power_w:g}, science_task_wh={self.science_task_wh:g}, roughness_multiplier="
+            f"{self.roughness_multiplier:g}, uncertainty_fraction={self.uncertainty_fraction:g}, "
+            f"gravity_mps2={self.gravity_mps2:g}"
+        )
+
+
+@dataclass(frozen=True)
 class RouteDesignDefaults:
-    """Values normally read from ``config/algorithms.yaml`` (``design_defaults`` / ``route_search``)."""
+    """Values read from ``config/algorithms.yaml`` (``design_defaults`` / ``route_search`` / ``energy_defaults``);
+    use :func:`route_defaults_from_config`.  The literals equal the shipped configuration."""
 
     max_route_m: float = 8000.0
     task_dwell_s: float = 60.0
@@ -245,6 +282,52 @@ class RouteDesignDefaults:
     seed: int = 0
     footprint_dilation_m: float = 0.0
     graph_max_distance_m: float = 400.0
+    max_edge_traversals: int = 2
+    auto_waypoints: AutoWaypointRule = field(default_factory=AutoWaypointRule)
+    energy_proposal: EnergyProposal = field(default_factory=EnergyProposal)
+
+
+def route_defaults_from_config(algorithms: AlgorithmsConfig, *, seed: int = 0) -> RouteDesignDefaults:
+    """Route design defaults from a parsed ``algorithms.yaml`` (the values the constraints/parameters hash reflect)."""
+    d, r, e = algorithms.design_defaults, algorithms.route_search, algorithms.energy_defaults
+    w = d.auto_waypoints
+    return RouteDesignDefaults(
+        max_route_m=float(d.max_route_m),
+        task_dwell_s=float(d.task_dwell_s),
+        max_expansions=r.max_expansions,
+        max_seconds=int(r.max_seconds),
+        max_labels_per_node=r.max_labels_per_node,
+        seed=seed,
+        footprint_dilation_m=float(d.footprint_dilation_m),
+        max_edge_traversals=r.max_edge_traversals,
+        auto_waypoints=AutoWaypointRule(
+            w1_min_edge_fraction=w.w1_min_edge_fraction,
+            w1_max_edge_fraction=w.w1_max_edge_fraction,
+            w2_min_from_w1_edge_fraction=w.w2_min_from_w1_edge_fraction,
+            band_neighbourhood_cells=w.band_neighbourhood_cells,
+            tolerance_cells=float(w.tolerance_cells),
+        ),
+        energy_proposal=EnergyProposal(
+            rolling_coefficient=e.rolling_coefficient,
+            drive_efficiency=e.drive_efficiency,
+            idle_power_w=e.idle_power_w,
+            science_task_wh=e.science_task_wh,
+            roughness_multiplier=e.roughness_multiplier,
+            uncertainty_fraction=e.uncertainty_fraction,
+            calibration_status=e.calibration_status,
+            gravity_mps2=e.gravity_mps2,
+        ),
+    )
+
+
+def default_route_defaults() -> RouteDesignDefaults:
+    """Defaults of the repository's own ``algorithms.yaml`` (config is parsed once and cached by content hash)."""
+    return route_defaults_from_config(load_config().algorithms)
+
+
+def default_hazard_min_intersection_m() -> float:
+    """``thresholds.hazard_min_intersection_m`` of the repository's own ``algorithms.yaml`` (cached)."""
+    return default_thresholds().hazard_min_intersection_m
 
 
 ROUTE_EXPOSURE_OBSERVABLE: Final = "unique_slope_exposure_m"

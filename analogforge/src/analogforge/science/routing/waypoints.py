@@ -6,6 +6,7 @@ ties between equal-size components go to the smallest row-major first cell):
 * ``S``  = component cell nearest the component's cell centroid (ties -> row-major);
 * ``W1`` = among component cells at Euclidean distance in ``[0.15, 0.30] * window_edge`` from ``S`` the one with the
   greatest number of band-slope cells in its 5x5 neighbourhood (ties -> row-major);
+  All numbers are ``design_defaults.auto_waypoints.*`` of ``config/algorithms.yaml`` (shipped values quoted here).
 * ``W2`` = same rule among cells at least ``0.10 * window_edge`` from ``W1`` (same annulus around ``S``).
 
 Task tolerance is one cell, dwell ``design_defaults.task_dwell_s``, incremental energy ``energy_model.science_task_wh``.
@@ -23,7 +24,6 @@ from typing import Final
 import numpy as np
 from scipy import ndimage
 
-from analogforge.ports import catalog
 from analogforge.ports.common import RuntimeMode
 from analogforge.ports.domain_models import SolverConfig
 from analogforge.ports.science_payloads import (
@@ -39,7 +39,9 @@ from analogforge.ports.science_payloads import (
 from analogforge.science.routing import GridArrays, RouteInputError
 from analogforge.science.routing.constraints import (
     ROUTE_TASK_OBSERVABLE,
+    AutoWaypointRule,
     RouteDesignDefaults,
+    default_route_defaults,
     exposure_specs_from_requirements,
     finish_design_payload,
 )
@@ -49,9 +51,6 @@ from analogforge.science.routing.grid_graph import RouteGraph, build_raster_grap
 
 AUTO_WAYPOINTS_ID: Final = "auto-waypoints-v1"
 SAMPLING_CAPABILITY: Final = "geological_sampling"
-S_MIN_FRACTION: Final = 0.15
-S_MAX_FRACTION: Final = 0.30
-W2_MIN_FRACTION: Final = 0.10
 
 
 @dataclass(frozen=True)
@@ -62,7 +61,7 @@ class AutoWaypoints:
     component_size: int
 
 
-def _band_count_5x5(grid: GridArrays, spec: ExposureSpec | None) -> np.ndarray:
+def _band_count(grid: GridArrays, spec: ExposureSpec | None, neighbourhood_cells: int) -> np.ndarray:
     if spec is None:
         return np.zeros(grid.elevation_m.shape, dtype=np.int64)
     in_band = np.zeros(grid.elevation_m.shape, dtype=np.int64)
@@ -71,14 +70,23 @@ def _band_count_5x5(grid: GridArrays, spec: ExposureSpec | None) -> np.ndarray:
         if slope_in_band(float(grid.slope_deg[r, c]), spec.band_deg, spec.upper_inclusive):
             in_band[r, c] = 1
     return np.asarray(
-        ndimage.convolve(in_band, np.ones((5, 5), dtype=np.int64), mode="constant", cval=0), dtype=np.int64
+        ndimage.convolve(
+            in_band, np.ones((neighbourhood_cells, neighbourhood_cells), dtype=np.int64), mode="constant", cval=0
+        ),
+        dtype=np.int64,
     )
 
 
 def auto_waypoints_v1(
-    graph: RouteGraph, grid: GridArrays, exposure: ExposureSpec | None, *, window_edge_m: float | None = None
+    graph: RouteGraph,
+    grid: GridArrays,
+    exposure: ExposureSpec | None,
+    *,
+    window_edge_m: float | None = None,
+    rule: AutoWaypointRule | None = None,
 ) -> AutoWaypoints:
     """Choose ``S``, ``W1``, ``W2`` as graph node indices.  Raises ``WAYPOINT_UNRESOLVED`` if the rule has no answer."""
+    rule = rule if rule is not None else default_route_defaults().auto_waypoints
     comps = components(graph)
     if not comps:
         raise RouteInputError("no traversable cells: cannot place waypoints", detail_code="WAYPOINT_UNRESOLVED")
@@ -90,7 +98,7 @@ def auto_waypoints_v1(
     d_centroid = np.hypot(cells[:, 0] - centroid[0], cells[:, 1] - centroid[1])
     start_pos = min(range(len(comp)), key=lambda k: (float(d_centroid[k]), comp[k]))
     start = comp[start_pos]
-    counts = _band_count_5x5(grid, exposure)
+    counts = _band_count(grid, exposure, rule.band_neighbourhood_cells)
 
     def is_band(idx: int) -> bool:
         if exposure is None:
@@ -116,19 +124,22 @@ def auto_waypoints_v1(
         i
         for i in comp
         if i != start
-        and S_MIN_FRACTION * edge_m - 1e-9 <= dist_m(start, i) <= S_MAX_FRACTION * edge_m + 1e-9
+        and rule.w1_min_edge_fraction * edge_m - 1e-9 <= dist_m(start, i) <= rule.w1_max_edge_fraction * edge_m + 1e-9
         and not is_band(i)
     ]
     w1 = pick(annulus)
     if w1 is None:
         raise RouteInputError(
-            "auto-waypoints-v1: no W1 candidate in the 0.15-0.30 window-edge annulus", detail_code="WAYPOINT_UNRESOLVED"
+            f"auto-waypoints-v1: no W1 candidate in the {rule.w1_min_edge_fraction:g}-"
+            f"{rule.w1_max_edge_fraction:g} window-edge annulus",
+            detail_code="WAYPOINT_UNRESOLVED",
         )
-    far_enough = [i for i in annulus if i != w1 and dist_m(w1, i) >= W2_MIN_FRACTION * edge_m - 1e-9]
+    far_enough = [i for i in annulus if i != w1 and dist_m(w1, i) >= rule.w2_min_from_w1_edge_fraction * edge_m - 1e-9]
     w2 = pick(far_enough)
     if w2 is None:
         raise RouteInputError(
-            "auto-waypoints-v1: no W2 candidate at least 0.10 window-edge from W1", detail_code="WAYPOINT_UNRESOLVED"
+            f"auto-waypoints-v1: no W2 candidate at least {rule.w2_min_from_w1_edge_fraction:g} window-edge from W1",
+            detail_code="WAYPOINT_UNRESOLVED",
         )
     return AutoWaypoints(start, w1, w2, len(comp))
 
@@ -163,7 +174,7 @@ def design_raster_benchmark(
         blocked_edge_ids=inp.blocked_edge_ids,
         check_cancelled=check_cancelled,
     )
-    picked = auto_waypoints_v1(graph, grid, exposures[0] if exposures else None)
+    picked = auto_waypoints_v1(graph, grid, exposures[0] if exposures else None, rule=defaults.auto_waypoints)
     task_req_ids = [r.id for r in inp.mission.requirements if r.observable == ROUTE_TASK_OBSERVABLE]
     science_wh = rover.energy_model.science_task_wh if rover.energy_model is not None else None
     tasks = [
@@ -172,7 +183,7 @@ def design_raster_benchmark(
             requirement_ids=task_req_ids,
             kind="SAMPLING",
             location=_waypoint(graph, node),
-            tolerance_m=grid.cell_size_m,
+            tolerance_m=defaults.auto_waypoints.tolerance_cells * grid.cell_size_m,
             dwell_s=defaults.task_dwell_s,
             incremental_energy_wh=science_wh,
             required_capability=SAMPLING_CAPABILITY,
@@ -194,6 +205,7 @@ def design_raster_benchmark(
         )
     if rover.energy_model is None:
         limitations.append("Rover has no energy model: energy-dependent checks are INCONCLUSIVE (ENERGY_UNCALIBRATED).")
+        limitations.append(f"energy_defaults: {defaults.energy_proposal.describe()}.")
     artifact = ConstraintsArtifact(
         artifact_kind="RASTER_ROUTE_TEST",
         mode=mode,
@@ -214,7 +226,7 @@ def design_raster_benchmark(
         exposures=exposures,
         max_distance_m=rover.max_route_m if rover.max_route_m is not None else defaults.max_route_m,
         max_duration_s=None,
-        max_undirected_edge_traversals=catalog.BUDGETS["max_undirected_edge_traversals"],
+        max_undirected_edge_traversals=defaults.max_edge_traversals,
         footprint_dilation_m=defaults.footprint_dilation_m,
         blocked_edge_ids=sorted(inp.blocked_edge_ids),
         energy=EnergySpec(
@@ -248,7 +260,7 @@ def design_benchmark(
     check_cancelled: Callable[[], None] | None = None,
 ) -> DesignBenchmarkPayload:
     """Dispatch ``DESIGN_BENCHMARK``: abstract graph scenario (synthetic only) or raster candidate."""
-    used = defaults if defaults is not None else RouteDesignDefaults()
+    used = defaults if defaults is not None else default_route_defaults()
     if inp.graph_fixture_id is not None:
         return design_graph_benchmark(
             inp,

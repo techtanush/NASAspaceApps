@@ -101,9 +101,15 @@ def _certificate_of(
     cancel: Callable[[], None] | None,
     *,
     relaxed: bool,
+    hazard_min_intersection_m: float | None = None,
 ) -> tuple[Certificate, Problem]:
     problem = prepare_problem(
-        constraints, grid, mode=mode, slope_cap_deg=_REMOVED_CAP_DEG if relaxed else None, check_cancelled=cancel
+        constraints,
+        grid,
+        mode=mode,
+        slope_cap_deg=_REMOVED_CAP_DEG if relaxed else None,
+        check_cancelled=cancel,
+        hazard_min_intersection_m=hazard_min_intersection_m,
     )
     cert = compute_certificate(
         problem.graph,
@@ -122,10 +128,15 @@ def analog_vs_rover(
     grid: GridArrays | None,
     mode: RuntimeMode,
     cancel: Callable[[], None] | None = None,
+    hazard_min_intersection_m: float | None = None,
 ) -> tuple[FailureCategory, Certificate, Certificate, str]:
     """Return ``(category, original certificate, relaxed certificate, method)`` for an exhaustive-infeasible search."""
-    original, _ = _certificate_of(constraints, grid, mode, cancel, relaxed=False)
-    relaxed, _ = _certificate_of(constraints, grid, mode, cancel, relaxed=True)
+    original, _ = _certificate_of(
+        constraints, grid, mode, cancel, relaxed=False, hazard_min_intersection_m=hazard_min_intersection_m
+    )
+    relaxed, _ = _certificate_of(
+        constraints, grid, mode, cancel, relaxed=True, hazard_min_intersection_m=hazard_min_intersection_m
+    )
     if original.infeasible:
         return ("ANALOG" if relaxed.infeasible else "ROVER"), original, relaxed, "certificate re-run"
     # infeasibility came from exhaustive enumeration: decide with the relaxed problem searched under the same budgets
@@ -136,6 +147,7 @@ def analog_vs_rover(
         grid=grid,
         mode=mode,
         check_cancelled=cancel,
+        hazard_min_intersection_m=hazard_min_intersection_m,
     )
     status = outcome.payload.search_status
     if status == "FOUND":
@@ -152,6 +164,7 @@ def diagnose_result(
     mode: RuntimeMode,
     diagnosis_evidence_key: str = "diagnosis",
     check_cancelled: Callable[[], None] | None = None,
+    hazard_min_intersection_m: float | None = None,
 ) -> DiagnoseOutput:
     constraints = inp.constraints
     tried = _tried_strategies(constraints, inp.attempt_history)
@@ -189,7 +202,9 @@ def diagnose_result(
 
     status = inp.search_status
     if status == "EXHAUSTIVE_INFEASIBLE":
-        cause, original, relaxed, method = analog_vs_rover(constraints, grid, mode, check_cancelled)
+        cause, original, relaxed, method = analog_vs_rover(
+            constraints, grid, mode, check_cancelled, hazard_min_intersection_m
+        )
         ids = original.violated_constraint_ids
         if not ids and constraints.strategy != "WAYPOINT_RETURN":
             ids = sorted(catalog.constraint_exposure(s.requirement_id) for s in constraints.exposures)

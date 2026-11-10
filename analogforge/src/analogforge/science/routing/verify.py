@@ -40,7 +40,6 @@ from analogforge.ports.science_payloads import (
 from analogforge.science.routing import (
     CONSTRAINT_INPUT_HASH,
     CONSTRAINT_TERRAIN_MASK,
-    EPS_LEN_M,
     EPS_VALUE,
     GridArrays,
     RouteInputError,
@@ -50,6 +49,7 @@ from analogforge.science.routing import (
     undirected_edge_id,
 )
 from analogforge.science.routing.constraints import (
+    default_hazard_min_intersection_m,
     make_energy_provider,
     usable_wh,
     validate_constraints,
@@ -255,8 +255,10 @@ def verify_route(
     rover_capabilities: Collection[str] | None = None,
     check_cancelled: Callable[[], None] | None = None,
     to_lonlat: Callable[[float, float], tuple[float, float]] | None = None,
+    hazard_min_intersection_m: float | None = None,
 ) -> VerifyOutput:
     """Recompute everything from ``route.node_sequence`` and decide PASS / FAIL / INCONCLUSIVE."""
+    min_len = default_hazard_min_intersection_m() if hazard_min_intersection_m is None else hazard_min_intersection_m
     cancel = check_cancelled if check_cancelled is not None else (lambda: None)
     validate_constraints(constraints, mode=mode)
     evidence = EvidenceRef(local_key=verification_evidence_key)
@@ -422,7 +424,7 @@ def verify_route(
             if not (math.isfinite(float(cell_slope[row, col])) and math.isfinite(float(grid.elevation_m[row, col]))):
                 nonfinite_cell = True
                 continue
-            if length > EPS_LEN_M:
+            if length > min_len:
                 s = float(cell_slope[row, col])
                 positive.append((s, length))
                 hazard = s if hazard is None else max(hazard, s)
@@ -911,7 +913,7 @@ def verify_route(
                 cumulative_energy_conservative_wh=cum_cons[i] if energy_ok else None,
                 in_band_requirement_ids=[]
                 if step is None
-                else [e.requirement_id for k, e in enumerate(constraints.exposures) if step.band_len_m[k] > EPS_LEN_M],
+                else [e.requirement_id for k, e in enumerate(constraints.exposures) if step.band_len_m[k] > min_len],
             )
         )
     telemetry = build_telemetry(

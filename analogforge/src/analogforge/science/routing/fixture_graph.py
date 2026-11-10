@@ -185,7 +185,7 @@ def design_graph_benchmark(
         exposures=exposures,
         max_distance_m=rover.max_route_m if rover.max_route_m is not None else defaults.graph_max_distance_m,
         max_duration_s=None,
-        max_undirected_edge_traversals=catalog.BUDGETS["max_undirected_edge_traversals"],
+        max_undirected_edge_traversals=defaults.max_edge_traversals,
         footprint_dilation_m=0.0,
         blocked_edge_ids=sorted(inp.blocked_edge_ids),
         energy=EnergySpec(

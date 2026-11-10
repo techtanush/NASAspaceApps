@@ -80,7 +80,12 @@ def test_s_raster_1_three_attempts(practice) -> None:  # type: ignore[no-untyped
     assert a1.search.search_status == "FOUND"
     assert a1.verify.outcome == "FAIL" and a1.verify.failure_category == "ROUTE"
     v = [x for x in a1.verify.violations if x.code == "EXPOSURE_SHORTFALL"]
-    assert len(v) == 1 and v[0].constraint_id == "C-EXPOSURE-R-EXPOSURE" and v[0].observed == 0.0 and v[0].threshold == 100.0
+    assert (
+        len(v) == 1
+        and v[0].constraint_id == "C-EXPOSURE-R-EXPOSURE"
+        and v[0].observed == 0.0
+        and v[0].threshold == 100.0
+    )
     assert (a1.diagnosis.recommended_repair, a1.diagnosis.recommended_strategy) == ("NEW_ROUTE", "EXPOSURE_COVERAGE")
 
     a2, _ = prove(flow, sc, A_, ares, "EXPOSURE_COVERAGE", 2, history=[attempt_summary(1, cand_a, a1)])
@@ -154,8 +159,19 @@ def test_equal_cost_routes_break_ties_lexicographically(tmp_path: Path) -> None:
     graph = base.constraints.graph
     assert graph is not None
     twins = [e for e in graph.edges if {e.a, e.b} in ({"S", "A"}, {"A", "W1"})]
-    z_edges = [GraphEdge(a=("Z" if e.a == "A" else e.a), b=("Z" if e.b == "A" else e.b), length_m=e.length_m, surface_slope_deg=e.surface_slope_deg, mock_energy_wh=e.mock_energy_wh) for e in twins]
-    widened = base.constraints.model_copy(update={"graph": graph.model_copy(update={"nodes": [*graph.nodes, "Z"], "edges": [*graph.edges, *z_edges]})})
+    z_edges = [
+        GraphEdge(
+            a=("Z" if e.a == "A" else e.a),
+            b=("Z" if e.b == "A" else e.b),
+            length_m=e.length_m,
+            surface_slope_deg=e.surface_slope_deg,
+            mock_energy_wh=e.mock_energy_wh,
+        )
+        for e in twins
+    ]
+    widened = base.constraints.model_copy(
+        update={"graph": graph.model_copy(update={"nodes": [*graph.nodes, "Z"], "edges": [*graph.edges, *z_edges]})}
+    )
     res, _ = run_search(svc, ctx, widened)
     assert isinstance(res.payload, SearchRoutePayload) and res.payload.route is not None
     assert tuple(res.payload.route.node_sequence) == catalog.GRAPH_SEARCH_WAYPOINT_RETURN  # via A, never Z
@@ -169,3 +185,57 @@ def run_search(svc, ctx, constraints):  # type: ignore[no-untyped-def]
     from analogforge.ports.science_payloads import SearchRouteInput
 
     return run(svc, SearchRouteInput(constraints=constraints, constraints_sha256=canonical_sha256(constraints)), ctx)
+
+
+def _verification_handle(analysis):  # type: ignore[no-untyped-def]
+    """The platform registers the verifier's evidence as a VERIFICATION-kind handle next to the analysis evidence."""
+    return analysis.model_copy(
+        update={"evidence_id": __import__("uuid").uuid4(), "kind": "VERIFICATION", "algorithm_id": "verify-route"}
+    )
+
+
+def test_s_no_energy_rows_exposure_tasks_credited_reserve_unknown(practice) -> None:  # type: ignore[no-untyped-def]
+    """Arch 40 section 6 S-NO-ENERGY: only the energy is unevaluable, so the verified rows keep their verdict."""
+    from support.builders import load_mission, requirement
+    from support.graph_flow import summary_of
+    from support.practice import analyze, candidate_ref, compare
+
+    from analogforge.ports.science_payloads import CompareRequirementPayload, VerificationSummary
+
+    flow, sc = practice
+    r = _rover("practice-no-energy-model")
+    a1, cand = prove(flow, sc, B_, r, "WAYPOINT_RETURN", 1)
+    a2, _ = prove(flow, sc, B_, r, "EXPOSURE_COVERAGE", 2, history=[attempt_summary(1, cand, a1)])
+    assert (a2.verify.outcome, a2.verify.failure_category) == ("INCONCLUSIVE", "DATA")
+    cand = candidate_ref(sc, B_)
+    _, handles = analyze(flow, cand)
+    evidence = [handles[0], _verification_handle(handles[0])]
+    mission = load_mission("mission-mars-mobility")
+    _, target_handle = None, flow.handles["CHARACTERIZE_TARGET:profile"]
+
+    def row(rid: str, verification: VerificationSummary):  # type: ignore[no-untyped-def]
+        res = compare(flow, requirement(mission, rid), cand, [target_handle], evidence, verification)
+        assert isinstance(res.payload, CompareRequirementPayload), res.issues
+        return res.payload
+
+    energy_only = summary_of(a2.verify)
+    assert [m.value for m in energy_only.metrics if m.metric_id == "reserve_pct"] == [None]
+    for rid in ("R-EXPOSURE", "R-TASKS"):
+        p = row(rid, energy_only)
+        assert (p.proposed_status, p.reason_code, p.evaluation_stage) == ("PASS", "ROUTE_VERIFIED", "FINAL"), rid
+    p = row("R-RESERVE", energy_only)
+    assert (p.proposed_status, p.reason_code, p.measured_value) == ("UNKNOWN", "ENERGY_MODEL_MISSING", None)
+
+    # a DATA-inconclusive with another cause (a violation, or no energy finding at all) earns no credit
+    for other in (
+        energy_only.model_copy(update={"violation_codes": ["UNKNOWN_TERRAIN"]}),
+        energy_only.model_copy(update={"metrics": [m for m in energy_only.metrics if m.metric_id != "reserve_pct"]}),
+        energy_only.model_copy(update={"failure_category": "SYSTEM"}),
+        energy_only.model_copy(update={"failure_category": "SEARCH_LIMIT"}),
+    ):
+        for rid in ("R-EXPOSURE", "R-TASKS"):
+            p = row(rid, other)
+            assert (p.proposed_status, p.reason_code) == ("UNKNOWN", "ROUTE_NOT_VERIFIED"), (
+                rid,
+                other.failure_category,
+            )

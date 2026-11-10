@@ -324,8 +324,10 @@
   `kind == VERIFICATION` handle (otherwise UNKNOWN `ROUTE_NOT_VERIFIED`, SC-11 NOT_ASSESSED); an `UNKNOWN_TERRAIN` violation -> UNKNOWN; any violation outside the row-scoped set
   {EXPOSURE_SHORTFALL, WAYPOINT_MISSED, TASK_CAPABILITY_MISSING, RETURN_NOT_COMPLETED, ENERGY_RESERVE_SHORTFALL, CLASS_DIVERSITY_SHORTFALL} (slope, forbidden terrain,
   discontinuity, stale hash, distance/duration/traversal budget) invalidates the route -> FAIL `ROUTE_FAILED` for every route row. Credit after an overall FAIL therefore survives only
-  when all violations are row-scoped (arch 40 section 5: A after PROVE IT keeps R-TASKS/R-RESERVE PASS when only EXPOSURE_SHORTFALL fired). Tension recorded: arch 40 S-NO-ENERGY says
-  "exposure/tasks PASS" for an INCONCLUSIVE/DATA verification; the review requirement (no PASS on INCONCLUSIVE) wins - those rows are UNKNOWN until the energy model exists. The existing
+  when all violations are row-scoped (arch 40 section 5: A after PROVE IT keeps R-TASKS/R-RESERVE PASS when only EXPOSURE_SHORTFALL fired). S-NO-ENERGY (arch 40 section 6, 08 section 4.7) is honoured: when the only finding of an INCONCLUSIVE/DATA verification is an
+  unevaluable energy reserve (`reserve_pct` present with value None, no violation codes), the exposure and tasks rows keep their verdict (PASS/FAIL, FINAL) and only
+  R-RESERVE is UNKNOWN `ENERGY_MODEL_MISSING`. Any other INCONCLUSIVE (SYSTEM, SEARCH_LIMIT, REQUIREMENT, DATA with a violation or without the energy finding) credits no row.
+  Covered through the facade by `test_s_no_energy_rows_exposure_tasks_credited_reserve_unknown`. The existing
   test that expected a search-only (non-VERIFICATION) handle to PASS at S3 now expects UNKNOWN at S2.
 * RV-04 `verified_route_supplied` needs outcome PASS/FAIL and no `UNKNOWN_TERRAIN`; energy/route-length dimensions read verifier metrics only from such a verification.
   A clearance requirement without `lower` is UNKNOWN (previously an `assert`).
@@ -345,3 +347,12 @@
 * RV-11 `assert_crs_matches_body` also compares the semi-minor axis: an oblate Mars CRS (a=3396190, b=3376200) is rejected `BODY_MISMATCH` instead of being silently treated as the Mars sphere.
 * RV-12 Connected zones of `ANALYZE_CANDIDATE` keep the default 18 deg cap: the kit input carries no rover, so honouring the rover cap (PRACTICE-LITE 12 deg) is impossible without a kit change
   (`CHANGE-REQUEST-analyze-rover-cap.json`). The payload now states the cap used and that reachability for a rover comes from route search.
+* R-CFG-01 (wired, no config.py change): `routing.constraints.route_defaults_from_config(cfg.algorithms, seed=)` builds `RouteDesignDefaults`
+  (now also `max_edge_traversals`, `auto_waypoints` rule, `energy_proposal`); `design_benchmark(defaults=None)` uses the cached repository config
+  (`default_route_defaults()`), `ops/route.py::_defaults` uses the request's config. `route_search.max_edge_traversals` sets
+  `max_undirected_edge_traversals` in graph and raster constraints (so the search/verifier, which read the artifact, follow it).
+  `design_defaults.auto_waypoints.*` drive `auto_waypoints_v1` (annulus fractions, band neighbourhood kernel) and the task tolerance (`tolerance_cells`
+  x cell size). `thresholds.hazard_min_intersection_m` is the `hazard_min_intersection_m=` argument of build/search/verify/diagnose (None = repository
+  config; ops pass the request config). `energy_defaults` are NOT applied silently (a rover without a model stays ENERGY_UNCALIBRATED); DESIGN_BENCHMARK
+  quotes them as an "ASSUMED earth-simple-v1 proposal (not applied)" limitation, so they appear in the constraints hash. Config values reach
+  `parameters_sha256` through the facade's existing `algorithm_config_sha256`. Tests: `tests/unit/science/test_routing_config.py`.

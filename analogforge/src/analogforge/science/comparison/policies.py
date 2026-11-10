@@ -705,9 +705,17 @@ def route_dependent(ctx: PolicyContext) -> PolicyDecision:
         scale_ok=True if scale is not None else None,
         route_check="INDEPENDENT" if independent else "ABSENT",
     )
-    if v.outcome == "INCONCLUSIVE":
-        # An inconclusive verification proves nothing about any row, whatever its failure category.
-        if kind == "reserve" and v.failure_category == "DATA" and (metric is None or metric.value is None):
+    # INCONCLUSIVE / DATA whose only finding is an unevaluable energy reserve (no energy model: reserve_pct present with
+    # value None, no violation of any kind) leaves the exposure and task findings definitive (arch 40 section 6
+    # S-NO-ENERGY); every other INCONCLUSIVE proves nothing about any row.
+    reserve_unknown = any(m.metric_id == "reserve_pct" and m.value is None for m in v.metrics)
+    energy_only = (
+        v.outcome == "INCONCLUSIVE" and v.failure_category == "DATA" and reserve_unknown and not v.violation_codes
+    )
+    if v.outcome == "INCONCLUSIVE" and not (energy_only and kind != "reserve"):
+        if energy_only or (
+            kind == "reserve" and v.failure_category == "DATA" and (metric is None or metric.value is None)
+        ):
             return replace(
                 base,
                 reason="ENERGY_MODEL_MISSING",

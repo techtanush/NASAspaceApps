@@ -156,6 +156,7 @@ def build_graph_for(
     *,
     slope_cap_deg: float | None = None,
     check_cancelled: Callable[[], None] | None = None,
+    hazard_min_intersection_m: float | None = None,
 ) -> RouteGraph:
     if constraints.artifact_kind == "SYNTHETIC_GRAPH_REGRESSION":
         return build_abstract_graph(constraints, slope_cap_deg=slope_cap_deg)
@@ -173,6 +174,7 @@ def build_graph_for(
         dilation_m=constraints.footprint_dilation_m,
         blocked_edge_ids=constraints.blocked_edge_ids,
         check_cancelled=check_cancelled,
+        hazard_min_intersection_m=hazard_min_intersection_m,
     )
 
 
@@ -183,10 +185,17 @@ def prepare_problem(
     mode: RuntimeMode,
     slope_cap_deg: float | None = None,
     check_cancelled: Callable[[], None] | None = None,
+    hazard_min_intersection_m: float | None = None,
 ) -> Problem:
     validate_constraints(constraints, mode=mode)
     provider = make_energy_provider(constraints)
-    graph = build_graph_for(constraints, grid, slope_cap_deg=slope_cap_deg, check_cancelled=check_cancelled)
+    graph = build_graph_for(
+        constraints,
+        grid,
+        slope_cap_deg=slope_cap_deg,
+        check_cancelled=check_cancelled,
+        hazard_min_intersection_m=hazard_min_intersection_m,
+    )
     costs = evaluate_costs(graph, constraints, provider)
     start = resolve_waypoint(graph, grid, constraints.start, 0.0)
     sets = {t.task_id: resolve_waypoint_set(graph, grid, t.location, t.tolerance_m) for t in constraints.tasks}
@@ -280,13 +289,16 @@ def search_route(
     route_artifact_key: str = "route",
     to_lonlat: Callable[[float, float], tuple[float, float]] | None = None,
     clock: Callable[[], float] = time.monotonic,
+    hazard_min_intersection_m: float | None = None,
 ) -> SearchOutput:
     """Run ``SEARCH_ROUTE``.  Raises ``RouteInputError`` for BLOCKED conditions (stale hash, missing grid, ...)."""
     started = clock()
     cancel = check_cancelled if check_cancelled is not None else (lambda: None)
     claimed_hash = require_fresh_hash(constraints, constraints_sha256_claimed)
     cancel()
-    problem = prepare_problem(constraints, grid, mode=mode, check_cancelled=cancel)
+    problem = prepare_problem(
+        constraints, grid, mode=mode, check_cancelled=cancel, hazard_min_intersection_m=hazard_min_intersection_m
+    )
     graph, provider, costs = problem.graph, problem.provider, problem.costs
     solver = constraints.solver
     budget_expansions = solver.max_expansions if max_expansions is None else min(solver.max_expansions, max_expansions)
