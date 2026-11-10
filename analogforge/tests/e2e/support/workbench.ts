@@ -101,6 +101,8 @@ export async function newMission(page: Page, options: { moon?: boolean; rover?: 
  await choose(page, 'select-mode', options.mode || 'synthetic');
  await expect(page.getByTestId('btn-accept-contract')).toBeEnabled();
  await page.getByTestId('btn-accept-contract').click();
+ // Resolve only after the acceptance acknowledgement has updated the visible state.
+ await expect(page.getByTestId('btn-start-run')).toBeEnabled();
 }
 export async function startRun(page: Page, options: Parameters<typeof newMission>[1] = {}) {
  await newMission(page, options);

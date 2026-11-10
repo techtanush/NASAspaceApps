@@ -66,3 +66,5 @@ input[type=checkbox]{appearance:none;position:relative;border:1px solid var(--bo
 @media(max-width:767px){.run-pinned-identity{flex-direction:column;gap:4px}.qualification-heading>div:first-child{max-width:none}.run-primary-action .button{min-height:44px}}
 
 @media(max-width:767px){.run-nav-strip .run-tabs{scroll-snap-type:x mandatory}.run-nav-strip .run-tabs>a{flex:0 0 100%;scroll-snap-align:start;justify-content:center}}
+
+.qual-scan{grid-template-columns:minmax(0,1fr) 72px}.qual-support{white-space:normal}.qual-scan>details{min-width:72px}.qual-scan>details[open]{min-width:0}
