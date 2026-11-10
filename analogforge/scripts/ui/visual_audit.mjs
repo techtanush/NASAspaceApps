@@ -63,6 +63,8 @@ export const reports=[];
 export const manifest=[];
 const hash=b=>createHash('sha256').update(b).digest('hex');
 export async function auditPage(page,name,{theme='dark',density='default',width=1440,height=900,focus=true,spacing=false}={}){
+ // Release the preceding frame's decoded screenshot buffers on memory-constrained runners.
+ if(typeof globalThis.gc==='function')globalThis.gc();
  const measureLoad=['S01','S06','S07','S10','S12'].some(prefix=>name.startsWith(prefix));
  if(measureLoad)await beginLoadedCohort(page,{width,height,theme,density});else{await page.evaluate(()=>{window.__auditMeasureCLS=false;});await page.setViewportSize({width,height});}
  await page.evaluate(()=>{if(!document.querySelector('[role=dialog]')&&document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo(0,0);for(const element of document.querySelectorAll('*')){const style=getComputedStyle(element);if(/auto|scroll/.test(style.overflow+style.overflowX+style.overflowY)){element.scrollTop=0;element.scrollLeft=0;}}});
