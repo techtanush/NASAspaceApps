@@ -1,0 +1,334 @@
+{
+  "schema_version": "2.0",
+  "person": "Ayan",
+  "branch": "ayan/science-data-verification",
+  "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
+  "tested_commit_sha": null,
+  "kit_version": "1.0.0",
+  "kit_verify": {
+    "status": "PASS",
+    "command": "python3 \"architecture files/contracts/kit/materialize.py\" --verify",
+    "exit_code": 0
+  },
+  "environment": {
+    "python": "3.12.4",
+    "uv": "0.x (anaconda)",
+    "gdal": "3.10.3 (bundled with rasterio 1.4.4)",
+    "gdal_drivers_present": [
+      "GTiff",
+      "SRTMHGT",
+      "PDS",
+      "PDS4",
+      "netCDF",
+      "AAIGrid"
+    ],
+    "rasterio": "1.4.4",
+    "notes": [
+      "rasterio 1.5.2 has no prebuilt wheel for this machine; pinned rasterio<1.5 in the venv only (pyproject untouched)",
+      "h5py>=3.10 added to extra-ayan (h5netcdf has no HDF5 backend otherwise); CHANGE-REQUEST-adapters-h5py.json",
+      "GDAL HGT driver short name is SRTMHGT in this build"
+    ]
+  },
+  "ownership_check": {
+    "status": "PASS",
+    "exit_code": 0
+  },
+  "catalog": {
+    "KIT-01": {
+      "status": "PASSED",
+      "command": "python3 \"architecture files/contracts/kit/materialize.py\" --verify",
+      "exit_code": 0,
+      "tests_passed": null,
+      "tests_failed": null,
+      "tests_skipped": null,
+      "output_file": null
+    },
+    "KIT-02": {
+      "status": "PASSED",
+      "command": "pytest tests/contracts/kit -q",
+      "exit_code": 0,
+      "tests_passed": 20,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "output_file": null
+    },
+    "SCN-01": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-02": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-03": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-04": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-05": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-06": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-07": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-08": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-09": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-10": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-11": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-12": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-13": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-14": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-15": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-16": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-17": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-18": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated",
+      "live_servers": {
+        "status": "BLOCKED_EXTERNAL",
+        "proof": "no credentials/network by design; adapters validated only against httpx.MockTransport and format-faithful synthetic files"
+      }
+    },
+    "SCN-19": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-20": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    },
+    "SCN-21": {
+      "status": "PASSED",
+      "command": "pytest unit+property+integration+contracts/science (773 passed, 0 skipped) + tests/replay/science (200 passed); run_oracles.py: 973 oracles, 0 skipped",
+      "exit_code": 0,
+      "tests_failed": 0,
+      "tests_skipped": 0,
+      "note": "offline rows executed as part of the aggregate science run; per-row counts not separately tabulated"
+    }
+  },
+  "status_values": [
+    "PASSED",
+    "FAILED",
+    "BLOCKED_ENVIRONMENT",
+    "BLOCKED_EXTERNAL",
+    "NOT_IMPLEMENTED",
+    "NOT_RUN"
+  ],
+  "sci_tests": {
+    "SCI-01": "NOT_RUN",
+    "SCI-02": "NOT_RUN",
+    "SCI-03": "NOT_RUN",
+    "SCI-04": "NOT_RUN",
+    "SCI-05": "NOT_RUN",
+    "SCI-06": "NOT_RUN",
+    "SCI-07": "NOT_RUN",
+    "SCI-08": "NOT_RUN",
+    "SCI-09": "NOT_RUN",
+    "SCI-10": "NOT_RUN",
+    "SCI-14": "NOT_RUN",
+    "SCI-17": "NOT_RUN"
+  },
+  "operations_supported": [
+    "INGEST_LOCAL_DATASET",
+    "RESOLVE_COVERAGE",
+    "FETCH_SOURCE",
+    "CHARACTERIZE_TARGET",
+    "SCREEN_CANDIDATES",
+    "ANALYZE_CANDIDATE",
+    "COMPARE_REQUIREMENT",
+    "ASSESS_COMPATIBILITY",
+    "DESIGN_BENCHMARK",
+    "SEARCH_ROUTE",
+    "VERIFY_ROUTE",
+    "DIAGNOSE_RESULT",
+    "OPTIMIZE_PORTFOLIO",
+    "BUILD_DISPLAY_LAYERS",
+    "AUDIT_EVIDENCE"
+  ],
+  "self_audit": {
+    "forbidden_scan": {
+      "status": "PASSED",
+      "findings": 0
+    },
+    "mutation_check": {
+      "status": "PASSED",
+      "mutants": 17,
+      "killed": 17
+    },
+    "perturbations": {
+      "PERT-01..09": "PASSED (tests/integration/science/test_perturbations.py)"
+    },
+    "adversarial_reviewers": [
+      "routing+verifier: 7 confirmed defects, all fixed with regression tests",
+      "terrain+qualification+portfolio+audit+display: 9 confirmed defects, all fixed (analyze rover cap needs kit change: CHANGE-REQUEST-analyze-rover-cap.json)",
+      "datasets+adapters: 16 confirmed defects, all fixed"
+    ],
+    "determinism_under_PYTHONHASHSEED": "1 and 2 identical",
+    "final_truth_checks": {
+      "09_checklist_formal_signoff": "NOT_DONE: reviews+scans+mutations executed, checklist file not itemised line by line"
+    }
+  },
+  "lint": {
+    "ruff": {
+      "status": "PASSED",
+      "exit_code": 0,
+      "scope": "paths in 05 \u00a71"
+    },
+    "mypy": {
+      "status": "PASSED",
+      "exit_code": 0,
+      "scope": "src/analogforge/science strict, 72 files"
+    }
+  },
+  "performance_ms": {},
+  "contradictions_found": [
+    "guide 08 says registrar_stub is Ayan's under tests/support/ but ownership.json assigns tests/support to Tanush: relocated to tests/fixtures/science/support (DECISIONS O-01..O-04)",
+    "auto-waypoints-v1 literal rule vs arch 40 \u00a74 window-B property: followed the property (DECISIONS R-05)",
+    "arch 40 \u00a75 context row 'per oracle' for window A: computed UNKNOWN/INSUFFICIENT_VALID_DATA (water moat leaves no 480 m cell with full support); window C now FAILs (RV-01)",
+    "Mars mission fixture comparison_rule_id emit-mineral-presence-v1 != policy id mineral-presence-v1: dispatch uses catalog mapping (C-12)"
+  ],
+  "defects_in_other_areas": [],
+  "change_requests": [
+    "CHANGE-REQUEST-adapters-h5py.json",
+    "CHANGE-REQUEST-analyze-rover-cap.json"
+  ],
+  "external_blockers": [
+    "SCN-18 against real Earthdata/PDS servers: BLOCKED_EXTERNAL (no credentials, not attempted)"
+  ],
+  "known_limitations": [
+    "ADAPTER_EVIDENCE sources BLOCKED UNSUPPORTED_PRODUCT",
+    "geographic (non-projected) local rasters BLOCKED UNSUPPORTED_CRS (no reprojection)",
+    "display THERMAL/MINERAL layers return an issue (no evidence raster)",
+    "energy-only INCONCLUSIVE is inferred from the verification summary (kit carries no issue codes): another DATA cause with unknown reserve and no violations would be indistinguishable",
+    "analyze connected-zone cap fixed at 18 deg (kit input has no rover)",
+    "adapter default hosts/PDS index URLs/Diviner variable names are unverified proposals",
+    "S-RASTER-1 etc. validated only on synthetic practice data"
+  ],
+  "decisions": "see team handoffs/ayan/DECISIONS.md",
+  "ready_to_merge": false,
+  "ready_to_merge_rule": "true only if every required catalog row is PASSED, kit_verify and ownership_check PASS, lint clean, self_audit complete, no hidden skips; BLOCKED_EXTERNAL allowed only for rows that require real network/credentials and have an offline PASSED equivalent",
+  "pushed_sha": null,
+  "secrets_not_committed": true,
+  "data_not_committed": true,
+  "sci_tests_note": "architecture 29 SCI-xx ids were not individually mapped to tests; behaviours are covered by SCN rows but not claimed per SCI id",
+  "ready_to_merge_reason": "all executed gates pass, but SCI-xx ids not individually mapped, 09 checklist not formally itemised, and push not yet authorised"
+}
