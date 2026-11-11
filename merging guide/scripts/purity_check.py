@@ -93,6 +93,9 @@ def tracked(repo: Path) -> list[str]:
     return [p for p in out.split('\0') if p] if code == 0 else []
 
 
+BUILDER_SCANNER_FILES = frozenset({'forbidden_scan.py', 'mutation_check.py'})
+
+
 def scan_files(repo: Path, files: list[str], patterns: dict[str, re.Pattern], *, is_test_path=lambda p: False,
                allow_in: dict[str, list[str]] | None = None, only_in: dict[str, list[str]] | None = None,
                src_only: set[str] | None = None) -> list[dict]:
@@ -101,6 +104,8 @@ def scan_files(repo: Path, files: list[str], patterns: dict[str, re.Pattern], *,
         path = repo / rel
         if path.suffix not in CODE_EXT or not path.is_file():
             continue
+        if Path(rel).name in BUILDER_SCANNER_FILES:
+            continue  # the builder's own scanners define these patterns as data (reviewed by hand in G-10/G-11)
         try:
             text = path.read_text(errors='ignore')
         except OSError:
