@@ -1,5 +1,24 @@
 # Aradhya frontend handoff
 
+## Current acceptance — round11
+
+Application source `adb076e99103a3a42fa77c0a823826075a60a997` on `aradhya/frontend-experience` passes the requested frontend visual-acceptance gate. Main is unchanged; no deployment or backend integration was performed.
+
+- Complete visual audit: 501 reports, 0 findings, 0 skipped checks. Frozen review packet: 568 images, 502 reports including pagination proof, 16 PDF pages and 48 faithful detail crops.
+- Three fresh independent reviews: HMI 3.6667, accessibility 3.6667, slop 3.5833. Every criterion >=3; every mean >=3.5; no confirmed open prohibited findings. Exact prompts and reports are preserved verbatim in DESIGN-REVIEW.md.
+- All 41 distinct browser cases verified: complete visual audit, 39 passing regression cases and corrected J02 rerun. Initial J02 failed because its selector expected a raw visible identifier; updated test locates the retained ID in details and asserts the readable label, preserving every numerical/persisted oracle assertion. No cases skipped or reported flaky; the initial failed batch is preserved. Current 90 frontend unit tests in 22 files, TypeScript, ESLint and production build pass.
+- Frozen-kit, ownership, prohibited-pattern scan, 150/150 tokens and byte identity of supplied token assets/generated CSS pass. Twelve complete native-resolution component-guide images are updated.
+
+Readable benchmark/rule/metric names retain exact original identifiers, operators and accepted wording in details. The evidence now includes actual rover parsing/validation errors and valid-import results, below-fold acceptance/hash controls, the complete target chart and data, later attempts, replanning/playback, and actual HTML/JSON/CSV export statuses. Packet: `analogforge/out/visual-review11-complete/screens.md`.
+
+Minor, nonblocking polish findings remain recorded: print Reserve label/value pagination, a footer-only final print sheet, a screen scroll hint in print, target-scale label proximity and practice launcher density. The passing review is not a claim that all polish issues are eliminated.
+
+Real-backend MRG-03 remains BLOCKED_ENVIRONMENT and belongs to the merging agent. Synthetic preview/fixture evidence verifies frontend presentation and contract behavior, not live terrain/model access or physical rover execution. The 131 Python tests, 36 mutations and 27 export/27 tamper checks below are historical 4c801f4 baseline evidence, not reruns of this presentation follow-up.
+
+## Historical verification and follow-ups
+
+The following prior notes are preserved as history; their older scores/counts/readiness do not describe the current accepted source.
+
 Application source `4c801f40ca86751fc16f0557d14bd0d160892a34` on `aradhya/frontend-experience` builds and passes functional verification. Independent visual acceptance remains failed, so `ready_to_merge` is false.
 
 Verified on the final application source:

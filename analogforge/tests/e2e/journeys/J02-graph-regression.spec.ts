@@ -10,7 +10,9 @@ test('J02 graph regression preserves exact independent graph oracle', async ({ p
   const second = page.locator('[data-testid=attempt-row][data-attempt-number="2"]');
   await expect(first).toHaveAttribute('data-outcome', 'FAIL');
   await expect(second).toHaveAttribute('data-outcome', 'PASS');
-  const metricCell = (attempt: Locator, id: string) => attempt.locator('tr').filter({ has: page.getByRole('rowheader', { name: id, exact: true }) }).locator('td').first();
+  // Visible names are readable; the exact persisted identifier remains in details.
+  const metricCell = (attempt: Locator, id: string) => attempt.locator('tr').filter({ has: page.locator('th details').getByText(id, { exact: true }) }).locator('td').first();
+  await expect(first.getByRole('rowheader', { name: 'Route distance', exact: true })).toBeVisible();
   await expect(metricCell(first, 'route_distance_m')).toHaveText(/120\s*m/);
   await expect(metricCell(first, 'energy_conservative_wh')).toHaveText(/26\.0\s*Wh/);
   await expect(metricCell(first, 'unique_exposure_m:R-EXPOSURE')).toHaveText(/0\s*m/);

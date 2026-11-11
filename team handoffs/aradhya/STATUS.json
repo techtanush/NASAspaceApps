@@ -4,7 +4,7 @@
   "branch": "aradhya/frontend-experience",
   "template_note": "Observed frontend branch evidence. Generated reports are under analogforge/out; real-backend integration is a separate merging-agent gate.",
   "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
-  "tested_commit_sha": "b3ca1dbd0e5015865898b18f31f82aa453268899",
+  "tested_commit_sha": "adb076e99103a3a42fa77c0a823826075a60a997",
   "kit_version": "1.0.0",
   "kit_verify": {
     "status": "PASSED",
@@ -21,14 +21,16 @@
       "A system sleep interrupted an overnight clean build-guard test. An unchanged serial rerun under temporary caffeinate passed80/80; no timeout threshold was relaxed.",
       "Pinned Node22/pnpm10 PATH is required on this Mac. Playwright prefers its matching Chromium when installed and retains Chrome as a fallback. Optional headless-shell download was unnecessary because the full Chromium binary launched successfully.",
       "Worker registration failed below1GiB free even with a fresh server and an HTTP200 worker file. After clearing regenerable compiler/shader caches, the unchanged b96462a source passed16 navigations over1.6minutes with no page errors. Final complete30-test gate is running serially with CI=1.",
-      "Round5 resolved a development-worker teardown/update race by retaining its inactive registration. Previous disk-only hypothesis was insufficient. New rapid16-navigation regression passes; production continues to exclude the worker. Dependencies were moved back from the verification checkout to the original workspace and original typecheck,lint and84 frontend tests pass."
+      "Round5 resolved a development-worker teardown/update race by retaining its inactive registration. Previous disk-only hypothesis was insufficient. New rapid16-navigation regression passes; production continues to exclude the worker. Dependencies were moved back from the verification checkout to the original workspace and original typecheck,lint and84 frontend tests pass.",
+      "Final adb076e verification:90 frontend tests/22 files, full501-report visual audit,39 regression cases and corrected J02 rerun pass serially. All three fresh image reviews pass. Node22.21.1/pnpm10.22.0 and matching Chromium141 used; no backend integration claim."
     ]
   },
   "ownership_check": {
     "status": "PASSED",
     "exit_code": 0,
     "base": "origin/main",
-    "output_file": "out/ownership-r6.log"
+    "output_file": "out/review11-ownership.log",
+    "source": "adb076e99103a3a42fa77c0a823826075a60a997"
   },
   "catalog": {
     "KIT-01": {
@@ -38,7 +40,7 @@
       "tests_passed": null,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "output_file": "out/kit-final.log"
+      "output_file": "out/review11-kit.log"
     },
     "KIT-02": {
       "status": "PASSED",
@@ -70,7 +72,7 @@
     },
     "UIX-05": {
       "status": "PASSED",
-      "evidence": "87 frontend tests in20 files pass; out/table-labels-unit.log. Application changes ed7ab5b, final browser assertion correction8bce5d3."
+      "evidence": "90 frontend tests in22 files pass on adb076e; out/review11-unit-final.log."
     },
     "UIX-06": {
       "status": "PASSED",
@@ -78,7 +80,7 @@
     },
     "UIX-07": {
       "status": "PASSED",
-      "evidence": "Final UIX-07 passes at 1440, 900 and 390 CSS px, including keyboard focus, 200% reflow, reduced motion and text spacing. No critical/serious axe findings."
+      "evidence": "Current complete browser regression passes accessibility at1440/900/390, keyboard, 200% reflow, reduced motion and text spacing; no critical/serious axe findings."
     },
     "UIX-08": {
       "status": "PASSED",
@@ -98,11 +100,11 @@
     },
     "UIX-12": {
       "status": "PASSED",
-      "evidence": "150/150 token checks; supplied files and generated CSS identical."
+      "evidence": "150/150 token checks; all three supplied assets and regenerated CSS byte-identical; out/review11-tokens.log and out/review11-token-identity.log."
     },
     "UIX-13": {
       "status": "PASSED",
-      "evidence": "Complete497-report audit on3e17e2b:0findings/0skips; out/visual-review7-complete/report.json additionally includes verified PDF page numbering."
+      "evidence": "Complete501-report audit on adb076e:0 findings/0 skips. Frozen packet includes502 reports with pagination proof,568 images and16 rendered PDF pages; out/visual-review11-complete/report.json."
     }
   },
   "journeys_mock_mode": {
@@ -165,7 +167,9 @@
   "self_audit": {
     "forbidden_scan": {
       "status": "PASSED",
-      "findings": 0
+      "findings": 0,
+      "output_file": "out/review11-forbidden.json",
+      "source": "adb076e99103a3a42fa77c0a823826075a60a997"
     },
     "mutation_check": {
       "status": "PASSED",
@@ -324,12 +328,12 @@
     "Real-backend MRG-03 journeys and live dataset/model credentials are unavailable in this frontend-only environment.",
     "Synthetic preview and fixture results establish presentation/contract behavior only, not real mission or physical rover validation.",
     "Vite reports a large application chunk; no deployment or production traffic performance claim is made.",
-    "Independent visual acceptance remains failed; see the complete reviewer reports. Build and functional test success does not waive this gate."
+    "Image-review gate passes with nonblocking polish findings preserved in DESIGN-REVIEW.md and minor_visual_polish_remaining."
   ],
   "decisions": "see team handoffs/aradhya/DECISIONS.md",
-  "ready_to_merge": false,
+  "ready_to_merge": true,
   "ready_to_merge_rule": "true only if every UIX row (UIX-01..13) and DR-01..04 is PASSED, J01-J13 pass in mock mode with 0 skipped, kit_verify and ownership_check PASS, lint/typecheck clean, self_audit complete, no hidden skips",
-  "pushed_sha": "8ca87694c0c3cdd86cabf107c40b493bb2777466",
+  "pushed_sha": "adb076e99103a3a42fa77c0a823826075a60a997",
   "secrets_not_committed": true,
   "build_output_not_committed": true,
   "design": {
@@ -340,17 +344,19 @@
     "tokens_css_identical": "PASSED",
     "visual_audit": {
       "status": "PASSED",
-      "source": "b3ca1dbd0e5015865898b18f31f82aa453268899",
+      "source": "adb076e99103a3a42fa77c0a823826075a60a997",
       "reports": 501,
       "findings": 0,
       "skipped_checks": 0,
-      "output_file": "out/visual-review10-complete/report.json",
-      "packet_images": 517
+      "output_file": "out/visual-review11-complete/report.json",
+      "packet_images": 568,
+      "packet_reports": 502,
+      "print_pages": 16
     },
     "styleguide": "PASSED",
     "design_review": {
       "DR-01": "PASSED",
-      "DR-02": "FAILED",
+      "DR-02": "PASSED",
       "DR-03": "PASSED",
       "DR-04": "PASSED",
       "rounds": [
@@ -469,67 +475,79 @@
           },
           "open_visual_X_findings": [],
           "erratum": "Accessibility author withdrew alleged PDF continuation clipping after faithful enlarged original-PDF crops; original and corrected reports preserved."
+        },
+        {
+          "round": 11,
+          "source": "adb076e99103a3a42fa77c0a823826075a60a997",
+          "status": "PASSED",
+          "means": {
+            "hmi": 3.6666666666666665,
+            "accessibility": 3.6666666666666665,
+            "slop": 3.5833333333333335
+          },
+          "all_individual_scores_at_least": 3,
+          "open_visual_X_findings": []
         }
       ],
       "final_scores": {
         "hmi": {
           "scores": [
-            3,
-            4,
-            3,
-            3,
-            3,
             4,
             4,
             4,
             3,
-            3,
             4,
+            4,
+            4,
+            4,
+            3,
+            3,
+            3,
             4
           ],
-          "mean": 3.5,
+          "mean": 3.6666666666666665,
           "status": "PASS"
         },
         "accessibility": {
           "scores": [
-            3,
+            4,
+            4,
             4,
             3,
             3,
+            4,
             3,
-            4,
-            4,
             4,
             4,
             3,
             4,
             4
           ],
-          "mean": 3.5833333333333335,
+          "mean": 3.6666666666666665,
           "status": "PASS"
         },
         "slop": {
           "scores": [
-            3,
-            4,
-            3,
-            3,
-            3,
             4,
             4,
             4,
             3,
+            4,
+            4,
+            4,
+            4,
             3,
             3,
-            4
+            3,
+            3
           ],
-          "mean": 3.4166666666666665,
-          "status": "FAIL"
+          "mean": 3.5833333333333335,
+          "status": "PASS"
         }
       },
       "review_file": "team handoffs/aradhya/DESIGN-REVIEW.md",
-      "last_reviewed_source": "b3ca1dbd0e5015865898b18f31f82aa453268899",
-      "follow_up_note": "Round10 amended accessibility and HMI pass; slop remains below mean threshold. Round11 presentation fixes and enlarged review evidence under verification."
+      "last_reviewed_source": "adb076e99103a3a42fa77c0a823826075a60a997",
+      "follow_up_note": "Round11: three fresh independent reviewers pass every threshold; exact prompts and reports preserved verbatim. Minor findings remain explicitly recorded; no open prohibited finding."
     },
     "slop_findings_open": [],
     "fonts_self_hosted": true,
@@ -537,7 +555,7 @@
     "third_party_licences_recorded": true,
     "styleguide_artifacts": {
       "files": 12,
-      "max_bytes": 285331,
+      "max_bytes": 285187,
       "native_resolution": true,
       "parts_per_theme_density": 2,
       "overlap_px": 48,
@@ -645,6 +663,18 @@
       "ownership": "PASSED",
       "forbidden_scan": "PASSED",
       "full_visual_review_rerun": false
+    },
+    "requested_readable_labels_and_review_evidence": {
+      "source": "adb076e99103a3a42fa77c0a823826075a60a997",
+      "status": "PASSED",
+      "items": [
+        "Readable rule/operator/metric labels with original identifiers and raw accepted wording retained in details.",
+        "Actual malformed JSON, rejected negative mass, valid import and final validation rows captured.",
+        "Acceptance/hash controls, full chart including right edge/data, later attempts, replanning/playback and all passport export statuses captured.",
+        "All PDF pages and48 faithful same-PDF detail crops included for review."
+      ],
+      "catalog": "out/visual-review11-complete/screens.md",
+      "review_reports": "team handoffs/aradhya/DESIGN-REVIEW.md"
     }
   },
   "science_presentation_evidence": {
@@ -691,8 +721,35 @@
     "contracts/algorithm-ids.json": "50f6e6578608cc13fc3914b15ee07a7fde162acb9790f599570e6e4d659f424e",
     "apps/web/src/generated/schema.d.ts": "d97d037c94674696ed365f9780517a480e63fb8b7a1e00056b11f17de265796b"
   },
-  "current_verification_source": "b3ca1dbd0e5015865898b18f31f82aa453268899",
+  "current_verification_source": "adb076e99103a3a42fa77c0a823826075a60a997",
   "browser_delivery": {
+    "source": "adb076e99103a3a42fa77c0a823826075a60a997",
+    "tests_passed": 41,
+    "tests_failed": 0,
+    "tests_skipped": 0,
+    "flaky": 0,
+    "output_files": [
+      "out/e2e-results-visual-review11-complete.json",
+      "out/e2e-results-visual-review11-regression.json",
+      "out/e2e-results-visual-review11-graph-corrected.json"
+    ],
+    "note": "41 distinct cases verified:1 full audit,39 passing regression cases and1 corrected J02 rerun. Initial regression failed only because J02 searched for raw visible identifiers after readable-label change. Test now locates exact retained IDs in details and also asserts readable label; all numerical and persisted graph-oracle assertions retained. Application source unchanged; no case skipped. This is not a single all-green40-test invocation.",
+    "initial_regression": {
+      "passed": 39,
+      "failed": 1,
+      "failed_case": "J02 graph regression: obsolete raw-visible-label selector",
+      "corrected_rerun_passed": 1,
+      "app_source_changed": false
+    }
+  },
+  "completion_scope": "Frontend contributor acceptance passes: current complete visual audit, three fresh image reviews and41 distinct browser cases including corrected J02 rerun. This is contributor readiness only; MRG-03 real-backend integration remains BLOCKED_ENVIRONMENT and owned by the merging agent.",
+  "real_backend_validation": {
+    "status": "BLOCKED_ENVIRONMENT",
+    "owner": "merging agent MRG-03",
+    "reason": "This branch does not contain the combined platform/science backend or live dataset/model credentials. Mock journeys and fixture exports do not verify that integration."
+  },
+  "pushed_sha_note": "Tested application source intended for branch push. Subsequent handoff commit changes documentation and permitted component-guide images only; verify exact remote final HEAD after push.",
+  "historical_browser_delivery": {
     "source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
     "tests_passed": 33,
     "tests_failed": 0,
@@ -701,11 +758,24 @@
     "output_file": "out/e2e-results-visual-complete-r6.json",
     "note": "This33-test full-suite result belongs to4c801f4. Current focused results are under design.requested_layout_fixes."
   },
-  "completion_scope": "Round10 full audit passes; amended image reviews still miss slop mean threshold. Round11 verified presentation improvements and PDF detail evidence await complete audit and three fresh reviews.",
-  "real_backend_validation": {
-    "status": "BLOCKED_ENVIRONMENT",
-    "owner": "merging agent MRG-03",
-    "reason": "This branch does not contain the combined platform/science backend or live dataset/model credentials. Mock journeys and fixture exports do not verify that integration."
+  "current_frontend_verification": {
+    "source": "adb076e99103a3a42fa77c0a823826075a60a997",
+    "unit_tests": 90,
+    "unit_files": 22,
+    "typecheck": "PASSED",
+    "lint": "PASSED",
+    "production_build": "PASSED",
+    "build_evidence": "out/review11-full.log",
+    "unit_evidence": "out/review11-unit-final.log",
+    "typecheck_evidence": "out/review11-typecheck-final.log",
+    "lint_evidence": "out/review11-lint-final.log",
+    "note": "Python131-test,36-mutant and27-export/27-tamper baseline evidence belongs to4c801f4; not rerun in this presentation follow-up. Renderer source unchanged in this follow-up."
   },
-  "pushed_sha_note": "Verified application source SHA. The subsequent handoff commit changes documentation and permitted component-guide images only."
+  "minor_visual_polish_remaining": [
+    "Printed Reserve label/value splits between pages14/15.",
+    "Footer-only final print page16.",
+    "Screen horizontal-scroll hint remains in print.",
+    "Target scale magnitude could sit nearer its bar.",
+    "Desktop practice launcher can be denser."
+  ]
 }
