@@ -537,5 +537,26 @@
     "NOT_IMPLEMENTED",
     "NOT_RUN"
   ],
-  "tested_commit_sha": "3e5d1b93e3e6c22a8c67af1a31d0e2f45efe5dde"
+  "tested_commit_sha": "3e5d1b93e3e6c22a8c67af1a31d0e2f45efe5dde",
+  "integration_revalidation": {
+    "date": "2026-11-11",
+    "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
+    "results": {
+      "kit": "PASS / 20 passed",
+      "ownership": "PASS",
+      "scn_offline": "802 passed, 0 skipped",
+      "replay": "200 passed",
+      "oracles": "1000, 0 skipped",
+      "ruff": "clean",
+      "mypy": "clean (74 files)",
+      "forbidden_scan": "0",
+      "mutations": "16/16 killed"
+    },
+    "defect_fixed": "SCREEN_CANDIDATES per-window DERIVED evidence had no artifact (artifact=None) -> SC-02 UNSATISFIED on every positive COMPARE with platform-supplied evidence; replaced with a per-window canonical JSON artifact; regression test test_evidence_artifact_integrity.py.",
+    "open_cross_branch_items": [
+      "graph scenario target/earth sources point at the abstract graph fixture (Tanush config)",
+      "assurance gate applicability for VERIFICATION claims undefined; platform raises instead of publishing LIMITED"
+    ],
+    "details": "team handoffs/ayan/DEBUG-REVIEW.md"
+  }
 }

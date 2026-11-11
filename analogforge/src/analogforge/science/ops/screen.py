@@ -5,10 +5,12 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from pydantic import BaseModel, ConfigDict
+
 from analogforge.ports import catalog
 from analogforge.ports.common import EvidenceRef
 from analogforge.ports.domain_models import MeasuredMetric
-from analogforge.ports.science import ComputationStatus
+from analogforge.ports.science import ArtifactDraft, ComputationStatus
 from analogforge.ports.science_payloads import (
     Histogram,
     ScreenCandidatesInput,
@@ -24,6 +26,19 @@ from analogforge.science.ops.base import OpBlocked, OpEnv, OpOutcome, derived_ev
 from analogforge.science.ops.source import resolve_source
 from analogforge.science.ops.terrain import Prepared, aoi_for_bounds, hist_of, metric, prepare
 from analogforge.science.ops.windows import WindowSpec, region_windows
+
+
+class WindowScreeningSummary(BaseModel):
+    """Canonical bytes behind one window's screening evidence (SC-02: derived evidence carries real artifact bytes)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    window_id: str
+    cell_m: float
+    native_resolution_m: float | None
+    comparison_scale_m: float | None
+    valid_fraction: float | None
+    metrics: list[MeasuredMetric]
 
 
 @dataclass
@@ -161,6 +176,7 @@ def run_screen(env: OpEnv) -> OpOutcome:
     frame: ProjectedFrame = frame_from_crs_wkt("EARTH", prep.grid.crs_wkt)
     params = env.params_hash(algo, env.operation_params(), [src.draft.parameters_sha256, *src.raster.source_hashes])
     evidence = [src.draft]
+    window_artifacts: list[ArtifactDraft] = []
     windows_out: list[ScreenedWindow] = []
     support_for_w1 = prep_s.support_m if prep_s is not None else None
     for r in rows:
@@ -207,6 +223,22 @@ def run_screen(env: OpEnv) -> OpOutcome:
                     metric("slope_w1_deg", r.w1, "deg", support_for_w1, r.valid_fraction or 0.0, "slope-w1-binned-v1")
                 )
             w_params = env.params_hash(algo, {"window": spec.window_id, **env.operation_params()}, [params])
+            w_scale = support_for_w1 if support_for_w1 is not None else cell
+            w_art = json_artifact(
+                env,
+                params_sha=w_params,
+                key=f"{key}-json",
+                name=f"window-{spec.window_id}.json",
+                payload=WindowScreeningSummary(
+                    window_id=spec.window_id,
+                    cell_m=cell,
+                    native_resolution_m=src.raster.native_resolution_m,
+                    comparison_scale_m=w_scale,
+                    valid_fraction=r.valid_fraction,
+                    metrics=ms,
+                ),
+            )
+            window_artifacts.append(w_art)
             evidence.append(
                 derived_evidence(
                     env,
@@ -215,12 +247,12 @@ def run_screen(env: OpEnv) -> OpOutcome:
                     body="EARTH",
                     algorithm_id=algo,
                     params_sha=w_params,
-                    artifact=None,
+                    artifact=w_art,
                     parent_keys=[src.draft.local_key],
                     metrics=ms,
                     limitations=[f"Coarse screening summary of {spec.window_id} at {cell:g} m support."],
                     native_resolution_m=src.raster.native_resolution_m,
-                    comparison_scale_m=support_for_w1 if support_for_w1 is not None else cell,
+                    comparison_scale_m=w_scale,
                     aoi_bbox=(aoi.bbox[0], aoi.bbox[1], aoi.bbox[2], aoi.bbox[3]),
                     dataset_product_id=src.product_id,
                 )
@@ -275,4 +307,5 @@ def run_screen(env: OpEnv) -> OpOutcome:
     if not windows_out:
         raise ScienceError("no windows were produced", code="NO_COVERAGE")
     counters: dict[str, int | float] = {"windows_screened": len(rows), "windows_ranked": len(ranked)}
-    return OpOutcome(ComputationStatus.SUCCEEDED, payload, algo, params, [art], evidence, [], counters)
+    artifacts = [*window_artifacts, art]
+    return OpOutcome(ComputationStatus.SUCCEEDED, payload, algo, params, artifacts, evidence, [], counters)
