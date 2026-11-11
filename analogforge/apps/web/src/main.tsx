@@ -11,6 +11,7 @@ import './styles/base.css';
 import './styles/layout.css';
 import './styles/review-maps.css';
 import './styles/review-evidence.css';
+import './styles/authoring.css';
 import './styles/print.css';
 async function boot() {
   if (import.meta.env.VITE_API_MOCK === '1') {

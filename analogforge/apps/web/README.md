@@ -27,6 +27,7 @@ The Tanush/Ayan merge supplies the actual platform and scientific services. Runn
 
 ```sh
 corepack pnpm run generate:client
+corepack pnpm --filter @analogforge/web run check:assurance
 corepack pnpm run typecheck
 corepack pnpm run lint
 corepack pnpm run test
@@ -51,3 +52,13 @@ The same journeys run against the merged backend with `E2E_TARGET=real` and `E2E
 `/__styleguide` is available only in development. It shows all components in both themes and three densities. Use `pnpm run audit:visual --all` to run the production checks and complete browser suite together, including the full visual audit. The full visual audit checks every screen across six viewports, both themes, and the required density variants. Its reports, screenshot catalog, production resource audit, and mutation logs are generated under `out/` and are not committed. The workspace postinstall adds only `/analogforge/out/` to the clone’s local Git exclude file; the frozen kit ignore file stays unchanged.
 
 Explicit development fixtures `?mockScenario=review-proxy` and `?mockScenario=blocked-worker` exercise scoped human review and dependency recovery. `?mockLatency=300` adds the visual audit’s network latency; ordinary preview sessions have no artificial latency. These switches do not exist in production builds.
+
+## Authoring and publication integrity
+
+Mission routes own separate editor state. Autosave queues edits made while a receipt is pending; fingerprint and acceptance responses apply only to the draft version that issued them. The authoring progress bar, target selectors, and paired geographic bounds use the existing tokens in both themes, including touch-sized controls on small screens.
+
+The passport view checks the frozen scientific-assurance JSON Schema and verifies the run, workspace, runtime mode, and accepted mission/rover hashes before presenting an audited report. Invalid reports stay **INCOMPLETE** with a retry action and no export controls. This is shape and identity checking; scientific publication decisions remain on the backend.
+
+`pnpm --filter @analogforge/web run generate:assurance` regenerates the standalone validator from `contracts/scientific-assurance.schema.json`. Production builds check that it is current. The browser imports precompiled validation functions and never compiles schemas or evaluates code strings.
+
+Mutation checks use an isolated checkout layout on port 5178, with `E2E_BASE_URL` and `WEB_PORT` set together. The runner first requires unmodified unit and browser controls to pass. Infrastructure errors cannot count as successful mutation detections.

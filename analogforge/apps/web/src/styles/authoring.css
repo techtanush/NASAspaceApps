@@ -1,0 +1,56 @@
+/* Mission authoring: clear progress and compact, aligned geographic inputs. */
+.mission-authoring .stepper {
+  border-block: 1px solid var(--border-subtle);
+  padding-block: 16px;
+  gap: 16px 32px;
+}
+.mission-authoring .stepper li { min-width: 0; }
+.mission-authoring .stepper li[aria-current=step] { font-weight: 600; }
+.mission-authoring .stepper li[aria-current=step] .step-number {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: var(--on-accent);
+}
+.mission-authoring .save-indicator {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2);
+  background: var(--surface-1);
+  font-size: 13px;
+}
+.mission-authoring .radio-group {
+  border: 0;
+  padding: 0;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.mission-authoring .radio-group legend {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.mission-authoring .radio-group label {
+  min-height: 44px;
+  padding: 4px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-2);
+  background: var(--surface-2);
+}
+.mission-authoring .radio-group label:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--surface-3);
+}
+@media (max-width: 767px) {
+  .mission-authoring .stepper {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 16px;
+    padding-block: 12px;
+  }
+  .mission-authoring .bbox-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 12px;
+  }
+  .mission-authoring .radio-group label { flex: 1; }
+}
