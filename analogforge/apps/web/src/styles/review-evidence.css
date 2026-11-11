@@ -115,3 +115,7 @@ input[type=checkbox]{appearance:none;position:relative;border:1px solid var(--bo
 .replan-comparison,.attempt-violations{display:flex;flex-direction:column;gap:8px}.replan-values{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0}.replan-values>div{min-width:0;padding:8px 12px;border:1px solid var(--border-subtle)}.replan-values dt{font-size:13px;color:var(--text-secondary)}.replan-values dd{margin:4px 0 0;overflow-wrap:anywhere}.attempt-violations details>div+div{margin-top:12px}
 @media screen{.attempt-benchmarks table{width:100%;min-width:640px;table-layout:fixed}.attempt-benchmarks thead th:first-child{width:40%}.attempt-benchmarks thead th:nth-child(2),.attempt-benchmarks thead th:nth-child(3){width:18%}.attempt-benchmarks thead th:last-child{width:24%}}
 @media(max-width:767px){.replan-values{grid-template-columns:minmax(0,1fr);gap:8px}}
+
+/* Keep presets ahead of query-sized lists; empty desktop lists need no reserved tail. */
+@media(min-width:768px){.workspace-overview>.practice-presets[open]{height:160px;min-height:160px}.workspace-overview .preset-content{min-height:0;max-height:108px;overflow:auto}.workspace-overview .preset-links>.skeleton{height:32px;min-height:32px;padding:4px 8px}}
+@media(min-width:1024px){.workspace-overview .workspace-table-slot[data-empty=true]{height:auto;min-height:0}}

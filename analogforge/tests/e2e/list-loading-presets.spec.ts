@@ -3,7 +3,7 @@ import {startRun,tab} from './support/workbench';
 import {auditPage,finishAudit,installAuditInstrumentation} from '../../scripts/ui/visual_audit.mjs';
 test('candidate metadata fits the 40/60 split and four loading rows remain complete',async({page})=>{
  test.setTimeout(300000);await installAuditInstrumentation(page);
- await page.addInitScript(()=>{const original=window.fetch.bind(window);let release=()=>{};const gate=new Promise<void>(resolve=>{release=resolve;});Object.assign(window,{releaseWorkspace:release});window.fetch=async(input,init)=>{const url=new URL(input instanceof Request?input.url:String(input),location.href);if(new URLSearchParams(location.search).has('holdWorkspace')&&['/api/v1/missions','/api/v1/runs'].includes(url.pathname))await gate;return original(input,init);};});
+ await page.addInitScript(()=>{const original=window.fetch.bind(window);let release=()=>{};const gate=new Promise<void>(resolve=>{release=resolve;});Object.assign(window,{releaseWorkspace:release});window.fetch=async(input,init)=>{const url=new URL(input instanceof Request?input.url:String(input),location.href);if(new URLSearchParams(location.search).has('holdWorkspace')&&['/api/v1/missions','/api/v1/runs','/api/v1/capabilities'].includes(url.pathname))await gate;return original(input,init);};});
  await page.goto('/?holdWorkspace=1');await expect(page.getByRole('status',{name:'Retrieving saved missions'})).toBeVisible();
  for(const width of [1440,390])for(const theme of ['dark','light'])for(const density of ['compact','default','comfortable']){
   await page.setViewportSize({width,height:900});await page.evaluate(({theme,density})=>{document.documentElement.dataset.theme=theme;document.documentElement.dataset.density=density;},{theme,density});
@@ -13,12 +13,13 @@ test('candidate metadata fits the 40/60 split and four loading rows remain compl
    for(const row of geometry){expect(row.top).toBeGreaterThanOrEqual(row.min-1);expect(row.bottom).toBeLessThanOrEqual(row.max+1);}
   }
  }
+ await page.setViewportSize({width:1440,height:900});await expect(page.locator('.practice-presets')).toHaveAttribute('open');const pendingPreset=(await page.locator('.practice-presets').boundingBox())!;const pendingListsTop=(await page.locator('.workspace-lists').boundingBox())!.y;await page.setViewportSize({width:390,height:900});
  await page.evaluate(()=>(window as unknown as {releaseWorkspace:()=>void}).releaseWorkspace());await expect(page.getByRole('status',{name:'Retrieving saved missions'})).toBeHidden();
  await expect(page.locator('.workspace-table-slot .table-overflow-hint')).toHaveCount(0);
  // Empty tables have no data columns to label; avoid cropped headings without scroll instructions.
  await expect(page.locator('.workspace-table-slot thead')).toHaveCount(0);
  const preset=page.locator('.practice-presets');await expect(preset).not.toHaveAttribute('open');await preset.locator('summary').click();await expect(preset.getByRole('link').first()).toBeVisible();const href=await preset.getByRole('link').first().getAttribute('href');expect(href).toContain('/missions/new?scenario=');await preset.locator('summary').click();
- await page.setViewportSize({width:1440,height:900});await expect(preset).toHaveAttribute('open');expect((await preset.boundingBox())!.height).toBeLessThanOrEqual(184);
+ await page.setViewportSize({width:1440,height:900});await expect(preset).toHaveAttribute('open');expect((await preset.boundingBox())!.height).toBeLessThanOrEqual(184);expect((await preset.boundingBox())!.height).toBeCloseTo(pendingPreset.height,1);expect((await page.locator('.workspace-lists').boundingBox())!.y).toBeCloseTo(pendingListsTop,1);for(const id of ['mission-list','run-list'])expect((await page.getByTestId(id).boundingBox())!.height).toBeLessThan(176);
  for(const width of [1440,390])for(const theme of ['dark','light'])await auditPage(page,'workspace-compact',{width,height:900,theme,focus:false});
  await startRun(page);await tab(page,'analogs');
  for(const width of [1920,1440,1280,390])for(const theme of ['dark','light']){
