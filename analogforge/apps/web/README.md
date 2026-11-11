@@ -55,7 +55,7 @@ Explicit development fixtures `?mockScenario=review-proxy` and `?mockScenario=bl
 
 ## Authoring and publication integrity
 
-Mission routes own separate editor state. Existing missions remain read-only behind a loading/retry state until their saved identity and draft arrive. Autosave queues edits made while a receipt is pending; fingerprint and acceptance responses apply only to the draft version that issued them. The authoring progress bar, target selectors, and paired geographic bounds use the existing tokens in both themes, including touch-sized controls on small screens.
+Candidate-selection URL updates are ignored if the user has navigated elsewhere before acknowledgement completes. Mission routes own separate editor state. Existing missions remain read-only behind a loading/retry state until their saved identity and draft arrive. Autosave queues edits made while a receipt is pending; fingerprint and acceptance responses apply only to the draft version that issued them. The authoring progress bar, target selectors, and paired geographic bounds use the existing tokens in both themes, including touch-sized controls on small screens.
 
 The passport view checks the frozen scientific-assurance JSON Schema and verifies the run, workspace, runtime mode, and accepted mission/rover hashes before presenting an audited report. Invalid reports stay **INCOMPLETE** with a retry action and no export controls. This is shape and identity checking; scientific publication decisions remain on the backend.
 
