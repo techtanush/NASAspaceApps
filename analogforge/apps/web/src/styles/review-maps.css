@@ -34,3 +34,8 @@
 .map-selection-readout{display:block;margin-top:8px;color:var(--text-primary)}
 /* Narrative stays in the available column; only plotted data scrolls horizontally. */
 .chart,.target-histogram{min-width:0;width:100%;max-width:100%}.chart-plot-scroll{min-width:0;width:100%}.chart>.helper{max-width:min(100%,72ch);white-space:normal;overflow-wrap:anywhere}
+
+/* The SVG bar shares the layer camera; its readable label stays outside SVG scaling. */
+.planetary-svg .planetary-scale-backdrop{fill:var(--surface-1);stroke:var(--border-strong)}.planetary-svg .planetary-scale-tick{fill:none;stroke:var(--text-primary);stroke-width:2}.planetary-distance-scale{min-width:0}.planetary-distance-scale .helper{overflow-wrap:anywhere}
+
+.planetary-crs{display:block;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:20px}

@@ -119,3 +119,6 @@ input[type=checkbox]{appearance:none;position:relative;border:1px solid var(--bo
 /* Keep presets ahead of query-sized lists; empty desktop lists need no reserved tail. */
 @media(min-width:768px){.workspace-overview>.practice-presets[open]{height:160px;min-height:160px}.workspace-overview .preset-content{min-height:0;max-height:108px;overflow:auto}.workspace-overview .preset-links>.skeleton{height:32px;min-height:32px;padding:4px 8px}}
 @media(min-width:1024px){.workspace-overview .workspace-table-slot[data-empty=true]{height:auto;min-height:0}}
+
+/* Bound authoring groups and retain inspectable pinned identity without expanding phone chrome. */
+.author-grid{display:flex;flex-wrap:wrap;align-items:flex-start;gap:24px}.author-grid>.mission-identity{flex:0 1 480px;width:100%;max-width:480px;min-width:0}.author-grid>.planetary-container{flex:1 1 320px;min-width:min(100%,320px)}.run-contract-reference{display:inline-flex;align-items:center;gap:4px 8px;flex-wrap:wrap;min-width:0;max-width:100%}.run-contract-reference>.hash-group{align-items:center;max-width:100%;flex-wrap:wrap}.run-contract-reference .hash-disclosure{max-width:100%}.import-issue-title{display:flex;align-items:flex-start;gap:8px}.import-issue-title>svg{flex:0 0 16px;margin-top:4px}.energy-json-editor{font-family:var(--font-mono);font-size:13px;line-height:20px;white-space:pre-wrap;tab-size:2}

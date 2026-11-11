@@ -15,7 +15,7 @@
  .passport-sheet{gap:8px}.passport-sheet>div,.passport-sheet>span,.passport-sheet>.row-list,.passport-sheet .attempt-card,.passport-sheet .panel,.passport-sheet .table-frame,.passport-sheet .table-scroll{break-inside:auto;page-break-inside:auto}
  .passport-sheet>.row-list,.passport-sheet .attempt-card,.passport-sheet .panel,.passport-sheet .row-list{display:block}.passport-sheet .attempt-card{margin:8px 0;padding:8px}.passport-sheet .attempt-card>*+*{margin-top:8px}.passport-sheet .attempt-card .panel{padding:8px;margin:8px 0}
  .passport-sheet th,.passport-sheet td{padding:4px 8px;vertical-align:top}.passport-sheet tr{break-inside:avoid;page-break-inside:avoid}.passport-sheet h2{font-size:16px;line-height:24px}.passport-headline h2{font-size:18px;line-height:24px}.passport-sheet h2,.passport-sheet h3,.passport-sheet .table-caption{break-after:avoid;page-break-after:avoid}
- .passport-sheet .table-frame:has(.passport-requirements){display:none}.passport-print-requirements{display:block;break-inside:auto}.print-requirement-table{margin:4px 0 12px;break-inside:auto;table-layout:fixed}.print-requirement-table th,.print-requirement-table td{font-size:12px;line-height:16px}.print-requirement-definition{font-weight:600;color:var(--text-primary);background:var(--surface-2)}.print-candidate-verdict{display:flex;align-items:baseline;gap:4px;flex-wrap:wrap}.print-candidate-verdict .status{font-size:12px;line-height:16px;padding:0 4px;min-height:20px}.print-reference{font-family:var(--font-mono);font-size:12px;line-height:16px;overflow-wrap:anywhere}.print-requirement-table p{margin:0;max-width:none}
+ .passport-sheet .table-frame:has(.passport-requirements){display:none}.passport-print-requirements{display:block;break-inside:auto}.print-requirement-table{margin:4px 0 12px;break-inside:avoid;page-break-inside:avoid;table-layout:fixed}.print-requirement-table th,.print-requirement-table td{font-size:12px;line-height:16px}.print-requirement-definition{font-weight:600;color:var(--text-primary);background:var(--surface-2)}.print-candidate-verdict{display:flex;align-items:baseline;gap:4px;flex-wrap:wrap}.print-candidate-verdict .status{font-size:12px;line-height:16px;padding:0 4px;min-height:20px}.print-reference{font-family:var(--font-mono);font-size:12px;line-height:16px;overflow-wrap:anywhere}.print-requirement-table p{margin:0;max-width:none}
  .attempt-benchmarks table{width:100%;min-width:0;table-layout:fixed}.attempt-benchmarks thead th:first-child{width:44%}.attempt-benchmarks thead th:nth-child(2),.attempt-benchmarks thead th:nth-child(3){width:15%}.attempt-benchmarks thead th:last-child{width:26%}.attempt-benchmarks td,.attempt-benchmarks th{font-size:12px;line-height:16px}.attempt-benchmarks th>p{margin:4px 0 0}.passport-sheet .attempt-rule-details{display:none!important}.attempt-print-identifiers{display:table-row}.attempt-print-identifiers td{padding:4px 8px 8px;color:var(--text-secondary);font-size:12px;line-height:16px}.attempt-print-identifiers span{display:block}.attempt-print-identifiers code{font-family:var(--font-mono);font-size:12px;overflow-wrap:anywhere}
  .attempt-print-receipts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px;font-size:12px;line-height:16px}.attempt-print-receipts strong{grid-column:1/-1}.attempt-print-receipts code{font-family:var(--font-mono);font-size:12px;overflow-wrap:anywhere}
  .passport-sheet .attempt-card details p,.passport-sheet .attempt-card .row-list p{font-size:12px;line-height:16px;margin:4px 0}.passport-sheet .attempt-card details{margin:4px 0}.passport-sheet .attempt-card summary{margin:4px 0;font-size:12px;line-height:16px}.passport-sheet .attempt-card .readout-list{gap:4px 12px}
@@ -23,3 +23,20 @@
 }
 
 @media print{.table-overflow-hint{display:none!important}}
+
+/* Screen sticky cells and scroll containers must not affect fragmented paper tables. */
+@media print{
+ .passport-sheet :is(.table-frame,.table-scroll,table,thead,tbody,tfoot,tr,th,td){position:static!important;inset:auto!important;transform:none!important;translate:none!important;overflow:visible!important;max-height:none!important;clip:auto!important;clip-path:none!important;contain:none!important}
+ .passport-sheet :is(thead,tbody,tfoot,tr,th,td){z-index:auto!important}
+ .passport-sheet thead{display:table-header-group;break-inside:avoid;break-after:avoid;page-break-after:avoid}
+ .passport-sheet .table-frame:has(>.attempt-benchmarks),.passport-sheet .table-frame:has(>.attempt-measurements){break-inside:avoid;page-break-inside:avoid}
+ .print-requirement-table .print-assessment-values p{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+ .print-assessment-values .quantity{margin-left:auto;text-align:right;font-variant-numeric:tabular-nums}
+ .attempt-measurements td:last-child,.attempt-measurements th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+}
+
+/* Use normal document flow for the paginated passport. */
+@media print{
+ .passport-sheet{display:block!important}
+ .passport-sheet>*+*{margin-top:8px}
+}

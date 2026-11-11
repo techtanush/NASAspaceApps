@@ -4,7 +4,7 @@
   "branch": "aradhya/frontend-experience",
   "template_note": "Observed frontend branch evidence. Generated reports are under analogforge/out; real-backend integration is a separate merging-agent gate.",
   "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
-  "tested_commit_sha": "bba02849daee4ebeda3360c838e8ce32bf8ad5bc",
+  "tested_commit_sha": "b3ca1dbd0e5015865898b18f31f82aa453268899",
   "kit_version": "1.0.0",
   "kit_verify": {
     "status": "PASSED",
@@ -340,12 +340,12 @@
     "tokens_css_identical": "PASSED",
     "visual_audit": {
       "status": "PASSED",
-      "source": "bba02849daee4ebeda3360c838e8ce32bf8ad5bc",
+      "source": "b3ca1dbd0e5015865898b18f31f82aa453268899",
       "reports": 501,
       "findings": 0,
       "skipped_checks": 0,
-      "output_file": "out/visual-review9-complete/report.json",
-      "packet_images": 526
+      "output_file": "out/visual-review10-complete/report.json",
+      "packet_images": 517
     },
     "styleguide": "PASSED",
     "design_review": {
@@ -457,6 +457,18 @@
           },
           "open_visual_X_findings": [],
           "erratum": "HMI author withdrew a12/18degree transcription error; original and corrected reports preserved verbatim."
+        },
+        {
+          "round": 10,
+          "source": "b3ca1dbd0e5015865898b18f31f82aa453268899",
+          "status": "FAILED",
+          "means": {
+            "hmi": 3.5,
+            "accessibility": 3.5833333333333335,
+            "slop": 3.4166666666666665
+          },
+          "open_visual_X_findings": [],
+          "erratum": "Accessibility author withdrew alleged PDF continuation clipping after faithful enlarged original-PDF crops; original and corrected reports preserved."
         }
       ],
       "final_scores": {
@@ -482,13 +494,13 @@
           "scores": [
             3,
             4,
-            4,
+            3,
+            3,
             3,
             4,
             4,
-            3,
             4,
-            3,
+            4,
             3,
             4,
             4
@@ -498,10 +510,10 @@
         },
         "slop": {
           "scores": [
-            4,
+            3,
             4,
             3,
-            2,
+            3,
             3,
             4,
             4,
@@ -516,8 +528,8 @@
         }
       },
       "review_file": "team handoffs/aradhya/DESIGN-REVIEW.md",
-      "last_reviewed_source": "bba02849daee4ebeda3360c838e8ce32bf8ad5bc",
-      "follow_up_note": "Round9 audit passes; accessibility and amended HMI pass, slop fails print-density criterion. Round10 print/layout corrections underway."
+      "last_reviewed_source": "b3ca1dbd0e5015865898b18f31f82aa453268899",
+      "follow_up_note": "Round10 amended accessibility and HMI pass; slop remains below mean threshold. Round11 presentation fixes and enlarged review evidence under verification."
     },
     "slop_findings_open": [],
     "fonts_self_hosted": true,
@@ -679,7 +691,7 @@
     "contracts/algorithm-ids.json": "50f6e6578608cc13fc3914b15ee07a7fde162acb9790f599570e6e4d659f424e",
     "apps/web/src/generated/schema.d.ts": "d97d037c94674696ed365f9780517a480e63fb8b7a1e00056b11f17de265796b"
   },
-  "current_verification_source": "bba02849daee4ebeda3360c838e8ce32bf8ad5bc",
+  "current_verification_source": "b3ca1dbd0e5015865898b18f31f82aa453268899",
   "browser_delivery": {
     "source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
     "tests_passed": 33,
@@ -689,7 +701,7 @@
     "output_file": "out/e2e-results-visual-complete-r6.json",
     "note": "This33-test full-suite result belongs to4c801f4. Current focused results are under design.requested_layout_fixes."
   },
-  "completion_scope": "Round9 full audit passed. Three-review acceptance remains failed on print density. Round10 frontend corrections underway. Real backend belongs to merging agent.",
+  "completion_scope": "Round10 full audit passes; amended image reviews still miss slop mean threshold. Round11 verified presentation improvements and PDF detail evidence await complete audit and three fresh reviews.",
   "real_backend_validation": {
     "status": "BLOCKED_ENVIRONMENT",
     "owner": "merging agent MRG-03",
