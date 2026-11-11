@@ -61,3 +61,13 @@ For every status in `PASS, PARTIAL, FAIL, GAP, UNKNOWN, PENDING` and every outco
 * Delete `node_modules`, `dist`, `out`; run `pnpm install --frozen-lockfile` + the whole gate again: identical results.
 * Run the renderer twice in separate processes with different `PYTHONHASHSEED`: identical bytes.
 * `python3 "architecture files/contracts/kit/materialize.py" --verify`; ownership check; then fill `STATUS.json`, commit (no build output), push.
+
+## 5. Authoring and audit regressions from the November 11 review
+
+Preserve `MissionEditor.review.test.tsx` and `PassportView.review.test.tsx` in every branch gate. They assert five asynchronous authoring cases: waiting for an existing mission to load before enabling edits; switching directly between mission edit routes; editing while the initial save receipt is delayed; editing during fingerprint preparation; and editing while acceptance is pending. A failed initial read must expose a safe retry without a writable blank form. A receipt may update the editor only when it belongs to the current route and draft version. A later edit must eventually be saved or show a recoverable conflict/error.
+
+Before showing an audited passport, validate the resolved assurance artifact against the unchanged frozen schema and bind its workspace, run, mode, mission hash, and rover hash to the displayed accepted inputs. A malformed or mismatched report stays INCOMPLETE, has a retry action, and exposes no download controls. Do not recompute scientific decisions or manifest digests in the UI. Generate the browser validator using `scripts/ui/generate_assurance_validator.mjs`; builds reject a stale generated file.
+
+The mutation runner must pass its unmodified isolated unit/browser controls before counting mutant failures. Its Vite filesystem allow-list must include both the temporary source tree and the owning dependency checkout. An alternate browser origin must be used consistently for navigation, server readiness, and the actual development-server port.
+
+Mission authoring polish is scoped in `apps/web/src/styles/authoring.css`. Preserve paired geographic inputs at mobile widths, explicit degree units, active-step contrast, keyboard focus, and 44px touch targets. Run the existing authoring scroll check and the complete visual matrix after changing these styles. Keep the existing statuses and scientific wording.

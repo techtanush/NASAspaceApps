@@ -42,8 +42,8 @@ Runtime assets are installed locally and bundled. The application loads no font,
 | @types/react | 19.2.5 | MIT | Build / test |
 | @types/react-dom | 19.2.3 | MIT | Build / test |
 | @vitejs/plugin-react | 5.1.1 | MIT | Build / test |
-| ajv | 8.17.1 | MIT | Build / test |
-| ajv-formats | 3.0.1 | MIT | Build / test |
+| ajv | 8.17.1 | MIT | Precompiled validation helper / build / test |
+| ajv-formats | 3.0.1 | MIT | Validation format helpers / build / test |
 | eslint | 9.39.1 | MIT | Build / test |
 | globals | 16.5.0 | MIT | Build / test |
 | jsdom | 26.1.0 | MIT | Build / test |

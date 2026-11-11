@@ -120,3 +120,30 @@ it('does not restore an accepted revision into a draft edited while acceptance w
   expect(screen.queryAllByTestId('requirement-row')).toHaveLength(0);
   expect(screen.getByTestId('btn-start-run')).toBeDisabled();
 });
+
+it('keeps an existing mission read-only until its saved identity and draft have loaded', async () => {
+  const pendingHeader = deferred<ReturnType<typeof header>>();
+  vi.mocked(api.get).mockImplementation((async (path: string) =>
+    path === '/missions/mission-b' ? pendingHeader.promise : defaultGet(path)) as typeof api.get);
+  mount('/missions/mission-b/edit');
+  expect(screen.queryByRole('textbox', { name: 'Mission name' })).not.toBeInTheDocument();
+  expect(screen.getByRole('status', { name: 'Retrieving the saved mission draft' })).toBeVisible();
+  expect(api.post).not.toHaveBeenCalled();
+  await act(async () => { pendingHeader.resolve(header('mission-b')); });
+  await waitFor(() => expect(screen.getByRole('textbox', { name: 'Mission name' })).toHaveValue('Mission B'));
+  expect(api.post).not.toHaveBeenCalled();
+});
+
+it('offers a safe retry after a saved mission fails to load without exposing a blank form', async () => {
+  let failed = false;
+  vi.mocked(api.get).mockImplementation((async (path: string) => {
+    if (path === '/missions/mission-b' && !failed) { failed = true; throw { code: 'ARTIFACT_UNAVAILABLE', message: 'Saved draft connection interrupted' }; }
+    return defaultGet(path);
+  }) as typeof api.get);
+  mount('/missions/mission-b/edit');
+  await waitFor(() => expect(screen.getByTestId('error-panel')).toBeVisible());
+  expect(screen.queryByRole('textbox', { name: 'Mission name' })).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Retry request' }));
+  await waitFor(() => expect(screen.getByRole('textbox', { name: 'Mission name' })).toHaveValue('Mission B'));
+  expect(api.post).not.toHaveBeenCalled();
+});
