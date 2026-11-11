@@ -24,3 +24,6 @@
 @media(max-width:767px){.run-layout{display:grid;height:calc(100dvh - 164px);grid-template-rows:auto auto minmax(0,1fr) auto;gap:8px}.run-working-area{overflow:auto;padding:4px;scroll-padding:16px}.run-layout>.operations-bar{position:relative;bottom:auto}}
 /* Long authoring pages scroll naturally; their controls must not pass under header controls. */
 @media screen{[data-testid=app-shell]:not(:has(.run-layout))>.app-header{position:relative;top:auto}}
+
+/* Route label text stays at native CSS size; the geographic display scrolls as one plot. */
+.route-plot-scroll{width:100%;max-width:100%;overflow:auto;border:1px solid var(--border-subtle);background:var(--map-water)}.route-plot-scroll>.route-geometry{width:100%;min-width:480px;height:240px;border:0}.route-geometry [data-route-label]{font-size:13px;letter-spacing:normal}.route-geometry [data-route-label-backdrop]{stroke-width:1px}@media print{.route-plot-scroll{overflow:visible}}

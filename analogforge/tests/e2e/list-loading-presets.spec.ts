@@ -15,6 +15,8 @@ test('candidate metadata fits the 40/60 split and four loading rows remain compl
  }
  await page.evaluate(()=>(window as unknown as {releaseWorkspace:()=>void}).releaseWorkspace());await expect(page.getByRole('status',{name:'Retrieving saved missions'})).toBeHidden();
  await expect(page.locator('.workspace-table-slot .table-overflow-hint')).toHaveCount(0);
+ // Empty tables have no data columns to label; avoid cropped headings without scroll instructions.
+ await expect(page.locator('.workspace-table-slot thead')).toHaveCount(0);
  const preset=page.locator('.practice-presets');await expect(preset).not.toHaveAttribute('open');await preset.locator('summary').click();await expect(preset.getByRole('link').first()).toBeVisible();const href=await preset.getByRole('link').first().getAttribute('href');expect(href).toContain('/missions/new?scenario=');await preset.locator('summary').click();
  await page.setViewportSize({width:1440,height:900});await expect(preset).toHaveAttribute('open');expect((await preset.boundingBox())!.height).toBeLessThanOrEqual(184);
  for(const width of [1440,390])for(const theme of ['dark','light'])await auditPage(page,'workspace-compact',{width,height:900,theme,focus:false});

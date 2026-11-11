@@ -63,6 +63,7 @@ test('UIX-13 complete visual audit C01–C20',async({page})=>{
   await evidence('review-replan','[data-testid=attempt-row]:nth-child(3) [data-testid=replan-diff]');
   await expect(page.getByTestId('route-playback')).toBeVisible();
   await evidence('review-playback-route','[data-testid=route-playback] .route-geometry');
+  await evidence('review-playback-route-right','[data-testid=route-playback] .route-geometry',['.route-plot-scroll']);
   await page.getByTestId('route-playback').getByRole('button',{name:'Next sample',exact:true}).click();
   await expect(page.getByTestId('route-playback').getByText(/^Telemetry sample 2 of/)).toBeVisible();
   await evidence('review-playback-controls','[data-testid=route-playback] .actions');

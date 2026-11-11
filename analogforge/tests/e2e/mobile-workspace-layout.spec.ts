@@ -22,7 +22,12 @@ test('mobile workspace exposes work, keeps captions readable and groups passport
  await tab(page,'analogs');await page.getByTestId('candidate-row').first().getByTestId('btn-select-candidate').click();await tab(page,'test-lab');await expect(page.getByTestId('btn-prove-it')).toBeInViewport();
  const exposure=page.locator('.accepted-benchmarks tbody tr').filter({hasText:'Unique slope exposure'});await expect(exposure.getByRole('cell').first()).toContainText('At least');await expect(exposure.getByText('unique_slope_exposure_m',{exact:false})).toBeHidden();await exposure.locator('summary').click();await expect(exposure.getByText('Requirement: R-EXPOSURE',{exact:true})).toBeVisible();await expect(exposure.getByText('Operator: GTE',{exact:true})).toBeVisible();await expect(exposure.getByText('Observable: unique_slope_exposure_m',{exact:true})).toBeVisible();await exposure.locator('summary').click();
  for(const theme of ['dark','light'])await auditPage(page,'mobile-experiment',{width:390,height:844,theme,focus:false});
- await prove(page);await tab(page,'passport');
+ await prove(page);
+ for(const width of [1440,390])for(const theme of ['dark','light']){
+  await auditPage(page,'playback-label-legibility',{width,height:width===390?844:900,theme,focus:false,anchor:'[data-testid=route-playback] .route-geometry'});
+  await expect(page.locator('[data-testid=route-playback] [data-route-label]')).toHaveCount(2);
+ }
+ await tab(page,'passport');
  for(const width of [1440,390])for(const theme of ['dark','light']){
   await auditPage(page,'passport-grouped',{width,height:width===390?844:900,theme,focus:false});
   const groups=await page.locator('.passport-requirements tbody').evaluateAll(groups=>groups.map(group=>{const heading=group.querySelector('th')!,first=group.querySelector('td')!;return {heading:heading.getBoundingClientRect().top,first:first.getBoundingClientRect().top,rows:group.querySelectorAll('tr').length,span:(heading as HTMLTableCellElement).rowSpan};}));

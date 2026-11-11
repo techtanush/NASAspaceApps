@@ -4,7 +4,7 @@
   "branch": "aradhya/frontend-experience",
   "template_note": "Observed frontend branch evidence. Generated reports are under analogforge/out; real-backend integration is a separate merging-agent gate.",
   "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
-  "tested_commit_sha": "3e17e2bc7b7a6d0a916fa55c4643484e2df602f6",
+  "tested_commit_sha": "c92fae7f6e2025f9bf505ba8e99b7ac87f470ede",
   "kit_version": "1.0.0",
   "kit_verify": {
     "status": "PASSED",
@@ -340,12 +340,12 @@
     "tokens_css_identical": "PASSED",
     "visual_audit": {
       "status": "PASSED",
-      "source": "3e17e2bc7b7a6d0a916fa55c4643484e2df602f6",
+      "source": "c92fae7f6e2025f9bf505ba8e99b7ac87f470ede",
       "reports": 497,
       "findings": 0,
       "skipped_checks": 0,
-      "output_file": "out/visual-review7-complete/report.json",
-      "packet_images": 512
+      "output_file": "out/visual-review8-complete/report.json",
+      "packet_images": 521
     },
     "styleguide": "PASSED",
     "design_review": {
@@ -431,44 +431,58 @@
           "open_visual_X_findings": [
             "X-26 mobile chart narrative"
           ]
+        },
+        {
+          "round": 8,
+          "source": "c92fae7f6e2025f9bf505ba8e99b7ac87f470ede",
+          "status": "FAILED",
+          "means": {
+            "hmi": 3.5,
+            "accessibility": 3.4166666666666665,
+            "slop": 3.1666666666666665
+          },
+          "open_visual_X_findings": [
+            "X-11 route label size",
+            "X-26 route line/label overlap"
+          ]
         }
       ],
       "final_scores": {
         "hmi": {
           "scores": [
+            4,
+            4,
+            3,
+            3,
+            3,
             3,
             4,
             4,
             3,
             3,
             4,
-            3,
-            4,
-            3,
-            3,
-            3,
             4
           ],
-          "mean": 3.4166666666666665,
-          "status": "FAILED"
+          "mean": 3.5,
+          "status": "PASS"
         },
         "accessibility": {
           "scores": [
-            4,
-            4,
-            3,
-            3,
-            3,
-            4,
             3,
             4,
             3,
             3,
+            4,
+            4,
             3,
-            2
+            4,
+            3,
+            3,
+            4,
+            3
           ],
-          "mean": 3.25,
-          "status": "FAILED"
+          "mean": 3.4166666666666665,
+          "status": "FAIL"
         },
         "slop": {
           "scores": [
@@ -476,25 +490,26 @@
             4,
             3,
             3,
-            4,
-            4,
             3,
+            3,
+            4,
             4,
             3,
             3,
             3,
             2
           ],
-          "mean": 3.25,
-          "status": "FAILED"
+          "mean": 3.1666666666666665,
+          "status": "FAIL"
         }
       },
       "review_file": "team handoffs/aradhya/DESIGN-REVIEW.md",
-      "last_reviewed_source": "3e17e2bc7b7a6d0a916fa55c4643484e2df602f6",
-      "follow_up_note": "Round7 fresh screenshot reviews remain failed. Round8 presentation corrections are implemented and undergoing focused verification; no new acceptance is claimed."
+      "last_reviewed_source": "c92fae7f6e2025f9bf505ba8e99b7ac87f470ede",
+      "follow_up_note": "Round8 complete audit passes, fresh visual review remains failed. Round9 fixes in progress for route labels, rejected-import attribution, empty column headings, and energy precision."
     },
     "slop_findings_open": [
-      "X-26 mobile chart explanatory prose confirmed in Round7; implemented reflow correction awaits the next complete audit and fresh review."
+      "X-11 route label size",
+      "X-26 route line/label overlap"
     ],
     "fonts_self_hosted": true,
     "external_requests_seen": 0,
@@ -655,7 +670,7 @@
     "contracts/algorithm-ids.json": "50f6e6578608cc13fc3914b15ee07a7fde162acb9790f599570e6e4d659f424e",
     "apps/web/src/generated/schema.d.ts": "d97d037c94674696ed365f9780517a480e63fb8b7a1e00056b11f17de265796b"
   },
-  "current_verification_source": "3e17e2bc7b7a6d0a916fa55c4643484e2df602f6",
+  "current_verification_source": "c92fae7f6e2025f9bf505ba8e99b7ac87f470ede",
   "browser_delivery": {
     "source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
     "tests_passed": 33,
@@ -665,7 +680,7 @@
     "output_file": "out/e2e-results-visual-complete-r6.json",
     "note": "This33-test full-suite result belongs to4c801f4. Current focused results are under design.requested_layout_fixes."
   },
-  "completion_scope": "Expanded visual catalog complete on3e17e2b; fresh Round7 review failed and is preserved verbatim. Round8 fixes are in progress. Real-backend MRG-03 belongs to the merging agent.",
+  "completion_scope": "Round8 complete visual audit passed; fresh reviews remain failed. Round9 frontend presentation fixes in progress. Real-backend MRG-03 belongs to merging agent.",
   "real_backend_validation": {
     "status": "BLOCKED_ENVIRONMENT",
     "owner": "merging agent MRG-03",

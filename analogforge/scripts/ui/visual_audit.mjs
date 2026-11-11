@@ -101,6 +101,14 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
   const rgb=s=>{const m=s.match(/[\d.]+/g);return m?m.map(Number):[0,0,0,0];};
   const lum=c=>{const s=c.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});return .2126*s[0]+.7152*s[1]+.0722*s[2]};
   const ratio=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+  // SVG computed font size omits the viewBox transform. Check the rendered label size too.
+  for(const label of document.querySelectorAll('[data-testid=route-playback] [data-route-label]')){
+   const transform=label.getScreenCTM(),style=getComputedStyle(label),size=parseFloat(style.fontSize)*(transform?Math.hypot(transform.a,transform.b):0);
+   if(size<13-.01)add('C02',label,`Rendered waypoint text ${size.toFixed(2)}px < 13`);
+   const box=label.getBBox(),backdrop=label.previousElementSibling,back=backdrop?.getBBox(),svg=label.ownerSVGElement?.viewBox.baseVal;
+   if(!back||box.x<back.x||box.y<back.y||box.x+box.width>back.x+back.width||box.y+box.height>back.y+back.height)add('C05',label,'Waypoint text is outside its opaque backing');
+   if(back&&svg&&(back.x<svg.x||back.y<svg.y||back.x+back.width>svg.x+svg.width||back.y+back.height>svg.y+svg.height))add('C05',label,'Waypoint label backing exceeds the plot frame');
+  }
   for(const e of all.filter(visible)){
    const s=getComputedStyle(e),r=e.getBoundingClientRect();
    if(e.matches('input[placeholder],textarea[placeholder]')&&!e.value&&e.getAttribute('placeholder')){
