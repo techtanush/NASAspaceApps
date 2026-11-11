@@ -163,6 +163,7 @@ def prepare(target: Path) -> None:
         "apps/web/design",
         "tests/e2e",
         "tests/fixtures/kit",
+        "tests/unit/passport_renderer/fixtures",
         "contracts",
         "scripts/ui",
     ]:
@@ -182,9 +183,12 @@ def prepare(target: Path) -> None:
     # Dependencies are symlinked to the owning checkout, so Vite must serve their local font assets.
     config = web / "vite.config.ts"
     configuration = config.read_text()
+    anchor = "server: {"
+    if configuration.count(anchor) != 1:
+        raise ValueError("Isolated Vite server configuration anchor is missing or ambiguous")
     configuration = configuration.replace(
-        "server: { strictPort:",
-        "server: { fs: {allow: " + json.dumps([str(target), str(ROOT)]) + "}, strictPort:",
+        anchor,
+        "server: { fs: {allow: " + json.dumps([str(target), str(ROOT)]) + "},",
         1,
     )
     config.write_text(configuration)
@@ -197,6 +201,60 @@ def prepare(target: Path) -> None:
         (ROOT / "src", target / "src"),
     ]:
         destination.symlink_to(source, target_is_directory=True)
+
+
+def run_frontend_baseline() -> dict[str, Any]:
+    """Prove the unmodified isolated layout works before treating failures as kills."""
+    logs = ROOT / "out/mutations"
+    logs.mkdir(parents=True, exist_ok=True)
+    checks = []
+    with tempfile.TemporaryDirectory(prefix="baseline-", dir=logs) as directory:
+        target = Path(directory)
+        prepare(target)
+        web = target / "apps/web"
+        env = dict(
+            os.environ,
+            CI="true",
+            E2E_TARGET="mock",
+            WEB_PORT="5178",
+            E2E_BASE_URL="http://127.0.0.1:5178",
+            E2E_RUN_NAME="Mbaseline",
+            PYTHONDONTWRITEBYTECODE="1",
+        )
+        commands = [
+            ["node", str(ROOT / "apps/web/node_modules/vitest/vitest.mjs"), "run", "--reporter=json"],
+            [
+                "node",
+                str(ROOT / "node_modules/@playwright/test/cli.js"),
+                "test",
+                "J01-golden.spec.ts",
+                "webgl-fallback.spec.ts",
+                "design-smoke.spec.ts",
+                "--reporter=json",
+            ],
+        ]
+        for kind, command in zip(("unit", "browser"), commands, strict=True):
+            log = logs / f"baseline-{kind}.log"
+            try:
+                result = subprocess.run(  # noqa: S603 — fixed commands on an isolated source copy
+                    command, cwd=web, env=env, capture_output=True, text=True, timeout=240, check=False
+                )
+                log.write_text(result.stdout + result.stderr)
+                checks.append(
+                    dict(
+                        kind=kind,
+                        status="PASS" if result.returncode == 0 else "FAIL",
+                        exit_code=result.returncode,
+                        output_file=str(log.relative_to(ROOT)),
+                    )
+                )
+            except subprocess.TimeoutExpired:
+                checks.append(dict(kind=kind, status="INFRASTRUCTURE_TIMEOUT"))
+            if checks[-1]["status"] != "PASS":
+                break
+    return dict(
+        status="PASS" if len(checks) == 2 and all(row["status"] == "PASS" for row in checks) else "FAIL", checks=checks
+    )
 
 
 def run_frontend_mutations(only: set[str] | None = None) -> list[dict[str, Any]]:
@@ -255,7 +313,15 @@ def run_frontend_mutations(only: set[str] | None = None) -> list[dict[str, Any]]
                 )
                 continue
             source.write_text(modified)
-            env = dict(os.environ, CI="true", E2E_TARGET="mock", E2E_RUN_NAME=identifier, PYTHONDONTWRITEBYTECODE="1")
+            env = dict(
+                os.environ,
+                CI="true",
+                E2E_TARGET="mock",
+                WEB_PORT="5178",
+                E2E_BASE_URL="http://127.0.0.1:5178",
+                E2E_RUN_NAME=identifier,
+                PYTHONDONTWRITEBYTECODE="1",
+            )
             if kind == "unit":
                 command = [
                     "node",
@@ -317,9 +383,15 @@ def run_frontend_mutations(only: set[str] | None = None) -> list[dict[str, Any]]
                 if kind in {"browser", "design", "external"}:
                     # An unrelated startup failure is not evidence that the intended regression was caught.
                     expected_failure = {
-                        "M6": "mock-banner", "M24": "candidate-list",
-                        "M26": "C10", "M27": "C02", "M28": "C09",
-                        "M32": "C07", "M33": "C05", "M35": "C13", "M36": "C01 external requests",
+                        "M6": "mock-banner",
+                        "M24": "candidate-list",
+                        "M26": "C10",
+                        "M27": "C02",
+                        "M28": "C09",
+                        "M32": "C07",
+                        "M33": "C05",
+                        "M35": "C13",
+                        "M36": "C01 external requests",
                     }[identifier]
                     killed = killed and expected_failure in output
                 records.append(
@@ -343,6 +415,13 @@ def main() -> int:
     parser.add_argument("--only", help="Diagnostic subset; full gate requires all 36")
     args = parser.parse_args()
     only = set(args.only.split(",")) if args.only else None
+    baseline = run_frontend_baseline()
+    if baseline["status"] != "PASS":
+        result = dict(status="FAIL", baseline=baseline, complete_catalog=False, mutants=0, killed=0, records=[])
+        args.json.parent.mkdir(parents=True, exist_ok=True)
+        args.json.write_text(json.dumps(result, indent=2) + "\n")
+        print(json.dumps(result, indent=2))
+        return 1
     records = run_frontend_mutations(only)
     if not only:
         records += run_api_mutations(ROOT) + run_renderer_mutations(ROOT)
@@ -352,6 +431,7 @@ def main() -> int:
     passed = all(row["killed"] for row in records) and (complete or bool(only))
     result = dict(
         status="PASS" if passed else "FAIL",
+        baseline=baseline,
         complete_catalog=complete,
         mutants=len(records),
         killed=sum(row["killed"] for row in records),
