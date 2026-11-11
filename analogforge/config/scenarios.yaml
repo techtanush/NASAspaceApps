@@ -23,8 +23,8 @@ synthetic-graph-regression-v1:
   status: AVAILABLE
   mission_preset: mission-graph-regression.json
   rover_presets: [ares-1.json]
-  target_source: {kind: SYNTHETIC_FIXTURE, fixture_id: canonical-graph-v1}
-  earth_source: {kind: SYNTHETIC_FIXTURE, fixture_id: canonical-graph-v1}
+  target_source: {kind: SYNTHETIC_FIXTURE, fixture_id: practice-mars-target-v1}
+  earth_source: {kind: SYNTHETIC_FIXTURE, fixture_id: practice-earth-grid-v1}
   search_region_set_id: practice-earth-grid-v1
   reference_set_id: practice-reference-set-v1
   graph_fixture_id: canonical-graph-v1

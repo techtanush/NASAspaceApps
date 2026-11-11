@@ -19,6 +19,7 @@ from analogforge.agents.runtime.scripted_provider import ScriptedProvider, proje
 from analogforge.agents.schemas.submission import RoleSubmission
 from analogforge.agents.schemas.task import AgentTask
 from analogforge.application import compatibility, discovery, portfolios, qualification, verification
+from analogforge.application.assurance import ScientificClaimRejected
 from analogforge.application.registrar import RegisteredResult, Registrar
 from analogforge.domain.budgets import BudgetExceeded, BudgetLedger
 from analogforge.domain.hashing_utils import content_hash
@@ -1012,6 +1013,30 @@ class WorkflowEngine:
                         if exc.disposition == "NEEDS_USER_REVIEW"
                         else "ROLE_INVESTIGATION_BLOCKED"
                     ],
+                },
+                event="run.blocked",
+                complete_job=job_id is not None,
+                job_id=job_id,
+                lease_token=lease_token,
+            )
+        except ScientificClaimRejected as exc:
+            # Architecture 33 sections 2.7/6: an invalid positive claim is refused, the attempted proposal and its
+            # diagnostic audit are retained, and no passport is published. The run stops in a defined state with the
+            # structured issue codes instead of escaping as an unhandled worker error.
+            current, _, _ = self._load(run_id, workspace_id)
+            runtime = current.setdefault("runtime", {})
+            self._save_run(
+                run_id,
+                workspace_id,
+                {
+                    "state": "BLOCKED",
+                    "runtime": {
+                        **runtime,
+                        "resume_state": current["state"],
+                        "stop_reason": "SCIENTIFIC_CLAIM_REJECTED",
+                        "claim_rejection_issues": list(exc.issue_codes),
+                    },
+                    "blocked_dependencies": ["SCIENTIFIC_CLAIM_REJECTED"],
                 },
                 event="run.blocked",
                 complete_job=job_id is not None,

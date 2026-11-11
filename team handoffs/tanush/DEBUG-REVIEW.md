@@ -20,3 +20,16 @@ Reviewer environment: clean Linux container, Python 3.13 (`uv sync --frozen --al
 
 ## Not verifiable here
 Real OpenAI calls, Docker image build, real science/renderer/NASA data (BLOCKED_EXTERNAL / BLOCKED_ENVIRONMENT as already recorded in `STATUS.json`).
+
+## Second pass (2026-11-11): seam fixes from a real-science trial merge
+
+A trial merge `main + Tanush + Ayan` running Tanush's journeys with `AF_SCIENCE_IMPL=real` exposed two platform-side gaps that fake-science tests could not reveal. Both are fixed here by replacing the defective behavior; Ayan's matching science fixes are on his branch.
+
+| Defect | Fix | Guard |
+| --- | --- | --- |
+| `config/scenarios.yaml`: `synthetic-graph-regression-v1` used the abstract `canonical-graph-v1` as `target_source`/`earth_source`; it has no terrain raster, so real CHARACTERIZE_TARGET returned `NO_COVERAGE` and the run blocked before PROVE IT | terrain sources are now `practice-mars-target-v1` / `practice-earth-grid-v1` (same Mars AOI as the mobility mission); `graph_fixture_id: canonical-graph-v1` still drives PROVE IT, so S-GRAPH-1 numbers are unchanged | `tests/unit/platform/test_scenario_sources.py` (fails on the old config) |
+| A refused positive claim (`ScientificClaimRejected` from the final audit) escaped `WorkflowEngine.advance` as an unhandled exception, contrary to architecture 33 §2.7/§6 (refuse, retain the diagnostic audit, publish no passport) | `advance` catches it and stores the run `BLOCKED` with `blocked_dependencies = ["SCIENTIFIC_CLAIM_REJECTED"]`, `runtime.stop_reason`, `runtime.claim_rejection_issues`, and a `run.blocked` event; no passport row is created | `test_runtime_journey.py::test_runtime_rejected_claim_blocks_run_without_passport` |
+
+Results:
+* Trial merge with the real science engine: `test_runtime_journey.py` 4/4 and `test_journey_api.py` 6/6 passed. All runs end COMPLETED with audited passports: Mars mobility with ARES-1, PRACTICE-LITE, PRACTICE-NO-ENERGY-MODEL and PRACTICE-SMALL-BATTERY, graph regression and Moon gap.
+* This branch alone (fake doubles, real PostgreSQL): 281 passed / 0 skipped (278 + 3 new); kit verify PASS; ruff and mypy clean; forbidden scan 0; mutation check 20/20; `validate_docs` PASS; ownership PASS.

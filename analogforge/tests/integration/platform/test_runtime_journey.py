@@ -261,3 +261,26 @@ def test_runtime_critic_opens_then_repairs_durable_proposal(runtime):
         opened = next(e["seq"] for e in events if e["event_type"] == "critic.issue_opened")
         resolved = next(e["seq"] for e in events if e["event_type"] == "critic.issue_resolved")
         assert resolved > opened
+
+
+def test_runtime_rejected_claim_blocks_run_without_passport(runtime, monkeypatch):
+    """Architecture 33 s2.7/s6: a refused positive claim stops the run in a defined state; no passport is published."""
+    engine, store, ws, make = runtime
+    run = advance_until(engine, make("synthetic-graph-regression-v1"), ws, {"AWAITING_REVIEW"})
+    run = engine.apply_action(run["id"], ws, "PROVE_IT", {}, run["revision"])
+    from analogforge.application import passports
+    from analogforge.application.assurance import ScientificClaimRejected
+
+    def reject(*_args, **_kwargs):
+        raise ScientificClaimRejected(["v:injected:POSITIVE_CLAIM_UNSUPPORTED"])
+
+    monkeypatch.setattr(passports, "audit", reject)
+    run = advance_until(engine, run, ws, {"COMPLETED", "BLOCKED", "FAILED"})
+    assert run["state"] == "BLOCKED"
+    assert run["blocked_dependencies"] == ["SCIENTIFIC_CLAIM_REJECTED"]
+    assert run["runtime"]["stop_reason"] == "SCIENTIFIC_CLAIM_REJECTED"
+    assert run["runtime"]["claim_rejection_issues"] == ["v:injected:POSITIVE_CLAIM_UNSUPPORTED"]
+    assert run["passport_id"] is None
+    with store.transaction(ws) as tx:
+        assert tx.list("passports", {"run_id": run["id"]}) == []
+        assert [e["event_type"] for e in tx.list("run_events", {"run_id": run["id"]})][-1] == "run.blocked"
