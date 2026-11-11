@@ -4,12 +4,14 @@
   "branch": "aradhya/frontend-experience",
   "template_note": "Observed frontend branch evidence. Generated reports are under analogforge/out; real-backend integration is a separate merging-agent gate.",
   "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
-  "tested_commit_sha": "adb076e99103a3a42fa77c0a823826075a60a997",
+  "tested_commit_sha": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
   "kit_version": "1.0.0",
   "kit_verify": {
     "status": "PASSED",
     "command": "python3 \"architecture files/contracts/kit/materialize.py\" --verify",
-    "exit_code": 0
+    "exit_code": 0,
+    "output_file": "out/review-baseline-2026-11-11/kit-release.log",
+    "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
   },
   "environment": {
     "node": "22.21.1",
@@ -22,15 +24,16 @@
       "Pinned Node22/pnpm10 PATH is required on this Mac. Playwright prefers its matching Chromium when installed and retains Chrome as a fallback. Optional headless-shell download was unnecessary because the full Chromium binary launched successfully.",
       "Worker registration failed below1GiB free even with a fresh server and an HTTP200 worker file. After clearing regenerable compiler/shader caches, the unchanged b96462a source passed16 navigations over1.6minutes with no page errors. Final complete30-test gate is running serially with CI=1.",
       "Round5 resolved a development-worker teardown/update race by retaining its inactive registration. Previous disk-only hypothesis was insufficient. New rapid16-navigation regression passes; production continues to exclude the worker. Dependencies were moved back from the verification checkout to the original workspace and original typecheck,lint and84 frontend tests pass.",
-      "Final adb076e verification:90 frontend tests/22 files, full501-report visual audit,39 regression cases and corrected J02 rerun pass serially. All three fresh image reviews pass. Node22.21.1/pnpm10.22.0 and matching Chromium141 used; no backend integration claim."
+      "Final adb076e verification:90 frontend tests/22 files, full501-report visual audit,39 regression cases and corrected J02 rerun pass serially. All three fresh image reviews pass. Node22.21.1/pnpm10.22.0 and matching Chromium141 used; no backend integration claim.",
+      "November11 review: pinned Node22.21.1/pnpm10.22.0, Python3.12.13 and matching Chromium141. All17 release commands pass;111 frontend tests,131 Python tests,41 browser cases,36 intended mutation detections. No merged-backend execution. System Node remains untouched."
     ]
   },
   "ownership_check": {
     "status": "PASSED",
     "exit_code": 0,
     "base": "origin/main",
-    "output_file": "out/review11-ownership.log",
-    "source": "adb076e99103a3a42fa77c0a823826075a60a997"
+    "output_file": "out/review-baseline-2026-11-11/ownership-post-handoff.json",
+    "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
   },
   "catalog": {
     "KIT-01": {
@@ -40,7 +43,9 @@
       "tests_passed": null,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "output_file": "out/review11-kit.log"
+      "output_file": "out/review11-kit.log",
+      "evidence": "Frozen kit byte verification passes; kit-release.log.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "KIT-02": {
       "status": "PASSED",
@@ -49,62 +54,77 @@
       "tests_passed": 20,
       "tests_failed": 0,
       "tests_skipped": 0,
-      "output_file": "out/python-final.log"
+      "output_file": "out/python-final.log",
+      "evidence": "20 frozen-kit tests pass within the131-test Python run; python-release.xml.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-01": {
       "status": "PASSED",
-      "evidence": "Strict TypeScript, ESLint and production build; clean clone also passes."
+      "evidence": "Strict TypeScript, ESLint and production build pass on final source; checks-release.json.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-02": {
       "status": "PASSED",
-      "evidence": "Bundled OpenAPI regeneration retains identical schema.d.ts SHA256."
+      "evidence": "Regenerating bundled OpenAPI leaves schema.d.ts unchanged; precompiled assurance validator freshness check passes.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-03": {
       "status": "PASSED",
-      "evidence": "AJV validates every operation/script; independent Python jsonschema validates exported observed responses and scientific artifact schemas."
+      "evidence": "All operation responses pass JavaScript and Python schema checks. The passport also validates assurance shape and accepted-input identity at runtime.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-04": {
       "status": "PASSED",
       "expected": 81,
       "implemented": 81,
       "asserted_visible_with_attributes": 81,
-      "evidence": "80 hooks appear in out/hooks-visual-complete-r6-0.json; passing J04 separately asserts visible rover-field-error[data-field=mass_kg] before replacement clears it. Together all 81 frozen hooks are covered."
+      "evidence": "All81 frozen hooks are covered by fresh runtime visibility/required-attribute assertions: full-suite receipts plus focused J01 excluded-window and J04 rover-field-error captures. Hook proof is recorded in review-2026-11-11/RESULTS.json.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-05": {
       "status": "PASSED",
-      "evidence": "90 frontend tests in22 files pass on adb076e; out/review11-unit-final.log."
+      "evidence": "111 frontend tests in25 files pass, including21 new regression/control tests; test-release.log and regressions-final.json.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-06": {
       "status": "PASSED",
-      "evidence": "8 stream tests plus hook isolation/reconciliation tests."
+      "evidence": "Existing stream, duplicate/gap recovery, cursor, stale-snapshot and run-switch tests pass unchanged.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-07": {
       "status": "PASSED",
-      "evidence": "Current complete browser regression passes accessibility at1440/900/390, keyboard, 200% reflow, reduced motion and text spacing; no critical/serious axe findings."
+      "evidence": "All accessibility browser cases pass at1440/900/390, including keyboard, zoom, reduced motion and text spacing. No critical/serious axe findings.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-08": {
       "status": "PASSED",
-      "evidence": "9 fixtures \u00d7 3 formats, deterministic under three hash seeds; hostile strings, CSV safety and all renderer errors."
+      "evidence": "Nine bundles across three formats pass determinism, hostile content, reference, null, attempt and digest checks. All27 exports verify and27 tamper cases reject.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-09": {
       "status": "PASSED",
-      "evidence": "Subprocess renderer purity against frozen-kit baseline; no additional forbidden imports, environment access or writes."
+      "evidence": "Subprocess renderer purity, strict mypy and Ruff pass; renderer source is unchanged by this review.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-10": {
       "status": "PASSED",
-      "evidence": "Production mock builds fail with MOCK_BUILD_FORBIDDEN; normal build excludes worker, preview banner and styleguide."
+      "evidence": "Production mock builds reject and normal production assets exclude development mock/worker/styleguide; unchanged build guard passes.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-11": {
       "status": "PASSED",
-      "evidence": "WebGL-disabled browser preserved candidate list/matrix/benchmarks and actual JSON export; latest full gate repeats it."
+      "evidence": "The full current browser run includes the WebGL-disabled path through candidate, matrix, benchmark and export controls.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-12": {
       "status": "PASSED",
-      "evidence": "150/150 token checks; all three supplied assets and regenerated CSS byte-identical; out/review11-tokens.log and out/review11-token-identity.log."
+      "evidence": "150/150 token checks pass. Supplied token/verifier/generator files and generated CSS retain exact byte identity.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "UIX-13": {
       "status": "PASSED",
-      "evidence": "Complete501-report audit on adb076e:0 findings/0 skips. Frozen packet includes502 reports with pagination proof,568 images and16 rendered PDF pages; out/visual-review11-complete/report.json."
+      "evidence": "Complete current visual matrix: 621 reports,0 findings,0 skipped checks; out/visual/report.json.",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     }
   },
   "journeys_mock_mode": {
@@ -143,7 +163,8 @@
   "testids": {
     "expected": 81,
     "implemented": 81,
-    "asserted_by_playwright": 81
+    "asserted_by_playwright": 81,
+    "evidence": "review-2026-11-11/RESULTS.json: current79-hook full-run dump plus focused J01/J04 receipts give all81 hooks with visible required attributes."
   },
   "renderer": {
     "fixtures": 9,
@@ -168,8 +189,8 @@
     "forbidden_scan": {
       "status": "PASSED",
       "findings": 0,
-      "output_file": "out/review11-forbidden.json",
-      "source": "adb076e99103a3a42fa77c0a823826075a60a997"
+      "output_file": "out/review-baseline-2026-11-11/forbidden-release.json",
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68"
     },
     "mutation_check": {
       "status": "PASSED",
@@ -177,60 +198,47 @@
       "killed": 36,
       "complete_catalog": true,
       "command": ".venv/bin/python scripts/ui/mutation_check.py --json out/mutations-final.json",
-      "output_file": "out/mutations-r6-final.json",
+      "output_file": "out/review-baseline-2026-11-11/mutations-release.json",
       "note": "All 36 required deliberate mutants were killed by their intended assertions on the final application source; infrastructure failures do not count.",
-      "source": "4c801f40ca86751fc16f0557d14bd0d160892a34"
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
+      "baseline_control": "111 unit tests and3 unmodified browser controls pass before mutants; setup failures cannot count."
     },
     "truthfulness_proof": {
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
+      "rendered": "out/truth-rendered-visual-review-release-2026-11-11-0.json",
+      "statuses": "out/truth-statuses-visual-review-release-2026-11-11-0.json",
+      "evidence": "Passing current J01-J13 assertions, C08 glyph checks and explicit unknown/gap/null cases; no scientific computation added to the browser."
+    },
+    "adversarial_reviewers": [
+      {
+        "reviewer": "Codex primary agent",
+        "method": "Single-agent review following the user's explicit no-subagents instruction",
+        "perspectives": [
+          "truthfulness and audit identity",
+          "asynchronous state and navigation",
+          "renderer safety and determinism",
+          "accessibility and responsive design"
+        ],
+        "findings_fixed": 8,
+        "new_tests": 21,
+        "evidence": "review-2026-11-11/REVIEW.md and RESULTS.json"
+      }
+    ],
+    "final_truth_checks": {
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
+      "status": "PASSED",
+      "release_commands": 17,
+      "renderer_deterministic": true,
+      "kit": "PASSED",
+      "ownership": "PASSED",
+      "evidence": "review-2026-11-11/RESULTS.json"
+    },
+    "historical_truthfulness_proof": {
       "status_words_and_glyphs": "out/truth-statuses-visual-complete-clean-0.json and styleguide-glyphs C08 report; PASS/PARTIAL/FAIL/GAP/UNKNOWN/PENDING have distinct words, data-status and glyphs.",
       "outcomes": "J01 PASS/FAIL and J03/J06 INCONCLUSIVE asserted; rendered status DOM dumps preserved.",
       "no_similarity_percentage": "Manual search of out/truth-rendered-visual-release-clean-0.json: observed percentages are explicit requirement coverage/modelled reserve and their metrics; no Mars similarity/match/readiness percentages. Dump contains rendered J01 authoring, target, candidates, qualification, compatibility, attempts and passport text."
     },
-    "adversarial_reviewers": [
-      {
-        "role": "renderer attacker",
-        "findings_fixed": [
-          "noncanonical/malformed manifest validation",
-          "dangling qualification evidence",
-          "SVG external stylesheet processing instruction",
-          "stale assurance identity and frozen-input binding"
-        ],
-        "evidence": "out/review-renderer-final.log; regression tests in tests/unit/passport_renderer"
-      },
-      {
-        "role": "truth auditor",
-        "findings_fixed": [
-          "no-energy modeled exposure/tasks vs reserve distinction",
-          "null energy telemetry",
-          "lite rover compatibility slope status",
-          "missing local mineral reason",
-          "per-benchmark status/margin display"
-        ],
-        "evidence": "independent attack.test.ts 5/5 passed; out/review-truth-final.log"
-      },
-      {
-        "role": "state-machine breaker",
-        "findings_fixed": [
-          "identity/revision guards",
-          "persisted event replay and cursor",
-          "reload resumes pending attempts",
-          "server publication single-flight"
-        ],
-        "evidence": "frontend stream/handler/hook tests; final browser J08 evidence pending"
-      },
-      {
-        "role": "accessibility/responsive auditor",
-        "findings_fixed": [
-          "explicit form labels",
-          "heading hierarchy and nested main",
-          "asynchronous route heading focus",
-          "drawer focus return/outside focus",
-          "disabled reasons"
-        ],
-        "evidence": "component tests; final browser a11y evidence pending"
-      }
-    ],
-    "final_truth_checks": {
+    "historical_final_truth_checks": {
       "clean_rebuild": {
         "status": "PASSED",
         "commit": "4c801f40ca86751fc16f0557d14bd0d160892a34",
@@ -275,7 +283,51 @@
           "import validation errors"
         ]
       }
-    }
+    },
+    "historical_adversarial_reviewers": [
+      {
+        "role": "renderer attacker",
+        "findings_fixed": [
+          "noncanonical/malformed manifest validation",
+          "dangling qualification evidence",
+          "SVG external stylesheet processing instruction",
+          "stale assurance identity and frozen-input binding"
+        ],
+        "evidence": "out/review-renderer-final.log; regression tests in tests/unit/passport_renderer"
+      },
+      {
+        "role": "truth auditor",
+        "findings_fixed": [
+          "no-energy modeled exposure/tasks vs reserve distinction",
+          "null energy telemetry",
+          "lite rover compatibility slope status",
+          "missing local mineral reason",
+          "per-benchmark status/margin display"
+        ],
+        "evidence": "independent attack.test.ts 5/5 passed; out/review-truth-final.log"
+      },
+      {
+        "role": "state-machine breaker",
+        "findings_fixed": [
+          "identity/revision guards",
+          "persisted event replay and cursor",
+          "reload resumes pending attempts",
+          "server publication single-flight"
+        ],
+        "evidence": "frontend stream/handler/hook tests; final browser J08 evidence pending"
+      },
+      {
+        "role": "accessibility/responsive auditor",
+        "findings_fixed": [
+          "explicit form labels",
+          "heading hierarchy and nested main",
+          "asynchronous route heading focus",
+          "drawer focus return/outside focus",
+          "disabled reasons"
+        ],
+        "evidence": "component tests; final browser a11y evidence pending"
+      }
+    ]
   },
   "lint": {
     "eslint": {
@@ -333,7 +385,7 @@
   "decisions": "see team handoffs/aradhya/DECISIONS.md",
   "ready_to_merge": true,
   "ready_to_merge_rule": "true only if every UIX row (UIX-01..13) and DR-01..04 is PASSED, J01-J13 pass in mock mode with 0 skipped, kit_verify and ownership_check PASS, lint/typecheck clean, self_audit complete, no hidden skips",
-  "pushed_sha": "adb076e99103a3a42fa77c0a823826075a60a997",
+  "pushed_sha": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
   "secrets_not_committed": true,
   "build_output_not_committed": true,
   "design": {
@@ -344,11 +396,11 @@
     "tokens_css_identical": "PASSED",
     "visual_audit": {
       "status": "PASSED",
-      "source": "adb076e99103a3a42fa77c0a823826075a60a997",
-      "reports": 501,
+      "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
+      "reports": 621,
       "findings": 0,
       "skipped_checks": 0,
-      "output_file": "out/visual-review11-complete/report.json",
+      "output_file": "out/visual/report.json",
       "packet_images": 568,
       "packet_reports": 502,
       "print_pages": 16
@@ -547,7 +599,13 @@
       },
       "review_file": "team handoffs/aradhya/DESIGN-REVIEW.md",
       "last_reviewed_source": "adb076e99103a3a42fa77c0a823826075a60a997",
-      "follow_up_note": "Round11: three fresh independent reviewers pass every threshold; exact prompts and reports preserved verbatim. Minor findings remain explicitly recorded; no open prohibited finding."
+      "follow_up_note": "Prior independent rubric reviews are historical baseline evidence. November11 authoring polish receives fresh single-agent image inspection and the complete visual/accessibility matrix. The user's no-subagents instruction overrides the guide's reviewer-spawning procedure; no new independent panel or panel scores are claimed.",
+      "current_single_agent_review": {
+        "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
+        "report": "review-2026-11-11/REVIEW.md",
+        "subagents_used": false,
+        "method_override": "Explicit user instruction"
+      }
     },
     "slop_findings_open": [],
     "fonts_self_hosted": true,
@@ -719,36 +777,37 @@
     "contracts/openapi.bundled.json": "e12d367326e478ca7fe60fb10f6d482991e6569863b0e9952c6a0a3327a63756",
     "contracts/ui-testids.json": "a949e002c4e5ea91bd30c2c94ae735ecf828f38f899e3aacd52ca95d06a21a21",
     "contracts/algorithm-ids.json": "50f6e6578608cc13fc3914b15ee07a7fde162acb9790f599570e6e4d659f424e",
-    "apps/web/src/generated/schema.d.ts": "d97d037c94674696ed365f9780517a480e63fb8b7a1e00056b11f17de265796b"
+    "apps/web/src/generated/schema.d.ts": "d97d037c94674696ed365f9780517a480e63fb8b7a1e00056b11f17de265796b",
+    "contracts/scientific-assurance.schema.json": "f88986b65b31ac8fbd2e6ad0fa05b31792a1b065786983789d174dec2008fa65",
+    "apps/web/src/generated/validateAssurance.js": "76c7f29fbe2380e9a197594ab1c6e9ab20f8ab27a82a1bf586cc19e66785e5ac"
   },
-  "current_verification_source": "adb076e99103a3a42fa77c0a823826075a60a997",
+  "current_verification_source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
   "browser_delivery": {
-    "source": "adb076e99103a3a42fa77c0a823826075a60a997",
+    "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
     "tests_passed": 41,
     "tests_failed": 0,
     "tests_skipped": 0,
     "flaky": 0,
+    "single_complete_invocation": true,
     "output_files": [
-      "out/e2e-results-visual-review11-complete.json",
-      "out/e2e-results-visual-review11-regression.json",
-      "out/e2e-results-visual-review11-graph-corrected.json"
+      "out/e2e-results-visual-review-release-2026-11-11.json"
     ],
-    "note": "41 distinct cases verified:1 full audit,39 passing regression cases and1 corrected J02 rerun. Initial regression failed only because J02 searched for raw visible identifiers after readable-label change. Test now locates exact retained IDs in details and also asserts readable label; all numerical and persisted graph-oracle assertions retained. Application source unchanged; no case skipped. This is not a single all-green40-test invocation.",
-    "initial_regression": {
-      "passed": 39,
-      "failed": 1,
-      "failed_case": "J02 graph regression: obsolete raw-visible-label selector",
-      "corrected_rerun_passed": 1,
-      "app_source_changed": false
+    "note": "Includes all journeys, accessibility, responsive regressions, full visual matrix and WebGL fallback. Earlier interrupted and failed discovery invocations are documented separately.",
+    "follow_up_hook_capture_cases": {
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "output_file": "out/e2e-results-review-hook-proof.json",
+      "runtime_unchanged": true
     }
   },
-  "completion_scope": "Frontend contributor acceptance passes: current complete visual audit, three fresh image reviews and41 distinct browser cases including corrected J02 rerun. This is contributor readiness only; MRG-03 real-backend integration remains BLOCKED_ENVIRONMENT and owned by the merging agent.",
+  "completion_scope": "Frontend contributor checks pass on the final reviewed source. Eight defects fixed and authoring UI polished. Current111 frontend/131 Python/41 browser/36 mutation checks pass. A fresh single-agent review follows the user's no-subagents instruction; prior independent rubric reviews remain historical. MRG-03 real-backend integration remains BLOCKED_ENVIRONMENT for the merging agent.",
   "real_backend_validation": {
     "status": "BLOCKED_ENVIRONMENT",
     "owner": "merging agent MRG-03",
     "reason": "This branch does not contain the combined platform/science backend or live dataset/model credentials. Mock journeys and fixture exports do not verify that integration."
   },
-  "pushed_sha_note": "Tested application source intended for branch push. Subsequent handoff commit changes documentation and permitted component-guide images only; verify exact remote final HEAD after push.",
+  "pushed_sha_note": "Tested application runtime source. A following handoff commit records documentation, refreshes the permitted12 component-guide images, and adds two read-only hook-receipt captures verified by focused J01/J04 reruns. Verify remote final HEAD after push.",
   "historical_browser_delivery": {
     "source": "4c801f40ca86751fc16f0557d14bd0d160892a34",
     "tests_passed": 33,
@@ -759,17 +818,17 @@
     "note": "This33-test full-suite result belongs to4c801f4. Current focused results are under design.requested_layout_fixes."
   },
   "current_frontend_verification": {
-    "source": "adb076e99103a3a42fa77c0a823826075a60a997",
-    "unit_tests": 90,
-    "unit_files": 22,
+    "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
+    "unit_tests": 111,
+    "unit_files": 25,
     "typecheck": "PASSED",
     "lint": "PASSED",
     "production_build": "PASSED",
-    "build_evidence": "out/review11-full.log",
-    "unit_evidence": "out/review11-unit-final.log",
-    "typecheck_evidence": "out/review11-typecheck-final.log",
-    "lint_evidence": "out/review11-lint-final.log",
-    "note": "Python131-test,36-mutant and27-export/27-tamper baseline evidence belongs to4c801f4; not rerun in this presentation follow-up. Renderer source unchanged in this follow-up."
+    "build_evidence": "out/review-baseline-2026-11-11/build-release.log",
+    "unit_evidence": "out/review-baseline-2026-11-11/test-release.log",
+    "typecheck_evidence": "out/review-baseline-2026-11-11/typecheck-release.log",
+    "lint_evidence": "out/review-baseline-2026-11-11/lint-release.log",
+    "note": "All Python, export, mutation and browser checks rerun on this review's final application source; exact receipts in review-2026-11-11/RESULTS.json."
   },
   "minor_visual_polish_remaining": [
     "Printed Reserve label/value splits between pages14/15.",
@@ -777,5 +836,14 @@
     "Screen horizontal-scroll hint remains in print.",
     "Target scale magnitude could sit nearer its bar.",
     "Desktop practice launcher can be denser."
-  ]
+  ],
+  "review_2026_11_11": {
+    "source": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
+    "findings_fixed": 8,
+    "new_regressions": 21,
+    "subagents_used": false,
+    "report": "review-2026-11-11/REVIEW.md",
+    "results": "review-2026-11-11/RESULTS.json",
+    "real_backend_tested": false
+  }
 }

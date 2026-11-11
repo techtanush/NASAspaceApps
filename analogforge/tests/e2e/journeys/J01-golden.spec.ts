@@ -19,6 +19,7 @@ test('J01 full Mars investigation, immutable fail/replan/pass and independently 
  await page.locator('summary').filter({hasText:'Excluded and not detailed'}).click();
  await expect(page.locator('[data-testid=excluded-window][data-reason=WATER_ONLY]')).toBeVisible();
  await expect(page.locator('[data-testid=excluded-window][data-reason=INSUFFICIENT_VALID_DATA]')).toBeVisible();
+ await inspectHooks(page);
  await expect(page.getByTestId('earth-map')).toBeVisible();
  await expect(page.getByTestId('candidate-list')).toBeVisible();
  let mapSelections=0;const countMapSelection=(request:import('@playwright/test').Request)=>{if(request.method()==='POST'&&request.url().endsWith('/actions')&&request.postDataJSON()?.action_type==='SELECT_CANDIDATE')mapSelections++;};page.on('request',countMapSelection);await page.getByRole('button',{name:/^Select C1:/}).click();await expect(page.getByTestId('candidate-row').first()).toHaveAttribute('data-selected','true');expect(mapSelections).toBe(1);page.off('request',countMapSelection);

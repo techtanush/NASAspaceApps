@@ -12,6 +12,7 @@ test('J04 invalid imports preserve typed fields and never persist', async ({ pag
   const good = JSON.parse(await readFile(fixture('rovers/ares-1.json'), 'utf8')); good.mass_kg = -3;
   await page.getByTestId('file-rover-import').setInputFiles({ name: 'invalid.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(good)) });
   await expect(page.locator('[data-testid=rover-field-error][data-field=mass_kg]')).toBeVisible();
+  await inspectHooks(page);
   const choosing=page.waitForEvent('filechooser');
   await page.getByRole('button',{name:'Replace file',exact:true}).click();
   await (await choosing).setFiles(fixture('rovers/ares-1.json'));

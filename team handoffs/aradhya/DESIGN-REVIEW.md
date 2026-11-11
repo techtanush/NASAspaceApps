@@ -4728,3 +4728,12 @@ The supplied visual acceptance formula yields PASS: minimum 3, mean 43/12 = 3.58
 - review-target-chart-data-390-light-default.png
 - passport-print-page-15.png
 - passport-print-page-15-detail-bottom.png
+
+
+## November11 authoring refinement — single-agent review
+
+Application source: `f5e4a238013e091ab6c8fe248a77bb73176a6d68`. The user explicitly requested no subagents, so this follow-up uses one primary reviewer. The earlier three-reviewer panels and their scores remain historical evidence; this section claims no new independent panel or scores.
+
+Fresh images inspected: `analogforge/out/visual/S02-1440-dark-default.png`, `S02-390-light-default.png`, and the refreshed component guide images `styleguide-dark-default-part-1.png` / `styleguide-light-default-part-2.png` under `apps/web/docs/design-review/`. The desktop form and region panels align; the current step is explicit, draft persistence has its own neutral receipt, and selected Mars/Moon controls have a clear border/background state. The mobile version keeps readable type, 44px controls, two-column progress and paired geographic bounds. Labels say west/south/east/north and retain degree units. No gradient, shadow, new palette, remote font, or scientific-status change was introduced.
+
+No new blocking design issue was found in these inspected authoring views. Existing minor print polish remains documented above. Full-source accessibility, component-kit checks and the complete C01–C20 matrix are recorded in `review-2026-11-11/RESULTS.json`; that current evidence is separate from the historical panels. The final visual packet and screenshots are generated under `analogforge/out/` and excluded from Git.

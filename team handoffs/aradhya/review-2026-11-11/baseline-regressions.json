@@ -1,0 +1,102 @@
+{
+  "incoming_commit": "7433cd84d56f537137eb1035d1a97f4ac51a315e",
+  "reports": {
+    "authoring-red": {
+      "passed": 0,
+      "failed": 4,
+      "cases": [
+        {
+          "title": "loads the new mission identity when route parameters change without unmounting the editor",
+          "status": "failed",
+          "first_failure_line": "Error: expect(element).toHaveValue(Mission B)"
+        },
+        {
+          "title": "saves the latest edit after a slow initial draft receipt finishes",
+          "status": "failed",
+          "first_failure_line": "AssertionError: expected \"spy\" to be called with arguments: [ '/missions/mission-a/drafts', \u2026(2) ]"
+        },
+        {
+          "title": "does not offer an obsolete fingerprint after the draft changes during preparation",
+          "status": "failed",
+          "first_failure_line": "AssertionError: expected [ <tr \u2026(3)>\u2026(5)</tr>, \u2026(8) ] to have a length of +0 but got 9"
+        },
+        {
+          "title": "does not restore an accepted revision into a draft edited while acceptance was pending",
+          "status": "failed",
+          "first_failure_line": "AssertionError: expected [ <tr \u2026(3)>\u2026(5)</tr>, \u2026(8) ] to have a length of +0 but got 9"
+        }
+      ]
+    },
+    "passport-red": {
+      "passed": 1,
+      "failed": 6,
+      "cases": [
+        {
+          "title": "shows the permitted positive cover only for a matching valid audit",
+          "status": "passed",
+          "first_failure_line": null
+        },
+        {
+          "title": "keeps a unrecognized publication audit incomplete instead of presenting a qualified headline",
+          "status": "failed",
+          "first_failure_line": "Error: expect(element).toHaveAttribute(\"data-publication\", \"INCOMPLETE\") // element.getAttribute(\"data-publication\") === \"INCOMPLETE\""
+        },
+        {
+          "title": "keeps a missing claims audit incomplete instead of presenting a qualified headline",
+          "status": "failed",
+          "first_failure_line": "Error: expect(element).toHaveAttribute(\"data-publication\", \"INCOMPLETE\") // element.getAttribute(\"data-publication\") === \"INCOMPLETE\""
+        },
+        {
+          "title": "keeps a wrong run audit incomplete instead of presenting a qualified headline",
+          "status": "failed",
+          "first_failure_line": "Error: expect(element).toHaveAttribute(\"data-publication\", \"INCOMPLETE\") // element.getAttribute(\"data-publication\") === \"INCOMPLETE\""
+        },
+        {
+          "title": "keeps a wrong workspace audit incomplete instead of presenting a qualified headline",
+          "status": "failed",
+          "first_failure_line": "Error: expect(element).toHaveAttribute(\"data-publication\", \"INCOMPLETE\") // element.getAttribute(\"data-publication\") === \"INCOMPLETE\""
+        },
+        {
+          "title": "keeps a promoted mode audit incomplete instead of presenting a qualified headline",
+          "status": "failed",
+          "first_failure_line": "Error: expect(element).toHaveAttribute(\"data-publication\", \"INCOMPLETE\") // element.getAttribute(\"data-publication\") === \"INCOMPLETE\""
+        },
+        {
+          "title": "keeps a wrong accepted mission audit incomplete instead of presenting a qualified headline",
+          "status": "failed",
+          "first_failure_line": "Error: expect(element).toHaveAttribute(\"data-publication\", \"INCOMPLETE\") // element.getAttribute(\"data-publication\") === \"INCOMPLETE\""
+        }
+      ]
+    }
+  },
+  "production_edits_applied_at_capture": false,
+  "additional_initial_load_probe": {
+    "source_commit": "bc73c25",
+    "production_edits_applied_at_capture": true,
+    "passed": 4,
+    "failed": 1,
+    "failures": [
+      {
+        "title": "keeps an existing mission read-only until its saved identity and draft have loaded",
+        "first_failure_line": "Error: expect(element).not.toBeInTheDocument()"
+      }
+    ]
+  },
+  "additional_navigation_probe": {
+    "source_commit": "832854fe9aad1df2cf7f15285c6bcf67688bbb98",
+    "passed": 1,
+    "failed": 1,
+    "cases": [
+      {
+        "title": "does not redirect a newer tab navigation when a candidate acknowledgement finishes in the same turn",
+        "status": "failed",
+        "first_failure_line": "AssertionError: expected '/runs/run/analogs' to be '/runs/run/qualification' // Object.is equality"
+      },
+      {
+        "title": "still records acknowledged candidate selection in the URL while the user stays on Analogs",
+        "status": "passed",
+        "first_failure_line": null
+      }
+    ]
+  }
+}
