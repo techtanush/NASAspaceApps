@@ -75,3 +75,49 @@ def test_positive_proposals_satisfy_platform_gates_with_platform_evidence(flow_a
             bad = {g: outcomes.get(g) for g in PLATFORM_REQUIRED_GATES if outcomes.get(g) in rejected}
             assert not bad, (window_id, req.id, payload.proposed_status, bad)
     assert positives > 0, "the practice storyline must produce at least one positive terrain row"
+
+
+def test_positive_qualification_claims_are_fully_assessable_by_the_audit(flow_after_analysis) -> None:  # type: ignore[no-untyped-def]
+    """The audited claim cites the COMPARISON + requirement records (35 s5b); they must carry the decisive values."""
+    from analogforge.ports.science_payloads import AuditEvidenceInput, AuditEvidencePayload, ClaimScope
+
+    flow, target_handle, analyses = flow_after_analysis
+    mission = load_mission("mission-mars-mobility")
+    audited = 0
+    for window_id, (cand, analysis_handles) in analyses.items():
+        screening = [flow.handles["SCREEN_CANDIDATES:screening"], flow.handles[f"SCREEN_CANDIDATES:window-{window_id}"]]
+        cand_handles = [*screening, *analysis_handles]
+        for req in mission.requirements:
+            policy = catalog.OBSERVABLE_POLICY_BY_OBSERVABLE.get(req.observable, "unknown-policy-v1")
+            inp = CompareRequirementInput(
+                requirement=req,
+                candidate=cand,
+                target_evidence_ids=[target_handle.evidence_id],
+                candidate_evidence_ids=[h.evidence_id for h in cand_handles],
+                verification=None,
+                observable_policy_id=policy,
+            )
+            result, reg = flow.call(inp, evidence=[target_handle, *cand_handles])
+            payload = result.payload
+            if payload is None or payload.proposed_status not in {"PASS", "PARTIAL"} or reg is None:
+                continue
+            row_handles = [reg.handles["comparison"], reg.handles["requirement"]]
+            assert any(m.value is not None for m in reg.handles["comparison"].metrics), req.id
+            claim = ClaimScope(
+                claim_id=f"q:{window_id}:{req.id}",
+                claim_type="QUALIFICATION",
+                requirement_id=req.id,
+                candidate_window_ids=[window_id],
+                evidence_ids=[h.evidence_id for h in row_handles],
+            )
+            audit, _ = flow.call(
+                AuditEvidenceInput(claims=[claim], check_set=[
+                    "provenance", "units", "crs", "scale", "coverage", "uncertainty", "proxies", "independence",
+                ]),
+                evidence=[*row_handles],
+            )
+            assert isinstance(audit.payload, AuditEvidencePayload), audit.issues
+            outcomes = {g.gate_id: g.outcome for g in audit.payload.claim_gates[0].gates}
+            assert outcomes["SC-05"] != "NOT_ASSESSED" and outcomes["SC-08"] != "NOT_ASSESSED", (req.id, outcomes)
+            audited += 1
+    assert audited > 0

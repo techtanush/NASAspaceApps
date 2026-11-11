@@ -223,6 +223,19 @@ class _ClaimAudit:
     def _metrics(self) -> list[tuple[EvidenceHandle, MeasuredMetric]]:
         return [(h, m) for h in self.handles for m in h.metrics]
 
+    def _route_verification(self) -> bool:
+        """A route-level VERIFICATION claim: the verified route against the frozen constraints of one test.
+
+        Its per-requirement statements are separate QUALIFICATION claims (E-09); this claim states only that the
+        independently recomputed route satisfies (or fails) the accepted constraints, so policy- and window-bound
+        gates are judged on the verification evidence itself instead of being left unassessed.
+        """
+        return (
+            self.claim.claim_type == "VERIFICATION"
+            and self.requirement is None
+            and any(h.kind == "VERIFICATION" for h in self.handles)
+        )
+
     # ---- gates
     def sc02(self) -> GateEvidence:
         if (skip := self._skipped("SC-02")) is not None:
@@ -283,6 +296,17 @@ class _ClaimAudit:
             )  # fmt: skip
         if problems:
             return self._gate("SC-03", "UNSATISFIED", "; ".join(problems))
+        if self.policy is None and self._route_verification():
+            bodies = sorted({h.body for h in self.handles if h.kind != "SOURCE"})
+            if len(bodies) != 1:
+                self._finding(
+                    "CRS_MISMATCH", "BLOCKING", (h.evidence_id for h in self.handles),
+                    f"route verification mixes bodies {bodies}", "CORRECT_METADATA",
+                )  # fmt: skip
+                return self._gate("SC-03", "UNSATISFIED", f"route verification evidence mixes bodies {bodies}")
+            return self._gate(
+                "SC-03", "SATISFIED", f"route evidence shares body {bodies[0]} and metric units match their ids"
+            )
         if self.policy is None:
             return self._gate("SC-03", "NOT_ASSESSED", "no observable policy is known, so the body cannot be judged")
         return self._gate(
@@ -298,6 +322,8 @@ class _ClaimAudit:
         if (skip := self._skipped("SC-04")) is not None:
             return skip
         req = self.requirement
+        if req is None and self._route_verification():
+            return self._route_support_gate()
         if req is None:
             return self._gate("SC-04", "NOT_ASSESSED", "no requirement window is available for this claim")
         if req.minimum_support_scale_m is None and req.maximum_support_scale_m is None:
@@ -322,6 +348,31 @@ class _ClaimAudit:
         return self._gate(
             "SC-04", "SATISFIED", f"all cited comparison scales lie inside the requirement window {window}"
         )
+
+    def _route_support_gate(self) -> GateEvidence:
+        valued = [m for h in self.handles if h.kind == "VERIFICATION" for m in h.metrics if m.value is not None]
+        supports = {m.support_scale_m for m in valued}
+        if not valued:
+            return self._gate("SC-04", "NOT_ASSESSED", "the verification cites no valued metric")
+        if supports == {None}:
+            if self.mode != "synthetic":
+                return self._gate("SC-04", "NOT_ASSESSED", "a non-synthetic route verification states no support")
+            return self._gate(
+                "SC-04", "NOT_APPLICABLE",
+                "abstract synthetic graph fixture: edges carry no spatial support (synthetic regression only)",
+            )  # fmt: skip
+        if None in supports or len(supports) != 1:
+            ids = [h.evidence_id for h in self.handles if h.kind == "VERIFICATION"]
+            self._finding(
+                "SCALE_MISMATCH", "BLOCKING", ids, f"route metrics mix support scales {sorted(map(str, supports))}",
+                "RECOMPUTE",
+            )  # fmt: skip
+            return self._gate("SC-04", "UNSATISFIED", "route metrics are not reported at one consistent support")
+        (support,) = supports
+        return self._gate(
+            "SC-04", "SATISFIED",
+            f"route recomputed on the analysis grid at {support:g} m support; no value is resampled to a finer scale",
+        )  # fmt: skip
 
     def sc05(self) -> GateEvidence:
         if (skip := self._skipped("SC-05")) is not None:
@@ -353,6 +404,11 @@ class _ClaimAudit:
         return self._gate("SC-05", "SATISFIED", f"valid coverage {coverage:.3f} meets the policy minimum {floor:.2f}")
 
     def sc06(self) -> GateEvidence:
+        if self.policy is None and self._route_verification():
+            return self._gate(
+                "SC-06", "NOT_APPLICABLE",
+                "route verification over a static terrain model; no acquisition-time dependence", refs=False,
+            )  # fmt: skip
         if self.policy is None:
             return self._gate(
                 "SC-06", "NOT_ASSESSED", "no observable policy is known, so temporal support is undetermined"

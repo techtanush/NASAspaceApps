@@ -546,17 +546,20 @@
       "ownership": "PASS",
       "scn_offline": "802 passed, 0 skipped",
       "replay": "200 passed",
-      "oracles": "1000, 0 skipped",
+      "oracles": "1006, 0 skipped",
       "ruff": "clean",
       "mypy": "clean (74 files)",
       "forbidden_scan": "0",
-      "mutations": "16/16 killed"
+      "mutations": "16/16 killed",
+      "scn_offline_plus_replay": "1006 passed, 0 skipped"
     },
     "defect_fixed": "SCREEN_CANDIDATES per-window DERIVED evidence had no artifact (artifact=None) -> SC-02 UNSATISFIED on every positive COMPARE with platform-supplied evidence; replaced with a per-window canonical JSON artifact; regression test test_evidence_artifact_integrity.py.",
-    "open_cross_branch_items": [
-      "graph scenario target/earth sources point at the abstract graph fixture (Tanush config)",
-      "assurance gate applicability for VERIFICATION claims undefined; platform raises instead of publishing LIMITED"
+    "details": "team handoffs/ayan/DEBUG-REVIEW.md",
+    "second_pass_fixes": [
+      "route-level VERIFICATION claims fully assessed (SC-03/04/06)",
+      "VERIFY_ROUTE emits accepted energy-assumption ASSUMPTION evidence (SC-07)",
+      "COMPARISON evidence carries decisive metrics (SC-05/08)"
     ],
-    "details": "team handoffs/ayan/DEBUG-REVIEW.md"
+    "trial_merge_real_science": "main+Tanush+Ayan, AF_SCIENCE_IMPL=real, PostgreSQL 16: test_runtime_journey 4/4 and test_journey_api 6/6 passed (all COMPLETED with audited passports)"
   }
 }

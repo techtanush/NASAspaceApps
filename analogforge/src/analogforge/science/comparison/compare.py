@@ -419,7 +419,9 @@ def compare_requirement(inputs: CompareInputs, config: ScienceConfig) -> Compari
         limitations=decision.limitations,
         gates=build_gates(decision, policy, policy_id, min_cov, config.algorithms.algorithm_lock),
         validation_level=_validation_level(inputs.mode, decision),
-        metrics=decision.metrics,
+        # The COMPARISON evidence carries every value the decision rests on (policy metrics plus the consulted
+        # subcriteria), so the claim audit can inspect coverage and uncertainty (SC-05/SC-08) on the cited record.
+        metrics=tuple(_decisive_metrics(decision)),
         consulted_evidence_ids=consulted_ids,
         confidence_dimensions=_dimensions(decision, policy),
     )

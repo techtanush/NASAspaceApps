@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict
 
 from analogforge.ports import catalog
 from analogforge.ports.hashing import bytes_sha256
@@ -11,6 +14,7 @@ from analogforge.ports.science_payloads import (
     ConstraintsArtifact,
     DesignBenchmarkInput,
     DiagnoseResultInput,
+    EnergySpec,
     GridSpec,
     SearchRouteInput,
     VerifyRouteInput,
@@ -162,6 +166,20 @@ def run_search(env: OpEnv) -> OpOutcome:
     return OpOutcome(status, out.payload, algo, params, artifacts, [ev], list(out.issues), counters)
 
 
+class AcceptedEnergyAssumption(BaseModel):
+    """The accepted, disclosed energy-model basis of one verification (from the frozen constraints)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    constraints_sha256: str
+    mission_revision_id: UUID
+    mission_content_sha256: str
+    rover_revision_id: UUID
+    rover_content_sha256: str
+    resource_provider: str
+    energy: EnergySpec
+
+
 def run_verify(env: OpEnv) -> OpOutcome:
     inp = env.request.inputs
     assert isinstance(inp, VerifyRouteInput)
@@ -223,6 +241,43 @@ def run_verify(env: OpEnv) -> OpOutcome:
                 params_sha=tel_params,
                 artifact=tel_art,
                 parent_keys=["verification"],
+            )
+        )
+    if any(m.quantity_kind == "ASSUMED" and m.value is not None for m in out.payload.metrics):
+        # The verifier used model parameters that are assumptions (uncalibrated rover energy model or the synthetic
+        # graph's mock edge energies). They were disclosed in the contract the user accepted (frozen constraints with
+        # mission/rover content hashes); this record carries that accepted basis so SC-07 can cite it.
+        assumption_art = json_artifact(
+            env,
+            params_sha=params,
+            key="accepted-energy-assumption-json",
+            name="accepted-energy-assumption.json",
+            payload=AcceptedEnergyAssumption(
+                constraints_sha256=inp.constraints_sha256,
+                mission_revision_id=c.mission_revision_id,
+                mission_content_sha256=c.mission_content_sha256,
+                rover_revision_id=c.rover_revision_id,
+                rover_content_sha256=c.rover_content_sha256,
+                resource_provider=c.resource_provider,
+                energy=c.energy,
+            ),
+            body="EARTH",
+        )
+        artifacts.append(assumption_art)
+        evidence.append(
+            derived_evidence(
+                env,
+                key="accepted-energy-assumption",
+                kind="ASSUMPTION",
+                body="EARTH",
+                algorithm_id=algo,
+                params_sha=params,
+                artifact=assumption_art,
+                parent_keys=["verification"],
+                limitations=[
+                    "Energy parameters are ASSUMED (not calibrated) as accepted in the frozen test constraints; "
+                    "conclusions that depend on them are conditional on this accepted assumption."
+                ],
             )
         )
     status = ComputationStatus.LIMITED if out.issues else ComputationStatus.SUCCEEDED
