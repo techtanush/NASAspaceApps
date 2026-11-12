@@ -175,7 +175,7 @@ class Settings(BaseSettings):
             lines = pid_file.read_text(encoding="ascii").splitlines()
             active_port = int(lines[3]) if len(lines) > 3 and lines[3].isdecimal() else None
         if version_file.is_file() and (
-            active_port == self.db_port or (active_port is None and self.profile == "tanush")
+            active_port == self.db_port or active_port is None
         ):
             major = version_file.read_text(encoding="ascii").strip()
             if major.isdecimal():
