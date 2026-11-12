@@ -36,6 +36,7 @@ def design(
                 # changes as one "Changed elements:" line (the convention the workbench parses), "none" for attempt 1.
                 "assumptions": [
                     *c["limitations"],
+                    f"Strategy: {c['strategy']}",
                     "Changed elements: " + ("; ".join(changed_elements) if changed_elements else "none"),
                 ],
             }
@@ -114,6 +115,13 @@ def no_route_result(
             "limitations": [
                 search["termination_reason"],
                 (diagnosis or {}).get("proof_scope", "Bounded search; not proof that no route exists"),
+                # The diagnosis decides what may happen next (architecture 40: ROVER => NEW_CONTRACT_REQUIRED, the
+                # accepted contract is never relaxed); the published result states it.
+                *(
+                    ["Permitted repairs: " + ", ".join(diagnosis["permitted_repairs"])]
+                    if diagnosis and diagnosis.get("permitted_repairs")
+                    else []
+                ),
             ],
         }
     ).model_dump(mode="json")

@@ -234,12 +234,16 @@ def test_full_accepted_contract_to_immutable_passport_and_downloads(
         assert public_run["mission_revision_id"] == accepted["id"]
         results = [get(client, f"/test-results/{result_id}") for result_id in public_run["test_result_ids"]]
         assert [row["outcome"] for row in results] == expected_outcomes
+        if rover_file and ("practice-lite" in rover_file or "practice-small" in rover_file):
+            # A ROVER diagnosis permits only a new contract; the published result says so (contract never relaxed).
+            assert "Permitted repairs: NEW_CONTRACT_REQUIRED" in results[-1]["limitations"]
         # Each public test record states its replan changes on one "Changed elements:" line (none for attempt 1).
         public_tests = [get(client, f"/tests/{test_id}") for test_id in public_run["test_ids"]]
         change_lines = [
             [line for line in test["assumptions"] if line.startswith("Changed elements: ")] for test in public_tests
         ]
         assert all(len(lines) == 1 for lines in change_lines)
+        assert all(any(line.startswith("Strategy: ") for line in test["assumptions"]) for test in public_tests)
         if public_tests:
             assert change_lines[0] == ["Changed elements: none"]
         if len(public_tests) > 1 and scenario == "synthetic-mars-mobility-v1" and rover_file == "ares-1.json":

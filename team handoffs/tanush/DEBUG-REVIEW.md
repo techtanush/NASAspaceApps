@@ -46,3 +46,14 @@ Aradhya's Playwright journeys driven through this API/worker with the real scien
 | `RETRY` was offered for `SCIENTIFIC_CLAIM_REJECTED`, re-running an audit that cannot change | not an allowed action for that stop | `test_runtime_rejected_claim_blocks_run_without_passport` |
 
 Results: platform suite 303 passed (kit 20 passed in its own process, as the gate specifies); mutations 20/20; forbidden scan 0; validate_docs PASS; kit verify PASS; ownership PASS. Real-backend browser journeys on the merged stack: J01 and J02 pass end to end (remaining journeys: see the merge report).
+
+### Third pass, continued: remaining journeys (J03–J13)
+Three more platform gaps, each replaced and guarded (platform suite 285 passed, ruff and mypy clean, forbidden scan 0 findings):
+
+| Defect | Fix | Guard |
+| --- | --- | --- |
+| A no-route result published the diagnosis but not which repairs are permitted, so the Test Lab could not say that only a new contract helps (PRACTICE-LITE/SMALL) | no-route `TestResult.limitations` adds `Permitted repairs: …` from `DIAGNOSE_RESULT.permitted_repairs` | `test_journey_api` (`Permitted repairs: NEW_CONTRACT_REQUIRED` for practice-lite/small) |
+| The public test record did not carry the search strategy, so attempts showed no strategy | `VerificationTest.assumptions` adds `Strategy: <strategy>` before the `Changed elements:` line | `test_journey_api` (every public test has one `Strategy:` line) |
+| `capabilities.modes` listed `live` only when an LLM credential was configured, so the option silently disappeared. Architecture 39 J13 and PLT-16 instead require that a live run without credentials is refused with 503 `PROVIDER_AUTH_FAILED` and a remediation hint (readiness is reported separately in `live_ai_configured`) | `live` is offered whenever any scenario's `allowed_modes` contains `live` | `test_live_mode_is_offered_once_bound_even_without_credentials` |
+
+J13 needs a scenario bound for live data. In a real merge, that binding comes from the MRG-05b TEST_HARNESS rehearsal or from real NASA data. Unbound, `live` is correctly absent.

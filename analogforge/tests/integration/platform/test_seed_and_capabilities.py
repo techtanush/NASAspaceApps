@@ -64,6 +64,25 @@ def test_seed_is_idempotent_and_capabilities_are_wire_valid(tmp_path):
     assert len(get_scenarios(settings)) == 5
 
 
+def test_live_mode_is_offered_once_bound_even_without_credentials(tmp_path):
+    """Architecture 39 J13: a bound live scenario keeps `live` selectable without a key; readiness is the flag."""
+    import shutil
+
+    import yaml
+
+    unbound = Settings(_env_file=None, data_root=tmp_path / "data")
+    assert "live" not in get_capabilities(unbound)["modes"]  # unbound live scenario: allowed_modes []
+    config = tmp_path / "config"
+    shutil.copytree(unbound.config_dir, config)
+    scenarios = yaml.safe_load((config / "scenarios.yaml").read_text())
+    scenarios["live-hackathon-v1"]["allowed_modes"] = ["live"]
+    (config / "scenarios.yaml").write_text(yaml.safe_dump(scenarios, sort_keys=False))
+    bound = Settings(_env_file=None, data_root=tmp_path / "data", config_dir=config)
+    capabilities = get_capabilities(bound)
+    assert "live" in capabilities["modes"]
+    assert capabilities["live_ai_configured"] is False
+
+
 def test_live_unbound_preflight_names_missing_dependencies(tmp_path):
     settings = Settings(_env_file=None, data_root=tmp_path)
     seed_synthetic(None, settings)

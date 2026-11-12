@@ -71,8 +71,11 @@ def get_capabilities(settings: Settings, store: Any = None) -> dict[str, Any]:
     locks_dir = settings.data_root / "locks"
     locks = sorted(path.stem for path in locks_dir.glob("*.json")) if locks_dir.is_dir() else []
     live_ready = bool(settings.openai_api_key and settings.openai_model)
+    # Live is offered whenever a live-capable (bound) scenario exists; readiness is reported separately in
+    # live_ai_configured, and a live run without credentials is refused with 503 PROVIDER_AUTH_FAILED and a
+    # remediation hint (PLT-16, architecture 39 J13) instead of the option silently disappearing.
     modes = ["synthetic", "replay"]
-    if live_ready and any("live" in config["allowed_modes"] for config in scenarios.values()):
+    if any("live" in config["allowed_modes"] for config in scenarios.values()):
         modes.append("live")
     worker_healthy = False
     if store is not None:
