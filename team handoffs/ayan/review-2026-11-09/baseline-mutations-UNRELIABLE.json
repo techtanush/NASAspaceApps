@@ -1,0 +1,234 @@
+{
+  "results": [
+    {
+      "mutant_id": "M1",
+      "description": "search tie-break uses reverse lexicographic order",
+      "file": "analogforge/science/routing/search.py",
+      "old": "return (round(f * _MICRO), label.rd, label.rc, label.seq, counter)",
+      "new": "return (round(f * _MICRO), label.rd, label.rc, bytes(255 - b for b in label.seq), counter)",
+      "tests": [
+        "tests/unit/science/test_graph_oracle.py",
+        "tests/integration/science/test_storylines.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 2 passed in 0.57s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M2",
+      "description": "verifier copies solver_claimed distance instead of recomputing",
+      "file": "analogforge/science/routing/verify.py",
+      "old": "total_dist, total_time = cum_dist[-1], cum_time[-1]",
+      "new": "total_dist, total_time = route.solver_claimed.distance_m, cum_time[-1]",
+      "tests": [
+        "tests/unit/science/test_verifier_independence.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 0.42s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M3",
+      "description": "band upper bound inclusive for non-final bands",
+      "file": "analogforge/science/routing/exposure.py",
+      "old": "return slope_deg <= high if upper_inclusive else slope_deg < high",
+      "new": "return slope_deg <= high",
+      "tests": [
+        "tests/unit/science/test_graph_oracle.py",
+        "tests/unit/science/test_features.py",
+        "tests/unit/science/test_routing_support.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 2 passed in 0.44s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M4a",
+      "description": "slope cap removed from grid graph nodes",
+      "file": "analogforge/science/routing/grid_graph.py",
+      "old": "node_ok = passable & (slope <= slope_cap_deg + _SLOPE_TOL)",
+      "new": "node_ok = passable",
+      "tests": [
+        "tests/integration/science/test_storylines.py",
+        "tests/integration/science/test_perturbations.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 0.30s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M4b",
+      "description": "slope cap removed from grid graph edges",
+      "file": "analogforge/science/routing/grid_graph.py",
+      "old": "if cell_slope > slope_cap_deg + _SLOPE_TOL:",
+      "new": "if False:",
+      "tests": [
+        "tests/integration/science/test_storylines.py",
+        "tests/integration/science/test_perturbations.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 0.30s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M5",
+      "description": "nodata cells filled with 0 before slope",
+      "file": "analogforge/science/features/slope.py",
+      "old": "field = compute_slope_aspect(np.where(missing, 0.0, elev), usable, geometry, flat_gradient_tolerance)",
+      "new": "field = compute_slope_aspect(np.where(missing, 0.0, elev), ~wet, geometry, flat_gradient_tolerance)",
+      "tests": [
+        "tests/unit/science/test_features.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 22 passed in 0.38s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M6",
+      "description": "scale/offset applied twice",
+      "file": "analogforge/science/raster/normalize.py",
+      "old": "physical = as_float if scale_already_applied else as_float * scale_factor + offset",
+      "new": "physical = as_float if scale_already_applied else (as_float * scale_factor + offset) * scale_factor + offset",
+      "tests": [
+        "tests/integration/science/test_parity.py",
+        "tests/unit/science/test_geometry.py",
+        "tests/integration/science/test_optional_layers.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 passed, 8 warnings in 1.38s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M7",
+      "description": "window grid-r0c0 status forced to PASS",
+      "file": "analogforge/science/ops/compare.py",
+      "old": "payload = outcome.to_payload(EvidenceRef(local_key=\"comparison\"))",
+      "new": "payload = outcome.to_payload(EvidenceRef(local_key=\"comparison\")).model_copy(update=({\"proposed_status\": \"PASS\"} if inp.candidate.window_id == \"grid-r0c0\" else {}))",
+      "tests": [
+        "tests/integration/science/test_perturbations.py",
+        "tests/integration/science/test_truth_table.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 6 warnings in 1.20s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M8",
+      "description": "network adapter allowed in synthetic mode",
+      "file": "analogforge/science/ops/coverage.py",
+      "old": "if env.request.mode != \"live\" or env.context.http_client() is None:",
+      "new": "if False:",
+      "tests": [
+        "tests/unit/science/test_import_hygiene.py",
+        "tests/contracts/science/test_port_conformance.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 5 passed in 1.15s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M9",
+      "description": "lossy pruning not counted",
+      "file": "analogforge/science/routing/search.py",
+      "old": "pruned_lossy += 1",
+      "new": "pruned_lossy += 0",
+      "tests": [
+        "tests/unit/science/test_search_limits.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 0.41s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M10",
+      "description": "gravity constant changed to 3.71",
+      "file": "analogforge/science/energy.py",
+      "old": "EARTH_GRAVITY_MPS2: Final = 9.80665",
+      "new": "EARTH_GRAVITY_MPS2: Final = 3.71",
+      "tests": [
+        "tests/unit/science/test_energy.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 0.17s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M11",
+      "description": "repeated edge earns extra unique exposure",
+      "file": "analogforge/science/routing/exposure.py",
+      "old": "        if first:\n",
+      "new": "        if True:\n",
+      "tests": [
+        "tests/unit/science/test_verifier_independence.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 0.42s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M13",
+      "description": "categorical mineral ids interpolated (3x3 mean, rounded)",
+      "file": "analogforge/science/ops/analyze.py",
+      "old": "ids = np.where(msrc.raster.nodata[rs], 0, np.nan_to_num(msrc.raster.values[rs], nan=0.0)).astype(int)",
+      "new": "ids = np.rint(__import__(\"scipy.ndimage\", fromlist=[\"x\"]).uniform_filter(np.where(msrc.raster.nodata[rs], 0, np.nan_to_num(msrc.raster.values[rs], nan=0.0)).astype(float), 3)).astype(int)",
+      "tests": [
+        "tests/integration/science/test_optional_layers.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n6 warnings, 1 error in 0.42s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M12",
+      "description": "EXHAUSTIVE_INFEASIBLE whenever the queue empties",
+      "file": "analogforge/science/routing/search.py",
+      "old": "    if pruned_lossy > 0:\n        return finish(\n            \"BUDGET_EXHAUSTED\",\n            counters(),\n            \"queue exhausted after lossy",
+      "new": "    if False:\n        return finish(\n            \"BUDGET_EXHAUSTED\",\n            counters(),\n            \"queue exhausted after lossy",
+      "tests": [
+        "tests/unit/science/test_search_limits.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 0.42s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M14",
+      "description": "UNKNOWN mapped to 0 in a metric",
+      "file": "analogforge/science/ops/analyze.py",
+      "old": "mvf if mvf > 0.0 else None,  # no retrieval in the window is unknown, never a zero",
+      "new": "mvf,",
+      "tests": [
+        "tests/integration/science/test_optional_layers.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n6 warnings, 1 error in 0.41s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M15",
+      "description": "analysis grid meta embeds a timestamp",
+      "file": "analogforge/science/raster/store.py",
+      "old": "\"parameters_sha256\": self.parameters_sha256,\n        }",
+      "new": "\"parameters_sha256\": self.parameters_sha256,\n            \"stamp\": __import__(\"time\").time_ns(),\n        }",
+      "tests": [
+        "tests/integration/science/test_determinism.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 0.30s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    },
+    {
+      "mutant_id": "M16",
+      "description": "ANALOG/ROVER rule inverted",
+      "file": "analogforge/science/routing/diagnose.py",
+      "old": "return (\"ANALOG\" if relaxed.infeasible else \"ROVER\"), original, relaxed, \"certificate re-run\"",
+      "new": "return (\"ROVER\" if relaxed.infeasible else \"ANALOG\"), original, relaxed, \"certificate re-run\"",
+      "tests": [
+        "tests/integration/science/test_storylines.py"
+      ],
+      "killed": true,
+      "exit_code": 1,
+      "tail": "!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed in 0.30s\n/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))"
+    }
+  ]
+}

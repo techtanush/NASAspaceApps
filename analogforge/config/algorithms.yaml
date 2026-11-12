@@ -1,0 +1,250 @@
+# AnalogForge science algorithm configuration (owner: Ayan). Strict, versioned, hashed.
+# The platform pins algorithm_config_sha256 = canonical_sha256(parsed file). Changing any value here changes
+# the audit identity: never edit a threshold to rescue a result.
+config_version: "1.0"
+
+# Version of every algorithm id the science library emits (ports.catalog.ALGORITHM_IDS values emitted by science
+# plus the named sub-algorithms).
+algorithm_lock:
+  ingest-local-dataset: "1.1.0"
+  characterize-target: "1.1.0"
+  screen-candidates: "1.1.0"
+  analyze-candidate: "1.1.0"
+  analysis-summary: "1.1.0"
+  compare-requirement: "1.1.0"
+  assess-compatibility: "1.0.0"
+  design-benchmark: "1.0.0"
+  search-route: "1.0.0"
+  verify-route: "1.0.0"
+  route-telemetry: "1.0.0"
+  accepted-requirement-record: "1.0.0"
+  accepted-energy-assumption: "1.0.0"
+  diagnose-result: "1.0.0"
+  optimize-portfolio: "1.0.0"
+  audit-evidence: "1.0.0"
+  build-display-layers: "1.1.0"
+  resolve-coverage: "1.0.0"
+  fetch-source: "1.1.0"
+  exhaustive-subset-v1: "1.0.0"
+  auto-waypoints-v1: "1.0.0"
+  earth-simple-v1: "1.0.0"
+  slope-lsq-plane-3x3-v1: "1.0.0"
+  roughness-detrended-rms-v1: "1.0.0"
+  relief-robust-q05-q95-v1: "1.0.0"
+  slope-w1-binned-v1: "1.0.0"
+  analysis-grid-npz-v1: "1.0.0"
+
+measurement_specs:
+  terrain-target-v1:
+    derivative_window_cells: 3
+    roughness_windows_cells: [3, 5, 9]
+    slope_hist_edges_deg: [0, 2, 5, 8, 12, 15, 18, 25, 35, 90]
+    comparison_support:
+      rule: MAX_OF_NATIVE_AND_REQUESTED
+      aggregation: AREA_AVERAGE
+      allow_upsample: false
+      default_requested_m: null
+  terrain-earth-v1:
+    derivative_window_cells: 3
+    roughness_windows_cells: [3, 5, 9]
+    slope_hist_edges_deg: [0, 2, 5, 8, 12, 15, 18, 25, 35, 90]
+    comparison_support:
+      rule: MAX_OF_NATIVE_AND_REQUESTED
+      aggregation: AREA_AVERAGE
+      allow_upsample: false
+      default_requested_m: 60
+
+# One entry for every value of ports.catalog.OBSERVABLE_POLICY_BY_OBSERVABLE (keyed by policy id).
+# units "*" means the policy does not constrain the requirement unit string.
+observable_policies:
+  slope-band-area-fraction-v1:
+    observable: slope_band_area_fraction
+    quantity: area fraction of valid land with surface slope in the requirement band
+    units: fraction
+    valid_bodies: [EARTH, MOON, MARS]
+    support_rule: REQUIREMENT_WINDOW
+    coverage_denominator: VALID_LAND_AREA_OVER_WINDOW_AREA
+    min_valid_fraction: 0.80
+    temporal_support: NOT_TIME_DEPENDENT
+    proxy_policy: DIRECT_ONLY
+    decision_rule: NOMINAL_THRESHOLD_INCLUSIVE
+    tolerance: 1.0e-12
+    applicable_gates: [SC-02, SC-03, SC-04, SC-05, SC-07, SC-08, SC-09]
+  slope-w1-common-support-v1:
+    observable: slope_distribution_w1_deg
+    quantity: Wasserstein-1 distance between binned surface-slope distributions at the common support
+    units: deg
+    valid_bodies: [EARTH, MOON, MARS]
+    support_rule: REQUIREMENT_WINDOW
+    coverage_denominator: VALID_LAND_AREA_OVER_WINDOW_AREA
+    min_valid_fraction: 0.80
+    temporal_support: NOT_TIME_DEPENDENT
+    proxy_policy: DIRECT_ONLY
+    decision_rule: NOMINAL_THRESHOLD_INCLUSIVE
+    tolerance: 1.0e-9
+    applicable_gates: [SC-02, SC-03, SC-04, SC-05, SC-07, SC-08, SC-09]
+  route-exposure-v1:
+    observable: unique_slope_exposure_m
+    quantity: unique undirected route distance inside the requirement slope band
+    units: m
+    valid_bodies: [EARTH]
+    support_rule: REQUIREMENT_WINDOW
+    coverage_denominator: ROUTE_LENGTH
+    min_valid_fraction: 0.80
+    temporal_support: NOT_TIME_DEPENDENT
+    proxy_policy: DIRECT_ONLY
+    decision_rule: ROUTE_VERIFIER_BENCHMARK
+    tolerance: 1.0e-9
+    applicable_gates: [SC-02, SC-03, SC-04, SC-05, SC-07, SC-08, SC-09, SC-11]
+  route-tasks-v1:
+    observable: completed_task_count
+    quantity: tasks completed on the verified closed route
+    units: count
+    valid_bodies: [EARTH]
+    support_rule: REQUIREMENT_WINDOW
+    coverage_denominator: ROUTE_LENGTH
+    min_valid_fraction: 0.80
+    temporal_support: NOT_TIME_DEPENDENT
+    proxy_policy: DIRECT_ONLY
+    decision_rule: ROUTE_VERIFIER_BENCHMARK
+    tolerance: 1.0e-9
+    applicable_gates: [SC-02, SC-03, SC-04, SC-05, SC-07, SC-08, SC-09, SC-11]
+  route-reserve-v1:
+    observable: final_battery_reserve_pct
+    quantity: modeled final battery reserve under the conservative Earth energy model
+    units: percent
+    valid_bodies: [EARTH]
+    support_rule: REQUIREMENT_WINDOW
+    coverage_denominator: ROUTE_LENGTH
+    min_valid_fraction: 0.80
+    temporal_support: NOT_TIME_DEPENDENT
+    proxy_policy: DIRECT_ONLY
+    decision_rule: ROUTE_VERIFIER_BENCHMARK
+    tolerance: 1.0e-9
+    applicable_gates: [SC-02, SC-03, SC-04, SC-05, SC-07, SC-08, SC-09, SC-11]
+  mineral-presence-v1:
+    observable: mineral_class_present
+    quantity: categorical mineral class presence (nearest or area-fraction only; ids are never interpolated)
+    units: class
+    valid_bodies: [EARTH, MOON, MARS]
+    support_rule: REQUIREMENT_WINDOW
+    coverage_denominator: VALID_RETRIEVAL_AREA_OVER_WINDOW_AREA
+    min_valid_fraction: 0.80
+    temporal_support: NOT_TIME_DEPENDENT
+    proxy_policy: NO_PROXY_ACCEPTED
+    decision_rule: UNRESOLVED_NO_RULE
+    tolerance: 0.0
+    applicable_gates: [SC-02, SC-03, SC-04, SC-05, SC-07, SC-08]
+  thermal-min-v1:
+    observable: surface_temperature_min_k
+    quantity: minimum surface temperature from a thermal product with explicit variable and aggregation
+    units: K
+    valid_bodies: [EARTH, MOON]
+    support_rule: REQUIREMENT_WINDOW
+    coverage_denominator: VALID_AREA_OVER_WINDOW_AREA
+    min_valid_fraction: 0.80
+    temporal_support: UNRESOLVED
+    proxy_policy: NO_PROXY_ACCEPTED
+    decision_rule: UNRESOLVED_NO_RULE
+    tolerance: 0.0
+    applicable_gates: [SC-02, SC-03, SC-04, SC-05, SC-06, SC-07, SC-08]
+  clearance-scale-v1:
+    observable: ground_clearance_m
+    quantity: obstacle height relative to rover underbody clearance (physical field evidence only)
+    units: m
+    valid_bodies: [EARTH]
+    support_rule: REQUIREMENT_WINDOW
+    coverage_denominator: NOT_APPLICABLE
+    min_valid_fraction: 0.80
+    temporal_support: NOT_TIME_DEPENDENT
+    proxy_policy: NO_PROXY_ACCEPTED
+    decision_rule: SCALE_GATE_ONLY
+    tolerance: 0.0
+    applicable_gates: [SC-02, SC-03, SC-04, SC-05, SC-07, SC-08]
+  physical-gap-v1:
+    observable: planetary_physical_condition
+    quantity: planetary condition that natural Earth site selection cannot reproduce
+    units: "*"
+    valid_bodies: [EARTH, MOON, MARS]
+    support_rule: NOT_APPLICABLE
+    coverage_denominator: NOT_APPLICABLE
+    min_valid_fraction: 0.80
+    temporal_support: NOT_TIME_DEPENDENT
+    proxy_policy: NO_PROXY_ACCEPTED
+    decision_rule: PHYSICAL_GAP
+    tolerance: 0.0
+    applicable_gates: [SC-03, SC-07]
+
+grid:
+  cell_size_m: 60
+  window_cells: 64
+  target_support_m:
+    rule: MAX_OF_NATIVE_AND_REQUESTED
+    earth_default_m: 60
+    aggregation: AREA_AVERAGE
+    allow_upsample: false
+
+route_search:
+  max_expansions: 200000
+  max_seconds: 30
+  max_labels_per_node: 32
+  max_edge_traversals: 2
+
+# earth-simple-v1 values are PROPOSALS (assumed, uncalibrated) per architecture 12 section 5.
+energy_defaults:
+  model_id: earth-simple-v1
+  rolling_coefficient: 0.06
+  drive_efficiency: 0.65
+  idle_power_w: 35
+  science_task_wh: 10
+  roughness_multiplier: 1.0
+  uncertainty_fraction: 0.25
+  calibration_status: ASSUMED
+  gravity_mps2: 9.80665
+
+design_defaults:
+  max_route_m: 8000
+  task_dwell_s: 60
+  footprint_dilation_m: 0
+  science_task_required_capability: geological_sampling
+  auto_waypoints:
+    rule_id: auto-waypoints-v1
+    w1_min_edge_fraction: 0.15
+    w1_max_edge_fraction: 0.30
+    w2_min_from_w1_edge_fraction: 0.10
+    band_neighbourhood_cells: 5
+    tolerance_cells: 1
+
+thresholds:
+  default_cap_deg: 18
+  min_valid_fraction: 0.80
+  hard_block_valid_fraction: 0.05
+  water_only_fraction: 0.98
+  medium_confidence_min_coverage: 0.90
+  flat_gradient_tolerance: 1.0e-12
+  hazard_min_intersection_m: 1.0e-9
+  numeric_tolerance: 1.0e-9
+  energy_tolerance_wh: 1.0e-9
+  max_linear_distortion: 0.01
+
+fixtures:
+  seed: 20261105
+  generators:
+    practice-mars-target-v1:
+      generator_id: practice-mars-target
+      version: "1.0.0"
+    practice-moon-target-v1:
+      generator_id: practice-moon-target
+      version: "1.0.0"
+    practice-moon-thermal-v1:
+      generator_id: practice-moon-thermal
+      version: "1.0.0"
+    practice-earth-grid-v1:
+      generator_id: practice-earth-grid
+      version: "1.0.0"
+    practice-earth-minerals-v1:
+      generator_id: practice-earth-minerals
+      version: "1.0.0"
+    canonical-graph-v1:
+      generator_id: canonical-graph
+      version: "1.0.0"

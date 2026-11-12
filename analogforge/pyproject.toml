@@ -55,7 +55,7 @@ dev = [
 # ---- extra-tanush: Tanush may append platform-only dependencies below this line ----
 extra-tanush = ["PyJWT[crypto]>=2.10", "types-jsonschema>=4.23"]
 # ---- extra-ayan: Ayan may append science-only dependencies below this line ----
-extra-ayan = []
+extra-ayan = ["h5py>=3.10"]
 # ---- extra-aradhya: Aradhya may append renderer-only dependencies below this line ----
 extra-aradhya = []
 

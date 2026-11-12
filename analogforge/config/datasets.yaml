@@ -1,0 +1,143 @@
+# Adapter registry (owner: Ayan). A registry entry is a PROPOSED source, never acquired evidence.
+# Architecture 08 section 1 plus the two non-network sources. Product ids/versions are discovery seeds.
+config_version: "1.0"
+
+adapters:
+  earth_nasadem_hgt_v001:
+    version: "1.0.0"
+    body: EARTH
+    provider: NASA LP DAAC
+    kind: NETWORK
+    discovery_method: CMR short name NASADEM_HGT version 001
+    product_families: [NASADEM_HGT.001]
+    documentation_urls:
+      - https://doi.org/10.5067/MEASURES/NASADEM/NASADEM_HGT.001
+      - https://lpdaac.usgs.gov/documents/2237/NASADEM_User_Guide_V13.pdf
+    authentication: EARTHDATA_BEARER
+    expected_metadata: [tile_identity, byte_order, dimensions, height_datum, sample_registration, water_mask]
+    decoder: hgt
+    quality_mask_builder: nasadem_num_water
+    permitted_claim_types: [terrain_model, regional_context]
+    network_required: true
+  earth_srtmgl1_v003:
+    version: "1.0.0"
+    body: EARTH
+    provider: NASA LP DAAC
+    kind: NETWORK
+    discovery_method: CMR short name SRTMGL1 version 003
+    product_families: [SRTMGL1.003]
+    documentation_urls:
+      - https://www.earthdata.nasa.gov/s3fs-public/2025-05/SRTM_Quick_Guide.pdf
+    authentication: EARTHDATA_BEARER
+    expected_metadata: [tile_identity, byte_order, dimensions, height_datum, sample_registration, nodata]
+    decoder: hgt
+    quality_mask_builder: srtm_void
+    permitted_claim_types: [terrain_model, regional_context]
+    network_required: true
+  mars_mola_megdr:
+    version: "1.0.0"
+    body: MARS
+    provider: NASA PDS Geosciences
+    kind: NETWORK
+    discovery_method: PDS index and label parsing
+    product_families: [mgs_mola_topography_derived MEGDR topography plus counts]
+    documentation_urls:
+      - https://pds-geosciences.wustl.edu/missions/mgs/megdr.html
+      - https://ode.rsl.wustl.edu/mars/pagehelp/Content/Missions_Instruments/MGS/MOLA/Intro.htm
+    authentication: NONE
+    expected_metadata: [label, scale_offset, topography_vs_radius, areoid, longitude_convention, observation_counts]
+    decoder: pds_img
+    quality_mask_builder: mola_counts
+    permitted_claim_types: [regional_context]
+    network_required: true
+  moon_lola_gdr:
+    version: "1.0.0"
+    body: MOON
+    provider: NASA PDS Geosciences
+    kind: NETWORK
+    discovery_method: PDS index and label parsing
+    product_families: [LOLA GDR derived products]
+    documentation_urls:
+      - https://pds-geosciences.wustl.edu/missions/lro/lola.htm
+      - https://pds-geosciences.wustl.edu/missions/lro/lola_faq.htm
+    authentication: NONE
+    expected_metadata: [label, scale_offset, reference_radius, projection, valid_extent]
+    decoder: pds_img
+    quality_mask_builder: lola_nodata
+    permitted_claim_types: [regional_context]
+    network_required: true
+  earth_emit_l2bmin_v001:
+    version: "1.0.0"
+    body: EARTH
+    provider: NASA LP DAAC
+    kind: NETWORK
+    discovery_method: CMR short name EMITL2BMIN version 001
+    product_families: [EMITL2BMIN.001]
+    documentation_urls:
+      - https://doi.org/10.5067/EMIT/EMITL2BMIN.001
+      - https://lpdaac.usgs.gov/documents/1660/EMITL2BMIN_User_Guide_V1.pdf
+      - https://github.com/nasa/EMIT-Data-Resources
+    authentication: EARTHDATA_BEARER
+    expected_metadata: [variable_dictionary, geolocation_lookup, categorical_semantics, quality_masks]
+    decoder: netcdf_emit
+    quality_mask_builder: emit_quality_mask
+    permitted_claim_types: [regional_context]
+    network_required: true
+  moon_diviner_derived:
+    version: "1.0.0"
+    body: MOON
+    provider: NASA PDS Geosciences
+    kind: NETWORK
+    discovery_method: PDS index and science-variable selection
+    product_families: [Diviner derived products]
+    documentation_urls:
+      - https://pds-geosciences.wustl.edu/missions/lro/diviner.htm
+      - https://www.diviner.ucla.edu/data
+    authentication: NONE
+    expected_metadata: [variable, units_kelvin, local_time_aggregation, missing_values, frame]
+    decoder: pds_img
+    quality_mask_builder: diviner_missing
+    permitted_claim_types: [regional_context]
+    network_required: true
+  earth_user_survey:
+    version: "1.0.0"
+    body: EARTH
+    provider: USER_SUPPLIED
+    kind: NETWORK
+    discovery_method: user upload with provenance metadata
+    product_families: [user GeoTIFF]
+    documentation_urls: []
+    authentication: NONE
+    expected_metadata: [crs, nodata, units, vertical_reference, provenance]
+    decoder: geotiff
+    quality_mask_builder: nodata_only
+    permitted_claim_types: [terrain_model, field_validation]
+    network_required: false
+  local_dataset:
+    version: "1.0.0"
+    body: null
+    provider: LOCAL_DROP_IN
+    kind: LOCAL
+    discovery_method: registered manifest under the dataset root
+    product_families: [manifest-described raster]
+    documentation_urls: []
+    authentication: NONE
+    expected_metadata: [manifest]
+    decoder: gdal
+    quality_mask_builder: manifest_nodata
+    permitted_claim_types: [terrain_model, regional_context]
+    network_required: false
+  synthetic_practice:
+    version: "1.0.0"
+    body: null
+    provider: SYNTHETIC_PRACTICE
+    kind: SYNTHETIC
+    discovery_method: deterministic in-memory generator
+    product_families: [practice fixtures]
+    documentation_urls: []
+    authentication: NONE
+    expected_metadata: [generator_id, generator_version, seed]
+    decoder: generator
+    quality_mask_builder: generator
+    permitted_claim_types: [terrain_model, regional_context]
+    network_required: false

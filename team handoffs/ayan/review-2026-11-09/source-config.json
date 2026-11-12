@@ -1,0 +1,21 @@
+{
+  "aggregate": {
+    "algorithm_config_sha256": "6a8b8b21c4f40dc0fe9d2f7d8931caaaeb7706ca951e45aebd57136e564e863e",
+    "candidates_config_sha256": "c87c35bb5cd1d59570730de2cfc4b067cc05f8ad7dc8581008af3b72546c6604",
+    "datasets_config_sha256": "0481f49314400f624f4e9de25c0a8154618593fc6d1bce0c2d4d6b3a35cdeb2f",
+    "ok": true
+  },
+  "config_dir": "/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/config",
+  "files": {
+    "algorithms.yaml": {
+      "ok": true
+    },
+    "candidates.yaml": {
+      "ok": true
+    },
+    "datasets.yaml": {
+      "ok": true
+    }
+  },
+  "status": "PASS"
+}

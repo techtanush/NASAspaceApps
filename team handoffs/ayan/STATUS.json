@@ -1,0 +1,565 @@
+{
+  "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
+  "branch": "ayan/science-data-verification",
+  "catalog": {
+    "KIT-01": {
+      "command": "python3 \"architecture files/contracts/kit/materialize.py\" --verify",
+      "exit_code": 0,
+      "output_file": null,
+      "status": "PASSED",
+      "tests_failed": null,
+      "tests_passed": null,
+      "tests_skipped": null
+    },
+    "KIT-02": {
+      "command": "pytest tests/contracts/kit -q",
+      "exit_code": 0,
+      "output_file": "review-2026-11-09/kit.xml",
+      "status": "PASSED",
+      "tests_failed": 0,
+      "tests_passed": 20,
+      "tests_skipped": 0
+    },
+    "SCN-01": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_geometry",
+        "test_features"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 95,
+      "tests_skipped": 0
+    },
+    "SCN-02": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_energy"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 37,
+      "tests_skipped": 0
+    },
+    "SCN-03": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_graph_oracle"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 26,
+      "tests_skipped": 0
+    },
+    "SCN-04": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_verifier_independence"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 19,
+      "tests_skipped": 0
+    },
+    "SCN-05": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_search_limits"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 12,
+      "tests_skipped": 0
+    },
+    "SCN-06": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_practice_windows"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 21,
+      "tests_skipped": 0
+    },
+    "SCN-07": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_screening"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 8,
+      "tests_skipped": 0
+    },
+    "SCN-08": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_truth_table"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 10,
+      "tests_skipped": 0
+    },
+    "SCN-09": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_storylines"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 7,
+      "tests_skipped": 0
+    },
+    "SCN-10": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_perturbations"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 9,
+      "tests_skipped": 0
+    },
+    "SCN-11": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_dataset_validation"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 135,
+      "tests_skipped": 0
+    },
+    "SCN-12": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_mock_nasa_drop",
+        "test_review_source_pipeline"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 40,
+      "tests_skipped": 0
+    },
+    "SCN-13": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_parity"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 14,
+      "tests_skipped": 0
+    },
+    "SCN-14": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_geometry"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 36,
+      "tests_skipped": 0
+    },
+    "SCN-15": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_optional_layers",
+        "test_review_source_pipeline"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 24,
+      "tests_skipped": 0
+    },
+    "SCN-16": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_portfolio"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 13,
+      "tests_skipped": 0
+    },
+    "SCN-17": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_display_layers",
+        "test_review_source_pipeline"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 32,
+      "tests_skipped": 0
+    },
+    "SCN-18": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "live_servers": {
+        "proof": "MockTransport/format-faithful fixtures only; no live NASA request attempted.",
+        "status": "NOT_RUN"
+      },
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_adapters"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 200,
+      "tests_skipped": 0
+    },
+    "SCN-19": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_import_hygiene"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 7,
+      "tests_skipped": 0
+    },
+    "SCN-20": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_determinism"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 4,
+      "tests_skipped": 0
+    },
+    "SCN-21": {
+      "command": ".venv/bin/python scripts/science/run_oracles.py --junit data/out/ayan-review-working/science-seed2.xml --json data/out/ayan-review-working/oracles-seed2.json",
+      "exit_code": 0,
+      "note": "Observed science-only offline coverage; rows share tests and must not be summed.",
+      "output_file": "review-2026-11-09/science-seed2.xml",
+      "status": "PASSED",
+      "test_modules": [
+        "test_cancellation"
+      ],
+      "tests_failed": 0,
+      "tests_passed": 6,
+      "tests_skipped": 0
+    }
+  },
+  "change_requests": [
+    "CHANGE-REQUEST-adapters-h5py.json",
+    "CHANGE-REQUEST-analyze-rover-cap.json"
+  ],
+  "contradictions_found": [
+    "guide 08 says registrar_stub is Ayan's under tests/support/ but ownership.json assigns tests/support to Tanush: relocated to tests/fixtures/science/support (DECISIONS O-01..O-04)",
+    "auto-waypoints-v1 literal rule vs arch 40 \u00a74 window-B property: followed the property (DECISIONS R-05)",
+    "arch 40 \u00a75 context row 'per oracle' for window A: computed UNKNOWN/INSUFFICIENT_VALID_DATA (water moat leaves no 480 m cell with full support); window C now FAILs (RV-01)",
+    "Mars mission fixture comparison_rule_id emit-mineral-presence-v1 != policy id mineral-presence-v1: dispatch uses catalog mapping (C-12)"
+  ],
+  "data_not_committed": true,
+  "decisions": "see team handoffs/ayan/DECISIONS.md",
+  "defects_in_other_areas": [],
+  "environment": {
+    "drivers": [
+      "GTiff",
+      "SRTMHGT",
+      "PDS",
+      "PDS4",
+      "netCDF",
+      "AAIGrid"
+    ],
+    "gdal": "3.10.3",
+    "notes": [
+      "Fresh .venv created with uv; editable dev+extra-ayan installation, rasterio==1.4.4 for the reported GDAL environment.",
+      "No lockfile or required dependency/version/tolerance weakened; frozen kit verified byte-for-byte."
+    ],
+    "numpy": "2.5.4",
+    "pyproj": "3.8.0",
+    "python": "3.12.13",
+    "rasterio": "1.4.4",
+    "scipy": "1.18.1",
+    "uv": "0.10.12"
+  },
+  "external_blockers": [
+    "Real NASA credentials/products and independent source controls were not supplied or acquired; live servers not attempted."
+  ],
+  "full_application_or_real_science_release_ready": false,
+  "kit_verify": {
+    "command": "python3 \"architecture files/contracts/kit/materialize.py\" --verify",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  "kit_version": "1.0.0",
+  "known_limitations": [
+    "Offline S0/S1 scope only; real NASA S2/S3/S4 product/comparative/experiment validation remains unrun.",
+    "FETCH_SOURCE raw assets still require product-specific decoding and validated manifest ingestion before ADAPTER_EVIDENCE analysis.",
+    "Optional mineral sources must align in CRS/grid before co-located metrics are credited; otherwise retained but unused.",
+    "Thermal variable/local-time/season interpretation remains unresolved for qualification; optional display is not thermal equivalence.",
+    "Energy-only INCONCLUSIVE inference uses a summary lacking issue codes; non-energy DATA with unknown reserve can be indistinguishable.",
+    "Connected-zone cap remains the configured default because AnalyzeCandidateInput has no rover; actual rover feasibility requires route search.",
+    "Actual NASA endpoint/product defaults unverified against live servers; no model or browser/application integration was run here.",
+    "No calibrated physical response, real held-out split or quantified interval propagation is demonstrated."
+  ],
+  "lint": {
+    "mypy": {
+      "exit_code": 0,
+      "scope": "strict science+adapters+tiles, 105 source files",
+      "status": "PASSED"
+    },
+    "ruff": {
+      "exit_code": 0,
+      "scope": "all owned source/test/scripts",
+      "status": "PASSED"
+    }
+  },
+  "operations_supported": [
+    "INGEST_LOCAL_DATASET",
+    "RESOLVE_COVERAGE",
+    "FETCH_SOURCE",
+    "CHARACTERIZE_TARGET",
+    "SCREEN_CANDIDATES",
+    "ANALYZE_CANDIDATE",
+    "COMPARE_REQUIREMENT",
+    "ASSESS_COMPATIBILITY",
+    "DESIGN_BENCHMARK",
+    "SEARCH_ROUTE",
+    "VERIFY_ROUTE",
+    "DIAGNOSE_RESULT",
+    "OPTIMIZE_PORTFOLIO",
+    "BUILD_DISPLAY_LAYERS",
+    "AUDIT_EVIDENCE"
+  ],
+  "ownership_check": {
+    "base": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
+    "exit_code": 0,
+    "output_file": "review-2026-11-09/ownership.json",
+    "status": "PASS"
+  },
+  "performance_ms": {},
+  "person": "Ayan",
+  "pushed_sha": "3e5d1b93e3e6c22a8c67af1a31d0e2f45efe5dde",
+  "pushed_sha_scope": "Tested source commit; handoff-only descendants carry the final review evidence. Verify remote branch ancestry.",
+  "ready_to_merge": true,
+  "ready_to_merge_reason": "All required offline SCN rows, kit, ownership, lint/types, mutation and determinism checks pass. Cross-branch SCI publication/UI and S2-S5 are separate unrun scopes.",
+  "ready_to_merge_rule": "true only if every required catalog row is PASSED, kit_verify and ownership_check PASS, lint clean, self_audit complete, no hidden skips; BLOCKED_EXTERNAL allowed only for rows that require real network/credentials and have an offline PASSED equivalent",
+  "ready_to_merge_scope": "Ayan science-library S0/S1 offline contributor gates only",
+  "review_started_from_sha": "68560469a34163dfb73a35b887aaa06d88a0f264",
+  "schema_version": "2.0",
+  "sci_tests": {
+    "SCI-01": "NOT_RUN",
+    "SCI-02": "PASSED",
+    "SCI-03": "NOT_RUN",
+    "SCI-04": "NOT_RUN",
+    "SCI-05": "NOT_RUN",
+    "SCI-06": "NOT_RUN",
+    "SCI-07": "NOT_RUN",
+    "SCI-08": "PASSED",
+    "SCI-09": "NOT_RUN",
+    "SCI-10": "NOT_RUN",
+    "SCI-11": "NOT_RUN",
+    "SCI-12": "NOT_RUN",
+    "SCI-13": "NOT_RUN",
+    "SCI-14": "NOT_RUN",
+    "SCI-15": "NOT_RUN",
+    "SCI-16": "NOT_RUN",
+    "SCI-17": "NOT_RUN",
+    "SCI-18": "NOT_RUN"
+  },
+  "sci_tests_note": "See scientific-validation-report.json: full joint SCI cases are not inferred from passing science subchecks.",
+  "scientific_validation_report": "scientific-validation-report.json",
+  "secrets_not_committed": true,
+  "self_audit": {
+    "adversarial_reviewers": [
+      "Single reviewer in this chat per explicit user instruction; no subagents. Historical earlier reviews are not represented as new independent reviewers."
+    ],
+    "determinism_under_PYTHONHASHSEED": {
+      "different_working_directories": true,
+      "evidence": [
+        "review-2026-11-09/repro-seed1.json",
+        "review-2026-11-09/repro-seed2.json"
+      ],
+      "full_oracle_reports_identical": true,
+      "seeds": [
+        1,
+        2
+      ],
+      "sha256": "5ffacda74b80ef1feb8c62be079d19d7777d6390b320ad6cd4be67cfe8632b0e",
+      "status": "PASSED",
+      "workflow_operations": 6,
+      "workflow_payload_and_artifact_receipts_identical": true
+    },
+    "final_truth_checks": {
+      "facade_import": "PASSED import hygiene/socket guards; standalone facade import completed in 0.10 s.",
+      "formal_signoff": "See review-2026-11-09/README.md; required tests/scans/mutations executed, four-reviewer step superseded by user.",
+      "fresh_environment": "Created before baseline; no old output/cache used as scientific input.",
+      "kit_whitespace": "Only whitespace finding is the exact frozen kit's final blank line in ports/science_payloads.py; intentionally preserved.",
+      "threshold_override": "PASSED test_comparison::test_thresholds_come_from_the_versioned_policy_file and review-2026-11-09/threshold-facade.json"
+    },
+    "forbidden_scan": {
+      "findings": 0,
+      "status": "PASSED"
+    },
+    "mutation_check": {
+      "baseline_policy": "Passing baseline + executed invariant failure; setup errors/skips/timeouts do not count.",
+      "killed": 16,
+      "mutants": 16,
+      "output_file": "review-2026-11-09/mutations.json",
+      "status": "PASSED",
+      "supersedes": "Original 17/17 report was unreliable; see REVIEW-FINDINGS.md for ineffective mutation definitions."
+    },
+    "perturbations": {
+      "PERT-01": {
+        "after": "Moat removed, EXPOSURE_COVERAGE: FOUND/PASS, no candidate switch",
+        "before": "Mesa route WAYPOINT_RETURN: FAIL/EXPOSURE_SHORTFALL",
+        "evidence": "review-2026-11-09/science-seed2.xml",
+        "status": "PASSED",
+        "test_path": "tests/integration/science/test_perturbations.py"
+      },
+      "PERT-02": {
+        "after": "10 degree ramp: FAIL/INSUFFICIENT_EXPOSURE; search EXHAUSTIVE_INFEASIBLE, ANALOG",
+        "before": "Default corridor supports slope availability and a verified route",
+        "evidence": "review-2026-11-09/science-seed2.xml",
+        "status": "PASSED",
+        "test_path": "tests/integration/science/test_perturbations.py"
+      },
+      "PERT-03": {
+        "after": "14 degree rover: EXHAUSTIVE_INFEASIBLE, ROVER, NEW_CONTRACT_REQUIRED",
+        "before": "18 degree rover: PASS",
+        "evidence": "review-2026-11-09/science-seed2.xml",
+        "status": "PASSED",
+        "test_path": "tests/integration/science/test_perturbations.py"
+      },
+      "PERT-04": {
+        "after": "30 Wh: EXHAUSTIVE_INFEASIBLE, ROVER",
+        "before": "1800 Wh: PASS",
+        "evidence": "review-2026-11-09/science-seed2.xml",
+        "status": "PASSED",
+        "test_path": "tests/integration/science/test_perturbations.py"
+      },
+      "PERT-05": {
+        "after": "22 degree target: mesa UNKNOWN, corridor FAIL",
+        "before": "Base target: mesa UNKNOWN, corridor PASS",
+        "evidence": "review-2026-11-09/science-seed2.xml",
+        "status": "PASSED",
+        "test_path": "tests/integration/science/test_perturbations.py"
+      },
+      "PERT-06": {
+        "after": "10000 m: EXHAUSTIVE_INFEASIBLE, ANALOG; domain-bounded, zero lossy prunes",
+        "before": "100 m exposure default: verified route",
+        "evidence": "review-2026-11-09/science-seed2.xml",
+        "status": "PASSED",
+        "test_path": "tests/integration/science/test_perturbations.py"
+      },
+      "PERT-07": {
+        "after": "Binding removed: UNKNOWN/EARTH_EVIDENCE_MISSING",
+        "before": "Mineral binding: UNKNOWN/TARGET_EVIDENCE_MISSING",
+        "evidence": "review-2026-11-09/science-seed2.xml",
+        "status": "PASSED",
+        "test_path": "tests/integration/science/test_perturbations.py"
+      },
+      "PERT-08": {
+        "after": "One nodata cell on old route: FAIL/UNKNOWN_TERRAIN or FORBIDDEN_INTERSECTION; fresh search avoids cell",
+        "before": "Original corridor route: PASS",
+        "evidence": "review-2026-11-09/science-seed2.xml",
+        "status": "PASSED",
+        "test_path": "tests/integration/science/test_perturbations.py"
+      },
+      "PERT-09": {
+        "after": "S--B length 500 m: different route and distance (or no route)",
+        "before": "Canonical exposure route: 230 m",
+        "evidence": "review-2026-11-09/science-seed2.xml",
+        "status": "PASSED",
+        "test_path": "tests/integration/science/test_perturbations.py"
+      }
+    }
+  },
+  "status_values": [
+    "PASSED",
+    "FAILED",
+    "BLOCKED_ENVIRONMENT",
+    "BLOCKED_EXTERNAL",
+    "NOT_IMPLEMENTED",
+    "NOT_RUN"
+  ],
+  "tested_commit_sha": "3e5d1b93e3e6c22a8c67af1a31d0e2f45efe5dde",
+  "integration_revalidation": {
+    "date": "2026-11-11",
+    "base_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
+    "results": {
+      "kit": "PASS / 20 passed",
+      "ownership": "PASS",
+      "scn_offline": "802 passed, 0 skipped",
+      "replay": "200 passed",
+      "oracles": "1006, 0 skipped",
+      "ruff": "clean",
+      "mypy": "clean (74 files)",
+      "forbidden_scan": "0",
+      "mutations": "16/16 killed",
+      "scn_offline_plus_replay": "1006 passed, 0 skipped"
+    },
+    "defect_fixed": "SCREEN_CANDIDATES per-window DERIVED evidence had no artifact (artifact=None) -> SC-02 UNSATISFIED on every positive COMPARE with platform-supplied evidence; replaced with a per-window canonical JSON artifact; regression test test_evidence_artifact_integrity.py.",
+    "details": "team handoffs/ayan/DEBUG-REVIEW.md",
+    "second_pass_fixes": [
+      "route-level VERIFICATION claims fully assessed (SC-03/04/06)",
+      "VERIFY_ROUTE emits accepted energy-assumption ASSUMPTION evidence (SC-07)",
+      "COMPARISON evidence carries decisive metrics (SC-05/08)"
+    ],
+    "trial_merge_real_science": "main+Tanush+Ayan, AF_SCIENCE_IMPL=real, PostgreSQL 16: test_runtime_journey 4/4 and test_journey_api 6/6 passed (all COMPLETED with audited passports)"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "added_regressions": 27,
+  "baseline_commit_sha": "68560469a34163dfb73a35b887aaa06d88a0f264",
+  "cross_process_workflow_sha256": "5ffacda74b80ef1feb8c62be079d19d7777d6390b320ad6cd4be67cfe8632b0e",
+  "cross_seed_reports_identical": true,
+  "environment": {
+    "drivers": [
+      "GTiff",
+      "SRTMHGT",
+      "PDS",
+      "PDS4",
+      "netCDF",
+      "AAIGrid"
+    ],
+    "gdal": "3.10.3",
+    "numpy": "2.5.4",
+    "pyproj": "3.8.0",
+    "python": "3.12.13",
+    "rasterio": "1.4.4",
+    "scipy": "1.18.1"
+  },
+  "kit_tests": 20,
+  "mutation_behaviors": 16,
+  "mutations_killed": 16,
+  "mypy_source_files": 105,
+  "pytest_duration_s": [
+    89.424,
+    92.388
+  ],
+  "science_tests": 1000,
+  "skipped": 0,
+  "source_config": {
+    "aggregate": {
+      "algorithm_config_sha256": "6a8b8b21c4f40dc0fe9d2f7d8931caaaeb7706ca951e45aebd57136e564e863e",
+      "candidates_config_sha256": "c87c35bb5cd1d59570730de2cfc4b067cc05f8ad7dc8581008af3b72546c6604",
+      "datasets_config_sha256": "0481f49314400f624f4e9de25c0a8154618593fc6d1bce0c2d4d6b3a35cdeb2f",
+      "ok": true
+    },
+    "config_dir": "/Users/tanushchokshi/Downloads/TKS/NASA space apps/Ayan/analogforge/config",
+    "files": {
+      "algorithms.yaml": {
+        "ok": true
+      },
+      "candidates.yaml": {
+        "ok": true
+      },
+      "datasets.yaml": {
+        "ok": true
+      }
+    },
+    "status": "PASS"
+  },
+  "tested_commit_sha": "3e5d1b93e3e6c22a8c67af1a31d0e2f45efe5dde"
+}
