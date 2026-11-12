@@ -1,0 +1,35 @@
+{
+  "status": "PASSED",
+  "repair_commit": "5e08b801f84625bc930b2be43974766a7f6c08ca",
+  "application_source_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "old_first_accepted_mission": {
+    "id": "cfe0859f-4ae0-4106-a8bd-3ef1d561d071",
+    "body": "MOON",
+    "requirements": 5
+  },
+  "counterexample_preserved": true,
+  "real_twice": {
+    "startTime": "2026-11-12T23:32:34.939Z",
+    "duration": 12345.776,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "preview_twice": {
+    "startTime": "2026-11-12T23:32:36.020Z",
+    "duration": 12441.912,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "assertions_preserved": [
+    "new accepted Mars mission has9requirements",
+    "accepted contract stays accepted",
+    "live slot AWAITING_DATASETS",
+    "Start disabled",
+    "API allowed_modes empty"
+  ],
+  "scope": "Test entity selection repaired; no product source, input thresholds or dataset binding changed. Whole24-case real batch separately rerun."
+}

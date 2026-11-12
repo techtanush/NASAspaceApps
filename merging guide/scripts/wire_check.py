@@ -107,8 +107,12 @@ def main() -> int:
             rec('E-passport-renderer', hasattr(r, 'render') and bool(getattr(r, 'renderer_version', '')))
         except Exception as exc:  # noqa: BLE001
             rec('E-passport-renderer', False, f'{type(exc).__name__}: {exc}')
-        code = ("import sys, analogforge.rendering.passport as r\n"
-                f"bad=[m for m in sys.modules if m in {sorted(NETWORKY)!r} or m.split('.')[0] in {sorted(HEAVY)!r}]\n"
+        # Pydantic's frozen port types load socket transitively. The renderer
+        # must add no network modules; platform/model modules remain forbidden.
+        code = ("import sys, analogforge.ports.passport_renderer\n"
+                "baseline=set(sys.modules)\n"
+                "import analogforge.rendering.passport as r\n"
+                f"bad=[m for m in sys.modules if (m not in baseline and m in {sorted(NETWORKY)!r}) or m.split('.')[0] in {sorted(HEAVY)!r}]\n"
                 "print(','.join(bad)); sys.exit(1 if bad else 0)")
         c, out = fresh_modules(code, app)
         rec('H-renderer-import-hygiene', c == 0, out[:300])

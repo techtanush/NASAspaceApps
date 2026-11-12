@@ -1,0 +1,161 @@
+{
+  "status": "PASSED",
+  "final_executable_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "executed_final_backend_cases": [
+    {
+      "classname": "tests.unit.platform.test_merge_dev_services",
+      "name": "test_dev_cleanup_terminates_nested_service_processes",
+      "seconds": 0.042
+    },
+    {
+      "classname": "tests.unit.platform.test_merge_dev_services",
+      "name": "test_exited_service_permission_race_does_not_prevent_other_owned_cleanup",
+      "seconds": 0.001
+    },
+    {
+      "classname": "tests.unit.platform.test_persistence_worker",
+      "name": "test_worker_handler_completes_one_job_and_graceful_stop",
+      "seconds": 0.233
+    },
+    {
+      "classname": "tests.unit.platform.test_persistence_worker",
+      "name": "test_worker_survives_deadline_and_cancellation_then_processes_next_job[ScienceDeadlineExceeded-BLOCKED]",
+      "seconds": 0.204
+    },
+    {
+      "classname": "tests.unit.platform.test_persistence_worker",
+      "name": "test_worker_survives_deadline_and_cancellation_then_processes_next_job[ScienceCancelled-CANCELLED]",
+      "seconds": 0.184
+    },
+    {
+      "classname": "tests.unit.platform.test_persistence_worker",
+      "name": "test_export_failure_preserves_completed_scientific_run",
+      "seconds": 0.184
+    },
+    {
+      "classname": "tests.unit.platform.test_persistence_worker",
+      "name": "test_unexpected_handler_error_fails_closed_and_next_job_runs[key]",
+      "seconds": 0.186
+    },
+    {
+      "classname": "tests.unit.platform.test_persistence_worker",
+      "name": "test_unexpected_handler_error_fails_closed_and_next_job_runs[attribute]",
+      "seconds": 0.198
+    },
+    {
+      "classname": "tests.unit.platform.test_persistence_worker",
+      "name": "test_unexpected_handler_error_fails_closed_and_next_job_runs[api]",
+      "seconds": 0.208
+    },
+    {
+      "classname": "tests.unit.platform.test_persistence_worker",
+      "name": "test_unexpected_handler_error_fails_closed_and_next_job_runs[assertion]",
+      "seconds": 0.193
+    },
+    {
+      "classname": "tests.unit.platform.test_worker_database_reconnect",
+      "name": "test_worker_survives_a_transient_connection_error_without_logging_credentials[OperationalError]",
+      "seconds": 0.0
+    },
+    {
+      "classname": "tests.unit.platform.test_worker_database_reconnect",
+      "name": "test_worker_survives_a_transient_connection_error_without_logging_credentials[InterfaceError]",
+      "seconds": 0.0
+    },
+    {
+      "classname": "tests.unit.platform.test_worker_database_reconnect",
+      "name": "test_signal_stop_never_waits_on_the_idle_event_lock",
+      "seconds": 0.369
+    },
+    {
+      "classname": "tests.integration.platform.test_jobs_leases",
+      "name": "test_two_workers_only_one_claim_and_heartbeat",
+      "seconds": 0.02
+    },
+    {
+      "classname": "tests.integration.platform.test_jobs_leases",
+      "name": "test_expired_lease_cannot_publish_and_reaper_fences",
+      "seconds": 0.02
+    },
+    {
+      "classname": "tests.integration.platform.test_jobs_leases",
+      "name": "test_unexpired_lease_requires_exact_owner_token",
+      "seconds": 0.018
+    },
+    {
+      "classname": "tests.integration.platform.test_jobs_leases",
+      "name": "test_cancel_during_work_retains_evidence_and_rejects_late_pass",
+      "seconds": 0.021
+    },
+    {
+      "classname": "tests.integration.platform.test_jobs_leases",
+      "name": "test_cancellation_marker_fences_even_when_job_lease_is_valid",
+      "seconds": 0.017
+    },
+    {
+      "classname": "tests.integration.platform.test_jobs_leases",
+      "name": "test_crash_after_blob_move_rolls_back_records_and_retry_deduplicates",
+      "seconds": 0.015
+    },
+    {
+      "classname": "tests.integration.platform.test_jobs_leases",
+      "name": "test_cancel_during_actual_cpu_child_is_prompt",
+      "seconds": 0.328
+    },
+    {
+      "classname": "tests.integration.platform.test_jobs_leases",
+      "name": "test_concurrent_cancellation_and_publication_share_lock_order",
+      "seconds": 0.869
+    },
+    {
+      "classname": "tests.integration.platform.test_process_recovery",
+      "name": "test_api_sigkill_restart_preserves_snapshot_and_sse_cursor",
+      "seconds": 1.656
+    },
+    {
+      "classname": "tests.integration.platform.test_process_recovery",
+      "name": "test_worker_sigkill_reap_replacement_publishes_once",
+      "seconds": 2.521
+    },
+    {
+      "classname": "tests.integration.platform.test_recovery",
+      "name": "test_exhausted_worker_retries_settle_parent_atomically[False]",
+      "seconds": 0.034
+    },
+    {
+      "classname": "tests.integration.platform.test_recovery",
+      "name": "test_exhausted_worker_retries_settle_parent_atomically[True]",
+      "seconds": 0.024
+    },
+    {
+      "classname": "tests.integration.platform.test_recovery",
+      "name": "test_replacement_api_loads_committed_snapshot_and_events",
+      "seconds": 0.022
+    },
+    {
+      "classname": "tests.integration.platform.test_recovery",
+      "name": "test_replacement_worker_reclaims_expired_job_once",
+      "seconds": 0.033
+    }
+  ],
+  "postgres_restart": {
+    "database_port": 5433,
+    "api_recovered": true,
+    "mission_preserved": true,
+    "worker_exit_code": null
+  },
+  "graceful_stop": {
+    "supervisor_pid": 29074,
+    "ports": [
+      8004,
+      5180
+    ],
+    "services_closed": true,
+    "elapsed_seconds": 0.211,
+    "signal": "SIGTERM",
+    "tested_commit_sha": "9afa1c521460b8ffc1a4c84948817f4ab9508d32",
+    "restart_ready": true,
+    "restart_probe_seconds": 0.198
+  },
+  "source_scope": "Native restart and shutdown were executed at the stated earlier commits; worker/supervisor implementation unchanged. Exact final backend matrix repeats lease, kill/recovery and reconnect regressions. No user database was reset."
+}

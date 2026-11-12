@@ -1,0 +1,36 @@
+{
+  "status": "PASSED",
+  "science_original_branch_oracles": [
+    {
+      "PYTHONHASHSEED": 1,
+      "passed": 1008,
+      "failed": 0,
+      "skipped": 0,
+      "tested_commit_sha": "ba22a4a72da6664f4a420c547cdcdf34016c6e4c"
+    },
+    {
+      "PYTHONHASHSEED": 2,
+      "passed": 1008,
+      "failed": 0,
+      "skipped": 0,
+      "tested_commit_sha": "ba22a4a72da6664f4a420c547cdcdf34016c6e4c"
+    }
+  ],
+  "merged_graph_practice_receipts": {
+    "tested_commit_sha": "4dde3467d22913a3c406f3510c9b7d2a275e083f",
+    "seeds": [
+      1,
+      2
+    ],
+    "byte_identical": true,
+    "receipt_sha256": "c22376d1e23010ac5242450f5f7c6a53ba9dca1347bfd75a031333f443019726",
+    "operations": [
+      "ANALYZE_CANDIDATE",
+      "CHARACTERIZE_TARGET",
+      "DESIGN_BENCHMARK",
+      "SCREEN_CANDIDATES",
+      "SEARCH_ROUTE",
+      "VERIFY_ROUTE"
+    ]
+  }
+}

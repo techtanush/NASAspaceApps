@@ -1,0 +1,29 @@
+{
+  "status": "PASSED",
+  "audit_commit_sha": "398ad7f50a44a654553a9ca3af40706d8dea2923",
+  "protocol_tests": {
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0
+  },
+  "real_replay_control": {
+    "replays": 12,
+    "normal_reader_EOF": 12,
+    "body_bytes_each": 103575,
+    "unexpected_transport_findings": 0,
+    "verified_terminal_completions": 12
+  },
+  "unexpected_abort_negative_control": {
+    "expected_C12_findings": 1,
+    "observed_C12_findings": 1,
+    "correctly_detected": true
+  },
+  "classification_requirements": [
+    "HTTP200 plus unique server X-Request-ID",
+    "Normal body-reader EOF; no swallowed read errors",
+    "Every SSE id and JSON sequence contiguous from requested cursor",
+    "Matching run/workspace identities and terminal state",
+    "Independent exact-final-cursor snapshot observed during the same response lifetime"
+  ],
+  "unchanged": "No visual threshold lowered, check skipped, blanket SSE exception or forced scientific result."
+}

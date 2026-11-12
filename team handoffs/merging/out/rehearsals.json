@@ -1,0 +1,449 @@
+{
+  "rehearsal_source_sha": "b06a6922d0421f5905e01440c87056bab52c5d24",
+  "final_source_sha": "f628943950289a5c0777149a617c39129c17efa2",
+  "runs": [
+    {
+      "log": "merged-rehearsal-b06a692-real.log",
+      "records": [
+        {
+          "label": "PERT-01-moat-removed",
+          "run_id": "fd24b4d8-78da-4896-9a97-56d9db7281cf",
+          "mode": "synthetic",
+          "outcomes": [
+            "FAIL",
+            "PASS"
+          ],
+          "categories": [
+            "ROUTE",
+            null
+          ],
+          "candidates": [
+            "Practice grid-r0c1",
+            "Practice grid-r0c1"
+          ],
+          "publication": "LIMITED",
+          "exports": {
+            "html": "858ca53a08235240b04468299704d321c2fa0b40bc7f4b10914fc84e805d9064",
+            "json": "03d8554f9632ffce8a00900e8e5b588a781f9dc6d02d10231608e1d3f2b98b9f",
+            "csv": "98388bb74282c1eb246820c7dd65e2c3b2fd99b2d0195e4671b2976d01f33ace"
+          },
+          "mineral_reason_codes": [
+            "EARTH_EVIDENCE_MISSING",
+            "TARGET_EVIDENCE_MISSING"
+          ]
+        },
+        {
+          "label": "PERT-03-slope-cap-14",
+          "run_id": "a3533b81-34b2-4c21-9268-ee5c57ec14a5",
+          "mode": "synthetic",
+          "outcomes": [
+            "FAIL",
+            "FAIL"
+          ],
+          "categories": [
+            "ROUTE",
+            "ROVER"
+          ],
+          "candidates": [
+            "Practice grid-r0c0",
+            "Practice grid-r0c0"
+          ],
+          "publication": "LIMITED",
+          "exports": {
+            "html": "c75d6e74ee2ef9ae7f8364cf6c3ac291cfbf2f362f269abdb5020144bc768183",
+            "json": "01ae010e12d47c0ddb952dc842a4a70b5fa458c14210b0b40808b6e6582159b1",
+            "csv": "fcd8e4c30a760a313688ae3756dd3835cf4a0de7299687a87f9887b2018d5987"
+          },
+          "mineral_reason_codes": [
+            "EARTH_EVIDENCE_MISSING",
+            "TARGET_EVIDENCE_MISSING"
+          ]
+        },
+        {
+          "label": "PERT-04-small-battery",
+          "run_id": "b7b0f93c-fd5b-43a8-aca5-5a79ce44b0cd",
+          "mode": "synthetic",
+          "outcomes": [
+            "FAIL"
+          ],
+          "categories": [
+            "ROVER"
+          ],
+          "candidates": [
+            "Practice grid-r0c0"
+          ],
+          "publication": "LIMITED",
+          "exports": {
+            "html": "9adbba8928f0dfc19086725dab552eee603f6f1a8b1ac9b5337e3cb71e21d38d",
+            "json": "08891e509baea62f94202f9fea9dfdf1a3f93977f5aa13eb6116157762abe282",
+            "csv": "1f6e9daf383673eabcacd6491075863a26ef81faecb42020ad11f73fbc2f848d"
+          },
+          "mineral_reason_codes": [
+            "EARTH_EVIDENCE_MISSING",
+            "TARGET_EVIDENCE_MISSING"
+          ]
+        },
+        {
+          "label": "TEST HARNESS \u2014 not NASA data",
+          "run_id": "fb79b61b-421b-4bd6-9ae5-eee5ed149970",
+          "mode": "live",
+          "outcomes": [
+            "FAIL",
+            "PASS"
+          ],
+          "categories": [
+            "ROUTE",
+            null
+          ],
+          "candidates": [
+            "Practice grid-r0c0",
+            "Practice grid-r0c0"
+          ],
+          "publication": "LIMITED",
+          "exports": {
+            "html": "0a8db2d7e507bea3f85175eb98735768cb1f7556323cc7493b4ca90252645516",
+            "json": "58b68db1e84002fdc4f1b0a5e6397eaacca9edd84331c7badc2bd4ddd017fc6b",
+            "csv": "dfc0e05f1de6359dd0b6617d74efdc84a3937549c86534dc2f3e566274fedb13"
+          },
+          "mineral_reason_codes": [
+            "EARTH_EVIDENCE_MISSING"
+          ],
+          "provider_calls": 38
+        }
+      ],
+      "exit_code": 0,
+      "implementation": "real science and renderer; actual HTTP handlers, PostgreSQL and worker"
+    },
+    {
+      "log": "data-slot-b06a692-real.log",
+      "records": [
+        {
+          "dataset": "mock-nasa-earth-dem",
+          "scaffold_format": "HGT",
+          "validation": "PASS"
+        },
+        {
+          "dataset": "mock-nasa-mars-dem",
+          "scaffold_format": "GEOTIFF",
+          "validation": "PASS"
+        },
+        {
+          "dataset": "mock-nasa-lunar-radius",
+          "scaffold_format": "PDS3_IMG",
+          "validation": "PASS"
+        },
+        {
+          "dataset": "mock-nasa-emit",
+          "scaffold_format": "NETCDF",
+          "validation": "PASS"
+        },
+        {
+          "dataset": "mock-nasa-ascii-dem",
+          "scaffold_format": "ASCII_GRID",
+          "validation": "PASS"
+        },
+        {
+          "dataset": "mock-nasa-bad-no-crs",
+          "expected_failure": "crs_resolved",
+          "observed": [
+            "crs_resolved"
+          ]
+        },
+        {
+          "dataset": "mock-nasa-bad-html",
+          "expected_failure": "html_login_page",
+          "observed": [
+            "html_login_page"
+          ]
+        },
+        {
+          "dataset": "mock-nasa-bad-double-scale",
+          "expected_failure": "scale_offset_once",
+          "observed": [
+            "scale_offset_once"
+          ]
+        },
+        {
+          "dataset": "mock-nasa-bad-units",
+          "expected_failure": "units_and_quantity",
+          "observed": [
+            "units_and_quantity"
+          ]
+        },
+        {
+          "guard": "synthetic drop into live",
+          "rejection": "MODE_MISMATCH"
+        },
+        {
+          "label": "mock-NASA-drop-real-app",
+          "run_id": "e9b81b42-4c40-49ac-a037-6b26d4fc3547",
+          "mode": "synthetic",
+          "outcomes": [
+            "FAIL",
+            "FAIL",
+            "FAIL"
+          ],
+          "categories": [
+            "ROUTE",
+            "ANALOG",
+            "ANALOG"
+          ],
+          "candidates": [
+            "Practice grid-r0c3",
+            "Practice grid-r0c3",
+            "Practice grid-r0c15"
+          ],
+          "publication": "LIMITED",
+          "exports": {
+            "html": "a7eb9dda6cd857066459d4949c253900810e8ae837696657602f9768a197eaab",
+            "json": "26de8a52baaee552ba9fed5aa47aff5bdd99e29996f357940968bde7c567451b",
+            "csv": "b48c613478929df0f38b39a5c3be5285e468e0c1256da606f98a4317501f6f41"
+          },
+          "mineral_reason_codes": [
+            "EARTH_EVIDENCE_MISSING"
+          ]
+        },
+        {
+          "guard": "locked-byte tamper via createRun HTTP",
+          "rejection": "SOURCE_CHECKSUM_MISMATCH"
+        },
+        {
+          "label": "P9-restored-default-minerals",
+          "run_id": "a53417b3-ee9c-4074-a54a-29bcd44febba",
+          "mode": "synthetic",
+          "outcomes": [
+            "FAIL",
+            "FAIL",
+            "PASS"
+          ],
+          "categories": [
+            "ROUTE",
+            "ANALOG",
+            null
+          ],
+          "candidates": [
+            "Practice grid-r0c1",
+            "Practice grid-r0c1",
+            "Practice grid-r0c0"
+          ],
+          "publication": "LIMITED",
+          "exports": {
+            "html": "f245a0e6b1dcfdc3e67426b3476034c8a08695ff7c3f05168fd7bf380c2e85ef",
+            "json": "b431a40004da46c7c624ee1b37deb139a1a5e3e6ce4880d4bab6570770330313",
+            "csv": "7bf9b7acae03c1cef0e3935061a4286677a7bb5aa23b25745ade511bc40b2903"
+          },
+          "mineral_reason_codes": [
+            "EARTH_EVIDENCE_MISSING",
+            "TARGET_EVIDENCE_MISSING"
+          ]
+        },
+        {
+          "label": "PERT-07-mineral-unbound",
+          "run_id": "902be205-126d-4c15-bc95-afd481d23b33",
+          "mode": "synthetic",
+          "outcomes": [
+            "FAIL",
+            "PASS"
+          ],
+          "categories": [
+            "ROUTE",
+            null
+          ],
+          "candidates": [
+            "Practice grid-r0c0",
+            "Practice grid-r0c0"
+          ],
+          "publication": "LIMITED",
+          "exports": {
+            "html": "dde82903c9ff4d941692ed59697d01045cc95959371d1e497fc81065d5f9a6e3",
+            "json": "05f09cd3d468041f552086e126bb12b8bdb9a2ef8541da00be67b4d518059092",
+            "csv": "906d8ff4b473caf4f9690c264a40832d79d87c4319460e648f07cbd9b7953461"
+          },
+          "mineral_reason_codes": [
+            "EARTH_EVIDENCE_MISSING"
+          ]
+        }
+      ],
+      "exit_code": 0,
+      "implementation": "real science and renderer; actual HTTP handlers, PostgreSQL and worker"
+    },
+    {
+      "log": "complex-actions-b06a692-real.log",
+      "records": [
+        {
+          "action": "BUILD_PORTFOLIO",
+          "checkpoint": "AWAITING_REVIEW",
+          "selected": [
+            "Practice grid-r0c1"
+          ],
+          "residuals": [
+            "R-ATMOSPHERE",
+            "R-CLEARANCE",
+            "R-EXPOSURE",
+            "R-GRAVITY",
+            "R-MINERAL",
+            "R-RESERVE",
+            "R-TARGET-SLOPE-CONTEXT",
+            "R-TASKS"
+          ],
+          "mission_revision_id": "e784c6e4-11ba-41b0-9d60-783fd2e13b4a"
+        },
+        {
+          "action": "NOMINATE_CANDIDATE",
+          "origin": "USER_SUPPLIED",
+          "candidate_id": "4137795a-bbe6-4b93-a5d9-1eaf270bd8cb",
+          "mission_revision_id": "e784c6e4-11ba-41b0-9d60-783fd2e13b4a"
+        },
+        {
+          "label": "portfolio-nomination-real-app",
+          "run_id": "4ea4cdb4-c6ec-4aed-acb5-97e399fa9841",
+          "mode": "synthetic",
+          "outcomes": [
+            "FAIL",
+            "PASS"
+          ],
+          "categories": [
+            "ROUTE",
+            null
+          ],
+          "candidates": [
+            "Practice grid-r0c0",
+            "Practice grid-r0c0"
+          ],
+          "publication": "LIMITED",
+          "exports": {
+            "html": "28d8d9008056e7f9c1c8bcb4256dde0a368a4b90b9024a5b271177966ce9e41d",
+            "json": "1f9640545efde5c6304ae8d1fa0514f565cfa3f03449739101daace110f6baf9",
+            "csv": "3e89918f8c35aa027058efe717f5c9705796a686321b1fb9a7170e52188a8439"
+          },
+          "mineral_reason_codes": [
+            "EARTH_EVIDENCE_MISSING",
+            "TARGET_EVIDENCE_MISSING"
+          ]
+        }
+      ],
+      "exit_code": 0,
+      "implementation": "real science and renderer; actual HTTP handlers, PostgreSQL and worker"
+    },
+    {
+      "log": "clean/out/search-limit-rehearsal-0134083.log",
+      "tested_commit_sha": "01340833a2c5b25419344399e6b8718245793f70",
+      "exit_code": 0,
+      "implementation": "Actual HTTP handlers, private PostgreSQL, worker, real science and renderer; explicitly gated local one-expansion override",
+      "records": [
+        {
+          "label": "P8-real-app-search-budget-one",
+          "run_id": "977d3d69-b39b-4e37-b94c-2cab87d8e25a",
+          "mode": "synthetic",
+          "outcomes": [
+            "INCONCLUSIVE",
+            "INCONCLUSIVE",
+            "INCONCLUSIVE"
+          ],
+          "categories": [
+            "SEARCH_LIMIT",
+            "SEARCH_LIMIT",
+            "SEARCH_LIMIT"
+          ],
+          "candidates": [
+            "Practice grid-r0c0",
+            "Practice grid-r0c0",
+            "Practice grid-r0c0"
+          ],
+          "publication": "LIMITED",
+          "exports": {
+            "html": "c87a0faf1f8df7229cd0486ec8479b45fce7c012181e61f6f8ee05b437dbbb40",
+            "json": "9cf9fe2fb9df3e370e0f4ba9b7430c4104edbacbfdb0f874db63c15158c88e4e",
+            "csv": "f15af3b117a8d7b5f2d6efe5072ffa924c1f6347220ec2d84803c6ee2d320bad"
+          },
+          "mineral_reason_codes": [
+            "EARTH_EVIDENCE_MISSING",
+            "TARGET_EVIDENCE_MISSING"
+          ],
+          "tested_commit_sha": "01340833a2c5b25419344399e6b8718245793f70",
+          "search_max_expansions": 1
+        }
+      ],
+      "coverage_limitation": "Earlier budget was persisted during dataset binding. This observed INCONCLUSIVE result did not independently prove process-only limits reached a separately started worker. Superseded for that gate by the fresh native UI/API rehearsal afterf628943."
+    },
+    {
+      "label": "P8-separate-native-processes-real-UI-and-API",
+      "tested_commit_sha": "f628943950289a5c0777149a617c39129c17efa2",
+      "exit_code": 0,
+      "implementation": "Fresh native API+worker started with process-only1-expansion override while disk budgets remain200000; UI/API/export assertions and config-file hash check",
+      "records": [
+        {
+          "status": "PASSED",
+          "tested_commit_sha": "f628943950289a5c0777149a617c39129c17efa2",
+          "run_id": "bcbe1beb-3bf5-4f6f-ad28-7f08be366511",
+          "search_max_expansions": 1,
+          "raw_file_budget": 200000,
+          "raw_config_unchanged": true,
+          "outcomes": [
+            "INCONCLUSIVE",
+            "INCONCLUSIVE",
+            "INCONCLUSIVE"
+          ],
+          "failure_categories": [
+            "SEARCH_LIMIT",
+            "SEARCH_LIMIT",
+            "SEARCH_LIMIT"
+          ],
+          "visible_search_limit_states": 3,
+          "publication": "LIMITED",
+          "manifest_sha256": "43ca5d56cbdc408cf8e66fd577e4ed3519bd6219bdd46d7f52ed752fb1065a3f",
+          "exports": {
+            "html": "31d0af85164e5c701e941a3a02c66aef919381b1164a43244ce18ebf539ff807",
+            "json": "2b01ad97d36e475e5e443eeaed2743f0b6f0f3ae421f83666cc98e52d815d298",
+            "csv": "a002c32fbaf2314589d5a161534a8d629f32ca85d8379592e334c71af8ef8178"
+          }
+        }
+      ]
+    }
+  ],
+  "scope": "Generated/local fixtures and local fake provider only; not NASA validation or external model quality.",
+  "changes_after_rehearsal_start": [
+    "analogforge/apps/web/src/api/hooks/useRunStream.test.tsx",
+    "analogforge/apps/web/src/api/hooks/useRunStream.ts",
+    "analogforge/apps/web/src/api/runStream.test.ts",
+    "analogforge/apps/web/src/api/runStream.ts",
+    "analogforge/apps/web/src/components/ui/index.tsx",
+    "analogforge/apps/web/src/components/ui/timestamp.test.tsx",
+    "analogforge/apps/web/src/features/passport/PassportView.tsx",
+    "analogforge/apps/web/src/features/workspace/Workspace.tsx",
+    "analogforge/apps/web/src/format/quantity.test.ts",
+    "analogforge/apps/web/src/format/quantity.ts",
+    "analogforge/apps/web/src/styles/review-evidence.css",
+    "analogforge/src/analogforge/api/router.py",
+    "analogforge/src/analogforge/application/capabilities.py",
+    "analogforge/tests/e2e/integration/merge-assertions.spec.ts",
+    "analogforge/tests/e2e/list-loading-presets.spec.ts",
+    "analogforge/tests/integration/platform/test_journey_api.py",
+    "analogforge/tests/unit/platform/test_http_security.py",
+    "analogforge/tests/unit/platform/test_scenario_sources.py"
+  ],
+  "invariant_scope": "Earlier rehearsals used b06a692. Numerical science, nomination/portfolio rules, source binding/validation, claim compilation and renderer bytes remain unchanged. Later changes repair image reads, browser formatting/layout/stream handling, and wire the explicitly guarded search-budget override. The latter has its own final-backend actual P8 rehearsal; no earlier run is relabelled as exact-final source.",
+  "extra_formats": {
+    "records": [
+      {
+        "format": "COG",
+        "scaffold_format": "GEOTIFF",
+        "status": "PASSED",
+        "is_synthetic": true,
+        "validation_checks": 15
+      },
+      {
+        "format": "PDS4",
+        "scaffold_format": "PDS4_IMG",
+        "status": "PASSED",
+        "is_synthetic": true,
+        "validation_checks": 15
+      },
+      {
+        "operation": "lock",
+        "status": "PASSED",
+        "policy_id": "merge-format-check-policy"
+      }
+    ]
+  }
+}

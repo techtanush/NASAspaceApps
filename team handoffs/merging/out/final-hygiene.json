@@ -1,0 +1,22 @@
+{
+  "status": "PASSED",
+  "tested_executable_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "tracked_secret_findings": [],
+  "tracked_env_files": 0,
+  "frontend_bundle_sensitive_setting_names": [],
+  "bundle_files_checked": 32,
+  "team_setup_exit_code": 0,
+  "generated_client_matches_committed": true,
+  "dependency_lock_policy": "All final suite commands use frozen/locked dependency resolution. Native bootstrap and clean-checkout reconstruction executed.",
+  "kit_version": "1.0.0",
+  "kit_changes": [],
+  "evidence": [
+    "suites.json",
+    "source-equivalence.json",
+    "wire-final.json",
+    "purity-merged.json",
+    "platform-forbidden.json",
+    "science-forbidden.json",
+    "ui-forbidden.json"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "stage": "final",
+  "status": "PASS",
+  "results": {
+    "K-kit-verify": {
+      "status": "PASS",
+      "notes": "kit verified"
+    },
+    "H-main-no-science-or-renderer-import": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "E-science-facade": {
+      "status": "PASS",
+      "notes": "ops=15/15"
+    },
+    "E-analogforge.science.datasets.inspect:draft_manifest": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "E-analogforge.science.fixtures.mock_nasa_drop:generate": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "E-analogforge.science.fixtures.practice:generate_all": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "H-facade-import-hygiene": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "E-passport-renderer": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "H-renderer-import-hygiene": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "E-analogforge.main:app": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "E-analogforge.cli:main": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "C-config-cross-keys": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "P-presets-byte-equal": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "T-testids-in-ui-source": {
+      "status": "PASS",
+      "notes": "missing: []"
+    },
+    "A-algorithm-ids-equal-catalog": {
+      "status": "PASS",
+      "notes": ""
+    },
+    "S-science-smoke-characterize-target": {
+      "status": "PASS",
+      "notes": ""
+    }
+  }
+}

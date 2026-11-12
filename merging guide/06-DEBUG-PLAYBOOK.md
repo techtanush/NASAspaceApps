@@ -85,3 +85,17 @@ Always: reproduce with the smallest case, read the actual payload/receipt/log, c
 ## F. Escalation rule
 
 If a defect needs a kit change, follow `01` §2: reproduce, minimal change request, `tools/build_kit.py`, kit tests, update all consumers, re-run **everything** (purity rows G-02, wiring W-01…W-15, journeys), and record it in the report under `kit_changes`.
+
+
+### Saved rover label is blank after repeated real journeys
+
+Evidence from the merge: the local library had more than25immutable rover revisions. `GET /rovers` returned a non-null `next_cursor`; a newly created revision was absent from the first page. The API saved and pinned the correct revision, while the dropdown had no option for its selected ID. J09 correctly failed its visible-label assertion. Clearing the database would mask the defect.
+
+Repair (`c263d2a`, MERGE-31): consume opaque collection cursors, de-duplicate revisions by ID, preserve the just-saved/edited selected profile during refresh, and show collection failures. Cursor cycles and the explicit loading bound must fail visibly rather than silently truncate. The exact UI regression was red before repair; later-page/cursor/error tests and the real keyboard/zoom journeys verify it after repair. Re-run the full frontend, mutation, preview/real browser and visual gates; preserve the failed invocation separately. No scientific thresholds or frozen inputs change.
+
+
+### J12 expects nine requirements but reopens an older Moon contract
+
+Check the entity before altering an assertion or resetting the database. The original J12 created a Mars mission, then selected the first accepted item in `GET /missions`. On a persistent library that item can be an older Moon mission with five requirements. The app may correctly show AWAITING_DATASETS and disabled Start while the test's unrelated nine-row expectation fails.
+
+MERGE-32 (`5e08b80`) captures the exact 201 creation response, confirms that mission was accepted, and reopens its ID. All nine-row and unavailable-slot assertions remain. Preserve the failing DOM, verify the same older-Moon counterexample in real mode and the updated preview twice, then repeat the full affected real batch. No app behavior or scientific thresholds change.

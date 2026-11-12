@@ -1,0 +1,30 @@
+{
+  "status": "PASSED",
+  "runs": [
+    {
+      "run": 1,
+      "exit_code": 0
+    },
+    {
+      "run": 2,
+      "exit_code": 0
+    },
+    {
+      "run": 3,
+      "exit_code": 0
+    },
+    {
+      "run": 4,
+      "exit_code": 0
+    },
+    {
+      "run": 5,
+      "exit_code": 0
+    }
+  ],
+  "cases_per_run": 2,
+  "failed": 0,
+  "skipped": 0,
+  "readiness_marker": "atomic rename after complete PID write",
+  "assertions": "unchanged parent exit and nested PID disappearance within original5seconds"
+}

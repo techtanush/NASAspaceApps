@@ -1,0 +1,239 @@
+{
+  "tested_commit_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "stats": {
+    "expected": 34,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0
+  },
+  "browser_harness_provenance": {
+    "main10": "c263d2a",
+    "remaining24": "5e08b80; onlyJ12entityselectionchanged, allassertionsretained"
+  },
+  "mode": "real backend, mocks off",
+  "batches": [
+    {
+      "startTime": "2026-11-12T22:57:34.134Z",
+      "duration": 1759371.603,
+      "expected": 10,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    {
+      "startTime": "2026-11-12T23:32:37.504Z",
+      "duration": 1144725.4679999999,
+      "expected": 24,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  ],
+  "isolation": "Two identical committed trees, independent local databases and workers",
+  "cases": [
+    {
+      "title": "MRG-03 real persisted attempts, frozen inputs, assurance, artifacts and export digests agree",
+      "file": "integration/merge-assertions.spec.ts",
+      "repeat_index": null,
+      "seconds": 234.739
+    },
+    {
+      "title": "MRG-11 real list loading reserves geometry before asynchronous row details arrive",
+      "file": "integration/merge-assertions.spec.ts",
+      "repeat_index": null,
+      "seconds": 29.483
+    },
+    {
+      "title": "MRG-03 real persisted attempts, frozen inputs, assurance, artifacts and export digests agree",
+      "file": "integration/merge-assertions.spec.ts",
+      "repeat_index": null,
+      "seconds": 189.541
+    },
+    {
+      "title": "MRG-11 real list loading reserves geometry before asynchronous row details arrive",
+      "file": "integration/merge-assertions.spec.ts",
+      "repeat_index": null,
+      "seconds": 21.428
+    },
+    {
+      "title": "J01 full Mars investigation, immutable fail/replan/pass and independently verified exports",
+      "file": "journeys/J01-golden.spec.ts",
+      "repeat_index": null,
+      "seconds": 184.337
+    },
+    {
+      "title": "J01 full Mars investigation, immutable fail/replan/pass and independently verified exports",
+      "file": "journeys/J01-golden.spec.ts",
+      "repeat_index": null,
+      "seconds": 180.739
+    },
+    {
+      "title": "J02 graph regression preserves exact independent graph oracle",
+      "file": "journeys/J02-graph-regression.spec.ts",
+      "repeat_index": null,
+      "seconds": 206.957
+    },
+    {
+      "title": "J02 graph regression preserves exact independent graph oracle",
+      "file": "journeys/J02-graph-regression.spec.ts",
+      "repeat_index": null,
+      "seconds": 114.557
+    },
+    {
+      "title": "J11 local dataset practice matches synthetic qualifications and attempts",
+      "file": "journeys/J11-local-dataset-parity.spec.ts",
+      "repeat_index": null,
+      "seconds": 349.605
+    },
+    {
+      "title": "J11 local dataset practice matches synthetic qualifications and attempts",
+      "file": "journeys/J11-local-dataset-parity.spec.ts",
+      "repeat_index": null,
+      "seconds": 244.152
+    },
+    {
+      "title": "J03 Moon site-only keeps unknown thermal, natural gaps and complete exports",
+      "file": "journeys/J03-moon-site-only.spec.ts",
+      "repeat_index": null,
+      "seconds": 40.394
+    },
+    {
+      "title": "J03 Moon site-only keeps unknown thermal, natural gaps and complete exports",
+      "file": "journeys/J03-moon-site-only.spec.ts",
+      "repeat_index": null,
+      "seconds": 36.077
+    },
+    {
+      "title": "J04 invalid imports preserve typed fields and never persist",
+      "file": "journeys/J04-rover-import-errors.spec.ts",
+      "repeat_index": null,
+      "seconds": 0.912
+    },
+    {
+      "title": "J04 invalid imports preserve typed fields and never persist",
+      "file": "journeys/J04-rover-import-errors.spec.ts",
+      "repeat_index": null,
+      "seconds": 0.819
+    },
+    {
+      "title": "J05 rover conflict never relaxes exposure contract",
+      "file": "journeys/J05-rover-conflict.spec.ts",
+      "repeat_index": null,
+      "seconds": 73.848
+    },
+    {
+      "title": "J05 rover conflict never relaxes exposure contract",
+      "file": "journeys/J05-rover-conflict.spec.ts",
+      "repeat_index": null,
+      "seconds": 72.625
+    },
+    {
+      "title": "J06 no energy calibration is inconclusive and never zero",
+      "file": "journeys/J06-no-energy.spec.ts",
+      "repeat_index": null,
+      "seconds": 82.835
+    },
+    {
+      "title": "J06 no energy calibration is inconclusive and never zero",
+      "file": "journeys/J06-no-energy.spec.ts",
+      "repeat_index": null,
+      "seconds": 84.0
+    },
+    {
+      "title": "J07 cancellation retains committed evidence and cannot later pass",
+      "file": "journeys/J07-cancellation.spec.ts",
+      "repeat_index": null,
+      "seconds": 54.781
+    },
+    {
+      "title": "J07 cancellation retains committed evidence and cannot later pass",
+      "file": "journeys/J07-cancellation.spec.ts",
+      "repeat_index": null,
+      "seconds": 54.625
+    },
+    {
+      "title": "J08 offline reconnect resynchronizes with strictly unique persisted events",
+      "file": "journeys/J08-connection-recovery.spec.ts",
+      "repeat_index": null,
+      "seconds": 59.832
+    },
+    {
+      "title": "J08b reload during verification resumes immutable attempts without duplication",
+      "file": "journeys/J08-connection-recovery.spec.ts",
+      "repeat_index": null,
+      "seconds": 85.06
+    },
+    {
+      "title": "J08 offline reconnect resynchronizes with strictly unique persisted events",
+      "file": "journeys/J08-connection-recovery.spec.ts",
+      "repeat_index": null,
+      "seconds": 59.903
+    },
+    {
+      "title": "J08b reload during verification resumes immutable attempts without duplication",
+      "file": "journeys/J08-connection-recovery.spec.ts",
+      "repeat_index": null,
+      "seconds": 85.238
+    },
+    {
+      "title": "J09 keyboard-only authoring and qualification work at 390px",
+      "file": "journeys/J09-keyboard-zoom.spec.ts",
+      "repeat_index": null,
+      "seconds": 57.572
+    },
+    {
+      "title": "J09b 200 percent zoom reflow retains primary actions and keyboard focus",
+      "file": "journeys/J09-keyboard-zoom.spec.ts",
+      "repeat_index": null,
+      "seconds": 53.223
+    },
+    {
+      "title": "J09 keyboard-only authoring and qualification work at 390px",
+      "file": "journeys/J09-keyboard-zoom.spec.ts",
+      "repeat_index": null,
+      "seconds": 54.634
+    },
+    {
+      "title": "J09b 200 percent zoom reflow retains primary actions and keyboard focus",
+      "file": "journeys/J09-keyboard-zoom.spec.ts",
+      "repeat_index": null,
+      "seconds": 54.591
+    },
+    {
+      "title": "J10 editing creates a new draft while accepted run inputs remain immutable",
+      "file": "journeys/J10-immutability.spec.ts",
+      "repeat_index": null,
+      "seconds": 54.342
+    },
+    {
+      "title": "J10 editing creates a new draft while accepted run inputs remain immutable",
+      "file": "journeys/J10-immutability.spec.ts",
+      "repeat_index": null,
+      "seconds": 55.212
+    },
+    {
+      "title": "J12 live dataset slot is explicitly unavailable and cannot start an accepted contract",
+      "file": "journeys/J12-unbound-live.spec.ts",
+      "repeat_index": null,
+      "seconds": 3.805
+    },
+    {
+      "title": "J12 live dataset slot is explicitly unavailable and cannot start an accepted contract",
+      "file": "journeys/J12-unbound-live.spec.ts",
+      "repeat_index": null,
+      "seconds": 4.825
+    },
+    {
+      "title": "J13 live without credentials fails without creating a run or scripted fallback",
+      "file": "journeys/J13-missing-live-credentials.spec.ts",
+      "repeat_index": null,
+      "seconds": 5.761
+    },
+    {
+      "title": "J13 live without credentials fails without creating a run or scripted fallback",
+      "file": "journeys/J13-missing-live-credentials.spec.ts",
+      "repeat_index": null,
+      "seconds": 6.103
+    }
+  ]
+}
