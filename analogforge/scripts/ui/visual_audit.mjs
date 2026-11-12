@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path';
 import { mkdirSync, readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
+import {terminalStreamProof,matchesTerminalSnapshot} from './stream_audit.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..');
 const require=createRequire(resolve(root,'apps/web/package.json'));
 const { PNG }=require('pngjs');
@@ -14,11 +15,21 @@ const requiredHooks=JSON.parse(readFileSync(resolve(root,'contracts/ui-testids.j
 const auditStates=new WeakMap();
 export async function installAuditInstrumentation(page){
  if(auditStates.has(page))return;
- const state={inflight:new Set(),navigationAborts:new WeakSet(),signals:new Map(),failures:[],cancellations:[]};auditStates.set(page,state);
+ const state={inflight:new Set(),navigationAborts:new WeakSet(),signals:new Map(),failures:[],cancellations:[],aborts:[],starts:new WeakMap(),responses:new WeakMap(),snapshots:[],completed:new Map()};auditStates.set(page,state);
  await page.exposeBinding('__analogForgeAuditAbort',(_source,url,method)=>{const key=method+' '+url;state.signals.set(key,(state.signals.get(key)||0)+1);});
+ await page.exposeBinding('__analogForgeAuditSSEComplete',(_source,url,requestId,body)=>{
+  const proof=terminalStreamProof(body,url,requestId);if(proof)state.completed.set(requestId,{proof,endedAt:Date.now()});
+ });
+ page.on('response',async response=>{
+  const seenAt=Date.now(),request=response.request(),path=new URL(response.url()).pathname;
+  if(/\/runs\/[a-f0-9-]{36}\/events$/.test(path))state.responses.set(request,{requestId:response.headers()['x-request-id'],status:response.status(),startedAt:state.starts.get(request)??seenAt});
+  if(/^\/api\/v1\/runs\/[a-f0-9-]{36}$/.test(path)&&response.ok()){
+   try{const snapshot=await response.json();if(snapshot.run_id&&snapshot.workspace_id&&Number.isSafeInteger(snapshot.last_event_seq))state.snapshots.push({snapshot,seenAt});}catch{/* A body read error supplies no success evidence. */}
+  }
+ });
  page.on('request',request=>{
   if(request.isNavigationRequest()&&request.frame()===page.mainFrame())for(const pending of state.inflight)state.navigationAborts.add(pending);
-  state.inflight.add(request);
+  state.inflight.add(request);state.starts.set(request,Date.now());
  });page.on('requestfinished',request=>state.inflight.delete(request));
  page.on('requestfailed',async request=>{
   state.inflight.delete(request);await new Promise(resolve=>setTimeout(resolve,40));
@@ -26,7 +37,10 @@ export async function installAuditInstrumentation(page){
   if(error==='net::ERR_ABORTED'&&(state.navigationAborts.has(request)||signalled)){
    if(signalled)state.signals.set(key,state.signals.get(key)-1);
    state.cancellations.push({method:request.method(),path:new URL(request.url()).pathname,reason:state.navigationAborts.has(request)?'audit navigation':'observed AbortSignal'});
-  }else state.failures.push({check:'C12',message:request.method()+' '+new URL(request.url()).pathname+': '+error});
+  }else{
+   const finding={check:'C12',message:request.method()+' '+new URL(request.url()).pathname+': '+error};
+   if(error==='net::ERR_ABORTED')state.aborts.push({request,finding});else state.failures.push(finding);
+  }
  });
  await page.addInitScript(()=>{
   window.__auditCLS=0;window.__auditShifts=[];window.__auditMeasureCLS=true;window.__auditPending=0;
@@ -35,14 +49,32 @@ export async function installAuditInstrumentation(page){
    const request=input instanceof Request?input:null;const url=new URL(request?request.url:String(input),location.href).href;const method=init?.method||request?.method||'GET';const signal=init?.signal||request?.signal;
    if(signal){const record=()=>{void window.__analogForgeAuditAbort(url,method);};if(signal.aborted)record();else signal.addEventListener('abort',record,{once:true});}
    const observed=/\/(?:api\/v1|auth|artifacts)\//.test(new URL(url).pathname);if(observed)window.__auditPending++;
-   return original(input,init).finally(()=>{if(observed)window.__auditPending--;});
+   return original(input,init).then(response=>{
+    const requestId=response.headers.get('x-request-id');
+    if(requestId&&/\/api\/v1\/runs\/[a-f0-9-]{36}\/events$/.test(new URL(url).pathname)&&response.headers.get('content-type')?.startsWith('text/event-stream')&&response.body){
+     const getReader=response.body.getReader.bind(response.body);
+     response.body.getReader=(...args)=>{
+      const reader=getReader(...args),read=reader.read.bind(reader),decoder=new TextDecoder();let body='',oversized=false,reported=false;
+      reader.read=(...args)=>read(...args).then(value=>{
+       if(value.value&&!oversized){body+=decoder.decode(value.value,{stream:true});if(body.length>1048576){oversized=true;body='';}}
+       if(value.done&&!reported){reported=true;if(!oversized){body+=decoder.decode();void window.__analogForgeAuditSSEComplete(url,requestId,body);}}
+       return value;
+      });return reader;
+     };
+    }
+    return response;
+   }).finally(()=>{if(observed)window.__auditPending--;});
   };
   const observer=new PerformanceObserver(list=>{if(window.__auditMeasureCLS)for(const entry of list.getEntries())if(!entry.hadRecentInput){window.__auditCLS+=entry.value;window.__auditShifts.push({value:entry.value,sources:(entry.sources||[]).map(source=>({node:source.node?.outerHTML?.slice(0,300),before:source.previousRect,after:source.currentRect}))});}});observer.observe({type:'layout-shift',buffered:true});
   for(const name of ['pushState','replaceState']){const method=history[name].bind(history);history[name]=(...args)=>{observer.takeRecords();window.__auditCLS=0;window.__auditShifts=[];window.__auditMeasureCLS=true;method(...args);};}
  });
 }
-export function auditFailures(page){return auditStates.get(page)?.failures||[];}
-export function auditCancellations(page){return auditStates.get(page)?.cancellations||[];}
+function verifiedTerminalResponse(state,{request}){
+ const response=state.responses.get(request),completion=response&&state.completed.get(response.requestId);
+ return response?.status===200&&completion&&matchesTerminalSnapshot(completion.proof,state.snapshots,response.startedAt,completion.endedAt);
+}
+export function auditFailures(page){const state=auditStates.get(page);return state?[...state.failures,...state.aborts.filter(item=>!verifiedTerminalResponse(state,item)).map(item=>item.finding)]:[];}
+export function auditCancellations(page){const state=auditStates.get(page);return state?[...state.cancellations,...state.aborts.filter(item=>verifiedTerminalResponse(state,item)).map(({request})=>({method:request.method(),path:new URL(request.url()).pathname,reason:'Chromium cancellation notification after complete contiguous terminal EOF and matching final snapshot',requestId:state.responses.get(request).requestId,eventCount:state.completed.get(state.responses.get(request).requestId).proof.eventCount}))]:[];}
 export async function waitForAuditData(page){
  for(let pass=0;pass<12;pass++){
   await page.waitForFunction(()=>!(window.__auditPending||0)&&document.fonts.status==='loaded');

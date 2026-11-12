@@ -1,0 +1,15 @@
+import{test}from'node:test';import assert from'node:assert/strict';
+import{terminalStreamProof,matchesTerminalSnapshot}from'./stream_audit.mjs';
+const run='11111111-1111-4111-8111-111111111111',workspace='workspace-a',url=`http://localhost/api/v1/runs/${run}/events?after=0`;
+const event=(seq,state='COMPLETED',changes={})=>({seq,run_id:run,workspace_id:workspace,state,...changes});
+const frame=e=>`id:${e.seq}\nevent:run.state_changed\ndata:${JSON.stringify(e)}\n\n`;
+const text=frame(event(1,'VERIFYING'))+frame(event(2));
+const snapshot={run_id:run,workspace_id:workspace,state:'COMPLETED',last_event_seq:2};
+test('complete contiguous terminal replay matches an independently received final snapshot',()=>{const p=terminalStreamProof(text,url,'response-1');assert.equal(p.eventCount,2);assert.equal(matchesTerminalSnapshot(p,[{snapshot,seenAt:20}],10,30),true);});
+test('a gap or duplicate is not proof of complete transport',()=>{assert.equal(terminalStreamProof(frame(event(1))+frame(event(3)),url,'r'),null);assert.equal(terminalStreamProof(frame(event(1))+frame(event(1)),url,'r'),null);});
+test('truncated frame or malformed data cannot excuse a cancellation',()=>{assert.equal(terminalStreamProof(text.slice(0,-1),url,'r'),null);assert.equal(terminalStreamProof('id:1\ndata:{bad}\n\n',url,'r'),null);});
+test('wrong-run, wrong-workspace or mismatched SSE id is rejected',()=>{assert.equal(terminalStreamProof(frame(event(1,'COMPLETED',{run_id:'foreign'})),url,'r'),null);assert.equal(terminalStreamProof(frame(event(1))+frame(event(2,'COMPLETED',{workspace_id:'foreign'})),url,'r'),null);assert.equal(terminalStreamProof(text.replace('id:2','id:8'),url,'r'),null);});
+test('nonterminal EOF and missing response identity remain failures',()=>{assert.equal(terminalStreamProof(frame(event(1,'AWAITING_REVIEW')),url,'r'),null);assert.equal(terminalStreamProof(text,url,null),null);});
+test('proof must match terminal snapshot identity and exact final cursor',()=>{const p=terminalStreamProof(text,url,'r');for(const changes of [{last_event_seq:3},{run_id:'foreign'},{workspace_id:'foreign'},{state:'FAILED'}])assert.equal(matchesTerminalSnapshot(p,[{snapshot:{...snapshot,...changes},seenAt:20}],10,30),false);});
+test('a stale snapshot from before or after this response cannot qualify it',()=>{const p=terminalStreamProof(text,url,'r');for(const seenAt of[9,31])assert.equal(matchesTerminalSnapshot(p,[{snapshot,seenAt}],10,30),false);});
+test('resumed cursor still requires every subsequent event',()=>{const p=terminalStreamProof(frame(event(5)),url.replace('after=0','after=4'),'r');assert.equal(p.lastSequence,5);assert.equal(p.eventCount,1);assert.equal(terminalStreamProof(frame(event(6)),url.replace('after=0','after=4'),'r'),null);});

@@ -18,6 +18,7 @@ uv run --locked mypy src/analogforge --exclude src/analogforge/ports
 corepack pnpm run generate:client
 git diff --exit-code -- apps/web/src/generated
 for check in typecheck lint test test:contracts build; do corepack pnpm run "$check"; done
+node --test scripts/ui/stream_audit.test.mjs
 uv run --locked python scripts/forbidden_scan.py --json out/platform-forbidden.json
 uv run --locked python scripts/science/forbidden_scan.py --json out/science-forbidden.json
 uv run --locked python scripts/ui/forbidden_scan.py --json out/ui-forbidden.json
