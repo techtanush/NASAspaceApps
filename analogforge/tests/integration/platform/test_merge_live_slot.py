@@ -99,3 +99,33 @@ def test_rehearsal_cli_and_newer_binding_protection(tmp_path, monkeypatch, capsy
     save_scenarios(settings, bound)
     assert cli.main(['rehearsal', 'restore-live-slot', '--json']) == 0
     assert json.loads(capsys.readouterr().out)['restored_scenario'] == 'live-hackathon-v1'
+
+
+def test_mock_nasa_drop_binds_to_local_practice_without_entering_live(tmp_path):
+    from argparse import Namespace
+
+    from analogforge.application.capabilities import get_scenarios
+    from analogforge.application.datasets import create_lock, generate_mock_nasa_drop, validate_dataset
+    from analogforge.cli import _bind
+
+    config = tmp_path / 'config'
+    shutil.copytree(Path(__file__).parents[3] / 'config', config)
+    settings = Settings(_env_file=None, data_root=tmp_path / 'data', config_dir=config)
+    generate_mock_nasa_drop(settings)
+    identifiers = ['mock-nasa-mars-dem', 'mock-nasa-earth-dem']
+    for identifier in identifiers:
+        assert validate_dataset(settings, identifier, write_checksums=True)['status'] == 'PASS'
+    create_lock(settings, 'mock-drop-policy-v1', identifiers)
+    args = Namespace(scenario_id='local-dataset-practice-v1', policy_id='mock-drop-policy-v1',
+                     target_terrain=identifiers[0], earth_terrain=identifiers[1],
+                     earth_mineral=None, lunar_thermal=None)
+    receipt = _bind(settings, args)
+    assert receipt['status'] == 'AVAILABLE'
+    bound = get_scenarios(settings)['local-dataset-practice-v1']
+    assert bound['allowed_modes'] == ['synthetic']
+    assert bound['target_source'] == {'kind': 'LOCAL_DATASET', 'dataset_id': identifiers[0]}
+    assert bound['earth_source'] == {'kind': 'LOCAL_DATASET', 'dataset_id': identifiers[1]}
+    args.scenario_id = 'live-hackathon-v1'
+    with pytest.raises(DatasetError, match='Synthetic'):
+        _bind(settings, args)
+    assert get_scenarios(settings)['live-hackathon-v1']['allowed_modes'] == []

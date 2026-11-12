@@ -137,8 +137,9 @@ def _bind(settings: Settings, args: argparse.Namespace) -> dict[str, Any]:
     if args.scenario_id not in scenarios:
         raise DatasetError("SCENARIO_UNKNOWN", f"Unknown scenario {args.scenario_id}")
     scenario = scenarios[args.scenario_id]
-    if args.scenario_id != "live-hackathon-v1":
-        raise DatasetError("SCENARIO_BIND_FORBIDDEN", "Only the live hackathon scenario is operator-bindable")
+    if args.scenario_id not in {"live-hackathon-v1", "local-dataset-practice-v1"}:
+        raise DatasetError("SCENARIO_BIND_FORBIDDEN", "Only the live and local dataset scenarios are operator-bindable")
+    live = args.scenario_id == "live-hackathon-v1"
     policy_id = args.policy_id or scenario["default_dataset_lock_id"]
     lock = read_lock(settings, policy_id)
     entries = {entry["dataset_id"]: entry for entry in lock["datasets"]}
@@ -160,8 +161,13 @@ def _bind(settings: Settings, args: argparse.Namespace) -> dict[str, Any]:
         entry = entries.get(dataset_id)
         if entry is None:
             raise DatasetError("DATASETS_UNBOUND", f"{dataset_id} is not in lock {policy_id}")
-        if load_manifest(settings, dataset_id).is_synthetic:
+        synthetic = load_manifest(settings, dataset_id).is_synthetic
+        if synthetic and live:
             raise DatasetError("MODE_MISMATCH", f"Synthetic dataset {dataset_id} cannot bind to a live scenario")
+        if not synthetic and not live:
+            raise DatasetError(
+                "MODE_MISMATCH", f"Non-synthetic dataset {dataset_id} cannot bind to a synthetic scenario"
+            )
         if entry["role"] != role_by_option[option]:
             raise DatasetError(
                 "DATASET_ROLE_MISMATCH", f"{dataset_id} has role {entry['role']}, expected {role_by_option[option]}"
@@ -181,7 +187,7 @@ def _bind(settings: Settings, args: argparse.Namespace) -> dict[str, Any]:
     }
     scenario["default_dataset_lock_id"] = policy_id
     scenario["status"] = "AVAILABLE"
-    scenario["allowed_modes"] = ["live"]
+    scenario["allowed_modes"] = ["live" if live else "synthetic"]
     save_scenarios(settings, scenarios)
     return {
         "scenario_id": args.scenario_id,
