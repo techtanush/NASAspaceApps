@@ -4,7 +4,8 @@ import sys
 from pathlib import Path
 
 from analogforge.rendering.passport import create_passport_renderer
-from passport_renderer.fixtures.builders import build_bundle
+
+from .fixtures.builders import build_bundle
 
 
 def test_renderer_import_does_not_import_network_or_platform():

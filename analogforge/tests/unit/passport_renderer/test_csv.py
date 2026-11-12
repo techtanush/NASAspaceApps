@@ -3,7 +3,8 @@ import io
 
 from analogforge.ports.passport_renderer import CSV_COLUMNS
 from analogforge.rendering.passport import create_passport_renderer
-from passport_renderer.fixtures.builders import build_bundle
+
+from .fixtures.builders import build_bundle
 
 
 def csv_rows(bundle):
@@ -44,7 +45,8 @@ def test_missing_rows_are_pending_and_formula_safe():
 
 def test_metric_mappings_and_evidence_scoping():
     from analogforge.ports.domain_models import MeasuredMetric
-    from passport_renderer.fixtures.builders import metric
+
+    from .fixtures.builders import metric
 
     bundle = build_bundle()
     rows = csv_rows(bundle)
@@ -63,7 +65,8 @@ def test_metric_mappings_and_evidence_scoping():
 
 def test_thermal_metric_mapping():
     from analogforge.ports.domain_models import MeasuredMetric
-    from passport_renderer.fixtures.builders import metric
+
+    from .fixtures.builders import metric
 
     bundle = build_bundle("limited")
     bundle.evidence_appendix[0].metrics = [MeasuredMetric.model_validate(metric("min_temperature_k", 88, "K"))]

@@ -9,7 +9,8 @@ import rfc8785
 from analogforge.ports.common import RuntimeMode
 from analogforge.ports.hashing import canonical_sha256
 from analogforge.rendering.passport import create_passport_renderer
-from passport_renderer.fixtures.builders import build_bundle
+
+from .fixtures.builders import build_bundle
 
 
 def test_json_structure(bundle):

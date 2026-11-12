@@ -4,7 +4,8 @@ import pytest
 
 from analogforge.ports.passport_renderer import RendererError
 from analogforge.rendering.passport import create_passport_renderer
-from passport_renderer.fixtures.builders import build_bundle
+
+from .fixtures.builders import build_bundle
 
 
 @pytest.mark.parametrize(

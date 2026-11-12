@@ -1,7 +1,8 @@
 import re
 
 from analogforge.rendering.passport import create_passport_renderer
-from passport_renderer.fixtures.builders import build_bundle
+
+from .fixtures.builders import build_bundle
 
 
 def test_complete_and_safe(bundle):
