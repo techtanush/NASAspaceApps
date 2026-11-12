@@ -37,6 +37,12 @@ E2E_TARGET=real E2E_BASE_URL=http://localhost:5173 E2E_API_URL=http://localhost:
    --reporter=json,html --output ../out/playwright
 ```
 
+Preconditions found in the 2026-11-12 trial merge (all three branches, real science and renderer, mocks off):
+* **J13** needs a scenario whose `allowed_modes` contains `live`; otherwise `live` is correctly not offered and the journey cannot select it. Bind one first, through the MRG-05b TEST_HARNESS rehearsal (§05 4) or real NASA data. Do not edit `config/scenarios.yaml` to fake a binding.
+* **J11** creates and locks the practice datasets itself (`datasets generate-practice`, `validate` ×3, `lock --datasets …`); point `ANALOGFORGE_CLI` at the merged venv if it is not `analogforge/.venv/bin/analogforge`.
+* A full real run takes about 1–1.5 h on 4 vCPU (workers 1, 900 s per-test budget, 1200 s for J11). Pass `--trace off`.
+* Trial result: J01–J13 all passed once the fixes listed in `06` §C were made. Re-run them; do not rely on the trial.
+
 Requirements while running:
 * The mock banner must be **absent**; every request goes to `E2E_API_URL`; assert in the harness that `window.__MSW__` is undefined.
 * For each journey also execute the **real-only assertions** behind `isMock()` (persisted job/receipt/evidence ids retrievable via the API; exports' digests; SSE sequence integrity; no secret strings in network logs).

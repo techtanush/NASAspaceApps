@@ -48,6 +48,16 @@ Always: reproduce with the smallest case, read the actual payload/receipt/log, c
 | `mode-badge` missing after reload | derived from local state instead of snapshot | Aradhya | read `snapshot.mode` |
 | Mock banner present in real mode | `VITE_API_MOCK` leaked | Aradhya | env; guard |
 | Playwright cannot find a test id | renamed/never rendered in real data path | Aradhya | restore; ensure real-data branch sets `data-*` |
+| Critic cards never appear; `GET /critiques` empty | critiques stored only in their table, never registered as `CRITIQUE` evidence | Tanush | **Fixed on Tanush's branch 2026-11-12** (`dc8767c`): each opened/resolved critique registers immutable evidence; endpoint returns latest per issue |
+| Test Lab shows "no comparison supplied", no strategy, or no permitted repairs | public `VerificationTest.assumptions` / `TestResult.limitations` lacked the `Strategy:`, `Changed elements:` and `Permitted repairs:` lines the UI reads | Tanush | **Fixed on Tanush's branch 2026-11-12**; guard `test_journey_api` |
+| Passport refused `INVALID_PASSPORT_AUDIT` | assurance claim `UNKNOWN`/`GAP` with empty `limitations` violates `scientific-assurance.schema.json` | Tanush | **Fixed 2026-11-12** (`dc8767c`); `test_assurance` validates every report against the schema |
+| Histogram/benchmark panel shows a binary or assumption record | UI matched evidence by `algorithm_id` only; a binary grid or accepted-assumption record shared the id | Aradhya (lookup) / Ayan (ids) | **Fixed 2026-11-12**: UI filters `kind!=ASSUMPTION` and JSON media type; Ayan uses `accepted-requirement-record` / `accepted-energy-assumption` sub-ids (35 §5b) |
+| Session bootstrap fails with a present-but-null `csrf_token` | `in` check treated null as present | Aradhya | **Fixed 2026-11-12** (`session.test.ts`) |
+| A journey passes in mock but fails in real | assertion encoded a mock-only shape (fixed row counts, reason code inside `explanation`, fixed attempt count, mock timing) | Aradhya (test) | assert the specified behaviour mode-agnostically; real rows are immutable (latest per candidate), `reason_code` lives in the COMPARE_REQUIREMENT artifact; see Aradhya DECISIONS D-2026-11-12-J |
+| J11 R-MINERAL: some candidates `EARTH_EVIDENCE_MISSING` in local practice | **correct**: the practice mineral layer covers only `grid-r0c0`/`grid-r2c2`; a window without retrievals stays EARTH_EVIDENCE_MISSING | none | do not "fix" the science to match the simplified "same" in architecture 40 §4 |
+| J13 cannot select `live` | no scenario is bound for live data (correct); earlier Tanush builds also hid `live` without LLM credentials (fixed 2026-11-12, guard `test_live_mode_is_offered_once_bound_even_without_credentials`) | merge (MRG-05b) / Tanush | bind a live scenario via the MRG-05b TEST_HARNESS rehearsal or real NASA data; without credentials a live start is refused 503 `PROVIDER_AUTH_FAILED` |
+| Real-backend journeys time out at 90 s | real step limits (prep 60 s + run 180 s + PROVE IT 240 s) | Aradhya (config) | `playwright.config.ts` uses 900 s per test in real mode; J11 1200 s |
+| Slow science calls late in a run | platform re-reads every run artifact blob for each science call | Tanush | within limits today; cache by sha256 if a budget is hit |
 
 ## D. Data slot
 
