@@ -7,6 +7,7 @@ import { resolve } from 'node:path';
 import { canonicalize } from 'json-canonicalize';
 import { api, prove, startRun, tab } from '../support/workbench';
 import { persistedResults, type S } from '../support/journeyChecks';
+import {auditPage,installAuditInstrumentation,reports} from '../../../scripts/ui/visual_audit.mjs';
 
 const root = resolve(import.meta.dirname, '../../..');
 const require = createRequire(resolve(root, 'apps/web/package.json'));
@@ -100,4 +101,16 @@ test('MRG-03 real persisted attempts, frozen inputs, assurance, artifacts and ex
     '--json', resolve(root, 'out/merge/wire-artifacts.json')], { cwd: root, stdio: 'pipe' });
   writeFileSync(resolve(root, 'out/merge/persisted-assertions.json'), JSON.stringify({ runId, outcomes, mission_hash: mission.content_sha256,
     rover_hash: rover.content_sha256, manifest_hash: passport.manifest_sha256, assurance_evidence_id: passport.assurance_evidence_id, digests }, null, 2));
+});
+
+test('MRG-11 real list loading reserves geometry before asynchronous row details arrive', async ({page})=>{
+  expect(process.env.E2E_TARGET).toBe('real');
+  await installAuditInstrumentation(page);
+  await page.goto('/');
+  const start=reports.length;
+  for(const [width,height] of [[1920,1080],[1440,900],[1280,800],[1024,768],[768,1024],[390,844]]){
+    for(const theme of ['dark','light'])await auditPage(page,'S01',{width,height,theme,focus:false});
+  }
+  const findings=reports.slice(start).flatMap(report=>report.findings);
+  expect(findings,JSON.stringify(findings.slice(0,8))).toEqual([]);
 });

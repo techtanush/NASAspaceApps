@@ -1,3 +1,4 @@
+import {formatTime} from '../../format/time';
 import { Children,cloneElement,isValidElement,useId,useRef,useState,useEffect,type ReactElement,type ReactNode,type CSSProperties,type ButtonHTMLAttributes,type InputHTMLAttributes } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
@@ -49,9 +50,8 @@ export function Segmented<T extends string>({label, options, value, onChange}:{l
   return <div className="segmented" role="group" aria-label={label}>{options.map(option => <Button key={option} aria-pressed={value===option} onClick={()=>onChange(option)}>{option}</Button>)}</div>;
 }
 export function Table({caption, children, className=''}:{caption:string;children:ReactNode;className?:string}) {
-  const region=useRef<HTMLDivElement>(null);const [overflow,setOverflow]=useState(false);const hint=useId();const captionId=useId();
-  useEffect(()=>{const node=region.current;if(!node)return;const measure=()=>setOverflow(!!node.querySelector('tbody tr:not([aria-hidden="true"])')&&node.scrollWidth>node.clientWidth+1);measure();if(typeof ResizeObserver==='undefined')return;const observer=new ResizeObserver(measure);observer.observe(node);if(node.querySelector('table'))observer.observe(node.querySelector('table')!);return()=>observer.disconnect();},[children]);
-  return <div className="table-frame"><div className="table-caption" id={captionId}>{caption}</div>{overflow&&<div id={hint} className="table-overflow-hint">Scroll horizontally for all columns · use arrow keys when focused</div>}<div ref={region} className={`table-scroll ${className}`} tabIndex={0} role="region" aria-labelledby={captionId} aria-describedby={overflow?hint:undefined}><table><caption className="sr-only">{caption}</caption>{children}</table></div></div>;
+  const hint=useId();const captionId=useId();
+  return <div className="table-frame"><div className="table-caption" id={captionId}>{caption}</div><div id={hint} className="table-overflow-hint">Table navigation · arrow keys scroll columns when needed</div><div className={`table-scroll ${className}`} tabIndex={0} role="region" aria-labelledby={captionId} aria-describedby={hint}><table><caption className="sr-only">{caption}</caption>{children}</table></div></div>;
 }
 export function Banner({title,children,status='PENDING'}:{title:string;children?:ReactNode;status?:Status}) {
   return <section className={`banner status-edge-${status.toLowerCase()}`}><strong>{title}</strong>{children && <div>{children}</div>}</section>;
@@ -79,7 +79,7 @@ export function Quantity({value,unit,support,asPercentage=false}:{value:number|n
   const formatted=formatQuantity(asPercentage?value*100:value,asPercentage?'%':unit);const [number,label]=formatted.split('\u00a0');
   return <span className="quantity" data-numeric><span>{number}</span>{label && <span className="unit">{'\u00a0'}{label}</span>}{support != null && <small className="support">{formatQuantity(support,'m')} support</small>}</span>;
 }
-export function Timestamp({value}:{value:string}) { return <time className="mono" dateTime={value} title={value}>{value.replace('T',' ').replace('.000','')}</time>; }
+export function Timestamp({value}:{value:string}) { return <time className="mono" dateTime={value} title={value}>{formatTime(value)}</time>; }
 export function Mono({children}:{children:ReactNode}) { return <span className="mono">{children}</span>; }
 export function Hash({value,testid,format,compact=false}:{value:string;testid?:string;format?:string;compact?:boolean}) { return compact&&value.length>12?<details className="hash-disclosure"><summary title={value}><code className="hash">{value.slice(0,12)}…</code></summary><code className="hash" data-testid={testid} data-format={format}>{value}</code></details>:<code className="hash" title={value} data-testid={testid} data-format={format}>{value}</code>; }
 export function CopyHash({value,kind='evidence',testid,format,compact=false}:{value:string;kind?:string;testid?:string;format?:string;compact?:boolean}) {

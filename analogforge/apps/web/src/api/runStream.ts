@@ -37,6 +37,7 @@ export class RunStream {
   constructor(private readonly options: RunStreamOptions) { this.cursor=options.cursor; }
   start(): void { if (!this.stopped) return; this.stopped=false; this.generation++; void this.connect(false,this.generation); }
   stop(): void { this.stopped=true; this.generation++; this.abort?.abort(); clearTimeout(this.timer); this.options.onConnection('closed'); }
+  private finishTerminal(): void { this.stopped=true; this.generation++; clearTimeout(this.timer); this.options.onConnection('closed'); }
   get lastSequence(): number { return this.cursor; }
   private async resync(generation: number): Promise<Snapshot | undefined> {
     this.options.onConnection('resyncing');
@@ -49,7 +50,7 @@ export class RunStream {
     if(this.stopped || event.run_id!==this.options.runId || (this.options.workspaceId&&event.workspace_id!==this.options.workspaceId) || event.seq<=this.cursor) return 'ignored';
     if(event.seq!==this.cursor+1) { await this.resync(this.generation); return 'resync'; }
     this.cursor=event.seq; this.options.onEvent(event);
-    if(terminal.has(event.state)) { await this.resync(this.generation); this.stop(); return 'terminal'; }
+    if(terminal.has(event.state)) { await this.resync(this.generation); this.finishTerminal(); return 'terminal'; }
     return 'event';
   }
   private async connect(reconnect: boolean,generation: number): Promise<void> {
@@ -57,8 +58,8 @@ export class RunStream {
     try {
       if(reconnect) { const snapshot=await this.resync(generation); if(snapshot && terminal.has(snapshot.state)) { this.stop(); return; } }
       if(this.stopped || generation !== this.generation) return;
-      this.options.onConnection('connecting'); this.abort=new AbortController();
-      const response=await (this.options.fetcher || fetch)(`${API_BASE}/runs/${this.options.runId}/events?after=${this.cursor}`,{signal:this.abort.signal,credentials:'same-origin',headers:{Accept:'text/event-stream','Last-Event-ID':String(this.cursor)}});
+      this.options.onConnection('connecting'); const transport=new AbortController();this.abort=transport;
+      const response=await (this.options.fetcher || fetch)(`${API_BASE}/runs/${this.options.runId}/events?after=${this.cursor}`,{signal:transport.signal,credentials:'same-origin',headers:{Accept:'text/event-stream','Last-Event-ID':String(this.cursor)}});
       if(response.status===410) { await this.resync(generation); this.schedule(generation,0); return; }
       if(!response.ok || !response.body) throw new TypeError('Event stream unavailable');
       this.options.onConnection('connected');
@@ -69,7 +70,14 @@ export class RunStream {
         parser.feed(decoder.decode(read.value,{stream:true}));
         const state=await pending;
         if(state==='resync') {await reader.cancel(); this.schedule(generation,0); return;}
-        if(state==='terminal') {await reader.cancel(); return;}
+        if(state==='terminal') {
+          // The server closes after its committed terminal event. Consume that
+          // successful response through EOF instead of reporting a transport abort.
+          let tail=await reader.read();
+          while(!tail.done)tail=await reader.read();
+          if(this.abort===transport)this.abort=undefined;
+          return;
+        }
       }
       if(!this.stopped) this.schedule(generation);
     } catch(error) {
