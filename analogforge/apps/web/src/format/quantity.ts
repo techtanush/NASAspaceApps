@@ -17,6 +17,12 @@ export function quantity(value:number|null|undefined,unit='',digits?:number):str
 }
 /** Numeric editors retain their labelled unit and accept unformatted text while focused. */
 export function inputQuantity(value:number|null|undefined,unit:string):string {return value==null||!Number.isFinite(value)?'':number(value,unit,undefined,false).replace('−','-');}
-export function quantityRange(lower:number|null,upper:number|null,unit:string):string {if(lower===null||upper===null)return 'Unknown';return `${quantity(lower,'',PRECISION[unit])}–${quantity(upper,unit,PRECISION[unit])}`;}
+export function quantityRange(lower:number|null,upper:number|null,unit:string):string {
+ if(lower===null||upper===null||!Number.isFinite(lower)||!Number.isFinite(upper))return 'Unknown';
+ // A range shares one unit: converting only its upper endpoint changes its physical meaning.
+ const label=unit==='m'&&Math.max(Math.abs(lower),Math.abs(upper))>=1000?'km':unit==='percent'?'%':unit;
+ const divisor=unit==='m'&&label==='km'?1000:1;
+ return `${number(lower/divisor,label)}–${number(upper/divisor,label)}${label?NBSP+label:''}`;
+}
 export function signedQuantity(value:number|null,unit:string):string {if(value===null)return 'Unknown';return `${value>=0?'+':''}${quantity(value,unit)}`;}
 export const formatQuantity=quantity;
