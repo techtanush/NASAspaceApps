@@ -49,3 +49,14 @@ def test_foreign_portfolio_candidate_is_rejected_before_enqueuing():
                             {"candidate_ids": [str(uuid4())], "max_sites": 3}, 1, uow=tx)
     tx.enqueue.assert_not_called()
     tx.replace.assert_not_called()
+
+
+def test_nominated_region_is_a_context_record_instead_of_an_unsupported_discovery_claim():
+    nominated = {**candidate(), "origin": "USER_SUPPLIED", "evidence_ids": []}
+    engine = object.__new__(WorkflowEngine)
+    engine._rows = MagicMock(side_effect=lambda _workspace, table, _run: [nominated] if table == "candidates" else [])
+    engine._latest_qualifications = MagicMock(return_value=[])
+    claims = engine._claims(str(uuid4()), str(uuid4()))
+    assert len(claims) == 1
+    assert claims[0].claim_type == "CONTEXT"
+    assert claims[0].claim_id == "nomination:" + nominated["id"]

@@ -960,8 +960,8 @@ class WorkflowEngine:
         ]
         claims.extend(
             ClaimScope(
-                claim_id="discovery:" + c["id"],
-                claim_type="DISCOVERY",
+                claim_id=("nomination:" if c["origin"] == "USER_SUPPLIED" else "discovery:") + c["id"],
+                claim_type="CONTEXT" if c["origin"] == "USER_SUPPLIED" else "DISCOVERY",
                 requirement_id=None,
                 candidate_window_ids=[c["window_id"]],
                 evidence_ids=c["evidence_ids"],

@@ -534,14 +534,16 @@ def publish_passport(
             )
         )
     for candidate in candidates:
-        claim_id = f"discovery:{candidate.id}"
+        nominated = candidate.origin == "USER_SUPPLIED"
+        claim_id = f"{'nomination' if nominated else 'discovery'}:{candidate.id}"
         claims.append(
             ClaimInput(
                 claim_id=claim_id,
-                claim_type="DISCOVERY",
+                claim_type="CONTEXT" if nominated else "DISCOVERY",
                 requirement_id=None,
                 candidate_ids=(candidate.id,),
-                scope=f"{candidate.discovery_method}; reference status {candidate.novelty_status}",
+                scope="User-nominated region; automatic discovery and reference-list novelty are not claimed"
+                if nominated else f"{candidate.discovery_method}; reference status {candidate.novelty_status}",
                 evidence_ids=tuple(candidate.evidence_ids),
                 validation_level=_claim_validation_level(run, claim_id, "S2"),
                 science_gates=_science_gates({}, run.get("audit_payload", {}), claim_id),
