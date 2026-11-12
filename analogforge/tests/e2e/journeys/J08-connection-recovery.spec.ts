@@ -40,7 +40,10 @@ test('J08b reload during verification resumes immutable attempts without duplica
   await expect(page.locator('[data-testid=attempt-row][data-attempt-number="1"]')).toBeVisible();
   const first = await api<S['RunSnapshot']>(page, `/runs/${runId}`);
   expect(first.body.test_result_ids.length).toBe(1);
-  expect(first.body.state).toBe('REPLANNING');
+  // Mock time is paused exactly between attempts; a real worker may still be closing attempt 1 (VERIFYING/DIAGNOSING)
+  // or already designing attempt 2. Either way the reload happens mid-run with exactly one committed result.
+  if (isMock()) expect(first.body.state).toBe('REPLANNING');
+  else expect(['VERIFYING', 'DIAGNOSING', 'REPLANNING', 'DESIGNING_TEST']).toContain(first.body.state);
   await page.reload();
   if (isMock()) await page.clock.resume();
   await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state', 'COMPLETED', { timeout: verificationTimeout() });

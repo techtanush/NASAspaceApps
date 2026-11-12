@@ -13,7 +13,9 @@ test('J03 Moon site-only keeps unknown thermal, natural gaps and complete export
   await expect(page.getByTestId('btn-prove-it')).toHaveAttribute('data-enabled', 'false');
   await expect(page.getByTestId('prove-it-disabled-reason')).toContainText(/rover/i);
   await expect(page.getByTestId('run-state-banner')).toContainText('Not run');
-  const compat = await api<{ error: { code: string } }>(page, `/compatibility?run_id=${runId}`);
+  // candidate_id is a required query parameter (frozen OpenAPI); without it the platform rightly answers 422.
+  const firstCandidate = (await api<{ items: { id: string }[] }>(page, `/candidates?run_id=${runId}&limit=1`)).body.items[0]!.id;
+  const compat = await api<{ error: { code: string } }>(page, `/compatibility?run_id=${runId}&candidate_id=${firstCandidate}`);
   expect(compat.status).toBe(409); expect(compat.body.error.code).toBe('ROVER_REQUIRED');
   await expect.poll(async () => (await api<S['RunSnapshot']>(page, `/runs/${runId}`)).body.passport_id).not.toBeNull();
   await tab(page, 'passport');

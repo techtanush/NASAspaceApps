@@ -10,7 +10,10 @@ test('J11 local dataset practice matches synthetic qualifications and attempts',
     const root = resolve(import.meta.dirname, '../../..');
     const cli = process.env.ANALOGFORGE_CLI || resolve(root, '.venv/bin/analogforge');
     execFileSync(cli, ['datasets', 'generate-practice'], { cwd: root, stdio: 'pipe' });
-    execFileSync(cli, ['datasets', 'lock', '--policy-id', 'local-practice-policy-v1'], { cwd: root, stdio: 'pipe' });
+    // Operator sequence of architecture 36 s3: validate each practice dataset, then lock exactly those datasets.
+    const practice = ['practice-mars-target-v1', 'practice-earth-grid-v1', 'practice-earth-minerals-v1'];
+    for (const dataset of practice) execFileSync(cli, ['datasets', 'validate', dataset], { cwd: root, stdio: 'pipe' });
+    execFileSync(cli, ['datasets', 'lock', '--policy-id', 'local-practice-policy-v1', '--datasets', ...practice], { cwd: root, stdio: 'pipe' });
   }
   const syntheticId = await startRun(page);
   await prove(page);
