@@ -11,7 +11,11 @@ trap cleanup EXIT INT TERM
 uv run analogforge serve & children+=("$!")
 uv run analogforge worker & children+=("$!")
 if [ -f apps/web/package.json ]; then
-  (cd apps/web && corepack pnpm dev --host 127.0.0.1) & children+=("$!")
+  # Vite runs two directories below the server's .env. Pass only its public
+  # routing settings; do not source or expose server credentials to the browser.
+  read -r API_PORT WEB_PORT < <(uv run python -c 'from analogforge.settings import Settings; s=Settings(); print(s.api_port, s.web_port)')
+  export API_PORT WEB_PORT
+  (cd apps/web && VITE_API_MOCK=0 corepack pnpm dev --host 127.0.0.1) & children+=("$!")
 fi
 echo 'AnalogForge development services started. Ctrl-C stops API, worker, and web.'
 while :; do
