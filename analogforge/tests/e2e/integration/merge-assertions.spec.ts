@@ -36,6 +36,11 @@ test('MRG-03 real persisted attempts, frozen inputs, assurance, artifacts and ex
     expect(qualifications.find(row => row.candidate_id === tests[2]!.candidate_id && row.requirement_id === requirement)?.status)
       .toBe('PASS');
   }
+  await tab(page, 'qualification');
+  for (const requirement of ['R-EXPOSURE', 'R-TASKS', 'R-RESERVE']) {
+    await expect(page.locator(`[data-testid=qual-cell][data-candidate-name="Practice grid-r0c0"][data-requirement-id=${requirement}]`))
+      .toHaveAttribute('data-status', 'PASS');
+  }
   for (const attempt of tests) {
     expect(attempt.mission_revision_id).toBe(before.mission_revision_id);
     expect(attempt.rover_revision_id).toBe(before.rover_revision_id);
