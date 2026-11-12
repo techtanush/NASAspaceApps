@@ -9,7 +9,7 @@ from collections.abc import Callable
 from typing import Any
 from uuid import uuid4
 
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import InterfaceError, OperationalError, SQLAlchemyError
 
 from analogforge.db.store import LeaseLost, PersistenceError, Store
 from analogforge.jobs.queue import HEARTBEAT_SECONDS, LEASE_SECONDS
@@ -154,5 +154,12 @@ class Worker:
 
     def run_forever(self, poll_seconds: float = 1) -> None:
         while not self.stopping.is_set():
-            if not self.run_once():
+            try:
+                worked = self.run_once()
+            except (OperationalError, InterfaceError) as exc:
+                # Committed work and lease ownership remain in PostgreSQL. Reconnect on the
+                # next poll; an interrupted stage must still reclaim its lease before publishing.
+                logger.warning("worker.database_unavailable", extra={"error_type": type(exc).__name__})
+                worked = False
+            if not worked:
                 self.stopping.wait(poll_seconds)

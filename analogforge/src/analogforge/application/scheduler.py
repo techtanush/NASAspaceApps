@@ -2103,6 +2103,10 @@ class WorkflowEngine:
                 run["state"] = run["runtime"]["resume_state"]
                 run["blocked_dependencies"] = []
             elif action in {"BUILD_PORTFOLIO", "NOMINATE_CANDIDATE"}:
+                if action == "BUILD_PORTFOLIO":
+                    requested = set(payload.get("candidate_ids", []))
+                    if not requested or not requested.issubset(run["candidate_ids"]):
+                        raise WorkflowError("INPUT_INVALID", "Candidate selection is outside this run")
                 run.setdefault("runtime", {})["pending_action"] = {"type": action, "payload": payload}
             tx.replace("runs", run_id, run, expected_revision)
             tx.append_event(run_id, "run.action", {"action_type": action, "summary": action}, run["mode"])
@@ -2135,7 +2139,12 @@ class WorkflowEngine:
         run, _, _ = self._load(run_id, workspace_id)
         candidates = self._rows(workspace_id, "candidates", run_id)
         if pending["type"] == "BUILD_PORTFOLIO":
-            rows = self._latest_qualifications(workspace_id, run_id)
+            requested = set(pending["payload"].get("candidate_ids", []))
+            if not requested or not requested.issubset({candidate["id"] for candidate in candidates}):
+                raise WorkflowError("INPUT_INVALID", "Candidate selection is outside this run")
+            candidates = [candidate for candidate in candidates if candidate["id"] in requested]
+            rows = [row for row in self._latest_qualifications(workspace_id, run_id)
+                    if row["candidate_id"] in requested]
 
             def publish(tx: Any, r: RegisteredResult) -> None:
                 portfolio = portfolios.assemble(
