@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Local Tanush integration against accepted central C3 contract before any push",
+  "status": "C3_TANUSH_PLATFORM_VALIDATED; COMBINED_PREFLIGHT_DEPENDENCIES_PENDING",
+  "central_contract_commit": "4c9897c96dc082b82b654988ff6898f85b90e504",
+  "final_tanush_source_commit": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+  "final_preview_integration_commit": "ceda96f049607abc33a453966fa367fb9f5541bd",
+  "preview_path": "/Users/tanushchokshi/Downloads/TKS/NASA space apps/IntegrationPreview",
+  "preview_mode": "detached local worktree; no push",
+  "baseline_full": {
+    "tanush_source_commit": "54650090245c90ae257ae25aeb8c85e461944b4d",
+    "preview_integration_commit": "c356eaf48c8f5c1f667a4d639854e9fbffa2c3f3",
+    "result": "PASS",
+    "tests": 275,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 568.61,
+    "note": "Complete platform suite before the final security catch-all delta."
+  },
+  "final_delta_validation": {
+    "result": "PASS",
+    "cpu_worker_lease_tests": {
+      "tests": 22,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 6.85
+    },
+    "kit_tests": {
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "strict_transport": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "operations_covered": 43,
+      "validated_responses": 81,
+      "response_schema_values": [
+        "PASSED"
+      ],
+      "known_contract_conflicts": []
+    },
+    "ruff": "PASS: all checks passed",
+    "mypy": "PASS: no issues in 123 source files",
+    "materialize_verify": "PASS after final merge",
+    "source_path": "PASS: API, ports, main, CPU and worker module paths resolve under IntegrationPreview/analogforge/src using the Tanush Python 3.12 virtual environment",
+    "c3_export_and_compatibility": "PASS: 43 operations, required four-field JSON export object, required preliminary boolean and public projection."
+  },
+  "equivalence": {
+    "central_commit_is_preview_ancestor": true,
+    "feature_to_preview_analogforge_content_diff": [
+      "analogforge/contracts/openapi.bundled.json"
+    ],
+    "production_source_diff_from_final_tanush_commit": [],
+    "preview_openapi_byte_identical_to_central_kit": true,
+    "production_delta_5465009_to_eb4cd4c": [
+      "analogforge/src/analogforge/jobs/cpu.py"
+    ],
+    "production_delta_detail": "One catch clause now handles Exception and sends only the exception type across the spawned child boundary; final tests add real spawned stderr regressions."
+  },
+  "test_environment": {
+    "interpreter": "/Users/tanushchokshi/Downloads/TKS/NASA space apps/Tanush/analogforge/.venv/bin/python3.12",
+    "pythonpath": "/Users/tanushchokshi/Downloads/TKS/NASA space apps/IntegrationPreview/analogforge/src",
+    "database_encoding": "UTF8",
+    "database_isolation": "Preview-only application/test databases separate from root test databases; ignored .env holds URLs.",
+    "data_root": "/Users/tanushchokshi/Downloads/TKS/NASA space apps/IntegrationPreview/analogforge/data"
+  },
+  "raw_reports": [
+    "team handoffs/merging/final-preview-platform.log",
+    "team handoffs/merging/final-preview-platform-junit.xml",
+    "team handoffs/merging/release-preview-cpu-delta.log",
+    "team handoffs/merging/release-preview-cpu-delta-junit.xml",
+    "team handoffs/merging/release-preview-kit.log",
+    "team handoffs/merging/release-preview-kit-junit.xml",
+    "team handoffs/merging/release-preview-transport.log",
+    "team handoffs/merging/release-preview-transport-junit.xml",
+    "team handoffs/merging/release-preview-transport-coverage.json",
+    "team handoffs/merging/release-preview-ruff.log",
+    "team handoffs/merging/release-preview-mypy.log",
+    "team handoffs/merging/root-final-platform-junit.xml",
+    "team handoffs/merging/root-make-check-final.log"
+  ],
+  "root_final_full": {
+    "result": "PASS",
+    "tanush_source_commit": "eb4cd4c63e4477a050370c8084c89c596e9ea1af",
+    "tests": 278,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 445.1,
+    "junit_sha256": "a54e68602efe03341e8a6d860e0631c271bfe0ad7768209d7f14e52a05e28bcf",
+    "evidence": "team handoffs/merging/root-final-platform-junit.xml"
+  },
+  "push_performed": false,
+  "root_make_check": {
+    "exit_code": 2,
+    "platform_tests": "PASS: same 278/278 final JUnit, zero skips",
+    "remaining_preflight": "Production preflight FAIL because Ayan-owned datasets/algorithms/candidates configs and science facade plus Aradhya-owned renderer are absent on the Tanush-only feature branch. No test double was substituted.",
+    "other_root_reported_checks": "Separate kit 20 PASS, docs PASS, Ruff PASS, mypy 123 PASS, kit verification PASS, uv lock 86 PASS; root ran ownership, scans, mutations and OpenAPI separately.",
+    "log_sha256": "ebc23899e57c2a4492a9b32ade8941002ff76aa897133a6a78378641f49fe4fe",
+    "evidence": "team handoffs/merging/root-make-check-final.log"
+  },
+  "remaining_integration_work": "Combined preflight and real science/renderer/browser gates require the Ayan and Aradhya branches. This C3 preview proves the Tanush platform and corrected wire contract, not full product release readiness."
+}

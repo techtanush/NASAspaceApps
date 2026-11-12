@@ -1,0 +1,186 @@
+uv run python '../architecture files/contracts/kit/materialize.py' --verify
+{
+  "status": "PASS",
+  "mode": "verify",
+  "kit_version": "1.0.0",
+  "app": "/Users/tanushchokshi/Downloads/TKS/NASA space apps/Tanush/analogforge",
+  "written": [],
+  "problems": []
+}
+/Applications/Xcode.app/Contents/Developer/usr/bin/make test
+uv run pytest tests/contracts/kit -q --strict-markers -p no:randomly
+/Users/tanushchokshi/Downloads/TKS/NASA space apps/Tanush/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+....................                                                     [100%]
+20 passed in 3.11s
+uv run pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly --junitxml data/out/platform-junit.xml
+/Users/tanushchokshi/Downloads/TKS/NASA space apps/Tanush/analogforge/.venv/lib/python3.12/site-packages/pytest_asyncio/plugin.py:300: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the "fixture" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to "function" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+........................................................................ [ 25%]
+........................................................................ [ 51%]
+........................................................................ [ 77%]
+..............................................................           [100%]
+278 passed in 445.10s (0:07:25)
+./scripts/validate_docs.sh
+validate_docs: PASS
+uv run ruff check src tests/unit/platform tests/integration/platform tests/contracts/platform tests/support
+All checks passed!
+uv run mypy src/analogforge --exclude 'src/analogforge/(ports|science|rendering/passport|adapters/(earthdata|pds|emit|diviner|user_survey|source_http))'
+Success: no issues found in 123 source files
+uv run python -m analogforge.cli preflight --mode synthetic --scenario synthetic-mars-mobility-v1 --output data/out/preflight-synthetic.json --json
+{
+  "gates": [
+    {
+      "checked_at": "2026-11-07T06:32:22.648057+00:00",
+      "code": "RUNTIME_READY",
+      "dependency": "GDAL",
+      "explanation": "Scientific runtime and required GDAL drivers import",
+      "remediation": "Install a rasterio/GDAL build with the required drivers",
+      "severity": "PASS",
+      "stage": "RUNTIME"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.648438+00:00",
+      "code": "STORAGE_SPACE_LOW",
+      "dependency": "DATA_ROOT",
+      "explanation": "Writable atomic storage; free bytes=1692418048",
+      "remediation": "Provide at least 10 GiB free space",
+      "severity": "WARN",
+      "stage": "STORAGE"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.652910+00:00",
+      "code": "DATABASE_READY",
+      "dependency": "DATABASE_URL",
+      "explanation": "Database readiness checked",
+      "remediation": "Start PostgreSQL/PostGIS and run migrations",
+      "severity": "PASS",
+      "stage": "STORAGE"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.656963+00:00",
+      "code": "MIGRATION_CURRENT",
+      "dependency": "DATABASE_URL",
+      "explanation": "Current schema revision=0007; expected=0007",
+      "remediation": "Run analogforge migrate",
+      "severity": "PASS",
+      "stage": "STORAGE"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.656966+00:00",
+      "code": "DATABASE_ENCODING_UTF8",
+      "dependency": "DATABASE_URL",
+      "explanation": "Database server encoding=UTF8",
+      "remediation": "Create a UTF8 database from template0",
+      "severity": "PASS",
+      "stage": "STORAGE"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.656969+00:00",
+      "code": "IDENTITY_READY",
+      "dependency": "AUTH_MODE",
+      "explanation": "local binding validated by typed settings",
+      "remediation": "",
+      "severity": "PASS",
+      "stage": "IDENTITY"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.656970+00:00",
+      "code": "MODEL_NOT_REQUIRED",
+      "dependency": "OpenAI",
+      "explanation": "synthetic mode does not construct a model provider",
+      "remediation": "",
+      "severity": "PASS",
+      "stage": "MODEL"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.676691+00:00",
+      "code": "SCENARIO_READY",
+      "dependency": "synthetic-mars-mobility-v1",
+      "explanation": "Scenario status=AVAILABLE; allowed modes=['synthetic']",
+      "remediation": "Bind required datasets or choose an available mode",
+      "severity": "PASS",
+      "stage": "SCENARIO"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.676755+00:00",
+      "code": "CONFIG_MISSING",
+      "dependency": "datasets.yaml",
+      "explanation": "Required configuration is missing",
+      "remediation": "Install config/datasets.yaml",
+      "severity": "FAIL",
+      "stage": "METADATA"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.676768+00:00",
+      "code": "CONFIG_MISSING",
+      "dependency": "algorithms.yaml",
+      "explanation": "Required configuration is missing",
+      "remediation": "Install config/algorithms.yaml",
+      "severity": "FAIL",
+      "stage": "METADATA"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.676778+00:00",
+      "code": "CONFIG_MISSING",
+      "dependency": "candidates.yaml",
+      "explanation": "Required configuration is missing",
+      "remediation": "Install config/candidates.yaml",
+      "severity": "FAIL",
+      "stage": "METADATA"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.676780+00:00",
+      "code": "DOWNLOAD_OFFLINE",
+      "dependency": "source adapters",
+      "explanation": "No network download is required by this preflight",
+      "remediation": "",
+      "severity": "PASS",
+      "stage": "DOWNLOAD"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.676831+00:00",
+      "code": "SCIENCE_FACADE_MISSING",
+      "dependency": "analogforge.science.facade",
+      "explanation": "Science facade entry point unavailable: ModuleNotFoundError",
+      "remediation": "Install the science facade and its runtime dependencies",
+      "severity": "FAIL",
+      "stage": "SCIENCE"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.677187+00:00",
+      "code": "RENDERER_MISSING",
+      "dependency": "analogforge.rendering.passport",
+      "explanation": "Passport renderer entry point unavailable: ModuleNotFoundError",
+      "remediation": "Install the passport renderer",
+      "severity": "FAIL",
+      "stage": "SCIENCE"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.677565+00:00",
+      "code": "LOCK_READY",
+      "dependency": "synthetic-policy-v1",
+      "explanation": "Policy hash and source files match",
+      "remediation": "",
+      "severity": "PASS",
+      "stage": "LOCK"
+    },
+    {
+      "checked_at": "2026-11-07T06:32:22.677569+00:00",
+      "code": "SYNTHETIC_FIXTURES_READY",
+      "dependency": "synthetic-policy-v1",
+      "explanation": "Scenario uses frozen synthetic fixture selectors",
+      "remediation": "",
+      "severity": "PASS",
+      "stage": "DATASETS"
+    }
+  ],
+  "mode": "synthetic",
+  "scenario_id": "synthetic-mars-mobility-v1",
+  "status": "FAIL"
+}
+make: *** [check] Error 1
