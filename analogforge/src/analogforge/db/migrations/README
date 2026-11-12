@@ -1,0 +1,4 @@
+Forward migrations 0001..0007 are applied using Store.migrate().
+Downgrade of deployed scientific data is intentionally unsupported. Restore a
+verified database + blob backup into an isolated environment instead. Migration
+credentials need CREATE EXTENSION privileges; runtime roles must not be owners.

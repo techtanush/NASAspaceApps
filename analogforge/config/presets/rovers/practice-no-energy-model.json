@@ -1,0 +1,25 @@
+{
+  "name": "PRACTICE-NO-ENERGY-MODEL",
+  "mass_kg": 42,
+  "max_slope_deg": 18,
+  "ground_clearance_m": 0.2,
+  "wheel_diameter_m": 0.3,
+  "max_obstacle_height_m": null,
+  "battery_wh": 1800,
+  "min_reserve_pct": 20,
+  "nominal_speed_mps": 0.5,
+  "max_route_m": null,
+  "sensors": [
+    "stereo_camera",
+    "imu",
+    "lidar"
+  ],
+  "capabilities": [
+    "autonomous_navigation",
+    "geological_sampling"
+  ],
+  "energy_model": null,
+  "assumptions": [
+    "Practice rover without an energy model: energy-dependent checks must be INCONCLUSIVE (DATA), never zero consumption."
+  ]
+}

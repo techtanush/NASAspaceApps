@@ -1,0 +1,82 @@
+{
+  "note": "Exact expected outcomes; mirrors analogforge.ports.catalog.GRAPH_EXPECTED. Tie-break: lexicographically smallest node_sequence among equal (distance, energy).",
+  "supplied_fail": {
+    "route": [
+      "S",
+      "A",
+      "W1",
+      "W2",
+      "W1",
+      "A",
+      "S"
+    ],
+    "distance_m": 120,
+    "energy_wh": 26,
+    "unique_exposure_m": 0,
+    "outcome": "FAIL",
+    "violation": "EXPOSURE_SHORTFALL",
+    "category": "ROUTE"
+  },
+  "supplied_pass": {
+    "route": [
+      "S",
+      "B",
+      "C",
+      "W1",
+      "W2",
+      "W1",
+      "C",
+      "B",
+      "S"
+    ],
+    "distance_m": 340,
+    "energy_wh": 34,
+    "unique_exposure_m": 150,
+    "outcome": "PASS",
+    "reserve_pct": 98.11111111111111
+  },
+  "search_waypoint_return": {
+    "route": [
+      "S",
+      "A",
+      "W1",
+      "W2",
+      "W1",
+      "A",
+      "S"
+    ],
+    "distance_m": 120,
+    "energy_wh": 26,
+    "unique_exposure_m": 0,
+    "search_status": "FOUND",
+    "outcome": "FAIL",
+    "category": "ROUTE"
+  },
+  "search_exposure_coverage": {
+    "route": [
+      "S",
+      "A",
+      "W1",
+      "W2",
+      "W1",
+      "C",
+      "B",
+      "S"
+    ],
+    "distance_m": 230,
+    "energy_wh": 30,
+    "unique_exposure_m": 150,
+    "search_status": "FOUND",
+    "outcome": "PASS",
+    "reserve_pct": 98.33333333333333
+  },
+  "one_expansion_budget": {
+    "search_status": "BUDGET_EXHAUSTED",
+    "outcome": "INCONCLUSIVE",
+    "category": "SEARCH_LIMIT"
+  },
+  "steep_edges_removed": {
+    "search_status": "EXHAUSTIVE_INFEASIBLE",
+    "outcome": "FAIL"
+  }
+}

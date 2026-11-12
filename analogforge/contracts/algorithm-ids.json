@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "algorithm_ids": {
+    "INGEST_LOCAL_DATASET": "ingest-local-dataset",
+    "CHARACTERIZE_TARGET": "characterize-target",
+    "SCREEN_CANDIDATES": "screen-candidates",
+    "ANALYZE_CANDIDATE": "analyze-candidate",
+    "ANALYSIS_SUMMARY": "analysis-summary",
+    "COMPARE_REQUIREMENT": "compare-requirement",
+    "ASSESS_COMPATIBILITY": "assess-compatibility",
+    "DESIGN_BENCHMARK": "design-benchmark",
+    "SEARCH_ROUTE": "search-route",
+    "VERIFY_ROUTE": "verify-route",
+    "ROUTE_TELEMETRY": "route-telemetry",
+    "DIAGNOSE_RESULT": "diagnose-result",
+    "OPTIMIZE_PORTFOLIO": "optimize-portfolio",
+    "AUDIT_EVIDENCE": "audit-evidence",
+    "SCIENTIFIC_ASSURANCE": "scientific-assurance"
+  },
+  "constraint_ids_note": "see analogforge.ports.catalog"
+}

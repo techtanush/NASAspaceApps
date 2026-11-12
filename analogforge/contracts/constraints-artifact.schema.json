@@ -1,0 +1,701 @@
+{
+  "$defs": {
+    "EnergyModel": {
+      "additionalProperties": false,
+      "properties": {
+        "model_id": {
+          "title": "Model Id",
+          "type": "string"
+        },
+        "rolling_coefficient": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Rolling Coefficient",
+          "type": "number"
+        },
+        "drive_efficiency": {
+          "exclusiveMinimum": 0.0,
+          "maximum": 1.0,
+          "title": "Drive Efficiency",
+          "type": "number"
+        },
+        "idle_power_w": {
+          "minimum": 0.0,
+          "title": "Idle Power W",
+          "type": "number"
+        },
+        "science_task_wh": {
+          "minimum": 0.0,
+          "title": "Science Task Wh",
+          "type": "number"
+        },
+        "roughness_multiplier": {
+          "minimum": 1.0,
+          "title": "Roughness Multiplier",
+          "type": "number"
+        },
+        "uncertainty_fraction": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Uncertainty Fraction",
+          "type": "number"
+        },
+        "calibration_status": {
+          "enum": [
+            "ASSUMED",
+            "CALIBRATED"
+          ],
+          "title": "Calibration Status",
+          "type": "string"
+        },
+        "calibration_evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Calibration Evidence Id"
+        }
+      },
+      "required": [
+        "model_id",
+        "rolling_coefficient",
+        "drive_efficiency",
+        "idle_power_w",
+        "science_task_wh",
+        "roughness_multiplier",
+        "uncertainty_fraction",
+        "calibration_status",
+        "calibration_evidence_id"
+      ],
+      "title": "EnergyModel",
+      "type": "object"
+    },
+    "EnergySpec": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EnergyModel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "battery_wh": {
+          "exclusiveMinimum": 0,
+          "title": "Battery Wh",
+          "type": "number"
+        },
+        "min_reserve_pct": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Min Reserve Pct",
+          "type": "number"
+        },
+        "rover_mass_kg": {
+          "exclusiveMinimum": 0,
+          "title": "Rover Mass Kg",
+          "type": "number"
+        },
+        "nominal_speed_mps": {
+          "exclusiveMinimum": 0,
+          "title": "Nominal Speed Mps",
+          "type": "number"
+        },
+        "gravity_mps2": {
+          "const": 9.80665,
+          "default": 9.80665,
+          "title": "Gravity Mps2",
+          "type": "number"
+        }
+      },
+      "required": [
+        "model",
+        "battery_wh",
+        "min_reserve_pct",
+        "rover_mass_kg",
+        "nominal_speed_mps"
+      ],
+      "title": "EnergySpec",
+      "type": "object"
+    },
+    "ExposureSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "requirement_id": {
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "metric_id": {
+          "const": "surface_slope_deg",
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "band_deg": {
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ],
+          "title": "Band Deg",
+          "type": "array"
+        },
+        "upper_inclusive": {
+          "title": "Upper Inclusive",
+          "type": "boolean"
+        },
+        "minimum_distance_m": {
+          "minimum": 0,
+          "title": "Minimum Distance M",
+          "type": "number"
+        },
+        "counting": {
+          "enum": [
+            "UNIQUE_UNDIRECTED_EDGE_DISTANCE",
+            "TOTAL_TRAVERSED_DISTANCE"
+          ],
+          "title": "Counting",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "metric_id",
+        "band_deg",
+        "upper_inclusive",
+        "minimum_distance_m",
+        "counting"
+      ],
+      "title": "ExposureSpec",
+      "type": "object"
+    },
+    "GraphEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "a": {
+          "title": "A",
+          "type": "string"
+        },
+        "b": {
+          "title": "B",
+          "type": "string"
+        },
+        "length_m": {
+          "exclusiveMinimum": 0,
+          "title": "Length M",
+          "type": "number"
+        },
+        "surface_slope_deg": {
+          "maximum": 90,
+          "minimum": 0,
+          "title": "Surface Slope Deg",
+          "type": "number"
+        },
+        "mock_energy_wh": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mock Energy Wh"
+        }
+      },
+      "required": [
+        "a",
+        "b",
+        "length_m",
+        "surface_slope_deg"
+      ],
+      "title": "GraphEdge",
+      "type": "object"
+    },
+    "GraphSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "nodes": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Nodes",
+          "type": "array"
+        },
+        "edges": {
+          "items": {
+            "$ref": "#/$defs/GraphEdge"
+          },
+          "minItems": 1,
+          "title": "Edges",
+          "type": "array"
+        }
+      },
+      "required": [
+        "nodes",
+        "edges"
+      ],
+      "title": "GraphSpec",
+      "type": "object"
+    },
+    "GridSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "analysis_evidence_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Analysis Evidence Id"
+        },
+        "analysis_grid_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Analysis Grid Sha256",
+          "type": "string"
+        },
+        "crs_wkt": {
+          "title": "Crs Wkt",
+          "type": "string"
+        },
+        "cell_size_m": {
+          "exclusiveMinimum": 0,
+          "title": "Cell Size M",
+          "type": "number"
+        },
+        "width": {
+          "minimum": 1,
+          "title": "Width",
+          "type": "integer"
+        },
+        "height": {
+          "minimum": 1,
+          "title": "Height",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "analysis_grid_sha256",
+        "crs_wkt",
+        "cell_size_m",
+        "width",
+        "height"
+      ],
+      "title": "GridSpec",
+      "type": "object"
+    },
+    "SolverConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "max_expansions": {
+          "minimum": 1,
+          "title": "Max Expansions",
+          "type": "integer"
+        },
+        "max_seconds": {
+          "minimum": 1,
+          "title": "Max Seconds",
+          "type": "integer"
+        },
+        "max_labels_per_node": {
+          "minimum": 1,
+          "title": "Max Labels Per Node",
+          "type": "integer"
+        },
+        "seed": {
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "max_expansions",
+        "max_seconds",
+        "max_labels_per_node",
+        "seed"
+      ],
+      "title": "SolverConfig",
+      "type": "object"
+    },
+    "TaskSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "task_id": {
+          "minLength": 1,
+          "title": "Task Id",
+          "type": "string"
+        },
+        "requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Requirement Ids",
+          "type": "array"
+        },
+        "kind": {
+          "enum": [
+            "SAMPLING",
+            "IMAGING",
+            "STOP"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "location": {
+          "$ref": "#/$defs/Waypoint"
+        },
+        "tolerance_m": {
+          "minimum": 0,
+          "title": "Tolerance M",
+          "type": "number"
+        },
+        "dwell_s": {
+          "minimum": 0,
+          "title": "Dwell S",
+          "type": "number"
+        },
+        "incremental_energy_wh": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Incremental Energy Wh"
+        },
+        "required_capability": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Capability"
+        },
+        "evidence_origin": {
+          "enum": [
+            "USER_DESIGNATED",
+            "EVIDENCE_SUPPORTED",
+            "SYNTHETIC_FIXTURE"
+          ],
+          "title": "Evidence Origin",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task_id",
+        "requirement_ids",
+        "kind",
+        "location",
+        "tolerance_m",
+        "dwell_s",
+        "evidence_origin"
+      ],
+      "title": "TaskSpec",
+      "type": "object"
+    },
+    "Waypoint": {
+      "additionalProperties": false,
+      "properties": {
+        "node_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Node Id"
+        },
+        "lon": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lon"
+        },
+        "lat": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lat"
+        },
+        "x_m": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "X M"
+        },
+        "y_m": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Y M"
+        }
+      },
+      "title": "Waypoint",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable frozen constraints for one VerificationTest. Stored as a JSON blob; its\ncanonical RFC 8785 SHA-256 is VerificationTest.constraints_sha256.",
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "artifact_kind": {
+      "enum": [
+        "RASTER_ROUTE_TEST",
+        "SYNTHETIC_GRAPH_REGRESSION"
+      ],
+      "title": "Artifact Kind",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "live",
+        "replay",
+        "synthetic"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "resource_provider": {
+      "enum": [
+        "PHYSICAL_EARTH_MODEL",
+        "TEST_ONLY_MOCK_GRAPH"
+      ],
+      "title": "Resource Provider",
+      "type": "string"
+    },
+    "mission_revision_id": {
+      "format": "uuid",
+      "title": "Mission Revision Id",
+      "type": "string"
+    },
+    "mission_content_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Mission Content Sha256",
+      "type": "string"
+    },
+    "rover_revision_id": {
+      "format": "uuid",
+      "title": "Rover Revision Id",
+      "type": "string"
+    },
+    "rover_content_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Rover Content Sha256",
+      "type": "string"
+    },
+    "candidate_window_id": {
+      "title": "Candidate Window Id",
+      "type": "string"
+    },
+    "test_revision": {
+      "minimum": 1,
+      "title": "Test Revision",
+      "type": "integer"
+    },
+    "strategy": {
+      "enum": [
+        "WAYPOINT_RETURN",
+        "EXPOSURE_COVERAGE",
+        "MINIMUM_FEASIBLE_ROUTE",
+        "RECOVERY_ALTERNATIVE"
+      ],
+      "title": "Strategy",
+      "type": "string"
+    },
+    "grid": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GridSpec"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "graph": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GraphSpec"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "start": {
+      "$ref": "#/$defs/Waypoint"
+    },
+    "return_required": {
+      "title": "Return Required",
+      "type": "boolean"
+    },
+    "tasks": {
+      "items": {
+        "$ref": "#/$defs/TaskSpec"
+      },
+      "title": "Tasks",
+      "type": "array"
+    },
+    "surface_slope_cap_deg": {
+      "exclusiveMaximum": 90,
+      "exclusiveMinimum": 0,
+      "title": "Surface Slope Cap Deg",
+      "type": "number"
+    },
+    "exposures": {
+      "items": {
+        "$ref": "#/$defs/ExposureSpec"
+      },
+      "title": "Exposures",
+      "type": "array"
+    },
+    "max_distance_m": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Max Distance M"
+    },
+    "max_duration_s": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Max Duration S"
+    },
+    "max_undirected_edge_traversals": {
+      "default": 2,
+      "minimum": 1,
+      "title": "Max Undirected Edge Traversals",
+      "type": "integer"
+    },
+    "unknown_is_forbidden": {
+      "const": true,
+      "default": true,
+      "title": "Unknown Is Forbidden",
+      "type": "boolean"
+    },
+    "footprint_dilation_m": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Footprint Dilation M",
+      "type": "number"
+    },
+    "blocked_edge_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Blocked Edge Ids",
+      "type": "array"
+    },
+    "energy": {
+      "$ref": "#/$defs/EnergySpec"
+    },
+    "solver": {
+      "$ref": "#/$defs/SolverConfig"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "artifact_kind",
+    "mode",
+    "resource_provider",
+    "mission_revision_id",
+    "mission_content_sha256",
+    "rover_revision_id",
+    "rover_content_sha256",
+    "candidate_window_id",
+    "test_revision",
+    "strategy",
+    "start",
+    "return_required",
+    "tasks",
+    "surface_slope_cap_deg",
+    "exposures",
+    "energy",
+    "solver"
+  ],
+  "title": "ConstraintsArtifact",
+  "type": "object",
+  "$comment": "Generated from analogforge.ports models by kit/tools/build_kit.py. Do not edit."
+}

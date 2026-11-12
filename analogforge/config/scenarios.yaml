@@ -1,0 +1,80 @@
+synthetic-mars-mobility-v1:
+  name: Mars mobility practice
+  body: MARS
+  description: Synthetic raster terrain, candidate qualification, and rover route verification.
+  allowed_modes: [synthetic]
+  default_dataset_lock_id: synthetic-policy-v1
+  status: AVAILABLE
+  mission_preset: mission-mars-mobility.json
+  rover_presets: [ares-1.json, practice-lite.json, practice-no-energy-model.json, practice-small-battery.json]
+  target_source: {kind: SYNTHETIC_FIXTURE, fixture_id: practice-mars-target-v1}
+  earth_source: {kind: SYNTHETIC_FIXTURE, fixture_id: practice-earth-grid-v1}
+  search_region_set_id: practice-earth-grid-v1
+  reference_set_id: practice-reference-set-v1
+  graph_fixture_id: null
+  defect_injection: true
+  operator_limits: {search_max_expansions: 200000, search_max_seconds: 30, search_max_labels_per_node: 32, coarse_windows_max: 30, detailed_candidates: 6, model_requests_per_run: 40, active_run_seconds: 900, replans_total: 3}
+synthetic-graph-regression-v1:
+  name: Canonical graph regression
+  body: MARS
+  description: Deterministic graph for search, route, and energy regression.
+  allowed_modes: [synthetic]
+  default_dataset_lock_id: synthetic-policy-v1
+  status: AVAILABLE
+  mission_preset: mission-graph-regression.json
+  rover_presets: [ares-1.json]
+  target_source: {kind: SYNTHETIC_FIXTURE, fixture_id: practice-mars-target-v1}
+  earth_source: {kind: SYNTHETIC_FIXTURE, fixture_id: practice-earth-grid-v1}
+  search_region_set_id: practice-earth-grid-v1
+  reference_set_id: practice-reference-set-v1
+  graph_fixture_id: canonical-graph-v1
+  operator_limits: {search_max_expansions: 200000, search_max_seconds: 30, search_max_labels_per_node: 32, coarse_windows_max: 30, detailed_candidates: 6, model_requests_per_run: 40, active_run_seconds: 900, replans_total: 3}
+synthetic-moon-gap-v1:
+  name: Moon site gap practice
+  body: MOON
+  description: Site-only qualification with visible lunar evidence gaps.
+  allowed_modes: [synthetic]
+  default_dataset_lock_id: synthetic-policy-v1
+  status: AVAILABLE
+  mission_preset: mission-moon-gap.json
+  rover_presets: []
+  target_source: {kind: SYNTHETIC_FIXTURE, fixture_id: practice-moon-target-v1}
+  earth_source: {kind: SYNTHETIC_FIXTURE, fixture_id: practice-earth-grid-v1}
+  search_region_set_id: practice-earth-grid-v1
+  reference_set_id: practice-reference-set-v1
+  graph_fixture_id: null
+  operator_limits: {search_max_expansions: 200000, search_max_seconds: 30, search_max_labels_per_node: 32, coarse_windows_max: 30, detailed_candidates: 6, model_requests_per_run: 40, active_run_seconds: 900, replans_total: 3}
+local-dataset-practice-v1:
+  name: Local dataset practice
+  body: MARS
+  description: Dataset-backed parity rehearsal using generated practice files.
+  allowed_modes: [synthetic]
+  default_dataset_lock_id: local-practice-policy-v1
+  status: AWAITING_DATASETS
+  mission_preset: mission-mars-mobility.json
+  rover_presets: [ares-1.json, practice-lite.json, practice-no-energy-model.json, practice-small-battery.json]
+  target_source: {kind: LOCAL_DATASET, dataset_id: practice-mars-target-v1}
+  earth_source: {kind: LOCAL_DATASET, dataset_id: practice-earth-grid-v1}
+  additional_sources:
+    earth_mineral: {kind: LOCAL_DATASET, dataset_id: practice-earth-minerals-v1}
+  search_region_set_id: practice-earth-grid-v1
+  reference_set_id: practice-reference-set-v1
+  graph_fixture_id: null
+  defect_injection: true
+  operator_limits: {search_max_expansions: 200000, search_max_seconds: 30, search_max_labels_per_node: 32, coarse_windows_max: 30, detailed_candidates: 6, model_requests_per_run: 40, active_run_seconds: 900, replans_total: 3}
+live-hackathon-v1:
+  name: Live hackathon data
+  body: MARS
+  description: Operator-bound real planetary and Earth datasets.
+  allowed_modes: []
+  requested_modes: [live]
+  default_dataset_lock_id: live-hackathon-policy-v1
+  status: AWAITING_DATASETS
+  mission_preset: null
+  rover_presets: []
+  target_source: null
+  earth_source: null
+  search_region_set_id: local-dataset-grid-v1
+  reference_set_id: practice-reference-set-v1
+  graph_fixture_id: null
+  operator_limits: {search_max_expansions: 200000, search_max_seconds: 30, search_max_labels_per_node: 32, coarse_windows_max: 30, detailed_candidates: 6, model_requests_per_run: 40, active_run_seconds: 900, replans_total: 3}

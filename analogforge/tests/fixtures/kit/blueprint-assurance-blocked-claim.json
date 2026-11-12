@@ -1,0 +1,168 @@
+{
+  "schema_version": "1.0",
+  "audit_id": "70000000-0000-4000-8000-000000000030",
+  "workspace_id": "70000000-0000-4000-8000-000000000011",
+  "run_id": "70000000-0000-4000-8000-000000000012",
+  "mode": "synthetic",
+  "created_at": "2026-11-04T12:00:00Z",
+  "snapshot_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "mission_content_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "rover_content_sha256": null,
+  "dataset_policy_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+  "acquired_manifest_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+  "algorithm_lock_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+  "assurance_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+  "critique_evidence_ids": [],
+  "claims": [
+    {
+      "claim_id": "clearance-unknown",
+      "claim_type": "QUALIFICATION",
+      "requirement_id": "REQ-CLEARANCE",
+      "candidate_ids": [],
+      "scope": "Synthetic test of inadequate terrain support for physical clearance.",
+      "disposition": "REJECTED",
+      "qualification_status": "UNKNOWN",
+      "verification_status": null,
+      "validation_level": "S0",
+      "evidence_ids": [
+        "70000000-0000-4000-8000-000000000001"
+      ],
+      "assumption_evidence_ids": [],
+      "gates": [
+        {
+          "gate_id": "SC-01",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-02",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-03",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "Abstract synthetic graph has no body-specific raster or physical coordinate frame.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-04",
+          "outcome": "UNSATISFIED",
+          "reason": "Synthetic inadequacy fixture: requested obstacle scale is finer than source support.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-05",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "No masked raster/AOI is used in this abstract graph regression.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-06",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "No time-varying measured source is used.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-07",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-08",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-09",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-10",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "No independent source corroboration is claimed.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-11",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "No rover supplied; site-only missing-evidence finding, no experiment verification claim.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-12",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-13",
+          "outcome": "NOT_APPLICABLE",
+          "reason": "No candidate discovery or held-out real-source validation is claimed.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-14",
+          "outcome": "SATISFIED",
+          "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "gate_id": "SC-15",
+          "outcome": "UNSATISFIED",
+          "reason": "A proposed positive clearance claim exceeded the supplied support.",
+          "evidence_ids": [
+            "70000000-0000-4000-8000-000000000001"
+          ]
+        }
+      ],
+      "permitted_statement": "No positive physical clearance statement is permitted; retain UNKNOWN pending adequate evidence.",
+      "limitations": [
+        "Fixture support is insufficient for the requested obstacle scale; no physical clearance claim is permitted."
+      ]
+    }
+  ],
+  "publication": "BLOCKED",
+  "blocking_issue_codes": [
+    "SC-04:UNSUPPORTED_CLEARANCE_CLAIM",
+    "SC-15:CLAIM_EXCEEDS_EVIDENCE"
+  ],
+  "limitations": [
+    "Blueprint fixture only: UUIDs and hash strings are synthetic test identifiers, not executed application evidence.",
+    "Essential clearance evidence is unavailable; no blanket mission qualification or PROVE IT without rover."
+  ]
+}
