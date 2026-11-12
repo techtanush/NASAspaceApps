@@ -23,6 +23,16 @@ it('reads a terminal stream through EOF without aborting its successful response
  stream.stop();
  expect(signal?.aborted).toBe(false);
 });
+it('drains EOF when one server batch contains completion followed by export notifications',async()=>{
+ const bytes=new TextEncoder().encode([event(1,'run-a','COMPLETED'),event(2,'run-a','COMPLETED'),event(3,'run-a','COMPLETED')].map(value=>`id:${value.seq}\nevent:run.state_changed\ndata:${JSON.stringify(value)}\n\n`).join(''));
+ const response=new Response(new ReadableStream({start(controller){controller.enqueue(bytes);controller.close();}}));
+ const reader=response.body!.getReader();const read=vi.spyOn(reader,'read');vi.spyOn(response.body!,'getReader').mockReturnValue(reader);
+ let signal:AbortSignal|undefined;
+ const receive=vi.fn();const stream=new RunStream({runId:'run-a',cursor:0,onEvent:receive,onSnapshot:vi.fn(),onConnection:vi.fn(),
+  fetchSnapshot:async()=>({...snapshot(3,4),state:'COMPLETED'}),fetcher:async(_url,init)=>{signal=init?.signal as AbortSignal;return response;}});
+ stream.start();await vi.waitFor(()=>expect(read).toHaveBeenCalledTimes(2));
+ expect(receive).toHaveBeenCalledOnce();stream.stop();expect(signal?.aborted).toBe(false);
+});
 it('FE-005 stop/run-switch rejects late events and cancels reconnect timers',async()=>{vi.useFakeTimers();const s=setup();s.stream.stop();await vi.runAllTimersAsync();expect(await s.stream.accept(event(1))).toBe('ignored');expect(s.fetcher).toHaveBeenCalledTimes(1);});
 it('410 expired cursor resyncs before reopening; backoff remains locked',async()=>{vi.useFakeTimers();let calls=0;const fetchSnapshot=vi.fn(async()=>snapshot(8,4));const fetcher=vi.fn(async(_input:RequestInfo|URL,_init?:RequestInit)=>{void _input;void _init;calls++;return calls===1?new Response('{}',{status:410}):new Response(new ReadableStream({start(){/* Keep subscription active. */}}));});const stream=new RunStream({runId:'run-a',cursor:0,fetchSnapshot,fetcher,onSnapshot:vi.fn(),onConnection:vi.fn(),onEvent:vi.fn()});stream.start();await vi.advanceTimersByTimeAsync(1);expect(fetchSnapshot).toHaveBeenCalled();expect(String(fetcher.mock.calls[1]?.[0])).toContain('after=8');expect([...BACKOFF_MS]).toEqual([1000,2000,4000,8000,15000]);stream.stop();});
 it('FE-004 stale snapshots never overwrite a newer revision',()=>{const current=snapshot(8,9);expect(newerSnapshot(current,snapshot(3,5))).toBe(current);expect(newerSnapshot(current,snapshot(10,10)).revision).toBe(10);});

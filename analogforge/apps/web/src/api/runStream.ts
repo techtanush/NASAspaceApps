@@ -64,7 +64,7 @@ export class RunStream {
       if(!response.ok || !response.body) throw new TypeError('Event stream unavailable');
       this.options.onConnection('connected');
       const reader=response.body.getReader(); const decoder=new TextDecoder(); let pending=Promise.resolve<'ignored'|'event'|'resync'|'terminal'>('ignored');
-      const parser=new SSEParser(message=>{pending=pending.then(()=>this.accept(JSON.parse(message.data) as RunEvent));});
+      const parser=new SSEParser(message=>{pending=pending.then(state=>state==='terminal'?state:this.accept(JSON.parse(message.data) as RunEvent));});
       while(!this.stopped && generation===this.generation) {
         const read=await reader.read(); if(read.done) break;
         parser.feed(decoder.decode(read.value,{stream:true}));

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -45,6 +46,12 @@ def get_scenarios(settings: Settings) -> dict[str, dict[str, Any]]:
             raise ValueError(f"scenario {scenario_id} has invalid status")
         if any(mode not in {"synthetic", "replay", "live"} for mode in scenario["allowed_modes"]):
             raise ValueError(f"scenario {scenario_id} has invalid allowed_modes")
+    if settings.operator_limits_json is not None:
+        # Settings rejects these overrides outside the explicitly enabled local harness.
+        # Apply to the effective scenario only; the checked-in source remains immutable.
+        overrides = json.loads(settings.operator_limits_json)
+        for scenario in raw.values():
+            scenario["operator_limits"] = {**scenario["operator_limits"], **overrides}
     return raw
 
 

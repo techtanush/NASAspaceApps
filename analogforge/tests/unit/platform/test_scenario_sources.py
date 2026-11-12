@@ -30,3 +30,23 @@ def test_graph_scenario_keeps_graph_for_prove_it_on_the_mobility_rasters():
     assert graph["graph_fixture_id"] == catalog.FIXTURE_CANONICAL_GRAPH
     assert graph["target_source"] == mobility["target_source"]
     assert graph["earth_source"] == mobility["earth_source"]
+
+
+def test_guarded_operator_override_reaches_every_scenario_without_mutating_config():
+    from analogforge.application.capabilities import get_scenarios
+    from analogforge.settings import Settings
+
+    base = Settings(_env_file=None)
+    config_file = base.config_dir / "scenarios.yaml"
+    original = config_file.read_bytes()
+    defaults = get_scenarios(base)
+    effective = get_scenarios(Settings(
+        _env_file=None, test_hooks=True,
+        operator_limits_json='{"search_max_expansions":1}',
+    ))
+    for identifier, scenario in effective.items():
+        assert scenario["operator_limits"]["search_max_expansions"] == 1
+        expected_seconds = defaults[identifier]["operator_limits"]["search_max_seconds"]
+        assert scenario["operator_limits"]["search_max_seconds"] == expected_seconds
+    assert get_scenarios(base) == defaults
+    assert config_file.read_bytes() == original
