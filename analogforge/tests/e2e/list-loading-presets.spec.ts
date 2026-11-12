@@ -8,15 +8,15 @@ test('candidate metadata fits the 40/60 split and four loading rows remain compl
  for(const width of [1440,390])for(const theme of ['dark','light'])for(const density of ['compact','default','comfortable']){
   await page.setViewportSize({width,height:900});await page.evaluate(({theme,density})=>{document.documentElement.dataset.theme=theme;document.documentElement.dataset.density=density;},{theme,density});
   for(const id of ['mission-list','run-list']){
-   const table=page.getByTestId(id);await expect(table.locator('.table-overflow-hint')).toHaveCount(0);await expect(table.locator('tbody tr[aria-hidden=true]')).toHaveCount(4);
+   const table=page.getByTestId(id);await expect(table.locator('.table-overflow-hint')).toHaveText('Table navigation · arrow keys scroll columns when needed');await expect(table.locator('tbody tr[aria-hidden=true]')).toHaveCount(4);
    const geometry=await table.evaluate(node=>{const slot=node.getBoundingClientRect(),region=node.querySelector('.table-scroll')!.getBoundingClientRect();return [...node.querySelectorAll('tbody tr')].map(row=>({top:row.getBoundingClientRect().top,bottom:row.getBoundingClientRect().bottom,min:Math.max(slot.top,region.top),max:Math.min(slot.bottom,region.bottom)}));});
    for(const row of geometry){expect(row.top).toBeGreaterThanOrEqual(row.min-1);expect(row.bottom).toBeLessThanOrEqual(row.max+1);}
   }
  }
  await page.setViewportSize({width:1440,height:900});await expect(page.locator('.practice-presets')).toHaveAttribute('open');const pendingPreset=(await page.locator('.practice-presets').boundingBox())!;const pendingListsTop=(await page.locator('.workspace-lists').boundingBox())!.y;await page.setViewportSize({width:390,height:900});
  await page.evaluate(()=>(window as unknown as {releaseWorkspace:()=>void}).releaseWorkspace());await expect(page.getByRole('status',{name:'Retrieving saved missions'})).toBeHidden();
- await expect(page.locator('.workspace-table-slot .table-overflow-hint')).toHaveCount(0);
- // Empty tables have no data columns to label; avoid cropped headings without scroll instructions.
+ await expect(page.locator('.workspace-table-slot .table-overflow-hint')).toHaveCount(2);
+ // Empty tables retain the same navigation-help geometry; data headings appear only with rows.
  await expect(page.locator('.workspace-table-slot thead')).toHaveCount(0);
  const preset=page.locator('.practice-presets');await expect(preset).not.toHaveAttribute('open');await preset.locator('summary').click();await expect(preset.getByRole('link').first()).toBeVisible();const href=await preset.getByRole('link').first().getAttribute('href');expect(href).toContain('/missions/new?scenario=');await preset.locator('summary').click();
  await page.setViewportSize({width:1440,height:900});await expect(preset).toHaveAttribute('open');expect((await preset.boundingBox())!.height).toBeLessThanOrEqual(184);expect((await preset.boundingBox())!.height).toBeCloseTo(pendingPreset.height,1);expect((await page.locator('.workspace-lists').boundingBox())!.y).toBeCloseTo(pendingListsTop,1);for(const id of ['mission-list','run-list'])expect((await page.getByTestId(id).boundingBox())!.height).toBeLessThan(176);
