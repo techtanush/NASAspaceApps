@@ -6,7 +6,6 @@ import os
 import signal
 import subprocess
 import sys
-import threading
 import time
 from pathlib import Path
 
@@ -20,6 +19,12 @@ def stop_services(processes: list[subprocess.Popen[bytes]], timeout: float = 10)
         try:
             os.killpg(process.pid, signal.SIGTERM)
         except ProcessLookupError:
+            continue
+        except PermissionError:
+            # A reaped launcher can leave a stale process-group id. Never signal
+            # an unrelated group or prevent cleanup of our other live services.
+            if process.poll() is None:
+                raise
             continue
     deadline = time.monotonic() + timeout
     for process in processes:
@@ -38,16 +43,20 @@ def main() -> int:
                 ([str(ROOT / '.venv/bin/analogforge'), 'worker'], ROOT)]
     if (ROOT / 'apps/web/package.json').is_file():
         commands.append((['corepack', 'pnpm', 'dev', '--host', '127.0.0.1'], ROOT / 'apps/web'))
-    stopping = threading.Event()
+    stopping = False
+    def request_stop(_signum: int, _frame: object) -> None:
+        nonlocal stopping
+        stopping = True
     for sig in (signal.SIGINT, signal.SIGTERM):
-        signal.signal(sig, lambda _signum, _frame: stopping.set())
+        signal.signal(sig, request_stop)
     processes: list[subprocess.Popen[bytes]] = []
     try:
         for command, directory in commands:
             # Fixed application commands, validated public ports, isolated groups.
             processes.append(subprocess.Popen(command, cwd=directory, env=environment, start_new_session=True))  # noqa: S603
         print('AnalogForge development services started. Ctrl-C stops API, worker, and web.', flush=True)
-        while not stopping.wait(0.2):
+        while not stopping:
+            time.sleep(0.2)
             for process in processes:
                 code = process.poll()
                 if code is not None:

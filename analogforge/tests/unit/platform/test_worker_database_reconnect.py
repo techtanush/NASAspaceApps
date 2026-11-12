@@ -1,5 +1,7 @@
 """Idle database outages must not take down the durable worker process."""
 
+import subprocess
+import sys
 from unittest.mock import MagicMock
 
 import pytest
@@ -26,3 +28,27 @@ def test_worker_survives_a_transient_connection_error_without_logging_credential
     assert "worker.database_unavailable" in caplog.text
     assert "private-connection-password" not in caplog.text
     assert "secret database statement" not in caplog.text
+
+
+def test_signal_stop_never_waits_on_the_idle_event_lock(tmp_path):
+    marker = tmp_path / "stopped"
+    script = (
+        "from pathlib import Path; from analogforge.jobs.worker import Worker; "
+        "w=Worker(None,lambda _:None)\n"
+        "with w.stopping._cond:\n"
+        " w.stop()\n"
+        " assert w.run_once() is False\n"
+        f" Path({str(marker)!r}).write_text('stopped')\n"
+    )
+    child = subprocess.Popen([sys.executable, "-c", script])  # noqa: S603
+    try:
+        try:
+            child.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            child.wait()
+        assert marker.is_file(), "A stop signal deadlocked while the idle loop held the event lock"
+    finally:
+        if child.poll() is None:
+            child.kill()
+            child.wait()

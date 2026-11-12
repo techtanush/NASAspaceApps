@@ -6,6 +6,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from unittest.mock import MagicMock
 
 
 def test_dev_cleanup_terminates_nested_service_processes(tmp_path):
@@ -34,3 +35,14 @@ def test_dev_cleanup_terminates_nested_service_processes(tmp_path):
             raise AssertionError('Nested service survived development shutdown')
     finally:
         module['stop_services']([process])
+
+
+def test_exited_service_permission_race_does_not_prevent_other_owned_cleanup(monkeypatch):
+    module = runpy.run_path(str(Path(__file__).parents[3] / 'scripts/dev_services.py'))
+    exited, live = MagicMock(pid=999999981), MagicMock(pid=999999982)
+    exited.poll.return_value = 0
+    signal_group = MagicMock(side_effect=[PermissionError(), None])
+    monkeypatch.setattr(os, 'killpg', signal_group)
+    module['stop_services']([exited, live])
+    assert signal_group.call_count == 2
+    live.wait.assert_called_once()

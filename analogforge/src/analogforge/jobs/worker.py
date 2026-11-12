@@ -32,16 +32,19 @@ class Worker:
         self.store, self.handler = store, handler
         self.lease_seconds, self.heartbeat_seconds = lease_seconds, heartbeat_seconds
         self.stopping = threading.Event()
+        self._stop_requested = False
         self.worker_id = str(uuid4())
         self.reaper = Reaper(store)
         self._last_presence = 0.0
 
     def stop(self) -> None:
         """Stop claiming; the current bounded handler completes or loses its lease."""
-        self.stopping.set()
+        # CLI signal handlers run on the idle loop's thread. Event.set() can
+        # deadlock if that signal interrupts Event.wait() while its lock is held.
+        self._stop_requested = True
 
     def run_once(self) -> bool:
-        if self.stopping.is_set():
+        if self._stop_requested or self.stopping.is_set():
             return False
         if time.monotonic() - self._last_presence >= self.heartbeat_seconds:
             self.store.record_worker_heartbeat(self.worker_id)
@@ -153,7 +156,7 @@ class Worker:
                 return
 
     def run_forever(self, poll_seconds: float = 1) -> None:
-        while not self.stopping.is_set():
+        while not (self._stop_requested or self.stopping.is_set()):
             try:
                 worked = self.run_once()
             except (OperationalError, InterfaceError) as exc:
