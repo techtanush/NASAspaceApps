@@ -20,7 +20,8 @@ export async function loadSession():Promise<Session> {
  const workspaceId=body?.workspace_id??workspace?.id;
  const role=body?.role??workspace?.role;
  if(!body||typeof workspaceId!=='string'||!UUID.test(workspaceId)||!['OWNER','EDITOR','VIEWER'].includes(String(role)))throw sessionError('SESSION_INVALID','The session does not identify a valid authorized workspace and role.',502);
- const hasSnake=Object.hasOwn(body,'csrf_token'),hasCamel=Object.hasOwn(body,'csrfToken');
+ // JSON null means the session supplies no token (local mode without cookie sessions); absent and null are equivalent.
+ const hasSnake=Object.hasOwn(body,'csrf_token')&&body.csrf_token!==null,hasCamel=Object.hasOwn(body,'csrfToken')&&body.csrfToken!==null;
  const csrf=hasSnake?body.csrf_token:body.csrfToken;
  if((hasSnake||hasCamel)&&(typeof csrf!=='string'||csrf.length===0||csrf.length>4096||[...csrf].some(character=>character.charCodeAt(0)<=32||character.charCodeAt(0)===127)))throw sessionError('SESSION_INVALID','The session supplied an invalid CSRF token.',502);
  if(hasSnake&&hasCamel&&body.csrf_token!==body.csrfToken)throw sessionError('SESSION_INVALID','The session supplied conflicting CSRF token fields.',502);

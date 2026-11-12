@@ -15,7 +15,8 @@ export function diagnosticSummary(code:string,message:string):string {
 }
 /** Parse only an explicitly recorded single-field comparison; never infer a value. */
 export function recordedChange(line:string|undefined):{field:string;before:string;after:string}|null {
- if(!line)return null;const match=/^Changed elements:\s*([^:]+):\s*([^→]+)→([^→]+)$/.exec(line);
+ // The platform writes ASCII '->'; fixtures use '→'. Both mean the same recorded change.
+ if(!line)return null;const match=/^Changed elements:\s*([^:]+):\s*(.+?)\s*(?:→|->)\s*(.+)$/.exec(line);
  if(!match||!match[1]?.trim()||!match[2]?.trim()||!match[3]?.trim())return null;
  return {field:match[1].trim(),before:match[2].trim(),after:match[3].trim()};
 }

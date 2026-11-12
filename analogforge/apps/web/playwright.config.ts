@@ -6,7 +6,7 @@ const executable=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || (existsSync(bundl
 const baseURL = process.env.E2E_BASE_URL || 'http://127.0.0.1:5176';
 const mock = process.env.E2E_TARGET === 'mock';
 export default defineConfig({
- testDir: '../../tests/e2e', timeout: 90000, expect: { timeout: 15000 }, fullyParallel: false, workers: 1,
+ testDir: '../../tests/e2e', timeout: mock ? 90000 : 900000 /* real backend: frozen step limits (prep 60 s + run 180 s + PROVE IT 240 s, guide 05 s3) exceed 90 s */, expect: { timeout: 15000 }, fullyParallel: false, workers: 1,
  reporter: [['list'], ['json', { outputFile: `../../out/e2e-results-${process.env.E2E_RUN_NAME || 'default'}.json` }]],
  use: { actionTimeout: 15000, navigationTimeout: 30000, baseURL, viewport: { width: 1440, height: 900 }, acceptDownloads: true, trace: /^(visual|M\d)/.test(process.env.E2E_RUN_NAME||'') ? 'off' : 'retain-on-failure', screenshot: 'only-on-failure', launchOptions: { executablePath: executable, args: ['--no-sandbox', '--enable-unsafe-swiftshader'] } },
  webServer: mock ? { command: 'pnpm run dev:mock', url: baseURL, reuseExistingServer: !process.env.CI, timeout: 30000 } : undefined,

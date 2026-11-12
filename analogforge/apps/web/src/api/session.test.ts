@@ -22,7 +22,13 @@ it('an omitted token stays absent, clearing a prior workspace token',async()=>{
  vi.stubGlobal('fetch',vi.fn(async(_url,init)=>{void _url;headers.push(new Headers(init.headers));return ++calls===1?Response.json({workspace_id:otherWorkspace,role:'OWNER'}):Response.json({revision:1});}));
  expect(await loadSession()).toEqual({workspaceId:otherWorkspace,role:'OWNER'});await api.post('/missions',{});expect(headers[1]!.has('X-CSRF-Token')).toBe(false);
 });
+it('a null token (platform local mode: no cookie session) is treated as absent, not as an invalid session',async()=>{
+ const headers:Headers[]=[];let calls=0;
+ vi.stubGlobal('fetch',vi.fn(async(_url,init)=>{void _url;headers.push(new Headers(init.headers));return ++calls===1?Response.json({authenticated:true,user_id:'22222222-2222-4222-8222-222222222222',workspace_id:otherWorkspace,role:'OWNER',csrf_token:null}):Response.json({revision:1});}));
+ expect(await loadSession()).toEqual({workspaceId:otherWorkspace,role:'OWNER'});await api.post('/missions',{});expect(headers[1]!.has('X-CSRF-Token')).toBe(false);
+});
 it.each([
+ [{workspace_id:otherWorkspace,role:'OWNER',csrf_token:42},'numeric token'],
  [{workspace_id:'not-a-uuid',role:'OWNER'},'workspace'],
  [{workspace_id:otherWorkspace,role:'ADMIN'},'role'],
  [{workspace_id:otherWorkspace,role:'OWNER',csrf_token:''},'empty token'],
