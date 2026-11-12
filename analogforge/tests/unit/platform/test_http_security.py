@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import io
 import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -16,6 +17,7 @@ import jwt
 import pytest
 from cryptography.hazmat.primitives.asymmetric import rsa
 from fastapi.testclient import TestClient
+from PIL import Image
 
 from analogforge.adapters.identity.local import IdentityService
 from analogforge.adapters.identity.oidc import OIDCClient
@@ -23,6 +25,7 @@ from analogforge.api.dependencies import Principal
 from analogforge.application.seed import seed_synthetic
 from analogforge.db.store import Store
 from analogforge.main import create_app
+from analogforge.ports.domain_models import DisplayLayerManifest
 from analogforge.settings import Settings
 from tests.contracts.platform.test_transport_complete import validate_document
 from tests.integration.platform.test_journey_api import FIXTURES, journey_store
@@ -89,6 +92,56 @@ def test_artifact_ranges_missing_bytes_tamper_and_workspace_authorization(journe
         assert error_document(client.get(url), 422)["error"]["code"] == "SOURCE_CHECKSUM_MISMATCH"
         private_file.unlink()
         assert error_document(client.get(url), 503)["error"]["code"] == "SOURCE_UNAVAILABLE"
+
+
+@pytest.mark.db
+def test_display_png_is_readable_only_through_its_workspace_publication(journey_store: Store, tmp_path: Path) -> None:
+    workspace, run = seed_run(journey_store)
+    foreign, _ = seed_run(journey_store)
+    actor = {"workspace": workspace}
+    settings = Settings(
+        _env_file=None,
+        database_url=journey_store.engine.url.render_as_string(hide_password=False),
+        data_root=tmp_path / "data",
+    )
+    app = create_app(
+        settings=settings, store=journey_store,
+        identity_provider=lambda _request: Principal(actor["workspace"], "operator"),
+    )
+    image_bytes = io.BytesIO()
+    Image.new("RGBA", (2, 2), (48, 96, 144, 255)).save(image_bytes, format="PNG")
+    content = image_bytes.getvalue()
+    blob = app.state.runtime.blobs.put_bytes(content, "image/png")
+    with journey_store.transaction(workspace) as unit:
+        unit.create("artifacts", {
+            "run_id": run["id"], "sha256": blob.sha256,
+            "media_type": "image/png", "size_bytes": len(content), "bytes": len(content),
+            "relative_path": blob.relative_path, "role": "DISPLAY_IMAGE",
+        })
+    url = f"/api/v1/artifacts/{blob.sha256}"
+    with TestClient(app) as client:
+        # A CAS file or private metadata alone is not a public reference.
+        error_document(client.get(url), 404)
+        layer = DisplayLayerManifest.model_validate({
+            "id": str(uuid4()), "workspace_id": workspace, "run_id": run["id"],
+            "mode": "synthetic", "candidate_id": None, "target_profile_id": None,
+            "body": "MARS", "layer_kind": "ELEVATION", "rendering": "PLANETARY_PLANAR_IMAGE",
+            "image_artifact_sha256": blob.sha256, "display_crs_wkt": "Synthetic Mars test frame",
+            "pixel_to_world": [0, 1, 0, 2, 0, -1], "width_px": 2, "height_px": 2,
+            "earth_corners": None, "legend": [], "unit": "m", "support_scale_m": 480,
+            "source_evidence_ids": [], "nodata_transparent": True,
+            "attribution": ["Synthetic test data"], "limitations": ["No real source validation"],
+        }).model_dump(mode="json")
+        with journey_store.transaction(workspace) as unit:
+            unit.create("display_layers", layer)
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.content == content
+        assert response.headers["Content-Type"] == "image/png"
+        assert response.headers["X-Content-Type-Options"] == "nosniff"
+        assert response.headers["X-Artifact-SHA256"] == hashlib.sha256(content).hexdigest()
+        actor["workspace"] = foreign
+        error_document(client.get(url), 404)
 
 
 @pytest.mark.db

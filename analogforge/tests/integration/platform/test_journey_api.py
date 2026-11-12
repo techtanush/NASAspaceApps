@@ -7,6 +7,7 @@ an endpoint, write a verdict or replace any scheduler/registrar implementation.
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 from pathlib import Path
 from uuid import uuid4
@@ -15,6 +16,7 @@ import pytest
 import rfc8785
 import sqlalchemy as sa
 from fastapi.testclient import TestClient
+from PIL import Image
 
 from analogforge.api.dependencies import Principal
 from analogforge.application.seed import seed_synthetic
@@ -158,6 +160,16 @@ def test_full_accepted_contract_to_immutable_passport_and_downloads(
         )
         run_id = run_cmd["run_id"]
         pre = drain(worker, platform_store, workspace_id, run_id, "AWAITING_REVIEW" if rover else "COMPLETED")
+        layers = get(client, f"/display-layers?run_id={run_id}")["items"]
+        assert layers, "A completed target analysis must publish its display layers"
+        for layer in layers:
+            image_response = client.get(f"/api/v1/artifacts/{layer['image_artifact_sha256']}")
+            assert image_response.status_code == 200
+            assert image_response.headers["Content-Type"] == "image/png"
+            assert hashlib.sha256(image_response.content).hexdigest() == layer["image_artifact_sha256"]
+            with Image.open(io.BytesIO(image_response.content)) as image:
+                assert image.size == (layer["width_px"], layer["height_px"])
+                image.verify()
         if rover:
             candidates = get(client, f"/candidates?run_id={run_id}&limit=25")["items"]
             if scenario == "synthetic-mars-mobility-v1":

@@ -263,10 +263,17 @@ async def dispatch(request: Request, principal: Principal, operation: dict[str, 
         elif operation_id == "getArtifact":
             sha = request.path_params["sha256"]
             refs = uow.list("evidence", {"artifact_sha256": sha}) + uow.list("export_artifacts", {"artifact_hash": sha})
-            if not refs:
+            metadata = uow.list("artifacts", {"sha256": sha})
+            is_png = any(row.get("media_type") == "image/png" for row in metadata)
+            published_png = is_png and bool(
+                uow.list("display_layers", {"image_artifact_sha256": sha})
+            )
+            # Display PNGs are authorized by their workspace-scoped manifest;
+            # a private CAS file or artifact metadata alone grants no access.
+            if not refs and not published_png:
                 raise ApiError("NOT_FOUND", "Artifact not found.", 404)
             content = rt.blobs.read(sha)
-            media_type = "application/octet-stream"
+            media_type = "image/png" if is_png else "application/octet-stream"
             headers = {
                 "ETag": f'"{sha}"',
                 "X-Artifact-SHA256": sha,

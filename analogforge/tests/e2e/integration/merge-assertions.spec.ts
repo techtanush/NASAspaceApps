@@ -20,6 +20,18 @@ test('MRG-03 real persisted attempts, frozen inputs, assurance, artifacts and ex
   const before = (await api<S['RunSnapshot']>(page, `/runs/${runId}`)).body;
   const mission = (await api<S['MissionTestContract']>(page, `/mission-revisions/${before.mission_revision_id}`)).body;
   const rover = (await api<S['RoverProfile']>(page, `/rover-revisions/${before.rover_revision_id}`)).body;
+  const layers = (await api<S['ListDisplayLayerManifest']>(page, `/display-layers?run_id=${runId}`)).body.items;
+  expect(layers.length).toBeGreaterThan(0);
+  for (const layer of layers) {
+    const response = await page.request.get(`/api/v1/artifacts/${layer.image_artifact_sha256}`);
+    expect(response.status(), `Published ${layer.body} ${layer.layer_kind} image is reachable`).toBe(200);
+    expect(response.headers()['content-type']).toBe('image/png');
+    expect(sha(await response.body())).toBe(layer.image_artifact_sha256);
+  }
+  await tab(page, 'target');
+  await expect(page.locator('[data-testid=planetary-panel] svg image')).toHaveCount(1);
+  await expect(page.getByText('The prepared image could not load. Numeric evidence remains available.')).toHaveCount(0);
+  await tab(page, 'analogs');
   await prove(page);
   const persisted = await persistedResults(page, runId);
   const tests = persisted.snapshot.test_ids.map(id => persisted.tests.find(attempt => attempt.id === id)!);
