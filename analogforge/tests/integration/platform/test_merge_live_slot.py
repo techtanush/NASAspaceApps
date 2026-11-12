@@ -74,3 +74,28 @@ def test_harness_cannot_establish_real_source_validation_or_unlabelled_claims():
         assert restricted.validation_level == 'S1'
         assert _mode_and_level(snapshot, restricted)[0] is True
         assert _statement(restricted, 'LIMITED').startswith('TEST HARNESS — not NASA data:')
+
+
+def test_rehearsal_cli_and_newer_binding_protection(tmp_path, monkeypatch, capsys):
+    import json
+
+    from analogforge import cli
+    from analogforge.application.capabilities import get_scenarios, save_scenarios
+
+    config = tmp_path / 'config'
+    shutil.copytree(Path(__file__).parents[3] / 'config', config)
+    settings = Settings(_env_file=None, data_root=tmp_path / 'data', config_dir=config,
+                        test_hooks=True, allow_test_harness_provider=True)
+    monkeypatch.setattr(cli, 'Settings', lambda: settings)
+    assert cli.main(['rehearsal', 'bind-live-slot', '--json']) == 0
+    assert json.loads(capsys.readouterr().out)['label'] == 'TEST HARNESS — not NASA data'
+    bound = get_scenarios(settings)
+    newer = get_scenarios(settings)
+    newer['live-hackathon-v1']['description'] = 'Newer operator configuration'
+    save_scenarios(settings, newer)
+    assert cli.main(['rehearsal', 'restore-live-slot', '--json']) == 1
+    assert json.loads(capsys.readouterr().err)['code'] == 'REVISION_CONFLICT'
+    assert get_scenarios(settings) == newer
+    save_scenarios(settings, bound)
+    assert cli.main(['rehearsal', 'restore-live-slot', '--json']) == 0
+    assert json.loads(capsys.readouterr().out)['restored_scenario'] == 'live-hackathon-v1'
