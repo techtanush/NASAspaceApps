@@ -119,7 +119,8 @@ def scan_files(repo: Path, files: list[str], patterns: dict[str, re.Pattern], *,
                 continue
             for m in rx.finditer(text):
                 line = text.count('\n', 0, m.start()) + 1
-                findings.append({'file': rel, 'line': line, 'pattern': name, 'text': text.splitlines()[line - 1].strip()[:160]})
+                full = text.splitlines()[line - 1].strip()
+                findings.append({'file': rel, 'line': line, 'pattern': name, 'text': full[:160], 'allowed_marker': 'allowed:' in full})
     return findings
 
 
@@ -320,7 +321,7 @@ def main() -> int:
         findings = scan_files(repo, scoped, patterns, is_test_path=is_test, allow_in=scope.get('allow_in'),
                               only_in=scope.get('only_in'), src_only=scope.get('extra_src_only'))
         # LOCALSTORAGE allowed only with an explicit marker on the line
-        findings = [f for f in findings if not (f['pattern'] == 'LOCALSTORAGE_STATE' and 'allowed:' in f['text'])]
+        findings = [f for f in findings if not (f['pattern'] == 'LOCALSTORAGE_STATE' and f.get('allowed_marker'))]
         if person in FORBIDDEN_IMPORTS:
             findings += forbidden_import_findings(repo, scoped, FORBIDDEN_IMPORTS[person], person in IMPORT_SCAN_SKIP_TESTS)
         if person == 'aradhya':
@@ -356,7 +357,7 @@ def main() -> int:
             is_test = lambda p: p.startswith('analogforge/tests/') or '/test/' in p or p.endswith(('.test.ts', '.test.tsx', '.spec.ts'))
             fs = scan_files(repo, scoped, patterns, is_test_path=is_test, allow_in=person_scope.get('allow_in'),
                             only_in=person_scope.get('only_in'), src_only=person_scope.get('extra_src_only'))
-            allfind += [f for f in fs if not (f['pattern'] == 'LOCALSTORAGE_STATE' and 'allowed:' in f['text'])]
+            allfind += [f for f in fs if not (f['pattern'] == 'LOCALSTORAGE_STATE' and f.get('allowed_marker'))]
         for who, prefixes in FORBIDDEN_IMPORTS.items():
             sc = SCOPES[who]
             sf = [f for f in files if any(f.startswith(d + '/') for d in sc['dirs']) and not any(f.startswith(s) for s in sc['skip'])]
