@@ -36,7 +36,35 @@ export async function loadDatabase():Promise<void> {
  if(typeof indexedDB==='undefined')return;
  await new Promise<void>((resolve,reject)=>{const req=indexedDB.open('analogforge-mock-preview-v1',1);req.onupgradeneeded=()=>req.result.createObjectStore('backend');req.onerror=()=>reject(req.error);req.onsuccess=()=>{persistent=req.result;const read=persistent.transaction('backend').objectStore('backend').get('state');read.onerror=()=>reject(read.error);read.onsuccess=()=>{if(read.result)Object.assign(db,read.result);resolve();};};});
 }
-export function saveDatabase():void {if(persistent){const transaction=persistent.transaction('backend','readwrite');transaction.objectStore('backend').put(clone(db),'state');}}
+let requestedSave=0, committedSave=0, writing=false;
+let pendingSave:Promise<void>=Promise.resolve();
+let persistenceError:unknown;
+export function saveDatabase():void {
+ if(!persistent)return;
+ requestedSave++;
+ if(writing)return;
+ writing=true;
+ pendingSave=(async()=>{
+  try{
+   while(committedSave<requestedSave){
+    const revision=requestedSave;
+    await new Promise<void>((resolve,reject)=>{
+     const transaction=persistent!.transaction('backend','readwrite');
+     transaction.oncomplete=()=>resolve();
+     transaction.onerror=transaction.onabort=()=>reject(transaction.error||new Error('Preview storage transaction failed'));
+     transaction.objectStore('backend').put(clone(db),'state');
+    });
+    committedSave=revision;
+   }
+   persistenceError=undefined;
+  }catch(error){persistenceError=error;}
+  finally{writing=false;}
+ })();
+}
+export async function flushDatabase():Promise<void> {
+ let checkpoint:Promise<void>;
+ do{checkpoint=pendingSave;await checkpoint;if(persistenceError!==undefined)throw persistenceError;}while(checkpoint!==pendingSave);
+}
 export function getRun(runId:string):MockRun|undefined { return db.runs[runId]; }
 export function emit(run:MockRun,eventType:string,summary:string,payload:Record<string,unknown>={}):void {
  const snapshot=run.snapshot;snapshot.last_event_seq++;snapshot.revision++;

@@ -4,7 +4,7 @@ import { publishAttemptArtifacts } from './attemptArtifacts';
 import displayFixtures from './fixtures/display-assets.json';
 import { renderMockExport } from '../api/mockBridge';
 import type { components } from '../generated/schema';
-import { clone,createMission,db,emit,id,makeRun,recordBase,saveDatabase,scenarios,seed,timestamp,workspaceId,type MockRun,type ReplayAttempt } from './state';
+import { clone,createMission,db,emit,flushDatabase,id,makeRun,recordBase,saveDatabase,scenarios,seed,timestamp,workspaceId,type MockRun,type ReplayAttempt } from './state';
 import { marsMobility } from './scripts/marsMobility';
 import { validateMutation } from './validation';
 import { liveNoKey } from './scripts/liveNoKey';
@@ -261,8 +261,10 @@ export const handlers=[http.get('*/auth/session',()=>HttpResponse.json({workspac
  if(request.method==='GET'&&/\/passports\/[^/]+\/exports\//.test(path)){
   const passportId=path.split('/')[2]!;const format=path.split('/')[4]!.split('?')[0]!;const run=Object.values(db.runs).find(item=>item.snapshot.passport_id===passportId);
   const key=`${passportId}:${format}`;
-  if(run?.exportBundle&&db.exportsRequested[key]){try{return await renderMockExport(run.exportBundle,format);}catch(err){return response(error('EXPORT_UNAVAILABLE',err instanceof Error?err.message:'Renderer bridge unavailable',503));}}
+  if(run?.exportBundle&&db.exportsRequested[key]){try{await flushDatabase();return await renderMockExport(run.exportBundle,format);}catch(err){return response(error('EXPORT_UNAVAILABLE',err instanceof Error?err.message:'Renderer bridge unavailable',503));}}
  }
  const body=request.method==='POST'?await request.json().catch(()=>null):null;
- return response(dispatch(request.method,path,body,request.headers));
+ const result=dispatch(request.method,path,body,request.headers);
+ await flushDatabase();
+ return response(result);
 })];
