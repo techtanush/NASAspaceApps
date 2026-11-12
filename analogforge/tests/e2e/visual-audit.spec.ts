@@ -4,12 +4,15 @@ import { newMission, startRun, tab, prove,api,fixture } from './support/workbenc
 // The implementation is shared with the command-line audit and imports no application code.
 // @ts-expect-error JavaScript audit module exports are checked by the runtime audit.
 import {auditPage,auditGlyphs,finishAudit,THRESHOLDS,COMPONENTS,reports,installAuditInstrumentation,auditFailures,auditCancellations,waitForAuditData,auditStyleguide,captureStyleguide} from '../../scripts/ui/visual_audit.mjs';
+// Chromium's GPU process reports pixel readbacks (the audit's own C08 glyph raster check) as '[.WebGL-0x…]GL Driver Message …'
+// on GPU-less software GL. These are browser diagnostics, not application console output; DECISIONS.md D-2026-11-12-C12.
+const CHROMIUM_GPU_DIAGNOSTIC=/^\[\.WebGL-0x[0-9a-f]+\]GL Driver Message \(/;
 test('UIX-13 complete visual audit C01–C20',async({page})=>{
  test.setTimeout(3600000);page.setDefaultTimeout(15000);
  page.on('request',request=>{if(request.method()==='POST')console.log('audit mutation',new URL(request.url()).pathname);});page.on('response',response=>{if(response.request().method()==='POST')console.log('audit acknowledgement',response.status(),new URL(response.url()).pathname);});
  page.on('framenavigated',frame=>{if(frame===page.mainFrame())console.log('audit navigation',frame.url());});
  const faults: string[]=[];const external:string[]=[];
- page.on('pageerror',e=>faults.push(e.message));page.on('console',m=>{if(['error','warning'].includes(m.type()))faults.push(m.text());});
+ page.on('pageerror',e=>faults.push(e.message));page.on('console',m=>{if(['error','warning'].includes(m.type())&&!CHROMIUM_GPU_DIAGNOSTIC.test(m.text()))faults.push(m.text());});
  page.on('request',r=>{if(/^https?:/.test(r.url())&&new URL(r.url()).origin!==(process.env.E2E_BASE_URL||'http://127.0.0.1:5176'))external.push(r.url());});
  await installAuditInstrumentation(page);
  await page.clock.setFixedTime(new Date('2026-11-08T12:00:00Z'));
