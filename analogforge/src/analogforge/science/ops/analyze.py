@@ -10,7 +10,7 @@ from analogforge.ports.common import EvidenceRef, ScienceIssue
 from analogforge.ports.science import ArtifactRole, ComputationStatus
 from analogforge.ports.science_payloads import AnalyzeCandidateInput, AnalyzeCandidatePayload, SourceSelector
 from analogforge.science.features.connected import Band, connected_zones, largest_component, safe_mask, to_port_zone
-from analogforge.science.features.coverage import coverage_summary
+from analogforge.science.features.coverage import QUALITY_NODATA, coverage_summary
 from analogforge.science.features.histogram import to_port_histogram
 from analogforge.science.ops.base import OpBlocked, OpEnv, OpOutcome, bytes_artifact, derived_evidence, json_artifact
 from analogforge.science.ops.source import find_bound_dataset, resolve_source, source_limitations
@@ -36,7 +36,8 @@ def run_analyze(env: OpEnv) -> OpOutcome:
     src = resolve_source(env, inp.source, roles=("EARTH_TERRAIN",))
     cell = float(cfg.algorithms.grid.cell_size_m)
     prep = prepare(src.raster, cell, cfg.algorithms.thresholds.flat_gradient_tolerance)
-    win = find_window(cfg, inp.candidate.window_id, prep.grid, inp.candidate.aoi)
+    win = find_window(cfg, inp.candidate.window_id, prep.grid, inp.candidate.aoi,
+                      allow_custom_aoi=inp.candidate.origin == "USER_SUPPLIED")
     if not win.inside_source:
         raise OpBlocked(
             f"window {win.window_id} lies outside the source extent", code="NO_COVERAGE", detail_code="WINDOW_OUTSIDE"
@@ -44,9 +45,26 @@ def run_analyze(env: OpEnv) -> OpOutcome:
     env.check()
     rs = (slice(win.r0, win.r0 + win.height), slice(win.c0, win.c0 + win.width))
     surf = prep.surf
-    quality = surf.quality[rs]
+    wgrid = prep.grid.window(win.r0, win.c0, win.height, win.width)
+    quality = surf.quality[rs].copy()
+    valid, land = surf.valid[rs].copy(), surf.land[rs].copy()
+    aoi_mask = None
+    aoi_cells = win.height * win.width
+    if win.requested_bounds is not None:
+        from analogforge.science.geometry import frame_from_crs_wkt
+        from analogforge.science.ops.characterize import _aoi_cell_count, _aoi_mask
+
+        frame = frame_from_crs_wkt(wgrid.body, wgrid.crs_wkt)
+        x, y = wgrid.centre_coordinates()
+        aoi_mask = _aoi_mask(inp.candidate.aoi, frame, x, y)
+        valid &= aoi_mask
+        land &= aoi_mask
+        quality[~aoi_mask] = QUALITY_NODATA
+        aoi_cells = max(int(aoi_mask.sum()), _aoi_cell_count(
+            inp.candidate.aoi, frame, prep.grid, *win.requested_bounds, env.check,
+        ))
     summary = coverage_summary(quality)
-    vf = summary.valid_fraction
+    vf = float(valid.sum()) / max(1, aoi_cells) if aoi_mask is not None else summary.valid_fraction
     th = cfg.algorithms.thresholds
     if vf < th.hard_block_valid_fraction:
         raise OpBlocked(
@@ -54,9 +72,6 @@ def run_analyze(env: OpEnv) -> OpOutcome:
             code="INSUFFICIENT_VALID_DATA",
             affected=[],
         )
-    wgrid = prep.grid.window(win.r0, win.c0, win.height, win.width)
-    valid = surf.valid[rs]
-    land = surf.land[rs]
     slope = np.where(valid, surf.slope_deg[rs], 0.0)
     elev = np.where(np.isfinite(prep.elevation[rs]), prep.elevation[rs], 0.0)
     mineral_id = find_bound_dataset(env, "EARTH_MINERAL", "EARTH")
@@ -110,8 +125,11 @@ def run_analyze(env: OpEnv) -> OpOutcome:
             and mg.shape == prep.grid.shape
         ):
             ids = np.where(msrc.raster.nodata[rs], 0, np.nan_to_num(msrc.raster.values[rs], nan=0.0)).astype(int)
+            if aoi_mask is not None:
+                ids[~aoi_mask] = 0
             present = ids > 0
-            mvf = float(present.sum()) / float(present.size)
+            mineral_cells = max(1, aoi_cells) if aoi_mask is not None else present.size
+            mvf = float(present.sum()) / float(mineral_cells)
             metrics.append(
                 metric(
                     "mineral_valid_fraction",
@@ -127,7 +145,7 @@ def run_analyze(env: OpEnv) -> OpOutcome:
                 metrics.append(
                     metric(
                         f"mineral_class_fraction:{cid}",
-                        float((ids == cid).sum()) / float(ids.size),
+                        float((ids == cid).sum()) / float(mineral_cells),
                         "fraction",
                         cell,
                         mvf,
@@ -161,6 +179,9 @@ def run_analyze(env: OpEnv) -> OpOutcome:
         "cells next to nodata or water are not valid.",
         *source_limitations(src.manifest),
     ]
+    if aoi_mask is not None:
+        limitations.append("User-nominated AOI: only cell centres inside the declared region contribute; "
+                           "unavailable source area lowers coverage. The source support is unchanged.")
     if prep.support_m > cell + 1e-9:
         limitations.append(f"Source is coarser than the {cell:g} m analysis cell; it was not upsampled.")
     limitations.append(

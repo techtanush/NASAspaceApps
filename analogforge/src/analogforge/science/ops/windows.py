@@ -4,12 +4,19 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from math import ceil, floor, isfinite
 
 from pyproj import CRS
 
 from analogforge.ports.domain_models import AreaOfInterest
 from analogforge.science.config import ScienceConfig, SearchRegionSet
-from analogforge.science.geometry import AnalysisGridSpec, frame_from_crs_wkt, lonlat_to_xy, unwrap_bbox
+from analogforge.science.geometry import (
+    AnalysisGridSpec,
+    bbox_to_projected_bounds,
+    frame_from_crs_wkt,
+    lonlat_to_xy,
+    unwrap_bbox,
+)
 from analogforge.science.ops.base import OpBlocked
 
 
@@ -24,6 +31,7 @@ class WindowSpec:
     width: int
     negative_control: bool
     inside_source: bool
+    requested_bounds: tuple[int, int, int, int] | None = None
 
     @property
     def bounds_cells(self) -> tuple[int, int, int, int]:
@@ -81,6 +89,7 @@ def region_windows(rs: SearchRegionSet, grid: AnalysisGridSpec) -> list[WindowSp
 
 def find_window(
     cfg: ScienceConfig, window_id: str, grid: AnalysisGridSpec, aoi: AreaOfInterest | None = None,
+    *, allow_custom_aoi: bool = False,
 ) -> WindowSpec:
     """The window with this id in the first region set that defines it on ``grid`` (fixed sets first)."""
     sets = sorted(cfg.candidates.search_region_sets.items(), key=lambda kv: (kv[1].kind != "FIXED_GRID", kv[0]))
@@ -110,6 +119,21 @@ def find_window(
                     return w
         except OpBlocked as exc:
             last = exc
+    if allow_custom_aoi and aoi is not None:
+        from analogforge.science.ops.characterize import MAX_AOI_CELLS
+
+        frame = frame_from_crs_wkt(grid.body, grid.crs_wkt)
+        bounds = bbox_to_projected_bounds(frame, tuple(aoi.bbox), aoi.longitude_convention)  # type: ignore[arg-type]
+        if not all(isfinite(value) for value in bounds):
+            raise OpBlocked("Nominated AOI cannot be projected on the source grid", code="NO_COVERAGE")
+        xmin, ymin, xmax, ymax = bounds
+        uc0, uc1 = floor((xmin - grid.origin_x_m) / grid.cell_size_m), ceil((xmax - grid.origin_x_m) / grid.cell_size_m)
+        ur0, ur1 = floor((grid.origin_y_m - ymax) / grid.cell_size_m), ceil((grid.origin_y_m - ymin) / grid.cell_size_m)
+        if max(0, ur1 - ur0) * max(0, uc1 - uc0) > MAX_AOI_CELLS:
+            raise OpBlocked("Nominated AOI exceeds the bounded analysis cell budget", code="RESOURCE_LIMIT")
+        r0, r1, c0, c1 = max(0, ur0), min(grid.height, ur1), max(0, uc0), min(grid.width, uc1)
+        return WindowSpec(window_id, 0, 0, r0, c0, max(0, r1 - r0), max(0, c1 - c0), False,
+                          r1 > r0 and c1 > c0, (ur0, ur1, uc0, uc1))
     if last is not None:
         raise last
     raise OpBlocked(

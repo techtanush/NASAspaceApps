@@ -535,6 +535,9 @@ def publish_passport(
         )
     for candidate in candidates:
         nominated = candidate.origin == "USER_SUPPLIED"
+        if nominated and not candidate.evidence_ids:
+            # The raw nomination and UNKNOWN qualification rows remain visible. It has no measured source claim.
+            continue
         claim_id = f"{'nomination' if nominated else 'discovery'}:{candidate.id}"
         claims.append(
             ClaimInput(

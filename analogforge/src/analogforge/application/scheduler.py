@@ -967,6 +967,7 @@ class WorkflowEngine:
                 evidence_ids=c["evidence_ids"],
             )
             for c in candidates
+            if c["origin"] != "USER_SUPPLIED" or c["evidence_ids"]
         )
         tests = {t["id"]: t for t in self._rows(workspace_id, "tests", run_id)}
         claims.extend(
@@ -2214,7 +2215,7 @@ class WorkflowEngine:
                 )
                 tx.replace("candidates", candidate["id"], fresh)
 
-            self._compute(
+            analyzed = self._compute(
                 AnalyzeCandidateInput(
                     candidate=discovery.reference(candidate),
                     source=scenario["earth_source"],
@@ -2226,5 +2227,13 @@ class WorkflowEngine:
                 lease_token=lease_token,
                 publish=publish,
             )
+            if analyzed.payload is None:
+                with self.store.transaction(workspace_id) as tx:
+                    unavailable = tx.require("candidates", candidate["id"])
+                    unavailable["limitations"] = [
+                        "User-nominated region has no supported terrain analysis; no measured source claim is made.",
+                        *[f"{issue['code']}: {issue['message']}" for issue in analyzed.issues],
+                    ]
+                    tx.replace("candidates", candidate["id"], unavailable)
             refreshed = next(c for c in self._rows(workspace_id, "candidates", run_id) if c["id"] == candidate["id"])
             self._qualify(run_id, workspace_id, [refreshed], mission, rover, job_id=job_id, lease_token=lease_token)

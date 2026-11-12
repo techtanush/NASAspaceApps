@@ -24,7 +24,8 @@ def candidate_record(
         {
             **envelope(workspace_id, run_id, mode),
             **{k: window[k] for k in ("name", "aoi", "origin", "novelty_status")},
-            "discovery_method": "mission-conditioned-bounded-screen",
+            "discovery_method": "user-nominated-aoi" if window["origin"] == "USER_SUPPLIED"
+            else "mission-conditioned-bounded-screen",
             "evidence_ids": evidence_ids,
             "metrics": [],
             "accessibility_status": "NOT_ASSESSED",
