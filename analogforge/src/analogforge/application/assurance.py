@@ -7,7 +7,7 @@ computes a terrain metric or allows a language-model statement to choose a verdi
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal, cast
@@ -97,6 +97,12 @@ def _gate(gate_id: str, valid: bool, reason: str, ids: Sequence[UUID] = ()) -> G
 
 
 def _statement(proposal: ClaimInput, disposition: str) -> str:
+    statement = _ordinary_statement(proposal, disposition)
+    label = "TEST HARNESS — not NASA data"
+    return f"{label}: {statement}" if label in proposal.limitations else statement
+
+
+def _ordinary_statement(proposal: ClaimInput, disposition: str) -> str:
     subject = proposal.requirement_id or proposal.claim_id
     scope = proposal.scope
     if disposition == "REJECTED":
@@ -112,6 +118,19 @@ def _statement(proposal: ClaimInput, disposition: str) -> str:
     return f"{prefix}, {subject} has outcome {result} within {scope}."
 
 
+def _is_rehearsal(snapshot: AuditSnapshot) -> bool:
+    return any((record.dataset_product_id or "").upper().startswith("TEST_HARNESS")
+               for record in snapshot.evidence.values())
+
+
+def restrict_rehearsal_claim(snapshot: AuditSnapshot, proposal: ClaimInput) -> ClaimInput:
+    """Executed fixture plumbing is software evidence, even on the live role path."""
+    if not _is_rehearsal(snapshot):
+        return proposal
+    return replace(proposal, validation_level="S0" if proposal.validation_level == "S0" else "S1",
+                   limitations=tuple(dict.fromkeys((*proposal.limitations, "TEST HARNESS — not NASA data"))))
+
+
 def _mode_and_level(snapshot: AuditSnapshot, proposal: ClaimInput) -> tuple[bool, str]:
     records = [
         snapshot.evidence[eid]
@@ -125,6 +144,8 @@ def _mode_and_level(snapshot: AuditSnapshot, proposal: ClaimInput) -> tuple[bool
         return False, "Evidence is from a different mode, workspace or run."
     if snapshot.mode == "synthetic" and proposal.validation_level not in {"S0", "S1"}:
         return False, "Synthetic evidence cannot establish real-source S2, S3 or S4."
+    if _is_rehearsal(snapshot) and proposal.validation_level not in {"S0", "S1"}:
+        return False, "TEST HARNESS cannot establish real-source S2, S3 or S4."
     required = {"S2": "decoded_source", "S3": "common_scale_comparison", "S4": "independent_verification"}
     receipt_kind = required.get(proposal.validation_level)
     if receipt_kind is not None:
@@ -465,7 +486,7 @@ def audit_registered_claim(
         nominal_model=scope == "terrain_model" and record["status"] in {"PASS", "PARTIAL"},
         current_row_matches=record["status"] == payload["proposed_status"],
     )
-    report = audit(snapshot, [claim], receipts)
+    report = audit(snapshot, [restrict_rehearsal_claim(snapshot, claim)], receipts)
     if report.publication == "BLOCKED":
         raise ScientificClaimRejected(report.blocking_issue_codes or ["ASSURANCE_BLOCKED"])
     blob = blob_store.put_bytes(canonical_json_bytes(report), "application/json")

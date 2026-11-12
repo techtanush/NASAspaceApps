@@ -39,6 +39,8 @@ def _parser() -> argparse.ArgumentParser:
     db = sub.add_parser("db")
     db.add_argument("action", choices=["up", "down", "status"])
     sub.add_parser("seed-synthetic")
+    rehearsal = sub.add_parser("rehearsal")
+    rehearsal.add_argument("action", choices=["bind-live-slot", "restore-live-slot"])
     preflight = sub.add_parser("preflight")
     preflight.add_argument("--mode", choices=["synthetic", "replay", "live"])
     preflight.add_argument("--scenario")
@@ -258,6 +260,10 @@ def _run(args: argparse.Namespace, settings: Settings) -> dict[str, Any]:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         return report
+    if args.command == "rehearsal":
+        from analogforge.application.rehearsal import bind_live_slot, restore_live_slot
+
+        return bind_live_slot(settings) if args.action == "bind-live-slot" else restore_live_slot(settings)
     if args.command == "datasets":
         action = args.dataset_action
         if action == "list":

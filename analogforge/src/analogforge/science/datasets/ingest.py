@@ -528,6 +528,8 @@ def _limitations(manifest: DatasetManifest | None, outcomes: list[ck.CheckOutcom
     notes += [f"{o.check_id}: {o.message}" for o in outcomes if o.status != "PASS"]
     if manifest.is_synthetic:
         notes.append("SYNTHETIC data - not NASA terrain")
+    elif manifest.provider.upper().startswith("TEST_HARNESS"):
+        notes.append("TEST HARNESS — not NASA data")
     return tuple(notes)
 
 

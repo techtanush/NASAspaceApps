@@ -60,6 +60,10 @@ def load_manifest(settings: Settings, dataset_id: str) -> DatasetManifest:
         ) from exc
     if manifest.dataset_id != dataset_id:
         raise DatasetError("MANIFEST_INVALID", "Manifest dataset_id does not match its directory")
+    if manifest.provider.upper().startswith("TEST_HARNESS") and not (
+        settings.test_hooks and settings.allow_test_harness_provider and settings.auth_mode == "local"
+    ):
+        raise DatasetError("MODE_MISMATCH", "TEST_HARNESS data requires both explicit local test hooks")
     return manifest
 
 

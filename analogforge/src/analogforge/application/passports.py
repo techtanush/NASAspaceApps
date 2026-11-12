@@ -548,7 +548,9 @@ def publish_passport(
                 limitations=tuple(candidate.limitations),
             )
         )
-    report = audit(audit_snapshot, claims, receipts)
+    from analogforge.application.assurance import restrict_rehearsal_claim
+
+    report = audit(audit_snapshot, [restrict_rehearsal_claim(audit_snapshot, claim) for claim in claims], receipts)
     assurance_blob = blob_store.put_bytes(canonical_json_bytes(report), "application/json")
     assurance_evidence = EvidenceRecord(
         schema_version="1.0",
