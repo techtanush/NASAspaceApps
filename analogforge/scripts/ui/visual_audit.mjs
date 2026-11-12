@@ -53,7 +53,7 @@ export async function waitForAuditData(page){
 }
 async function beginLoadedCohort(page,{width,height,theme,density}){
  await page.setViewportSize({width,height});
- await page.evaluate(({theme,density})=>{localStorage.setItem('af.theme',theme);localStorage.setItem('af.density',density);},{theme,density});
+ await page.evaluate(({theme,density})=>{localStorage.setItem('af.theme',theme);localStorage.setItem('af.density',density);},{theme,density}); // allowed: view-preference
  const state=auditStates.get(page);if(state)for(const request of state.inflight)state.navigationAborts.add(request);
  // Use a fresh document navigation: Chromium's hard reload can temporarily bypass
  // the preview service worker, whose startup then schedules a second reload.

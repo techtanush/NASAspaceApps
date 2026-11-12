@@ -82,6 +82,9 @@ export async function pressControl(page: Page, target: Locator) {
 }
 
 export async function keyboardMission(page: Page) {
+  // Enable native file-chooser interception before any keyboard activation; it is switched on lazily by the first
+  // listener, and a late switch lets the real dialog open and block the page (observed ~50% at 200 % zoom).
+  page.on('filechooser', () => undefined);
   await page.goto('/');
   await pressControl(page, page.getByTestId('btn-new-mission'));
   await tabTo(page, page.getByTestId('input-mission-name'));
@@ -95,6 +98,10 @@ export async function keyboardMission(page: Page) {
   await expect(page.locator('[data-testid=input-bbox][data-edge=min_lon]')).toHaveValue('137');
   await expect(page.locator('[data-testid=save-indicator][data-save-state=saved]')).toBeVisible();
   await tabTo(page, page.getByTestId('file-rover-import'));
+  // A keyboard-opened native file picker needs a focused document; earlier contexts in the same worker can leave it unfocused.
+  await page.bringToFront();
+  await expect.poll(() => page.evaluate(() => document.hasFocus())).toBe(true);
+  await expect(page.getByTestId('file-rover-import')).toBeFocused();
   const choosing = page.waitForEvent('filechooser');
   await page.keyboard.press('Space');
   await (await choosing).setFiles(fixture('rovers/ares-1.json'));

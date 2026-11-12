@@ -45,7 +45,7 @@ test('editing an existing rover creates a new immutable revision with the frozen
 test('job success keeps run settings locked until the proposed contract arrives',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.addInitScript(()=>{
-  localStorage.setItem('af.theme','light');
+  localStorage.setItem('af.theme','light'); // allowed: view-preference
   const state={requested:false,release:()=>{}};
   const pending=new Promise<void>(resolve=>{state.release=resolve;});
   Object.assign(window,{__proposalGate:state});
