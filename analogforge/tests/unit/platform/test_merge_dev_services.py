@@ -12,9 +12,23 @@ from unittest.mock import MagicMock
 def test_dev_cleanup_terminates_nested_service_processes(tmp_path):
     module = runpy.run_path(str(Path(__file__).parents[3] / 'scripts/dev_services.py'))
     child_pid = tmp_path / 'child.pid'
-    script = ('import subprocess,sys,time;from pathlib import Path;'
-              'child=subprocess.Popen([sys.executable,"-c","import time; time.sleep(60)"]);'
-              'Path(sys.argv[1]).write_text(str(child.pid));time.sleep(60)')
+    # Publish readiness atomically; file existence must mean its PID is complete.
+    # The fixture parent also reaps its child after the group signal, keeping
+    # the original PID-disappearance assertion independent of launchd timing.
+    script = """
+import signal, subprocess, sys, time
+from pathlib import Path
+child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+def stop(_signum, _frame):
+    child.wait(timeout=5)
+    raise SystemExit(0)
+signal.signal(signal.SIGTERM, stop)
+marker = Path(sys.argv[1])
+pending = marker.with_name(marker.name + ".tmp")
+pending.write_text(str(child.pid))
+pending.replace(marker)
+time.sleep(60)
+"""
     process = subprocess.Popen([sys.executable, '-c', script, str(child_pid)], start_new_session=True)  # noqa: S603
     try:
         deadline = time.monotonic() + 5
