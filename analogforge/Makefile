@@ -1,4 +1,4 @@
-.PHONY: bootstrap dev migrate seed-synthetic preflight test test-live generate-client build check backup restore-check down
+.PHONY: bootstrap dev migrate seed-synthetic preflight test test-live generate-client build check check-platform backup restore-check down
 
 PY := uv run
 
@@ -33,6 +33,9 @@ build:
 	@if [ -f apps/web/package.json ]; then cd apps/web && corepack pnpm build; else echo "Frontend package is unavailable"; exit 1; fi
 
 check:
+	@if [ -f src/analogforge/science/facade.py ] && [ -f apps/web/package.json ]; then ./scripts/check_merged.sh; else $(MAKE) check-platform; fi
+
+check-platform:
 	$(PY) python '../architecture files/contracts/kit/materialize.py' --verify
 	$(MAKE) test
 	./scripts/validate_docs.sh
