@@ -125,14 +125,18 @@ def test_live_slot_rejects_synthetic_lock(tmp_path):
     assert caught.value.code == "MODE_MISMATCH"
 
 
-def test_complete_practice_lock_enables_scenario(tmp_path):
+@pytest.mark.parametrize("operator_limits", [None, '{"search_max_expansions":1}'])
+def test_complete_practice_lock_enables_scenario(tmp_path, operator_limits):
     from shutil import copyfile
 
     config = tmp_path / "config"
     config.mkdir()
     source = Settings(_env_file=None).config_dir / "scenarios.yaml"
     copyfile(source, config / "scenarios.yaml")
-    settings = Settings(_env_file=None, data_root=tmp_path / "data", config_dir=config)
+    settings = Settings(
+        _env_file=None, data_root=tmp_path / "data", config_dir=config,
+        test_hooks=operator_limits is not None, operator_limits_json=operator_limits,
+    )
     specs = (
         ("practice-mars-target-v1", "MARS", "TARGET_TERRAIN"),
         ("practice-earth-grid-v1", "EARTH", "EARTH_TERRAIN"),
@@ -156,3 +160,10 @@ def test_complete_practice_lock_enables_scenario(tmp_path):
     from analogforge.application.capabilities import get_scenarios
 
     assert get_scenarios(settings)["local-dataset-practice-v1"]["status"] == "AVAILABLE"
+
+    # Enabling a dataset must not persist an ephemeral process-only budget override.
+    disabled = Settings(_env_file=None, config_dir=config)
+    defaults = get_scenarios(disabled)
+    assert all(row["operator_limits"]["search_max_expansions"] == 200_000 for row in defaults.values())
+    if operator_limits is not None:
+        assert get_scenarios(settings)["local-dataset-practice-v1"]["operator_limits"]["search_max_expansions"] == 1

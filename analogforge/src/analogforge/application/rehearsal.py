@@ -33,10 +33,10 @@ def bind_live_slot(settings: Settings) -> dict[str, Any]:
     state_path = _authorize(settings)
     if state_path.is_file():
         state = json.loads(state_path.read_text())
-        if get_scenarios(settings)[SCENARIO] != state["bound_scenario"]:
+        if get_scenarios(settings, include_operator_overrides=False)[SCENARIO] != state["bound_scenario"]:
             raise DatasetError("REVISION_CONFLICT", "Rehearsal binding changed; restore it before rebinding")
         return dict(state["receipt"])
-    original = get_scenarios(settings)[SCENARIO]
+    original = get_scenarios(settings, include_operator_overrides=False)[SCENARIO]
     if original["allowed_modes"]:
         raise DatasetError("REVISION_CONFLICT", "Rehearsal refuses to replace an already bound live dataset")
     identifiers = ["test-harness-mars-terrain", "test-harness-earth-terrain"]
@@ -71,7 +71,11 @@ def bind_live_slot(settings: Settings) -> dict[str, Any]:
                               earth_terrain=identifiers[1], earth_mineral=None, lunar_thermal=None))
     receipt = {"status": "PASS", "label": LABEL, "scenario_id": SCENARIO,
                "dataset_ids": identifiers, "policy_id": POLICY, "policy_sha256": lock["policy_sha256"]}
-    state = {"original_scenario": original, "bound_scenario": get_scenarios(settings)[SCENARIO], "receipt": receipt}
+    state = {
+        "original_scenario": original,
+        "bound_scenario": get_scenarios(settings, include_operator_overrides=False)[SCENARIO],
+        "receipt": receipt,
+    }
     state_path.parent.mkdir(parents=True, exist_ok=True)
     state_path.write_text(json.dumps(state, indent=2) + "\n")
     return receipt
@@ -82,7 +86,7 @@ def restore_live_slot(settings: Settings) -> dict[str, Any]:
     if not state_path.is_file():
         raise DatasetError("INPUT_INVALID", "No TEST_HARNESS binding receipt exists to restore")
     state = json.loads(state_path.read_text())
-    scenarios = get_scenarios(settings)
+    scenarios = get_scenarios(settings, include_operator_overrides=False)
     if scenarios[SCENARIO] != state["bound_scenario"]:
         raise DatasetError("REVISION_CONFLICT", "Rehearsal refuses to overwrite a newer operator binding")
     scenarios[SCENARIO] = state["original_scenario"]

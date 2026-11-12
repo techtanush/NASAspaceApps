@@ -12,7 +12,18 @@ from analogforge.ports import catalog
 from analogforge.settings import Settings
 
 
-def get_scenarios(settings: Settings) -> dict[str, dict[str, Any]]:
+def effective_scenario(settings: Settings, scenario: dict[str, Any]) -> dict[str, Any]:
+    """Share process-only guarded budgets between HTTP and durable workers."""
+    result = dict(scenario)
+    override = getattr(settings, "operator_limits_json", None)
+    if override is not None:
+        result["operator_limits"] = {**result.get("operator_limits", {}), **json.loads(override)}
+    return result
+
+
+def get_scenarios(
+    settings: Settings, *, include_operator_overrides: bool = True
+) -> dict[str, dict[str, Any]]:
     path = settings.config_dir / "scenarios.yaml"
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
@@ -46,18 +57,14 @@ def get_scenarios(settings: Settings) -> dict[str, dict[str, Any]]:
             raise ValueError(f"scenario {scenario_id} has invalid status")
         if any(mode not in {"synthetic", "replay", "live"} for mode in scenario["allowed_modes"]):
             raise ValueError(f"scenario {scenario_id} has invalid allowed_modes")
-    if settings.operator_limits_json is not None:
-        # Settings rejects these overrides outside the explicitly enabled local harness.
-        # Apply to the effective scenario only; the checked-in source remains immutable.
-        overrides = json.loads(settings.operator_limits_json)
-        for scenario in raw.values():
-            scenario["operator_limits"] = {**scenario["operator_limits"], **overrides}
+    if include_operator_overrides:
+        return {identifier: effective_scenario(settings, scenario) for identifier, scenario in raw.items()}
     return raw
 
 
 def save_scenarios(settings: Settings, scenarios: dict[str, dict[str, Any]]) -> Path:
     path = settings.config_dir / "scenarios.yaml"
-    get_scenarios(settings)
+    get_scenarios(settings, include_operator_overrides=False)
     path.write_text(yaml.safe_dump(scenarios, sort_keys=False), encoding="utf-8")
     return path
 

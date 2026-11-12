@@ -133,7 +133,7 @@ def _db(settings: Settings, action: str) -> dict[str, Any]:
 
 
 def _bind(settings: Settings, args: argparse.Namespace) -> dict[str, Any]:
-    scenarios = get_scenarios(settings)
+    scenarios = get_scenarios(settings, include_operator_overrides=False)
     if args.scenario_id not in scenarios:
         raise DatasetError("SCENARIO_UNKNOWN", f"Unknown scenario {args.scenario_id}")
     scenario = scenarios[args.scenario_id]

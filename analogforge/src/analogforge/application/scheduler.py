@@ -139,7 +139,9 @@ class WorkflowEngine:
             match = entries.get(identifier)
         if match is None:
             raise WorkflowError("INPUT_INVALID", "Unknown scenario")
-        return dict(match)
+        from analogforge.application.capabilities import effective_scenario
+
+        return effective_scenario(self.settings, dict(match))
 
     def _load(self, run_id: str, workspace_id: str) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any] | None]:
         with self.store.transaction(workspace_id) as tx:

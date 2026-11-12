@@ -227,7 +227,7 @@ def _enable_local_practice(settings: Settings, policy_id: str, entries: list[dic
     ):
         from analogforge.application.capabilities import get_scenarios, save_scenarios
 
-        scenarios = get_scenarios(settings)
+        scenarios = get_scenarios(settings, include_operator_overrides=False)
         scenarios["local-dataset-practice-v1"]["status"] = "AVAILABLE"
         save_scenarios(settings, scenarios)
 

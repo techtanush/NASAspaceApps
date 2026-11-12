@@ -50,3 +50,18 @@ def test_guarded_operator_override_reaches_every_scenario_without_mutating_confi
         assert scenario["operator_limits"]["search_max_seconds"] == expected_seconds
     assert get_scenarios(base) == defaults
     assert config_file.read_bytes() == original
+
+
+def test_worker_scenario_uses_the_same_guarded_budget_as_the_api(tmp_path):
+    from analogforge.application.capabilities import get_scenarios
+    from analogforge.application.scheduler import WorkflowEngine
+    from analogforge.settings import Settings
+
+    settings = Settings(
+        _env_file=None, data_root=tmp_path, test_hooks=True,
+        operator_limits_json='{"search_max_expansions":1}',
+    )
+    api = get_scenarios(settings)["synthetic-mars-mobility-v1"]
+    worker = WorkflowEngine(None, settings)._scenario("synthetic-mars-mobility-v1")
+    assert worker["operator_limits"]["search_max_expansions"] == 1
+    assert worker["operator_limits"] == api["operator_limits"]
