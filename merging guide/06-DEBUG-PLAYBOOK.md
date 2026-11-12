@@ -78,6 +78,8 @@ Always: reproduce with the smallest case, read the actual payload/receipt/log, c
 | Missing GDAL driver (`PDS`, `PDS4`, `HGT`, `netCDF`) | use rasterio wheels with bundled GDAL or install system GDAL; preflight `RUNTIME` lists drivers |
 | Playwright cannot launch | install Chromium (`pnpm exec playwright install chromium`) or use `/opt/pw-browsers/chromium` with `--no-sandbox` |
 | Port in use | pick the next profile ports; update `API_PORT/WEB_PORT/DB_PORT`, CORS and Vite proxy together; do not kill unknown processes |
+| Merged tree: `ModuleNotFoundError: No module named 'passport_renderer'` while collecting `tests/unit/passport_renderer` (passes on Aradhya's branch alone) | Tanush adds `tests/__init__.py` and `tests/unit/__init__.py`, so pytest imports the renderer tests as `tests.unit.passport_renderer`; a top-level `from passport_renderer…` import then fails. **Fixed on Aradhya's branch 2026-11-12**: the renderer tests use relative imports (`from .fixtures.builders import …`), which work in both layouts. Its scripts add `tests/unit` to `sys.path` themselves |
+| `pyproject.toml` add/add conflict in the `extra-*` lists | expected: each builder fills only their own list; keep each person's line from their own branch |
 | `uv lock` conflicts after merging extras | resolve by relaxing only the conflicting *extra* dependency pins in the owner's list; never touch kit dependencies |
 
 ## F. Escalation rule
