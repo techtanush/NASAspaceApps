@@ -37,3 +37,13 @@ Science-side fixes on this branch (each replaces the defective behavior; regress
 Platform-side fixes (Tanush's branch): graph scenario terrain sources now point at the practice rasters (the graph stays the PROVE IT fixture), and a refused claim now ends the run `BLOCKED` with `SCIENTIFIC_CLAIM_REJECTED` and the issue codes instead of an unhandled exception.
 
 Gates after these changes: 1006 tests passed (0 skipped), 1006 oracles, mutations 16/16, ruff and strict mypy clean, forbidden scan 0, ownership PASS.
+
+## 4. Third pass (2026-11-12): real-backend browser journeys against the merged stack
+Aradhya's Playwright journeys run with mocks off against Tanush's API/worker and this science engine exposed two evidence-identity defects (the UI loads "the" artifact of an evidence carrying an operation's catalog algorithm id as that operation's payload, architecture 35 §5b):
+
+| Defect | Fix | Guard |
+| --- | --- | --- |
+| Per-window screening records (pass 1) carried their own summary artifacts under the `screen-candidates` id, so the Analogs view could load a summary instead of the screening table and crashed (`windows` undefined) | each window record now points at the screening payload artifact itself (content-addressed, stored once); its metrics stay per window | `test_every_screening_tagged_record_carries_the_screening_payload` |
+| The accepted-requirement `ASSUMPTION` record shared the `compare-requirement` id (and the verifier's accepted-energy record shared `verify-route`), so the matrix loaded the requirement JSON and showed every stage as PENDING | own sub-algorithm ids `accepted-requirement-record` / `accepted-energy-assumption` (added to the algorithm lock); the audit reads requirements from the new id | `test_catalog_algorithm_ids_always_point_at_the_operation_payload` (fails on the old code) |
+
+Gates after the change: 1008 passed / 0 skipped, mutations 16/16, ruff + strict mypy clean, forbidden scan 0, ownership PASS.

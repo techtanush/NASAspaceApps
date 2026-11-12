@@ -53,7 +53,8 @@ def test_s_graph_1(tmp_path: Path) -> None:
     assert abs(m2["reserve_pct"] - exp2["reserve_pct"]) < 1e-9  # type: ignore[operator]
     # evidence ids per 08 section 4 / architecture 35 5b
     ids = {d.algorithm_id for d in a2.results["verify"].evidence_drafts}
-    assert ids == {"verify-route", "route-telemetry"}
+    # ASSUMED mock graph energies are cited through the accepted-assumption record (its own sub-algorithm id).
+    assert ids == {"verify-route", "route-telemetry", "accepted-energy-assumption"}
     assert a2.results["verify"].artifacts[1].role.value == "TELEMETRY"
 
 

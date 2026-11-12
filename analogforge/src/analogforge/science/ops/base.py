@@ -177,6 +177,13 @@ class OpOutcome:
     counters: dict[str, int | float] = field(default_factory=dict)
 
 
+# Sub-algorithm ids for ASSUMPTION records that accompany a payload-bearing operation. They must differ from the
+# operation's catalog id: architecture 35 s5b lets consumers load "the" artifact of an evidence carrying an
+# operation's algorithm id as that operation's payload (like analysis-summary / route-telemetry).
+ALGORITHM_ACCEPTED_REQUIREMENT = "accepted-requirement-record"
+ALGORITHM_ACCEPTED_ENERGY = "accepted-energy-assumption"
+
+
 def json_artifact(
     env: OpEnv,
     *,

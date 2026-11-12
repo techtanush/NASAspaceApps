@@ -15,7 +15,14 @@ from analogforge.ports.domain_models import Requirement
 from analogforge.ports.science import ComputationStatus, EvidenceHandle
 from analogforge.ports.science_payloads import AuditEvidenceInput, ScreenCandidatesPayload
 from analogforge.science.audit import DiscoveryEvidence, audit_evidence, discovery_evidence_from_screening
-from analogforge.science.ops.base import OpBlocked, OpEnv, OpOutcome, derived_evidence, json_artifact
+from analogforge.science.ops.base import (
+    ALGORITHM_ACCEPTED_REQUIREMENT,
+    OpBlocked,
+    OpEnv,
+    OpOutcome,
+    derived_evidence,
+    json_artifact,
+)
 
 _REF = re.compile(r"reference_set=([A-Za-z0-9._-]+)")
 
@@ -56,7 +63,7 @@ def run_audit(env: OpEnv) -> OpOutcome:
         )
     requirements: dict[str, Requirement] = {}
     for h in env.request.input_evidence:
-        if h.kind == "ASSUMPTION" and h.algorithm_id == catalog.ALGORITHM_IDS["COMPARE_REQUIREMENT"]:
+        if h.kind == "ASSUMPTION" and h.algorithm_id == ALGORITHM_ACCEPTED_REQUIREMENT:
             try:
                 req = env.read_model(h, Requirement)
             except OpBlocked:

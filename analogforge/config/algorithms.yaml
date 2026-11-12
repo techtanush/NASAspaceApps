@@ -17,6 +17,8 @@ algorithm_lock:
   search-route: "1.0.0"
   verify-route: "1.0.0"
   route-telemetry: "1.0.0"
+  accepted-requirement-record: "1.0.0"
+  accepted-energy-assumption: "1.0.0"
   diagnose-result: "1.0.0"
   optimize-portfolio: "1.0.0"
   audit-evidence: "1.0.0"

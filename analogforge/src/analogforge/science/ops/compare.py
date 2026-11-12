@@ -30,6 +30,7 @@ from analogforge.science.features.histogram import area_weighted_histogram, to_p
 from analogforge.science.features.slope import analyze_surface
 from analogforge.science.geometry import AnalysisGridSpec, PixelGeometry, frame_from_crs_wkt, unwrap_bbox, xy_to_lonlat
 from analogforge.science.ops.base import (
+    ALGORITHM_ACCEPTED_REQUIREMENT,
     OpBlocked,
     OpEnv,
     OpOutcome,
@@ -193,8 +194,10 @@ def run_compare(env: OpEnv) -> OpOutcome:
         key="requirement",
         kind="ASSUMPTION",
         body="EARTH",
-        algorithm_id=algo,
-        params_sha=env.params_hash(algo, {"requirement": inp.requirement.model_dump(mode="json")}),
+        algorithm_id=ALGORITHM_ACCEPTED_REQUIREMENT,
+        params_sha=env.params_hash(
+            ALGORITHM_ACCEPTED_REQUIREMENT, {"requirement": inp.requirement.model_dump(mode="json")}
+        ),
         artifact=req_art,
         limitations=[
             "Requirement record as accepted in the mission contract; carried so the audit can read its window."

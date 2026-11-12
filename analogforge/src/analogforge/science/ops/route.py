@@ -20,7 +20,7 @@ from analogforge.ports.science_payloads import (
     VerifyRouteInput,
 )
 from analogforge.science.geometry import frame_from_crs_wkt, xy_to_lonlat
-from analogforge.science.ops.base import OpEnv, OpOutcome, derived_evidence, json_artifact
+from analogforge.science.ops.base import ALGORITHM_ACCEPTED_ENERGY, OpEnv, OpOutcome, derived_evidence, json_artifact
 from analogforge.science.raster.store import decode_analysis_grid
 from analogforge.science.routing import GridArrays, grid_arrays_from_analysis, load_grid_arrays
 from analogforge.science.routing.constraints import RouteDesignDefaults, route_defaults_from_config
@@ -270,7 +270,7 @@ def run_verify(env: OpEnv) -> OpOutcome:
                 key="accepted-energy-assumption",
                 kind="ASSUMPTION",
                 body="EARTH",
-                algorithm_id=algo,
+                algorithm_id=ALGORITHM_ACCEPTED_ENERGY,
                 params_sha=params,
                 artifact=assumption_art,
                 parent_keys=["verification"],

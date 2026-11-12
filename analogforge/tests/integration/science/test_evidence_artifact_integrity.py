@@ -121,3 +121,62 @@ def test_positive_qualification_claims_are_fully_assessable_by_the_audit(flow_af
             assert outcomes["SC-05"] != "NOT_ASSESSED" and outcomes["SC-08"] != "NOT_ASSESSED", (req.id, outcomes)
             audited += 1
     assert audited > 0
+
+
+def test_every_screening_tagged_record_carries_the_screening_payload(flow_after_analysis) -> None:  # type: ignore[no-untyped-def]
+    """Architecture 35 s5b: the UI loads the artifact of ANY evidence with the screening algorithm id as the payload.
+
+    Found in the real-backend browser run (2026-11-12): per-window records with their own summary artifacts crashed
+    the Analogs view (`windows` undefined). Every such record must hold the full ScreenCandidatesPayload bytes.
+    """
+    import json
+
+    from analogforge.ports.science_payloads import ScreenCandidatesPayload
+
+    flow, _, _ = flow_after_analysis
+    screening = [r for r in flow.results if r.operation == "SCREEN_CANDIDATES"]
+    assert screening
+    for result in screening:
+        by_key = {a.local_key: a for a in result.artifacts}
+        tagged = [d for d in result.evidence_drafts if d.algorithm_id == catalog.ALGORITHM_IDS["SCREEN_CANDIDATES"]]
+        assert len(tagged) > 1  # run-level record plus per-window records
+        for draft in tagged:
+            artifact = by_key[draft.artifact_key]  # type: ignore[index]
+            path = flow.ctx.scratch_dir() / artifact.scratch_relpath
+            ScreenCandidatesPayload.model_validate(json.loads(path.read_bytes()))
+
+
+def _artifact_json(flow, result, draft):  # type: ignore[no-untyped-def]
+    import json
+
+    by_key = {a.local_key: a for a in result.artifacts}
+    return json.loads((flow.ctx.scratch_dir() / by_key[draft.artifact_key].scratch_relpath).read_bytes())
+
+
+def test_catalog_algorithm_ids_always_point_at_the_operation_payload(flow_after_analysis) -> None:  # type: ignore[no-untyped-def]
+    """Architecture 35 s5b, for every operation in the practice flow: an evidence carrying the operation's catalog
+    algorithm id holds the operation payload; accompanying records (accepted requirement) use their own ids.
+
+    Found in the real-backend browser run (2026-11-12): the requirement ASSUMPTION record shared the
+    compare-requirement id, so the qualification matrix loaded the requirement JSON and showed stages as PENDING.
+    """
+    import json
+
+    flow, _, _ = flow_after_analysis
+    checked = 0
+    for result in flow.results:
+        if result.operation == "ANALYZE_CANDIDATE" or result.payload is None:
+            continue  # documented special case: binary grid + analysis-summary child
+        catalog_id = catalog.ALGORITHM_IDS[str(getattr(result.operation, "value", result.operation))]
+        expected = json.loads(result.payload.model_dump_json())
+        media = {a.local_key: a.media_type for a in result.artifacts}
+        for draft in result.evidence_drafts:
+            if draft.algorithm_id != catalog_id or media.get(draft.artifact_key or "") != "application/json":
+                continue  # binary companions (e.g. the characterize-target analysis grid) are not display payloads
+            assert draft.artifact_key is not None, (result.operation, draft.local_key)
+            assert _artifact_json(flow, result, draft) == expected, (result.operation, draft.local_key)
+            checked += 1
+        for draft in result.evidence_drafts:
+            if draft.kind == "ASSUMPTION":
+                assert draft.algorithm_id != catalog_id, (result.operation, draft.local_key)
+    assert checked > 0
