@@ -1,0 +1,111 @@
+/* GENERATED from design/tokens.json by scripts/ui/gen_tokens_css.py. Do not edit by hand. */
+
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-7: 48px;
+  --radius-0: 0; --radius-1: 2px; --radius-2: 4px; --radius-3: 6px;
+  --text-xs: 12px; --text-sm: 13px; --text-md: 14px; --text-lg: 16px; --text-xl: 20px; --text-2xl: 24px;
+  --lh-tight: 1.25; --lh-normal: 1.45;
+  --row-h-compact: 28px; --row-h-default: 36px; --row-h-comfortable: 44px;
+  --control-h: 32px; --control-h-touch: 44px;
+  --focus-width: 2px; --focus-offset: 2px;
+  --dur-fast: 100ms; --dur-base: 160ms; --ease: cubic-bezier(0.2, 0, 0, 1);
+  --header-h: 48px; --left-w: 264px; --right-w: 352px; --ops-h: 220px;
+  color-scheme: dark;
+}
+
+:root, [data-theme="dark"] {
+  --accent: #5AAEFF;
+  --accent-strong: #2F7FD6;
+  --border-strong: #62748B;
+  --border-subtle: #2A3646;
+  --canvas: #0B0F14;
+  --focus-ring: #8CC8FF;
+  --map-graticule: #2A3646;
+  --map-land: #18212C;
+  --map-water: #0D1319;
+  --on-accent: #06101C;
+  --state-fail: #F26B66;
+  --state-fail-bg: #2C1515;
+  --state-gap: #A98BFF;
+  --state-gap-bg: #1F1A33;
+  --state-partial: #E2A93B;
+  --state-partial-bg: #2A2110;
+  --state-pass: #3FBF7F;
+  --state-pass-bg: #10261C;
+  --state-pending: #6FB7E8;
+  --state-pending-bg: #12212D;
+  --state-unknown: #9AA7B8;
+  --state-unknown-bg: #1B222B;
+  --surface-1: #11171E;
+  --surface-2: #171F29;
+  --surface-3: #1F2935;
+  --text-primary: #E8EDF3;
+  --text-secondary: #AAB6C5;
+  --text-tertiary: #8997A9;
+}
+
+[data-theme="light"] {
+  --accent: #0B5CC2;
+  --accent-strong: #094A9E;
+  --border-strong: #7A8798;
+  --border-subtle: #D3DAE3;
+  --canvas: #F4F6F9;
+  --focus-ring: #0B5CC2;
+  --map-graticule: #C4CDD9;
+  --map-land: #E4E9EF;
+  --map-water: #F4F6F9;
+  --on-accent: #FFFFFF;
+  --state-fail: #B3261E;
+  --state-fail-bg: #FBE6E4;
+  --state-gap: #5B3FC2;
+  --state-gap-bg: #ECE7FB;
+  --state-partial: #8A5A00;
+  --state-partial-bg: #FBF0D9;
+  --state-pass: #0C7340;
+  --state-pass-bg: #E4F4EB;
+  --state-pending: #0A6190;
+  --state-pending-bg: #E0F0F9;
+  --state-unknown: #4B5868;
+  --state-unknown-bg: #E8ECF1;
+  --surface-1: #FFFFFF;
+  --surface-2: #EEF1F5;
+  --surface-3: #E2E7EE;
+  --text-primary: #111A24;
+  --text-secondary: #3B4857;
+  --text-tertiary: #566475;
+}
+
+@media print {
+:root {
+    --accent: #0B5CC2;
+    --accent-strong: #094A9E;
+    --border-strong: #7A8798;
+    --border-subtle: #D3DAE3;
+    --canvas: #F4F6F9;
+    --focus-ring: #0B5CC2;
+    --map-graticule: #C4CDD9;
+    --map-land: #E4E9EF;
+    --map-water: #F4F6F9;
+    --on-accent: #FFFFFF;
+    --state-fail: #B3261E;
+    --state-fail-bg: #FBE6E4;
+    --state-gap: #5B3FC2;
+    --state-gap-bg: #ECE7FB;
+    --state-partial: #8A5A00;
+    --state-partial-bg: #FBF0D9;
+    --state-pass: #0C7340;
+    --state-pass-bg: #E4F4EB;
+    --state-pending: #0A6190;
+    --state-pending-bg: #E0F0F9;
+    --state-unknown: #4B5868;
+    --state-unknown-bg: #E8ECF1;
+    --surface-1: #FFFFFF;
+    --surface-2: #EEF1F5;
+    --surface-3: #E2E7EE;
+    --text-primary: #111A24;
+    --text-secondary: #3B4857;
+    --text-tertiary: #566475;
+  }
+}

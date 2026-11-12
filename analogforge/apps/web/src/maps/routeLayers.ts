@@ -1,0 +1,1 @@
+export const routeStyles = { proposed:{dash:[4,4],label:'Proposed route'},current:{dash:[],label:'Current committed route'},prior:{dash:[2,4],label:'Previous attempt'},violation:{dash:[8,2,2,2],label:'Verifier-reported violation'},forbidden:{dash:[2,2],label:'Forbidden area'} } as const;

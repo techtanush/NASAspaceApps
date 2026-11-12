@@ -1,0 +1,339 @@
+{
+  "constraints": {
+    "schema_version": "1.0",
+    "artifact_kind": "RASTER_ROUTE_TEST",
+    "mode": "synthetic",
+    "resource_provider": "PHYSICAL_EARTH_MODEL",
+    "mission_revision_id": "70000000-0000-4000-8000-000000000001",
+    "mission_content_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+    "rover_revision_id": "70000000-0000-4000-8000-000000000001",
+    "rover_content_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+    "candidate_window_id": "grid-r0c1",
+    "test_revision": 1,
+    "strategy": "WAYPOINT_RETURN",
+    "grid": {
+      "analysis_evidence_id": "70000000-0000-4000-8000-000000000001",
+      "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "crs_wkt": "EPSG:32612",
+      "cell_size_m": 60.0,
+      "width": 64,
+      "height": 64
+    },
+    "graph": null,
+    "start": {
+      "node_id": null,
+      "lon": -111.0,
+      "lat": 35.0,
+      "x_m": 494240.0,
+      "y_m": 3900000.0
+    },
+    "return_required": true,
+    "tasks": [
+      {
+        "task_id": "W1",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.99,
+          "lat": 35.01,
+          "x_m": 494840.0,
+          "y_m": 3899400.0
+        },
+        "tolerance_m": 60.0,
+        "dwell_s": 60.0,
+        "incremental_energy_wh": 10.0,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      },
+      {
+        "task_id": "W2",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.98,
+          "lat": 35.01,
+          "x_m": 495440.0,
+          "y_m": 3899400.0
+        },
+        "tolerance_m": 60.0,
+        "dwell_s": 60.0,
+        "incremental_energy_wh": 10.0,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      }
+    ],
+    "surface_slope_cap_deg": 18.0,
+    "exposures": [
+      {
+        "requirement_id": "R-EXPOSURE",
+        "metric_id": "surface_slope_deg",
+        "band_deg": [
+          12.0,
+          18.0
+        ],
+        "upper_inclusive": true,
+        "minimum_distance_m": 100.0,
+        "counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE"
+      }
+    ],
+    "max_distance_m": 8000.0,
+    "max_duration_s": null,
+    "max_undirected_edge_traversals": 2,
+    "unknown_is_forbidden": true,
+    "footprint_dilation_m": 0.0,
+    "blocked_edge_ids": [],
+    "energy": {
+      "model": {
+        "model_id": "earth-simple-v1",
+        "rolling_coefficient": 0.06,
+        "drive_efficiency": 0.65,
+        "idle_power_w": 35.0,
+        "science_task_wh": 10.0,
+        "roughness_multiplier": 1.0,
+        "uncertainty_fraction": 0.25,
+        "calibration_status": "ASSUMED",
+        "calibration_evidence_id": null
+      },
+      "battery_wh": 1800.0,
+      "min_reserve_pct": 20.0,
+      "rover_mass_kg": 42.0,
+      "nominal_speed_mps": 0.5,
+      "gravity_mps2": 9.80665
+    },
+    "solver": {
+      "max_expansions": 100000,
+      "max_seconds": 60,
+      "max_labels_per_node": 100,
+      "seed": 20261105
+    },
+    "limitations": [
+      "Authored mock practice constraints; not a scientific computation",
+      "An unspecified rover maximum route uses the recorded 8000 m design default"
+    ]
+  },
+  "graphConstraints": {
+    "schema_version": "1.0",
+    "artifact_kind": "SYNTHETIC_GRAPH_REGRESSION",
+    "mode": "synthetic",
+    "resource_provider": "TEST_ONLY_MOCK_GRAPH",
+    "mission_revision_id": "70000000-0000-4000-8000-000000000001",
+    "mission_content_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+    "rover_revision_id": "70000000-0000-4000-8000-000000000001",
+    "rover_content_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+    "candidate_window_id": "grid-r0c1",
+    "test_revision": 1,
+    "strategy": "WAYPOINT_RETURN",
+    "grid": null,
+    "graph": {
+      "nodes": [
+        "S",
+        "A",
+        "B",
+        "C",
+        "W1",
+        "W2"
+      ],
+      "edges": [
+        {
+          "a": "S",
+          "b": "A",
+          "length_m": 20.0,
+          "surface_slope_deg": 10.0,
+          "mock_energy_wh": 1.0
+        },
+        {
+          "a": "A",
+          "b": "W1",
+          "length_m": 20.0,
+          "surface_slope_deg": 10.0,
+          "mock_energy_wh": 1.0
+        },
+        {
+          "a": "W1",
+          "b": "W2",
+          "length_m": 20.0,
+          "surface_slope_deg": 10.0,
+          "mock_energy_wh": 1.0
+        },
+        {
+          "a": "S",
+          "b": "B",
+          "length_m": 50.0,
+          "surface_slope_deg": 15.0,
+          "mock_energy_wh": 2.0
+        },
+        {
+          "a": "B",
+          "b": "C",
+          "length_m": 50.0,
+          "surface_slope_deg": 15.0,
+          "mock_energy_wh": 2.0
+        },
+        {
+          "a": "C",
+          "b": "W1",
+          "length_m": 50.0,
+          "surface_slope_deg": 15.0,
+          "mock_energy_wh": 2.0
+        }
+      ]
+    },
+    "start": {
+      "node_id": "S",
+      "lon": null,
+      "lat": null,
+      "x_m": null,
+      "y_m": null
+    },
+    "return_required": true,
+    "tasks": [
+      {
+        "task_id": "W1",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.99,
+          "lat": 35.01,
+          "x_m": 494840.0,
+          "y_m": 3899400.0
+        },
+        "tolerance_m": 60.0,
+        "dwell_s": 60.0,
+        "incremental_energy_wh": 10.0,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      },
+      {
+        "task_id": "W2",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.98,
+          "lat": 35.01,
+          "x_m": 495440.0,
+          "y_m": 3899400.0
+        },
+        "tolerance_m": 60.0,
+        "dwell_s": 60.0,
+        "incremental_energy_wh": 10.0,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      }
+    ],
+    "surface_slope_cap_deg": 18.0,
+    "exposures": [
+      {
+        "requirement_id": "R-EXPOSURE",
+        "metric_id": "surface_slope_deg",
+        "band_deg": [
+          12.0,
+          18.0
+        ],
+        "upper_inclusive": true,
+        "minimum_distance_m": 100.0,
+        "counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE"
+      }
+    ],
+    "max_distance_m": 400.0,
+    "max_duration_s": null,
+    "max_undirected_edge_traversals": 2,
+    "unknown_is_forbidden": true,
+    "footprint_dilation_m": 0.0,
+    "blocked_edge_ids": [],
+    "energy": {
+      "model": {
+        "model_id": "earth-simple-v1",
+        "rolling_coefficient": 0.06,
+        "drive_efficiency": 0.65,
+        "idle_power_w": 35.0,
+        "science_task_wh": 10.0,
+        "roughness_multiplier": 1.0,
+        "uncertainty_fraction": 0.25,
+        "calibration_status": "ASSUMED",
+        "calibration_evidence_id": null
+      },
+      "battery_wh": 1800.0,
+      "min_reserve_pct": 20.0,
+      "rover_mass_kg": 42.0,
+      "nominal_speed_mps": 0.5,
+      "gravity_mps2": 9.80665
+    },
+    "solver": {
+      "max_expansions": 100000,
+      "max_seconds": 60,
+      "max_labels_per_node": 100,
+      "seed": 20261105
+    },
+    "limitations": [
+      "Authored mock practice constraints; not a scientific computation",
+      "An unspecified rover maximum route uses the recorded 8000 m design default"
+    ]
+  },
+  "route": {
+    "schema_version": "1.0",
+    "route_key": "practice-waypoint-return",
+    "mode": "synthetic",
+    "constraints_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+    "strategy": "WAYPOINT_RETURN",
+    "graph_revision": "synthetic-practice-grid-v1",
+    "node_sequence": [
+      "S",
+      "A",
+      "W1",
+      "W2",
+      "W1",
+      "A",
+      "S"
+    ],
+    "task_events": [
+      {
+        "task_id": "W1",
+        "node_id": "W1",
+        "arrival_distance_m": 40.0,
+        "dwell_s": 60.0
+      },
+      {
+        "task_id": "W2",
+        "node_id": "W2",
+        "arrival_distance_m": 60.0,
+        "dwell_s": 60.0
+      }
+    ],
+    "display_geometry": {
+      "type": "LineString",
+      "coordinates": [
+        [
+          -111.0,
+          35.0
+        ],
+        [
+          -110.995,
+          35.005
+        ],
+        [
+          -111.0,
+          35.0
+        ]
+      ]
+    },
+    "solver_claimed": {
+      "distance_m": 120.0,
+      "energy_conservative_wh": 26.0,
+      "unique_exposure_m": {
+        "R-EXPOSURE": 0.0
+      }
+    }
+  }
+}

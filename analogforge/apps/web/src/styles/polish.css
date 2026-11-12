@@ -1,0 +1,38 @@
+/* Mission-console polish (architecture 41): one disclosure glyph, calm run status row, quiet page focus, real checkboxes. */
+
+/* 1. One disclosure glyph everywhere: a thin chevron instead of "+" / "−" / native triangles. */
+summary{list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before,
+:is(.run-metadata,.candidate-state-details,.practice-presets)>summary::before,
+.hash-disclosure summary::before{content:'';display:inline-block;flex:0 0 8px;width:8px;height:8px;margin:0 8px 0 0;border-right:2px solid var(--text-secondary);border-bottom:2px solid var(--text-secondary);transform:translateY(-2px) rotate(-45deg);transition:transform var(--dur-fast) var(--ease);vertical-align:middle}
+details[open]>summary::before,
+:is(.run-metadata,.candidate-state-details,.practice-presets)[open]>summary::before,
+.hash-disclosure[open] summary::before{content:'';transform:translateY(-4px) rotate(45deg)}
+summary:hover::before{border-color:var(--text-primary)}
+
+/* 2. Route changes move focus to the page heading for screen readers; that programmatic focus is not a visible control. */
+h1[tabindex="-1"]:focus,h1[tabindex="-1"]:focus-visible{outline:none}
+
+/* 3. Run status row on wide screens: fixed, aligned, no disclosure chrome. */
+.run-metadata-static{min-width:0;max-width:100%;flex:1 0 100%} /* own line: label width changes (Live updates / resyncing / Final) must never reflow the header (C11) */
+.run-metadata-static>.header-cluster{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0}
+.run-state{border-left-width:3px}
+
+/* 4. Checkboxes drawn by the design system (24 px target, 2 px radius, accent fill + check when on). */
+input[type=checkbox]{appearance:none;display:inline-grid;place-content:center;width:24px;height:24px;border:1px solid var(--border-strong);border-radius:var(--radius-1);background:var(--surface-2);cursor:pointer;padding:0}
+input[type=checkbox]:hover{border-color:var(--text-secondary)}
+input[type=checkbox]:checked{background:var(--accent-strong);border-color:var(--accent-strong)}
+input[type=checkbox]:checked::before{content:'';width:12px;height:6px;border-left:2px solid var(--on-accent);border-bottom:2px solid var(--on-accent);transform:translateY(-2px) rotate(-45deg)}
+input[type=checkbox]:disabled{border-style:dashed;cursor:not-allowed}
+@media(pointer:coarse){input[type=checkbox]{width:44px;height:44px}}
+
+/* 5. Header: product line anchored beside the wordmark, controls to the right. */
+.app-header{justify-content:flex-start}
+.app-header>.header-context{margin-left:16px;padding-left:16px;border-left:1px solid var(--border-subtle)}
+.app-header>.header-cluster{margin-left:auto}
+
+@media print{summary::before{display:none!important}}
+
+/* 6. A run stopped by a refused claim explains itself instead of offering a retry that cannot succeed. */
+.run-stop-reason{flex-basis:100%;max-width:72ch}

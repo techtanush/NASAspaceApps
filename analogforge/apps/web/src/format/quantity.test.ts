@@ -1,0 +1,8 @@
+import { expect,it } from 'vitest';
+import { quantity,quantityRange,signedQuantity,inputQuantity } from './quantity';
+it('FE-002 preserves unknown, zero and supplied percent semantics',()=>{expect(quantity(null,'m')).toBe('Unknown');expect(quantity(undefined)).toBe('Unknown');expect(quantity(Number.NaN)).toBe('Unknown');expect(quantity(0,'m')).toBe('0\u00a0m');expect(quantity(20,'percent')).toBe('20.0\u00a0%');});
+it('per-quantity precision, SI display conversion and true minus are consistent',()=>{expect(quantity(230,'m')).toBe('230\u00a0m');expect(quantity(12480,'m')).toBe('12.48\u00a0km');expect(quantity(26,'Wh')).toBe('26.0\u00a0Wh');expect(quantity(15,'deg')).toBe('15.0\u00a0deg');expect(quantity(.82,'fraction')).toBe('0.82\u00a0fraction');expect(quantity(.5,'m/s')).toBe('0.50\u00a0m/s');expect(quantity(42,'kg')).toBe('42.0\u00a0kg');expect(quantity(88,'K')).toBe('88\u00a0K');expect(quantity(-.4,'Wh')).toBe('−0.4\u00a0Wh');expect(signedQuantity(12,'Wh')).toBe('+12.0\u00a0Wh');expect(quantityRange(5,12.5,'deg')).toBe('5.0–12.5\u00a0deg');});
+
+it('preserves nonzero engineering dimensions below whole-unit precision',()=>{expect(quantity(.2,'m')).toBe('0.20\u00a0m');expect(quantity(.00012,'m')).toBe('0.00012\u00a0m');expect(quantity(.02,'Wh')).not.toBe('0.0\u00a0Wh');});
+
+it('formats saved numeric editors without changing their labelled units',()=>{expect(inputQuantity(1800,'Wh')).toBe('1800.0');expect(inputQuantity(1800,'m')).toBe('1800');expect(inputQuantity(.2,'m')).toBe('0.20');expect(inputQuantity(.5,'m/s')).toBe('0.50');expect(inputQuantity(null,'m')).toBe('');});

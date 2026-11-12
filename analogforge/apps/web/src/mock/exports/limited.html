@@ -1,0 +1,3585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AnalogForge — Practice lunar surface operations and thermal test</title>
+<style>
+:root { color-scheme: light; font-family: Arial, sans-serif; color: #17212b; background: #fff; }
+body { margin: 0 auto; max-width: 1100px; padding: 32px; line-height: 1.5; font-size: 14px; }
+h1 { font-size: 26px; } h2 { border-bottom: 2px solid #52606d; padding-bottom: 8px; margin-top: 32px; }
+h3 { font-size: 17px; } table { width: 100%; border-collapse: collapse; margin-block: 16px; }
+th, td { padding: 8px; border: 1px solid #8492a0; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+th { background: #edf0f3; } .numeric { text-align: right; font-variant-numeric: tabular-nums; }
+.mode, .draft { display: inline-block; padding: 8px 12px; border: 2px solid currentColor; font-weight: bold; }
+.draft { color: #8a3000; } .hash { font-family: monospace; overflow-wrap: anywhere; }
+li, p, dd { overflow-wrap: anywhere; } dl.record { margin-left: 16px; } dt { font-weight: bold; }
+dd { margin-left: 16px; margin-bottom: 8px; } .attempt, tr { break-inside: avoid; page-break-inside: avoid; }
+img { max-width: 100%; max-height: 500px; } thead { display: table-header-group; }
+@page { margin: 18mm; }
+@media print { :root, body { background: #fff; color: #000; } body { padding: 0; max-width: none; }
+ h2 { break-after: avoid; } table { font-size: 11px; } .mode { border-color: #000; } }
+</style>
+</head>
+<body>
+
+<section id="cover">
+<p class="mode">SYNTHETIC
+
+</p>
+
+<h1>AnalogForge — Practice lunar surface operations and thermal test</h1>
+<h2>No rover supplied — site qualification only</h2>
+
+<p>Modeled terrain-feasibility verification — not physical rover execution</p>
+<p>Generated 2026-11-08T12:00:00Z · Passport 70000000-0000-4000-8000-000000000032 · Run 70000000-0000-4000-8000-000000000002</p>
+<p>Mission revision 1 · 70000000-0000-4000-8000-000000000003 · Target MOON</p>
+<p>No rover supplied — site qualification only</p>
+<p>Manifest SHA-256 <span class="hash">1843fb15144996708624f7eca0a71e1019352a35875bba020c3aeb7aeb076005</span>
+</p>
+<p>Assurance: LIMITED</p>
+<h3>Irreproducible conditions and critical unknowns</h3>
+<ul>
+<li>Lunar gravity and vacuum
+</li>
+</ul>
+
+
+<ul>
+<li>Earth thermal evidence
+</li>
+</ul>
+
+
+</section>
+<section id="mission-contract">
+<h2>Mission Test Contract</h2><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000003</dd><dt>mission_id</dt>
+<dd>70000000-0000-4000-8000-000000000004</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>revision</dt>
+<dd>1</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>accepted_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>content_sha256</dt>
+<dd>5b9d05ad64a00ba1d4b7c2cdcc62e966105de78d57b329c42c2b93bb14aa5a18</dd><dt>name</dt>
+<dd>Practice lunar surface operations and thermal test</dd><dt>objective</dt>
+<dd>Test rover surface operations on south-polar lunar terrain, including cold-trap thermal conditions, under lunar gravity and vacuum.</dd><dt>target</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>MOON</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-10.0
+</li>
+<li>-89.5
+</li>
+<li>10.0
+</li>
+<li>-87.5
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>PLANETOCENTRIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_MOON_REFERENCE_SPHERE_1737400M</dd></dl>
+</dd><dt>requirements</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>id</dt>
+<dd>R-SLOPE-AVAILABILITY</dd><dt>label</dt>
+<dd>At least 5% of valid candidate area lies in the 12-18 deg slope band</dd><dt>dimension</dt>
+<dd>TERRAIN</dd><dt>observable</dt>
+<dd>slope_band_area_fraction</dd><dt>operator</dt>
+<dd>GTE</dd><dt>lower</dt>
+<dd>0.05</dd><dt>upper</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>fraction</dd><dt>mandatory</dt>
+<dd>True</dd><dt>weight</dt>
+<dd>1.0</dd><dt>evidence_scope</dt>
+<dd>terrain_model</dd><dt>minimum_support_scale_m</dt>
+<dd>Unknown</dd><dt>maximum_support_scale_m</dt>
+<dd>60.0</dd><dt>origin</dt>
+<dd>PROPOSED_DEFAULT</dd><dt>acceptance_note</dt>
+<dd>Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.</dd><dt>parameters</dt>
+<dd><dl class="record"><dt>slope_band_deg</dt>
+<dd>
+<ul>
+<li>12.0
+</li>
+<li>18.0
+</li>
+</ul>
+</dd><dt>exposure_counting</dt>
+<dd>Unknown</dd><dt>task_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>co_location_group</dt>
+<dd>Unknown</dd><dt>comparison_rule_id</dt>
+<dd>slope-band-area-fraction-v1</dd><dt>temporal_support</dt>
+<dd>Unknown</dd></dl>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>id</dt>
+<dd>R-TARGET-SLOPE-CONTEXT</dd><dt>label</dt>
+<dd>Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support</dd><dt>dimension</dt>
+<dd>TERRAIN</dd><dt>observable</dt>
+<dd>slope_distribution_w1_deg</dd><dt>operator</dt>
+<dd>LTE</dd><dt>lower</dt>
+<dd>Unknown</dd><dt>upper</dt>
+<dd>6.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>mandatory</dt>
+<dd>False</dd><dt>weight</dt>
+<dd>1.0</dd><dt>evidence_scope</dt>
+<dd>regional_context</dd><dt>minimum_support_scale_m</dt>
+<dd>480.0</dd><dt>maximum_support_scale_m</dt>
+<dd>1000.0</dd><dt>origin</dt>
+<dd>PROPOSED_DEFAULT</dd><dt>acceptance_note</dt>
+<dd>Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.</dd><dt>parameters</dt>
+<dd><dl class="record"><dt>slope_band_deg</dt>
+<dd>Unknown</dd><dt>exposure_counting</dt>
+<dd>Unknown</dd><dt>task_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>co_location_group</dt>
+<dd>Unknown</dd><dt>comparison_rule_id</dt>
+<dd>slope-w1-common-support-v1</dd><dt>temporal_support</dt>
+<dd>Unknown</dd></dl>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>id</dt>
+<dd>R-THERMAL</dd><dt>label</dt>
+<dd>Surface temperature minimum at or below 120 K (multi-year minimum)</dd><dt>dimension</dt>
+<dd>THERMAL</dd><dt>observable</dt>
+<dd>surface_temperature_min_k</dd><dt>operator</dt>
+<dd>LTE</dd><dt>lower</dt>
+<dd>Unknown</dd><dt>upper</dt>
+<dd>120.0</dd><dt>unit</dt>
+<dd>K</dd><dt>mandatory</dt>
+<dd>True</dd><dt>weight</dt>
+<dd>1.0</dd><dt>evidence_scope</dt>
+<dd>regional_context</dd><dt>minimum_support_scale_m</dt>
+<dd>Unknown</dd><dt>maximum_support_scale_m</dt>
+<dd>250.0</dd><dt>origin</dt>
+<dd>PROPOSED_DEFAULT</dd><dt>acceptance_note</dt>
+<dd>Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.</dd><dt>parameters</dt>
+<dd><dl class="record"><dt>slope_band_deg</dt>
+<dd>Unknown</dd><dt>exposure_counting</dt>
+<dd>Unknown</dd><dt>task_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>co_location_group</dt>
+<dd>Unknown</dd><dt>comparison_rule_id</dt>
+<dd>thermal-min-compatible-quantity-v1</dd><dt>temporal_support</dt>
+<dd>multi-year minimum</dd></dl>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>id</dt>
+<dd>R-GRAVITY</dd><dt>label</dt>
+<dd>Lunar gravity (1.62 m/s2)</dd><dt>dimension</dt>
+<dd>GRAVITY</dd><dt>observable</dt>
+<dd>planetary_gravity</dd><dt>operator</dt>
+<dd>NOT_NATURALLY_REPRODUCIBLE</dd><dt>lower</dt>
+<dd>Unknown</dd><dt>upper</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m/s2</dd><dt>mandatory</dt>
+<dd>False</dd><dt>weight</dt>
+<dd>1.0</dd><dt>evidence_scope</dt>
+<dd>field_validation</dd><dt>minimum_support_scale_m</dt>
+<dd>Unknown</dd><dt>maximum_support_scale_m</dt>
+<dd>Unknown</dd><dt>origin</dt>
+<dd>PROPOSED_DEFAULT</dd><dt>acceptance_note</dt>
+<dd>Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.</dd><dt>parameters</dt>
+<dd><dl class="record"><dt>slope_band_deg</dt>
+<dd>Unknown</dd><dt>exposure_counting</dt>
+<dd>Unknown</dd><dt>task_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>co_location_group</dt>
+<dd>Unknown</dd><dt>comparison_rule_id</dt>
+<dd>Unknown</dd><dt>temporal_support</dt>
+<dd>Unknown</dd></dl>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>id</dt>
+<dd>R-VACUUM</dd><dt>label</dt>
+<dd>Hard vacuum</dd><dt>dimension</dt>
+<dd>ATMOSPHERE</dd><dt>observable</dt>
+<dd>planetary_atmosphere</dd><dt>operator</dt>
+<dd>NOT_NATURALLY_REPRODUCIBLE</dd><dt>lower</dt>
+<dd>Unknown</dd><dt>upper</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>Pa</dd><dt>mandatory</dt>
+<dd>False</dd><dt>weight</dt>
+<dd>1.0</dd><dt>evidence_scope</dt>
+<dd>field_validation</dd><dt>minimum_support_scale_m</dt>
+<dd>Unknown</dd><dt>maximum_support_scale_m</dt>
+<dd>Unknown</dd><dt>origin</dt>
+<dd>PROPOSED_DEFAULT</dd><dt>acceptance_note</dt>
+<dd>Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.</dd><dt>parameters</dt>
+<dd><dl class="record"><dt>slope_band_deg</dt>
+<dd>Unknown</dd><dt>exposure_counting</dt>
+<dd>Unknown</dd><dt>task_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>co_location_group</dt>
+<dd>Unknown</dd><dt>comparison_rule_id</dt>
+<dd>Unknown</dd><dt>temporal_support</dt>
+<dd>Unknown</dd></dl>
+</dd></dl>
+
+</li>
+</ul>
+</dd><dt>assumptions</dt>
+<dd>
+<ul>
+<li>All lunar and Earth terrain in this scenario is synthetic practice data; no Diviner or Earth thermal source is configured, so thermal must be UNKNOWN.
+</li>
+</ul>
+</dd><dt>forbidden_actions</dt>
+<dd>
+<ul>
+<li>Relax accepted requirements during replanning
+</li>
+</ul>
+</dd></dl>
+</section>
+<section id="target-and-sites">
+<h2>Target and Earth sites</h2>
+<p>Display context only; site access and physical performance are not established.</p>
+<dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000001e</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>target</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>MOON</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-10.0
+</li>
+<li>-89.5
+</li>
+<li>10.0
+</li>
+<li>-87.5
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>PLANETOCENTRIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_MOON_REFERENCE_SPHERE_1737400M</dd></dl>
+</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.15</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>960.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>unavailable_dimensions</dt>
+<dd>
+<ul>
+<li>MINERAL
+</li>
+<li>PHYSICAL_CLEARANCE
+</li>
+</ul>
+</dd></dl>
+<h3>Practice grid-r0c1</h3><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000000a</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>name</dt>
+<dd>Practice grid-r0c1</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-116.0
+</li>
+<li>35.0
+</li>
+<li>-115.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>origin</dt>
+<dd>DISCOVERED</dd><dt>discovery_method</dt>
+<dd>Synthetic practice screening</dd><dt>novelty_status</dt>
+<dd>NOT_IN_REFERENCE_LIST</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.4</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>accessibility_status</dt>
+<dd>NOT_ASSESSED</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Synthetic practice data; field access is not assessed.
+</li>
+</ul>
+</dd></dl>
+<h3>Practice grid-r0c0</h3><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000000b</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>name</dt>
+<dd>Practice grid-r0c0</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-115.0
+</li>
+<li>35.0
+</li>
+<li>-114.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>origin</dt>
+<dd>DISCOVERED</dd><dt>discovery_method</dt>
+<dd>Synthetic practice screening</dd><dt>novelty_status</dt>
+<dd>NOT_IN_REFERENCE_LIST</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000015
+</li>
+</ul>
+</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.1</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>accessibility_status</dt>
+<dd>NOT_ASSESSED</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Synthetic practice data; field access is not assessed.
+</li>
+</ul>
+</dd></dl>
+<h3>Practice grid-r2c2</h3><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000000c</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>name</dt>
+<dd>Practice grid-r2c2</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-114.0
+</li>
+<li>35.0
+</li>
+<li>-113.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>origin</dt>
+<dd>KNOWN_CONTROL</dd><dt>discovery_method</dt>
+<dd>Synthetic practice screening</dd><dt>novelty_status</dt>
+<dd>KNOWN_ANALOG</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000016
+</li>
+</ul>
+</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.08</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>accessibility_status</dt>
+<dd>NOT_ASSESSED</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Synthetic practice data; field access is not assessed.
+</li>
+</ul>
+</dd></dl>
+<h3>Practice grid-r1c0</h3><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000000d</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>name</dt>
+<dd>Practice grid-r1c0</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-113.0
+</li>
+<li>35.0
+</li>
+<li>-112.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>origin</dt>
+<dd>DISCOVERED</dd><dt>discovery_method</dt>
+<dd>Synthetic practice screening</dd><dt>novelty_status</dt>
+<dd>NOT_IN_REFERENCE_LIST</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000017
+</li>
+</ul>
+</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.03</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>accessibility_status</dt>
+<dd>NOT_ASSESSED</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Synthetic practice data; field access is not assessed.
+</li>
+</ul>
+</dd></dl>
+<h3>Practice grid-r2c0</h3><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000000e</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>name</dt>
+<dd>Practice grid-r2c0</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-112.0
+</li>
+<li>35.0
+</li>
+<li>-111.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>origin</dt>
+<dd>DISCOVERED</dd><dt>discovery_method</dt>
+<dd>Synthetic practice screening</dd><dt>novelty_status</dt>
+<dd>NOT_IN_REFERENCE_LIST</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000018
+</li>
+</ul>
+</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.02</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>accessibility_status</dt>
+<dd>NOT_ASSESSED</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Synthetic practice data; field access is not assessed.
+</li>
+</ul>
+</dd></dl>
+<h3>Practice grid-r0c2</h3><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000000f</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>name</dt>
+<dd>Practice grid-r0c2</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-111.0
+</li>
+<li>35.0
+</li>
+<li>-110.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>origin</dt>
+<dd>SYNTHETIC_CONTROL</dd><dt>discovery_method</dt>
+<dd>Synthetic practice screening</dd><dt>novelty_status</dt>
+<dd>NOT_IN_REFERENCE_LIST</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000019
+</li>
+</ul>
+</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.0</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>accessibility_status</dt>
+<dd>NOT_ASSESSED</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Synthetic practice data; field access is not assessed.
+</li>
+</ul>
+</dd></dl>
+
+
+
+<p>Report imagery unavailable; numeric and geometry records are included above.</p>
+</section>
+<section id="qualification">
+<h2>Qualification by accepted requirement</h2>
+<table>
+<thead>
+<tr>
+<th>Candidate / requirement</th>
+<th>State / stage</th>
+<th>Rule / support</th>
+<th>Evidence / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr data-requirement-id="R-SLOPE-AVAILABILITY" data-status="PASS">
+<th scope="row">Practice grid-r0c1<br>R-SLOPE-AVAILABILITY<br>At least 5% of valid candidate area lies in the 12-18 deg slope band</th>
+<td>PASS<br>Not supplied by the frozen contract</td>
+<td>slope_band_area_fraction
+ · GTE
+ 0.05
+ / Unknown
+ fraction
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 60.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-0000000003e8</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000a</dd><dt>requirement_id</dt>
+<dd>R-SLOPE-AVAILABILITY</dd><dt>status</dt>
+<dd>PASS</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-band-area-fraction-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: PASS.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-TARGET-SLOPE-CONTEXT" data-status="PASS">
+<th scope="row">Practice grid-r0c1<br>R-TARGET-SLOPE-CONTEXT<br>Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support</th>
+<td>PASS<br>Not supplied by the frozen contract</td>
+<td>slope_distribution_w1_deg
+ · LTE
+ Unknown
+ / 6.0
+ deg
+
+<br>Comparison support 960.0
+ m · required support 480.0
+ to 1000.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-0000000003e9</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000a</dd><dt>requirement_id</dt>
+<dd>R-TARGET-SLOPE-CONTEXT</dd><dt>status</dt>
+<dd>PASS</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-w1-common-support-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>960.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: PASS.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-THERMAL" data-status="UNKNOWN">
+<th scope="row">Practice grid-r0c1<br>R-THERMAL<br>Surface temperature minimum at or below 120 K (multi-year minimum)</th>
+<td>UNKNOWN<br>Not supplied by the frozen contract</td>
+<td>surface_temperature_min_k
+ · LTE
+ Unknown
+ / 120.0
+ K
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 250.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-0000000003ea</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000a</dd><dt>requirement_id</dt>
+<dd>R-THERMAL</dd><dt>status</dt>
+<dd>UNKNOWN</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>thermal-min-compatible-quantity-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: UNKNOWN.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-GRAVITY" data-status="GAP">
+<th scope="row">Practice grid-r0c1<br>R-GRAVITY<br>Lunar gravity (1.62 m/s2)</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_gravity
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ m/s2
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-0000000003eb</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000a</dd><dt>requirement_id</dt>
+<dd>R-GRAVITY</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-VACUUM" data-status="GAP">
+<th scope="row">Practice grid-r0c1<br>R-VACUUM<br>Hard vacuum</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_atmosphere
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ Pa
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-0000000003ec</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000a</dd><dt>requirement_id</dt>
+<dd>R-VACUUM</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-SLOPE-AVAILABILITY" data-status="PASS">
+<th scope="row">Practice grid-r0c0<br>R-SLOPE-AVAILABILITY<br>At least 5% of valid candidate area lies in the 12-18 deg slope band</th>
+<td>PASS<br>Not supplied by the frozen contract</td>
+<td>slope_band_area_fraction
+ · GTE
+ 0.05
+ / Unknown
+ fraction
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 60.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-0000000003fc</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000b</dd><dt>requirement_id</dt>
+<dd>R-SLOPE-AVAILABILITY</dd><dt>status</dt>
+<dd>PASS</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000015
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-band-area-fraction-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: PASS.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-TARGET-SLOPE-CONTEXT" data-status="PASS">
+<th scope="row">Practice grid-r0c0<br>R-TARGET-SLOPE-CONTEXT<br>Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support</th>
+<td>PASS<br>Not supplied by the frozen contract</td>
+<td>slope_distribution_w1_deg
+ · LTE
+ Unknown
+ / 6.0
+ deg
+
+<br>Comparison support 960.0
+ m · required support 480.0
+ to 1000.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-0000000003fd</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000b</dd><dt>requirement_id</dt>
+<dd>R-TARGET-SLOPE-CONTEXT</dd><dt>status</dt>
+<dd>PASS</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000015
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-w1-common-support-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>960.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: PASS.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-THERMAL" data-status="UNKNOWN">
+<th scope="row">Practice grid-r0c0<br>R-THERMAL<br>Surface temperature minimum at or below 120 K (multi-year minimum)</th>
+<td>UNKNOWN<br>Not supplied by the frozen contract</td>
+<td>surface_temperature_min_k
+ · LTE
+ Unknown
+ / 120.0
+ K
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 250.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-0000000003fe</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000b</dd><dt>requirement_id</dt>
+<dd>R-THERMAL</dd><dt>status</dt>
+<dd>UNKNOWN</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000015
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>thermal-min-compatible-quantity-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: UNKNOWN.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-GRAVITY" data-status="GAP">
+<th scope="row">Practice grid-r0c0<br>R-GRAVITY<br>Lunar gravity (1.62 m/s2)</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_gravity
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ m/s2
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-0000000003ff</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000b</dd><dt>requirement_id</dt>
+<dd>R-GRAVITY</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000015
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-VACUUM" data-status="GAP">
+<th scope="row">Practice grid-r0c0<br>R-VACUUM<br>Hard vacuum</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_atmosphere
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ Pa
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000400</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000b</dd><dt>requirement_id</dt>
+<dd>R-VACUUM</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000015
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-SLOPE-AVAILABILITY" data-status="PASS">
+<th scope="row">Practice grid-r2c2<br>R-SLOPE-AVAILABILITY<br>At least 5% of valid candidate area lies in the 12-18 deg slope band</th>
+<td>PASS<br>Not supplied by the frozen contract</td>
+<td>slope_band_area_fraction
+ · GTE
+ 0.05
+ / Unknown
+ fraction
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 60.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000410</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000c</dd><dt>requirement_id</dt>
+<dd>R-SLOPE-AVAILABILITY</dd><dt>status</dt>
+<dd>PASS</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000016
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-band-area-fraction-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: PASS.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-TARGET-SLOPE-CONTEXT" data-status="PASS">
+<th scope="row">Practice grid-r2c2<br>R-TARGET-SLOPE-CONTEXT<br>Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support</th>
+<td>PASS<br>Not supplied by the frozen contract</td>
+<td>slope_distribution_w1_deg
+ · LTE
+ Unknown
+ / 6.0
+ deg
+
+<br>Comparison support 960.0
+ m · required support 480.0
+ to 1000.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000411</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000c</dd><dt>requirement_id</dt>
+<dd>R-TARGET-SLOPE-CONTEXT</dd><dt>status</dt>
+<dd>PASS</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000016
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-w1-common-support-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>960.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: PASS.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-THERMAL" data-status="UNKNOWN">
+<th scope="row">Practice grid-r2c2<br>R-THERMAL<br>Surface temperature minimum at or below 120 K (multi-year minimum)</th>
+<td>UNKNOWN<br>Not supplied by the frozen contract</td>
+<td>surface_temperature_min_k
+ · LTE
+ Unknown
+ / 120.0
+ K
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 250.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000412</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000c</dd><dt>requirement_id</dt>
+<dd>R-THERMAL</dd><dt>status</dt>
+<dd>UNKNOWN</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000016
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>thermal-min-compatible-quantity-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: UNKNOWN.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-GRAVITY" data-status="GAP">
+<th scope="row">Practice grid-r2c2<br>R-GRAVITY<br>Lunar gravity (1.62 m/s2)</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_gravity
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ m/s2
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000413</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000c</dd><dt>requirement_id</dt>
+<dd>R-GRAVITY</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000016
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-VACUUM" data-status="GAP">
+<th scope="row">Practice grid-r2c2<br>R-VACUUM<br>Hard vacuum</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_atmosphere
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ Pa
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000414</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000c</dd><dt>requirement_id</dt>
+<dd>R-VACUUM</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000016
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-SLOPE-AVAILABILITY" data-status="FAIL">
+<th scope="row">Practice grid-r1c0<br>R-SLOPE-AVAILABILITY<br>At least 5% of valid candidate area lies in the 12-18 deg slope band</th>
+<td>FAIL<br>Not supplied by the frozen contract</td>
+<td>slope_band_area_fraction
+ · GTE
+ 0.05
+ / Unknown
+ fraction
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 60.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000424</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000d</dd><dt>requirement_id</dt>
+<dd>R-SLOPE-AVAILABILITY</dd><dt>status</dt>
+<dd>FAIL</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000017
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-band-area-fraction-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: FAIL.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-TARGET-SLOPE-CONTEXT" data-status="PASS">
+<th scope="row">Practice grid-r1c0<br>R-TARGET-SLOPE-CONTEXT<br>Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support</th>
+<td>PASS<br>Not supplied by the frozen contract</td>
+<td>slope_distribution_w1_deg
+ · LTE
+ Unknown
+ / 6.0
+ deg
+
+<br>Comparison support 960.0
+ m · required support 480.0
+ to 1000.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000425</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000d</dd><dt>requirement_id</dt>
+<dd>R-TARGET-SLOPE-CONTEXT</dd><dt>status</dt>
+<dd>PASS</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000017
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-w1-common-support-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>960.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: PASS.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-THERMAL" data-status="UNKNOWN">
+<th scope="row">Practice grid-r1c0<br>R-THERMAL<br>Surface temperature minimum at or below 120 K (multi-year minimum)</th>
+<td>UNKNOWN<br>Not supplied by the frozen contract</td>
+<td>surface_temperature_min_k
+ · LTE
+ Unknown
+ / 120.0
+ K
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 250.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000426</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000d</dd><dt>requirement_id</dt>
+<dd>R-THERMAL</dd><dt>status</dt>
+<dd>UNKNOWN</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000017
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>thermal-min-compatible-quantity-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: UNKNOWN.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-GRAVITY" data-status="GAP">
+<th scope="row">Practice grid-r1c0<br>R-GRAVITY<br>Lunar gravity (1.62 m/s2)</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_gravity
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ m/s2
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000427</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000d</dd><dt>requirement_id</dt>
+<dd>R-GRAVITY</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000017
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-VACUUM" data-status="GAP">
+<th scope="row">Practice grid-r1c0<br>R-VACUUM<br>Hard vacuum</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_atmosphere
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ Pa
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000428</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000d</dd><dt>requirement_id</dt>
+<dd>R-VACUUM</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000017
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-SLOPE-AVAILABILITY" data-status="FAIL">
+<th scope="row">Practice grid-r2c0<br>R-SLOPE-AVAILABILITY<br>At least 5% of valid candidate area lies in the 12-18 deg slope band</th>
+<td>FAIL<br>Not supplied by the frozen contract</td>
+<td>slope_band_area_fraction
+ · GTE
+ 0.05
+ / Unknown
+ fraction
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 60.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000438</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000e</dd><dt>requirement_id</dt>
+<dd>R-SLOPE-AVAILABILITY</dd><dt>status</dt>
+<dd>FAIL</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000018
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-band-area-fraction-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: FAIL.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-TARGET-SLOPE-CONTEXT" data-status="PASS">
+<th scope="row">Practice grid-r2c0<br>R-TARGET-SLOPE-CONTEXT<br>Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support</th>
+<td>PASS<br>Not supplied by the frozen contract</td>
+<td>slope_distribution_w1_deg
+ · LTE
+ Unknown
+ / 6.0
+ deg
+
+<br>Comparison support 960.0
+ m · required support 480.0
+ to 1000.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000439</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000e</dd><dt>requirement_id</dt>
+<dd>R-TARGET-SLOPE-CONTEXT</dd><dt>status</dt>
+<dd>PASS</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000018
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-w1-common-support-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>960.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: PASS.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-THERMAL" data-status="UNKNOWN">
+<th scope="row">Practice grid-r2c0<br>R-THERMAL<br>Surface temperature minimum at or below 120 K (multi-year minimum)</th>
+<td>UNKNOWN<br>Not supplied by the frozen contract</td>
+<td>surface_temperature_min_k
+ · LTE
+ Unknown
+ / 120.0
+ K
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 250.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000043a</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000e</dd><dt>requirement_id</dt>
+<dd>R-THERMAL</dd><dt>status</dt>
+<dd>UNKNOWN</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000018
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>thermal-min-compatible-quantity-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: UNKNOWN.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-GRAVITY" data-status="GAP">
+<th scope="row">Practice grid-r2c0<br>R-GRAVITY<br>Lunar gravity (1.62 m/s2)</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_gravity
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ m/s2
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000043b</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000e</dd><dt>requirement_id</dt>
+<dd>R-GRAVITY</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000018
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-VACUUM" data-status="GAP">
+<th scope="row">Practice grid-r2c0<br>R-VACUUM<br>Hard vacuum</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_atmosphere
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ Pa
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000043c</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000e</dd><dt>requirement_id</dt>
+<dd>R-VACUUM</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000018
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-SLOPE-AVAILABILITY" data-status="FAIL">
+<th scope="row">Practice grid-r0c2<br>R-SLOPE-AVAILABILITY<br>At least 5% of valid candidate area lies in the 12-18 deg slope band</th>
+<td>FAIL<br>Not supplied by the frozen contract</td>
+<td>slope_band_area_fraction
+ · GTE
+ 0.05
+ / Unknown
+ fraction
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 60.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000044c</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000f</dd><dt>requirement_id</dt>
+<dd>R-SLOPE-AVAILABILITY</dd><dt>status</dt>
+<dd>FAIL</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000019
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-band-area-fraction-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: FAIL.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-TARGET-SLOPE-CONTEXT" data-status="PASS">
+<th scope="row">Practice grid-r0c2<br>R-TARGET-SLOPE-CONTEXT<br>Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support</th>
+<td>PASS<br>Not supplied by the frozen contract</td>
+<td>slope_distribution_w1_deg
+ · LTE
+ Unknown
+ / 6.0
+ deg
+
+<br>Comparison support 960.0
+ m · required support 480.0
+ to 1000.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000044d</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000f</dd><dt>requirement_id</dt>
+<dd>R-TARGET-SLOPE-CONTEXT</dd><dt>status</dt>
+<dd>PASS</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000019
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>slope-w1-common-support-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>960.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: PASS.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-THERMAL" data-status="UNKNOWN">
+<th scope="row">Practice grid-r0c2<br>R-THERMAL<br>Surface temperature minimum at or below 120 K (multi-year minimum)</th>
+<td>UNKNOWN<br>Not supplied by the frozen contract</td>
+<td>surface_temperature_min_k
+ · LTE
+ Unknown
+ / 120.0
+ K
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to 250.0
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000044e</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000f</dd><dt>requirement_id</dt>
+<dd>R-THERMAL</dd><dt>status</dt>
+<dd>UNKNOWN</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000019
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>thermal-min-compatible-quantity-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: UNKNOWN.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-GRAVITY" data-status="GAP">
+<th scope="row">Practice grid-r0c2<br>R-GRAVITY<br>Lunar gravity (1.62 m/s2)</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_gravity
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ m/s2
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-00000000044f</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000f</dd><dt>requirement_id</dt>
+<dd>R-GRAVITY</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000019
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr><tr data-requirement-id="R-VACUUM" data-status="GAP">
+<th scope="row">Practice grid-r0c2<br>R-VACUUM<br>Hard vacuum</th>
+<td>GAP<br>Not supplied by the frozen contract</td>
+<td>planetary_atmosphere
+ · NOT_NATURALLY_REPRODUCIBLE
+ Unknown
+ / Unknown
+ Pa
+
+<br>Comparison support 60.0
+ m · required support Unknown
+ to Unknown
+ m</td>
+<td><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000450</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>candidate_id</dt>
+<dd>70000000-0000-4000-8000-00000000000f</dd><dt>requirement_id</dt>
+<dd>R-VACUUM</dd><dt>status</dt>
+<dd>GAP</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000019
+</li>
+</ul>
+</dd><dt>rule_id</dt>
+<dd>route-verification-v1</dd><dt>rule_version</dt>
+<dd>1.0</dd><dt>confidence</dt>
+<dd>MEDIUM</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>explanation</dt>
+<dd>Synthetic presentation receipt: GAP.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>No physical validation; accepted constraints unchanged.
+</li>
+</ul>
+</dd><dt>critic_status</dt>
+<dd>RESOLVED</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd></dl>
+</td>
+</tr></tbody>
+</table>
+<h3>GAP — not naturally reproduced on Earth</h3>
+<ul>
+<li>R-GRAVITY
+ · 70000000-0000-4000-8000-00000000000a
+ · Synthetic presentation receipt: GAP.
+</li>
+<li>R-VACUUM
+ · 70000000-0000-4000-8000-00000000000a
+ · Synthetic presentation receipt: GAP.
+</li>
+<li>R-GRAVITY
+ · 70000000-0000-4000-8000-00000000000b
+ · Synthetic presentation receipt: GAP.
+</li>
+<li>R-VACUUM
+ · 70000000-0000-4000-8000-00000000000b
+ · Synthetic presentation receipt: GAP.
+</li>
+<li>R-GRAVITY
+ · 70000000-0000-4000-8000-00000000000c
+ · Synthetic presentation receipt: GAP.
+</li>
+<li>R-VACUUM
+ · 70000000-0000-4000-8000-00000000000c
+ · Synthetic presentation receipt: GAP.
+</li>
+<li>R-GRAVITY
+ · 70000000-0000-4000-8000-00000000000d
+ · Synthetic presentation receipt: GAP.
+</li>
+<li>R-VACUUM
+ · 70000000-0000-4000-8000-00000000000d
+ · Synthetic presentation receipt: GAP.
+</li>
+<li>R-GRAVITY
+ · 70000000-0000-4000-8000-00000000000e
+ · Synthetic presentation receipt: GAP.
+</li>
+<li>R-VACUUM
+ · 70000000-0000-4000-8000-00000000000e
+ · Synthetic presentation receipt: GAP.
+</li>
+<li>R-GRAVITY
+ · 70000000-0000-4000-8000-00000000000f
+ · Synthetic presentation receipt: GAP.
+</li>
+<li>R-VACUUM
+ · 70000000-0000-4000-8000-00000000000f
+ · Synthetic presentation receipt: GAP.
+</li>
+</ul>
+<h3>UNKNOWN — insufficient evidence</h3>
+<ul>
+<li>R-THERMAL
+ · 70000000-0000-4000-8000-00000000000a
+ · Synthetic presentation receipt: UNKNOWN.
+</li>
+<li>R-THERMAL
+ · 70000000-0000-4000-8000-00000000000b
+ · Synthetic presentation receipt: UNKNOWN.
+</li>
+<li>R-THERMAL
+ · 70000000-0000-4000-8000-00000000000c
+ · Synthetic presentation receipt: UNKNOWN.
+</li>
+<li>R-THERMAL
+ · 70000000-0000-4000-8000-00000000000d
+ · Synthetic presentation receipt: UNKNOWN.
+</li>
+<li>R-THERMAL
+ · 70000000-0000-4000-8000-00000000000e
+ · Synthetic presentation receipt: UNKNOWN.
+</li>
+<li>R-THERMAL
+ · 70000000-0000-4000-8000-00000000000f
+ · Synthetic presentation receipt: UNKNOWN.
+</li>
+</ul>
+</section>
+<section id="compatibility">
+<h2>Rover compatibility</h2>
+<ul>
+<li>None recorded</li>
+</ul>
+Unknown
+<p>Declared capabilities are not observed performance.
+Preliminary assessments remain separate from verified route results.</p>
+</section>
+<section id="prove-it">
+<h2>PROVE IT — complete attempt history</h2>
+
+<p>Not verified. No rover supplied — site qualification only
+</p>
+
+<ul>
+<li>None recorded</li>
+</ul>
+
+</section>
+<section id="portfolio">
+<h2>Composite portfolio</h2>Unknown
+<p>Separate campaigns do not establish simultaneous co-located conditions.
+Logistics, permissions and access require independent assessment.</p>
+</section>
+<section id="critic-limitations">
+<h2>Critic and limitations</h2>
+<ul>
+<li>None recorded</li>
+</ul>
+
+<ul>
+<li>Not NASA data; not physical rover execution.
+</li>
+</ul>
+</section>
+<section id="assurance">
+<h2>Scientific assurance</h2><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>audit_id</dt>
+<dd>70000000-0000-4000-8000-000000000028</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>snapshot_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>mission_content_sha256</dt>
+<dd>5b9d05ad64a00ba1d4b7c2cdcc62e966105de78d57b329c42c2b93bb14aa5a18</dd><dt>rover_content_sha256</dt>
+<dd>Unknown</dd><dt>dataset_policy_sha256</dt>
+<dd>4444444444444444444444444444444444444444444444444444444444444444</dd><dt>acquired_manifest_sha256</dt>
+<dd>5555555555555555555555555555555555555555555555555555555555555555</dd><dt>algorithm_lock_sha256</dt>
+<dd>6666666666666666666666666666666666666666666666666666666666666666</dd><dt>assurance_policy_sha256</dt>
+<dd>7777777777777777777777777777777777777777777777777777777777777777</dd><dt>critique_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>claims</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>claim_id</dt>
+<dd>clearance-unknown</dd><dt>claim_type</dt>
+<dd>QUALIFICATION</dd><dt>requirement_id</dt>
+<dd>R-THERMAL</dd><dt>candidate_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-00000000000a
+</li>
+<li>70000000-0000-4000-8000-00000000000b
+</li>
+<li>70000000-0000-4000-8000-00000000000c
+</li>
+<li>70000000-0000-4000-8000-00000000000d
+</li>
+<li>70000000-0000-4000-8000-00000000000e
+</li>
+<li>70000000-0000-4000-8000-00000000000f
+</li>
+</ul>
+</dd><dt>scope</dt>
+<dd>Synthetic test of inadequate terrain support for physical clearance.</dd><dt>disposition</dt>
+<dd>UNKNOWN</dd><dt>qualification_status</dt>
+<dd>UNKNOWN</dd><dt>verification_status</dt>
+<dd>Unknown</dd><dt>validation_level</dt>
+<dd>S0</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd><dt>assumption_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>gates</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-01</dd><dt>outcome</dt>
+<dd>SATISFIED</dd><dt>reason</dt>
+<dd>Synthetic fixture assertion only; implementation must supply actual typed receipts.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-02</dd><dt>outcome</dt>
+<dd>SATISFIED</dd><dt>reason</dt>
+<dd>Synthetic fixture assertion only; implementation must supply actual typed receipts.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-03</dd><dt>outcome</dt>
+<dd>NOT_APPLICABLE</dd><dt>reason</dt>
+<dd>Abstract synthetic graph has no body-specific raster or physical coordinate frame.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-04</dd><dt>outcome</dt>
+<dd>UNSATISFIED</dd><dt>reason</dt>
+<dd>Synthetic inadequacy fixture: requested obstacle scale is finer than source support.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-05</dd><dt>outcome</dt>
+<dd>NOT_APPLICABLE</dd><dt>reason</dt>
+<dd>No masked raster/AOI is used in this abstract graph regression.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-06</dd><dt>outcome</dt>
+<dd>NOT_APPLICABLE</dd><dt>reason</dt>
+<dd>No time-varying measured source is used.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-07</dd><dt>outcome</dt>
+<dd>SATISFIED</dd><dt>reason</dt>
+<dd>Synthetic fixture assertion only; implementation must supply actual typed receipts.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-08</dd><dt>outcome</dt>
+<dd>SATISFIED</dd><dt>reason</dt>
+<dd>Synthetic fixture assertion only; implementation must supply actual typed receipts.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-09</dd><dt>outcome</dt>
+<dd>SATISFIED</dd><dt>reason</dt>
+<dd>Synthetic fixture assertion only; implementation must supply actual typed receipts.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-10</dd><dt>outcome</dt>
+<dd>NOT_APPLICABLE</dd><dt>reason</dt>
+<dd>No independent source corroboration is claimed.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-11</dd><dt>outcome</dt>
+<dd>NOT_APPLICABLE</dd><dt>reason</dt>
+<dd>No rover supplied; site-only missing-evidence finding, no experiment verification claim.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-12</dd><dt>outcome</dt>
+<dd>SATISFIED</dd><dt>reason</dt>
+<dd>Synthetic fixture assertion only; implementation must supply actual typed receipts.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-13</dd><dt>outcome</dt>
+<dd>NOT_APPLICABLE</dd><dt>reason</dt>
+<dd>No candidate discovery or held-out real-source validation is claimed.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-14</dd><dt>outcome</dt>
+<dd>SATISFIED</dd><dt>reason</dt>
+<dd>Synthetic fixture assertion only; implementation must supply actual typed receipts.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>gate_id</dt>
+<dd>SC-15</dd><dt>outcome</dt>
+<dd>SATISFIED</dd><dt>reason</dt>
+<dd>Synthetic fixture assertion only; implementation must supply actual typed receipts.</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+</ul>
+</dd></dl>
+
+</li>
+</ul>
+</dd><dt>permitted_statement</dt>
+<dd>Earth thermal evidence is UNKNOWN; no thermal qualification is supported.</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Fixture support is insufficient for the requested obstacle scale; no physical clearance claim is permitted.
+</li>
+</ul>
+</dd></dl>
+
+</li>
+</ul>
+</dd><dt>publication</dt>
+<dd>LIMITED</dd><dt>blocking_issue_codes</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Blueprint fixture only: UUIDs and hash strings are synthetic test identifiers, not executed application evidence.
+</li>
+<li>Essential clearance evidence is unavailable; no blanket mission qualification or PROVE IT without rover.
+</li>
+</ul>
+</dd></dl>
+</section>
+<section id="next-steps">
+<h2>Next steps</h2>
+<ul>
+<li>Acquire field evidence at the required physical clearance support.
+</li>
+</ul>
+</section>
+<section id="provenance">
+<h2>Provenance appendix</h2>
+<h3>Source locks</h3><dl class="record"><dt>dataset_policy_sha256</dt>
+<dd>4444444444444444444444444444444444444444444444444444444444444444</dd><dt>acquired_manifest_sha256</dt>
+<dd>5555555555555555555555555555555555555555555555555555555555555555</dd><dt>build_lock_sha256</dt>
+<dd>Unknown</dd><dt>config_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>algorithm_lock_sha256</dt>
+<dd>6666666666666666666666666666666666666666666666666666666666666666</dd></dl>
+<h3>Evidence records</h3>
+<ul>
+<li><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000014</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>kind</dt>
+<dd>DERIVED</dd><dt>artifact_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>artifact_media_type</dt>
+<dd>application/json</dd><dt>source_uri</dt>
+<dd>Unknown</dd><dt>dataset_product_id</dt>
+<dd>practice-earth-grid-v1</dd><dt>dataset_version</dt>
+<dd>1</dd><dt>granule_id</dt>
+<dd>Unknown</dd><dt>license_note</dt>
+<dd>Synthetic fixture only</dd><dt>body</dt>
+<dd>EARTH</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-116.0
+</li>
+<li>35.0
+</li>
+<li>-115.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>input_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>parameters_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>algorithm_id</dt>
+<dd>analyze-candidate-v1</dd><dt>algorithm_version</dt>
+<dd>1.0</dd><dt>native_resolution_m</dt>
+<dd>60.0</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.4</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Not physical rover execution.
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000015</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>kind</dt>
+<dd>DERIVED</dd><dt>artifact_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>artifact_media_type</dt>
+<dd>application/json</dd><dt>source_uri</dt>
+<dd>Unknown</dd><dt>dataset_product_id</dt>
+<dd>practice-earth-grid-v1</dd><dt>dataset_version</dt>
+<dd>1</dd><dt>granule_id</dt>
+<dd>Unknown</dd><dt>license_note</dt>
+<dd>Synthetic fixture only</dd><dt>body</dt>
+<dd>EARTH</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-115.0
+</li>
+<li>35.0
+</li>
+<li>-114.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>input_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>parameters_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>algorithm_id</dt>
+<dd>analyze-candidate-v1</dd><dt>algorithm_version</dt>
+<dd>1.0</dd><dt>native_resolution_m</dt>
+<dd>60.0</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.1</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Not physical rover execution.
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000016</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>kind</dt>
+<dd>DERIVED</dd><dt>artifact_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>artifact_media_type</dt>
+<dd>application/json</dd><dt>source_uri</dt>
+<dd>Unknown</dd><dt>dataset_product_id</dt>
+<dd>practice-earth-grid-v1</dd><dt>dataset_version</dt>
+<dd>1</dd><dt>granule_id</dt>
+<dd>Unknown</dd><dt>license_note</dt>
+<dd>Synthetic fixture only</dd><dt>body</dt>
+<dd>EARTH</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-114.0
+</li>
+<li>35.0
+</li>
+<li>-113.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>input_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>parameters_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>algorithm_id</dt>
+<dd>analyze-candidate-v1</dd><dt>algorithm_version</dt>
+<dd>1.0</dd><dt>native_resolution_m</dt>
+<dd>60.0</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.08</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Not physical rover execution.
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000017</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>kind</dt>
+<dd>DERIVED</dd><dt>artifact_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>artifact_media_type</dt>
+<dd>application/json</dd><dt>source_uri</dt>
+<dd>Unknown</dd><dt>dataset_product_id</dt>
+<dd>practice-earth-grid-v1</dd><dt>dataset_version</dt>
+<dd>1</dd><dt>granule_id</dt>
+<dd>Unknown</dd><dt>license_note</dt>
+<dd>Synthetic fixture only</dd><dt>body</dt>
+<dd>EARTH</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-113.0
+</li>
+<li>35.0
+</li>
+<li>-112.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>input_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>parameters_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>algorithm_id</dt>
+<dd>analyze-candidate-v1</dd><dt>algorithm_version</dt>
+<dd>1.0</dd><dt>native_resolution_m</dt>
+<dd>60.0</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.03</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Not physical rover execution.
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000018</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>kind</dt>
+<dd>DERIVED</dd><dt>artifact_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>artifact_media_type</dt>
+<dd>application/json</dd><dt>source_uri</dt>
+<dd>Unknown</dd><dt>dataset_product_id</dt>
+<dd>practice-earth-grid-v1</dd><dt>dataset_version</dt>
+<dd>1</dd><dt>granule_id</dt>
+<dd>Unknown</dd><dt>license_note</dt>
+<dd>Synthetic fixture only</dd><dt>body</dt>
+<dd>EARTH</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-112.0
+</li>
+<li>35.0
+</li>
+<li>-111.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>input_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>parameters_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>algorithm_id</dt>
+<dd>analyze-candidate-v1</dd><dt>algorithm_version</dt>
+<dd>1.0</dd><dt>native_resolution_m</dt>
+<dd>60.0</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.02</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Not physical rover execution.
+</li>
+</ul>
+</dd></dl>
+
+</li>
+<li><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000019</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>kind</dt>
+<dd>DERIVED</dd><dt>artifact_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>artifact_media_type</dt>
+<dd>application/json</dd><dt>source_uri</dt>
+<dd>Unknown</dd><dt>dataset_product_id</dt>
+<dd>practice-earth-grid-v1</dd><dt>dataset_version</dt>
+<dd>1</dd><dt>granule_id</dt>
+<dd>Unknown</dd><dt>license_note</dt>
+<dd>Synthetic fixture only</dd><dt>body</dt>
+<dd>EARTH</dd><dt>aoi</dt>
+<dd><dl class="record"><dt>body</dt>
+<dd>EARTH</dd><dt>bbox</dt>
+<dd>
+<ul>
+<li>-111.0
+</li>
+<li>35.0
+</li>
+<li>-110.9
+</li>
+<li>35.1
+</li>
+</ul>
+</dd><dt>longitude_convention</dt>
+<dd>NEG180_180</dd><dt>latitude_type</dt>
+<dd>GEODETIC</dd><dt>crs_wkt</dt>
+<dd>Unknown</dd><dt>vertical_datum</dt>
+<dd>SYNTHETIC_EARTH_REFERENCE</dd></dl>
+</dd><dt>input_evidence_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>parameters_sha256</dt>
+<dd>1111111111111111111111111111111111111111111111111111111111111111</dd><dt>algorithm_id</dt>
+<dd>analyze-candidate-v1</dd><dt>algorithm_version</dt>
+<dd>1.0</dd><dt>native_resolution_m</dt>
+<dd>60.0</dd><dt>comparison_scale_m</dt>
+<dd>60.0</dd><dt>metrics</dt>
+<dd>
+<ul>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_area_fraction:12-18</dd><dt>value</dt>
+<dd>0.0</dd><dt>unit</dt>
+<dd>fraction</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>slope_w1_deg</dd><dt>value</dt>
+<dd>4.0</dd><dt>unit</dt>
+<dd>deg</dd><dt>support_scale_m</dt>
+<dd>480.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>unique_exposure_m:R-EXPOSURE</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>m</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>tasks_completed</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>count</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+<li><dl class="record"><dt>metric_id</dt>
+<dd>reserve_pct</dd><dt>value</dt>
+<dd>Unknown</dd><dt>unit</dt>
+<dd>percent</dd><dt>support_scale_m</dt>
+<dd>60.0</dd><dt>quantity_kind</dt>
+<dd>DERIVED</dd><dt>method_id</dt>
+<dd>synthetic-presentation-fixture-v1</dd><dt>valid_fraction</dt>
+<dd>1.0</dd><dt>uncertainty_note</dt>
+<dd>Synthetic fixture; not a field measurement.</dd></dl>
+
+</li>
+</ul>
+</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Not physical rover execution.
+</li>
+</ul>
+</dd></dl>
+
+</li>
+</ul>
+
+<h3>Passport references</h3><dl class="record"><dt>schema_version</dt>
+<dd>1.0</dd><dt>id</dt>
+<dd>70000000-0000-4000-8000-000000000032</dd><dt>workspace_id</dt>
+<dd>70000000-0000-4000-8000-000000000001</dd><dt>run_id</dt>
+<dd>70000000-0000-4000-8000-000000000002</dd><dt>mode</dt>
+<dd>synthetic</dd><dt>created_at</dt>
+<dd>2026-11-08T12:00:00Z</dd><dt>mission_revision_id</dt>
+<dd>70000000-0000-4000-8000-000000000003</dd><dt>rover_revision_id</dt>
+<dd>Unknown</dd><dt>candidate_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-00000000000a
+</li>
+<li>70000000-0000-4000-8000-00000000000b
+</li>
+<li>70000000-0000-4000-8000-00000000000c
+</li>
+<li>70000000-0000-4000-8000-00000000000d
+</li>
+<li>70000000-0000-4000-8000-00000000000e
+</li>
+<li>70000000-0000-4000-8000-00000000000f
+</li>
+</ul>
+</dd><dt>portfolio_id</dt>
+<dd>Unknown</dd><dt>qualification_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-0000000003e8
+</li>
+<li>70000000-0000-4000-8000-0000000003e9
+</li>
+<li>70000000-0000-4000-8000-0000000003ea
+</li>
+<li>70000000-0000-4000-8000-0000000003eb
+</li>
+<li>70000000-0000-4000-8000-0000000003ec
+</li>
+<li>70000000-0000-4000-8000-0000000003fc
+</li>
+<li>70000000-0000-4000-8000-0000000003fd
+</li>
+<li>70000000-0000-4000-8000-0000000003fe
+</li>
+<li>70000000-0000-4000-8000-0000000003ff
+</li>
+<li>70000000-0000-4000-8000-000000000400
+</li>
+<li>70000000-0000-4000-8000-000000000410
+</li>
+<li>70000000-0000-4000-8000-000000000411
+</li>
+<li>70000000-0000-4000-8000-000000000412
+</li>
+<li>70000000-0000-4000-8000-000000000413
+</li>
+<li>70000000-0000-4000-8000-000000000414
+</li>
+<li>70000000-0000-4000-8000-000000000424
+</li>
+<li>70000000-0000-4000-8000-000000000425
+</li>
+<li>70000000-0000-4000-8000-000000000426
+</li>
+<li>70000000-0000-4000-8000-000000000427
+</li>
+<li>70000000-0000-4000-8000-000000000428
+</li>
+<li>70000000-0000-4000-8000-000000000438
+</li>
+<li>70000000-0000-4000-8000-000000000439
+</li>
+<li>70000000-0000-4000-8000-00000000043a
+</li>
+<li>70000000-0000-4000-8000-00000000043b
+</li>
+<li>70000000-0000-4000-8000-00000000043c
+</li>
+<li>70000000-0000-4000-8000-00000000044c
+</li>
+<li>70000000-0000-4000-8000-00000000044d
+</li>
+<li>70000000-0000-4000-8000-00000000044e
+</li>
+<li>70000000-0000-4000-8000-00000000044f
+</li>
+<li>70000000-0000-4000-8000-000000000450
+</li>
+</ul>
+</dd><dt>test_result_ids</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>qualified_uses</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>partial_uses</dt>
+<dd>
+<ul>
+<li>None recorded</li>
+</ul>
+</dd><dt>unsupported_uses</dt>
+<dd>
+<ul>
+<li>Lunar gravity and vacuum
+</li>
+</ul>
+</dd><dt>unknowns</dt>
+<dd>
+<ul>
+<li>Earth thermal evidence
+</li>
+</ul>
+</dd><dt>evidence_ids</dt>
+<dd>
+<ul>
+<li>70000000-0000-4000-8000-000000000014
+</li>
+<li>70000000-0000-4000-8000-000000000015
+</li>
+<li>70000000-0000-4000-8000-000000000016
+</li>
+<li>70000000-0000-4000-8000-000000000017
+</li>
+<li>70000000-0000-4000-8000-000000000018
+</li>
+<li>70000000-0000-4000-8000-000000000019
+</li>
+<li>70000000-0000-4000-8000-000000000029
+</li>
+</ul>
+</dd><dt>manifest_sha256</dt>
+<dd>1843fb15144996708624f7eca0a71e1019352a35875bba020c3aeb7aeb076005</dd><dt>limitations</dt>
+<dd>
+<ul>
+<li>Not NASA data; not physical rover execution.
+</li>
+</ul>
+</dd><dt>next_steps</dt>
+<dd>
+<ul>
+<li>Acquire field evidence at the required physical clearance support.
+</li>
+</ul>
+</dd><dt>assurance_evidence_id</dt>
+<dd>70000000-0000-4000-8000-000000000029</dd></dl>
+<p>Renderer 1.0.0 · Manifest SHA-256 1843fb15144996708624f7eca0a71e1019352a35875bba020c3aeb7aeb076005</p>
+<p>The digest establishes content consistency, not scientific correctness or endorsement.</p>
+</section>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "analogforge-workspace",
+  "private": true,
+  "packageManager": "pnpm@10.22.0",
+  "scripts": {
+    "dev": "pnpm --filter @analogforge/web run dev",
+    "dev:mock": "pnpm --filter @analogforge/web run dev:mock",
+    "generate:client": "pnpm --filter @analogforge/web run generate:client",
+    "typecheck": "pnpm --filter @analogforge/web run typecheck",
+    "lint": "pnpm --filter @analogforge/web run lint",
+    "test": "pnpm --filter @analogforge/web run test",
+    "test:contracts": "pnpm --filter @analogforge/web run test:contracts",
+    "build": "pnpm --filter @analogforge/web run build",
+    "test:e2e": "pnpm --filter @analogforge/web run test:e2e",
+    "test:e2e:mock": "pnpm --filter @analogforge/web run test:e2e:mock",
+    "a11y": "pnpm --filter @analogforge/web run a11y",
+    "audit:visual": "pnpm --filter @analogforge/web run audit:visual",
+    "verify:tokens": "pnpm --filter @analogforge/web run verify:tokens",
+    "postinstall": "node scripts/ui/setup_generated_outputs.mjs"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@axe-core/playwright": "4.11.0",
+    "@playwright/test": "1.56.1",
+    "json-canonicalize": "1.2.0"
+  }
+}

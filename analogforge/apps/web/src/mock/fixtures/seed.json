@@ -1,0 +1,2555 @@
+{
+  "workspaceId": "00000000-0000-4000-8000-000000000001",
+  "runId": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+  "createdAt": "2026-11-05T12:00:00Z",
+  "hash": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+  "missionPresets": {
+    "MARS": {
+      "name": "Practice Mars rover mobility and sampling test",
+      "objective": "Test autonomous Mars rover mobility on steep rocky terrain and access two geological sampling waypoints, returning with at least 20% modeled battery reserve.",
+      "target": {
+        "body": "MARS",
+        "bbox": [
+          137.0,
+          -5.0,
+          138.0,
+          -4.0
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "PLANETOCENTRIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_MARS_REFERENCE_SPHERE_3396190M"
+      },
+      "requirements": [
+        {
+          "id": "R-SLOPE-AVAILABILITY",
+          "label": "At least 5% of valid candidate area lies in the 12-18 deg slope band",
+          "dimension": "TERRAIN",
+          "observable": "slope_band_area_fraction",
+          "operator": "GTE",
+          "lower": 0.05,
+          "upper": null,
+          "unit": "fraction",
+          "mandatory": true,
+          "weight": 1,
+          "evidence_scope": "terrain_model",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 60,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": [
+              12,
+              18
+            ],
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": "slope-band-area-fraction-v1",
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-TARGET-SLOPE-CONTEXT",
+          "label": "Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support",
+          "dimension": "TERRAIN",
+          "observable": "slope_distribution_w1_deg",
+          "operator": "LTE",
+          "lower": null,
+          "upper": 6.0,
+          "unit": "deg",
+          "mandatory": false,
+          "weight": 1,
+          "evidence_scope": "regional_context",
+          "minimum_support_scale_m": 480,
+          "maximum_support_scale_m": 1000,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": "slope-w1-common-support-v1",
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-EXPOSURE",
+          "label": "At least 100 m unique route distance in the 12-18 deg slope band",
+          "dimension": "TERRAIN",
+          "observable": "unique_slope_exposure_m",
+          "operator": "GTE",
+          "lower": 100,
+          "upper": null,
+          "unit": "m",
+          "mandatory": true,
+          "weight": 1,
+          "evidence_scope": "terrain_model",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 60,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": [
+              12,
+              18
+            ],
+            "exposure_counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE",
+            "task_ids": [],
+            "co_location_group": "campaign-A",
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-TASKS",
+          "label": "Visit sampling waypoints W1 and W2 on the same route",
+          "dimension": "SCIENCE",
+          "observable": "completed_task_count",
+          "operator": "GTE",
+          "lower": 2,
+          "upper": null,
+          "unit": "count",
+          "mandatory": true,
+          "weight": 1,
+          "evidence_scope": "terrain_model",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 60,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [
+              "W1",
+              "W2"
+            ],
+            "co_location_group": "campaign-A",
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-RESERVE",
+          "label": "Return to start with at least 20% modeled battery reserve",
+          "dimension": "OPERATIONS",
+          "observable": "final_battery_reserve_pct",
+          "operator": "GTE",
+          "lower": 20,
+          "upper": null,
+          "unit": "percent",
+          "mandatory": true,
+          "weight": 1,
+          "evidence_scope": "terrain_model",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 60,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": "campaign-A",
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-MINERAL",
+          "label": "Exposed mineral context present at sampling area (optional)",
+          "dimension": "SCIENCE",
+          "observable": "mineral_class_present",
+          "operator": "PRESENT",
+          "lower": null,
+          "upper": null,
+          "unit": "class",
+          "mandatory": false,
+          "weight": 1,
+          "evidence_scope": "regional_context",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 100,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": "emit-mineral-presence-v1",
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-CLEARANCE",
+          "label": "Obstacles below 0.20 m rover clearance (physical field evidence)",
+          "dimension": "TERRAIN",
+          "observable": "ground_clearance_m",
+          "operator": "GTE",
+          "lower": 0.2,
+          "upper": null,
+          "unit": "m",
+          "mandatory": false,
+          "weight": 1,
+          "evidence_scope": "field_validation",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 0.02,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-GRAVITY",
+          "label": "Mars gravity (3.71 m/s2) for mobility behavior",
+          "dimension": "GRAVITY",
+          "observable": "planetary_gravity",
+          "operator": "NOT_NATURALLY_REPRODUCIBLE",
+          "lower": null,
+          "upper": null,
+          "unit": "m/s2",
+          "mandatory": false,
+          "weight": 1,
+          "evidence_scope": "field_validation",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": null,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-ATMOSPHERE",
+          "label": "Mars atmospheric pressure and composition",
+          "dimension": "ATMOSPHERE",
+          "observable": "planetary_atmosphere",
+          "operator": "NOT_NATURALLY_REPRODUCIBLE",
+          "lower": null,
+          "upper": null,
+          "unit": "Pa",
+          "mandatory": false,
+          "weight": 1,
+          "evidence_scope": "field_validation",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": null,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        }
+      ],
+      "assumptions": [
+        "All terrain in this scenario is synthetic practice data generated from documented formulas; it is not NASA data.",
+        "Sampling waypoints W1/W2 are user-designated task locations; mineral identity is not established.",
+        "Sampling waypoints W1/W2 are placed inside the candidate zone by the deterministic auto-waypoints-v1 rule (procedural task locations; not evidence-supported sample sites)."
+      ],
+      "forbidden_actions": [
+        "Relax accepted requirements during replanning",
+        "Use the test-only mock graph resource provider in live mode"
+      ]
+    },
+    "MOON": {
+      "name": "Practice lunar surface operations and thermal test",
+      "objective": "Test rover surface operations on south-polar lunar terrain, including cold-trap thermal conditions, under lunar gravity and vacuum.",
+      "target": {
+        "body": "MOON",
+        "bbox": [
+          -10.0,
+          -89.5,
+          10.0,
+          -87.5
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "PLANETOCENTRIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_MOON_REFERENCE_SPHERE_1737400M"
+      },
+      "requirements": [
+        {
+          "id": "R-SLOPE-AVAILABILITY",
+          "label": "At least 5% of valid candidate area lies in the 12-18 deg slope band",
+          "dimension": "TERRAIN",
+          "observable": "slope_band_area_fraction",
+          "operator": "GTE",
+          "lower": 0.05,
+          "upper": null,
+          "unit": "fraction",
+          "mandatory": true,
+          "weight": 1,
+          "evidence_scope": "terrain_model",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 60,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": [
+              12,
+              18
+            ],
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": "slope-band-area-fraction-v1",
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-TARGET-SLOPE-CONTEXT",
+          "label": "Candidate slope distribution within 6 deg (Wasserstein-1) of the target at the common comparison support",
+          "dimension": "TERRAIN",
+          "observable": "slope_distribution_w1_deg",
+          "operator": "LTE",
+          "lower": null,
+          "upper": 6.0,
+          "unit": "deg",
+          "mandatory": false,
+          "weight": 1,
+          "evidence_scope": "regional_context",
+          "minimum_support_scale_m": 480,
+          "maximum_support_scale_m": 1000,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": "slope-w1-common-support-v1",
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-THERMAL",
+          "label": "Surface temperature minimum at or below 120 K (multi-year minimum)",
+          "dimension": "THERMAL",
+          "observable": "surface_temperature_min_k",
+          "operator": "LTE",
+          "lower": null,
+          "upper": 120,
+          "unit": "K",
+          "mandatory": true,
+          "weight": 1,
+          "evidence_scope": "regional_context",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 250,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": "thermal-min-compatible-quantity-v1",
+            "temporal_support": "multi-year minimum"
+          }
+        },
+        {
+          "id": "R-GRAVITY",
+          "label": "Lunar gravity (1.62 m/s2)",
+          "dimension": "GRAVITY",
+          "observable": "planetary_gravity",
+          "operator": "NOT_NATURALLY_REPRODUCIBLE",
+          "lower": null,
+          "upper": null,
+          "unit": "m/s2",
+          "mandatory": false,
+          "weight": 1,
+          "evidence_scope": "field_validation",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": null,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-VACUUM",
+          "label": "Hard vacuum",
+          "dimension": "ATMOSPHERE",
+          "observable": "planetary_atmosphere",
+          "operator": "NOT_NATURALLY_REPRODUCIBLE",
+          "lower": null,
+          "upper": null,
+          "unit": "Pa",
+          "mandatory": false,
+          "weight": 1,
+          "evidence_scope": "field_validation",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": null,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Practice-scenario assumption accepted for synthetic testing; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        }
+      ],
+      "assumptions": [
+        "All lunar and Earth terrain in this scenario is synthetic practice data; no Diviner or Earth thermal source is configured, so thermal must be UNKNOWN."
+      ],
+      "forbidden_actions": [
+        "Relax accepted requirements during replanning"
+      ]
+    },
+    "GRAPH": {
+      "name": "Synthetic Mars mobility regression",
+      "objective": "Exercise fixed slope exposure and two designated task waypoints on a synthetic Earth test graph.",
+      "target": {
+        "body": "MARS",
+        "bbox": [
+          137.0,
+          -5.0,
+          138.0,
+          -4.0
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "PLANETOCENTRIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+      },
+      "requirements": [
+        {
+          "id": "R-EXPOSURE",
+          "label": "At least100m unique12to18degree terrain",
+          "dimension": "TERRAIN",
+          "observable": "unique_slope_exposure_m",
+          "operator": "GTE",
+          "lower": 100,
+          "upper": null,
+          "unit": "m",
+          "mandatory": true,
+          "weight": 1,
+          "evidence_scope": "terrain_model",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 60,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Synthetic regression fixture assumption; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": [
+              12,
+              18
+            ],
+            "exposure_counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE",
+            "task_ids": [],
+            "co_location_group": "campaign-A",
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-TASKS",
+          "label": "Visit W1 and W2",
+          "dimension": "SCIENCE",
+          "observable": "completed_task_count",
+          "operator": "GTE",
+          "lower": 2,
+          "upper": null,
+          "unit": "count",
+          "mandatory": true,
+          "weight": 1,
+          "evidence_scope": "terrain_model",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 60,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Synthetic regression fixture assumption; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [
+              "W1",
+              "W2"
+            ],
+            "co_location_group": "campaign-A",
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-RESERVE",
+          "label": "Return with20percent reserve",
+          "dimension": "OPERATIONS",
+          "observable": "final_battery_reserve_pct",
+          "operator": "GTE",
+          "lower": 20,
+          "upper": null,
+          "unit": "percent",
+          "mandatory": true,
+          "weight": 1,
+          "evidence_scope": "terrain_model",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 60,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Synthetic regression fixture assumption; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": "campaign-A",
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-GRAVITY",
+          "label": "Mars gravity remains a natural-site gap",
+          "dimension": "GRAVITY",
+          "observable": "planetary_gravity",
+          "operator": "NOT_NATURALLY_REPRODUCIBLE",
+          "lower": null,
+          "upper": null,
+          "unit": "m/s2",
+          "mandatory": false,
+          "weight": 1,
+          "evidence_scope": "field_validation",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": null,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Synthetic regression fixture assumption; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        },
+        {
+          "id": "R-CLEARANCE",
+          "label": "Physical clearance evidence is unavailable",
+          "dimension": "TERRAIN",
+          "observable": "ground_clearance_m",
+          "operator": "GTE",
+          "lower": 0.2,
+          "upper": null,
+          "unit": "m",
+          "mandatory": false,
+          "weight": 1,
+          "evidence_scope": "field_validation",
+          "minimum_support_scale_m": null,
+          "maximum_support_scale_m": 0.02,
+          "origin": "PROPOSED_DEFAULT",
+          "acceptance_note": "Synthetic regression fixture assumption; not inferred from NASA data.",
+          "parameters": {
+            "slope_band_deg": null,
+            "exposure_counting": null,
+            "task_ids": [],
+            "co_location_group": null,
+            "comparison_rule_id": null,
+            "temporal_support": null
+          }
+        }
+      ],
+      "assumptions": [
+        "All source terrain and graph values are synthetic test data.",
+        "Task locations are designated waypoints; mineral identity is not established."
+      ],
+      "forbidden_actions": [
+        "Relax accepted requirements during replanning",
+        "Use synthetic graph resource provider in live mode"
+      ]
+    }
+  },
+  "roverPresets": {
+    "ARES-1": {
+      "name": "ARES-1",
+      "mass_kg": 42,
+      "max_slope_deg": 18,
+      "ground_clearance_m": 0.2,
+      "wheel_diameter_m": 0.3,
+      "max_obstacle_height_m": null,
+      "battery_wh": 1800,
+      "min_reserve_pct": 20,
+      "nominal_speed_mps": 0.5,
+      "max_route_m": null,
+      "sensors": [
+        "stereo_camera",
+        "imu",
+        "lidar"
+      ],
+      "capabilities": [
+        "autonomous_navigation",
+        "geological_sampling"
+      ],
+      "energy_model": {
+        "model_id": "earth-simple-v1",
+        "rolling_coefficient": 0.06,
+        "drive_efficiency": 0.65,
+        "idle_power_w": 35,
+        "science_task_wh": 10,
+        "roughness_multiplier": 1,
+        "uncertainty_fraction": 0.25,
+        "calibration_status": "ASSUMED",
+        "calibration_evidence_id": null
+      },
+      "assumptions": [
+        "Illustrative engineering values from the AnalogForge brief; not a manufacturer-certified profile.",
+        "Energy coefficients are ASSUMED design defaults (architecture 12 section 5), not calibrated."
+      ]
+    },
+    "PRACTICE-LITE": {
+      "name": "PRACTICE-LITE",
+      "mass_kg": 42,
+      "max_slope_deg": 12,
+      "ground_clearance_m": 0.2,
+      "wheel_diameter_m": 0.3,
+      "max_obstacle_height_m": null,
+      "battery_wh": 1800,
+      "min_reserve_pct": 20,
+      "nominal_speed_mps": 0.5,
+      "max_route_m": null,
+      "sensors": [
+        "stereo_camera",
+        "imu",
+        "lidar"
+      ],
+      "capabilities": [
+        "autonomous_navigation",
+        "geological_sampling"
+      ],
+      "energy_model": {
+        "model_id": "earth-simple-v1",
+        "rolling_coefficient": 0.06,
+        "drive_efficiency": 0.65,
+        "idle_power_w": 35,
+        "science_task_wh": 10,
+        "roughness_multiplier": 1,
+        "uncertainty_fraction": 0.25,
+        "calibration_status": "ASSUMED",
+        "calibration_evidence_id": null
+      },
+      "assumptions": [
+        "Practice rover: 12 deg safe slope deliberately below the [12,18] deg exposure band; must surface a contract/rover conflict, never a relaxed requirement."
+      ]
+    },
+    "PRACTICE-NO-ENERGY-MODEL": {
+      "name": "PRACTICE-NO-ENERGY-MODEL",
+      "mass_kg": 42,
+      "max_slope_deg": 18,
+      "ground_clearance_m": 0.2,
+      "wheel_diameter_m": 0.3,
+      "max_obstacle_height_m": null,
+      "battery_wh": 1800,
+      "min_reserve_pct": 20,
+      "nominal_speed_mps": 0.5,
+      "max_route_m": null,
+      "sensors": [
+        "stereo_camera",
+        "imu",
+        "lidar"
+      ],
+      "capabilities": [
+        "autonomous_navigation",
+        "geological_sampling"
+      ],
+      "energy_model": null,
+      "assumptions": [
+        "Practice rover without an energy model: energy-dependent checks must be INCONCLUSIVE (DATA), never zero consumption."
+      ]
+    },
+    "PRACTICE-SMALL-BATTERY": {
+      "name": "PRACTICE-SMALL-BATTERY",
+      "mass_kg": 42,
+      "max_slope_deg": 18,
+      "ground_clearance_m": 0.2,
+      "wheel_diameter_m": 0.3,
+      "max_obstacle_height_m": null,
+      "battery_wh": 30,
+      "min_reserve_pct": 20,
+      "nominal_speed_mps": 0.5,
+      "max_route_m": null,
+      "sensors": [
+        "stereo_camera",
+        "imu",
+        "lidar"
+      ],
+      "capabilities": [
+        "autonomous_navigation",
+        "geological_sampling"
+      ],
+      "energy_model": {
+        "model_id": "earth-simple-v1",
+        "rolling_coefficient": 0.06,
+        "drive_efficiency": 0.65,
+        "idle_power_w": 35,
+        "science_task_wh": 10,
+        "roughness_multiplier": 1,
+        "uncertainty_fraction": 0.25,
+        "calibration_status": "ASSUMED",
+        "calibration_evidence_id": null
+      },
+      "assumptions": [
+        "Practice rover with a 30 Wh battery: a kilometre-scale route must FAIL ENERGY_RESERVE_SHORTFALL (category ROVER) under unchanged requirements."
+      ]
+    }
+  },
+  "scenarios": [
+    {
+      "id": "synthetic-mars-mobility-v1",
+      "name": "Mars mobility",
+      "body": "MARS",
+      "description": "Synthetic practice data",
+      "allowed_modes": [
+        "synthetic",
+        "replay"
+      ],
+      "default_dataset_lock_id": "practice-lock-v1",
+      "operator_limits": {
+        "search_max_expansions": 100000,
+        "search_max_seconds": 60,
+        "search_max_labels_per_node": 100,
+        "coarse_windows_max": 9,
+        "detailed_candidates": 6,
+        "model_requests_per_run": 60,
+        "active_run_seconds": 900,
+        "replans_total": 3
+      }
+    },
+    {
+      "id": "synthetic-graph-regression-v1",
+      "name": "Graph regression",
+      "body": "MARS",
+      "description": "Synthetic practice data",
+      "allowed_modes": [
+        "synthetic",
+        "replay"
+      ],
+      "default_dataset_lock_id": "practice-lock-v1",
+      "operator_limits": {
+        "search_max_expansions": 100000,
+        "search_max_seconds": 60,
+        "search_max_labels_per_node": 100,
+        "coarse_windows_max": 9,
+        "detailed_candidates": 6,
+        "model_requests_per_run": 60,
+        "active_run_seconds": 900,
+        "replans_total": 3
+      }
+    },
+    {
+      "id": "synthetic-moon-gap-v1",
+      "name": "Moon site qualification",
+      "body": "MOON",
+      "description": "Synthetic practice data",
+      "allowed_modes": [
+        "synthetic",
+        "replay"
+      ],
+      "default_dataset_lock_id": "practice-lock-v1",
+      "operator_limits": {
+        "search_max_expansions": 100000,
+        "search_max_seconds": 60,
+        "search_max_labels_per_node": 100,
+        "coarse_windows_max": 9,
+        "detailed_candidates": 6,
+        "model_requests_per_run": 60,
+        "active_run_seconds": 900,
+        "replans_total": 3
+      }
+    },
+    {
+      "id": "local-dataset-practice-v1",
+      "name": "Local dataset practice",
+      "body": "MARS",
+      "description": "Synthetic practice data",
+      "allowed_modes": [
+        "synthetic",
+        "replay"
+      ],
+      "default_dataset_lock_id": "practice-lock-v1",
+      "operator_limits": {
+        "search_max_expansions": 100000,
+        "search_max_seconds": 60,
+        "search_max_labels_per_node": 100,
+        "coarse_windows_max": 9,
+        "detailed_candidates": 6,
+        "model_requests_per_run": 60,
+        "active_run_seconds": 900,
+        "replans_total": 3
+      }
+    },
+    {
+      "id": "live-hackathon-v1",
+      "name": "NASA dataset slot",
+      "body": "MARS",
+      "description": "AWAITING_DATASETS \u2014 bind a dataset before running",
+      "allowed_modes": [],
+      "default_dataset_lock_id": "unbound",
+      "operator_limits": {
+        "search_max_expansions": 100000,
+        "search_max_seconds": 60,
+        "search_max_labels_per_node": 100,
+        "coarse_windows_max": 9,
+        "detailed_candidates": 6,
+        "model_requests_per_run": 60,
+        "active_run_seconds": 900,
+        "replans_total": 3
+      }
+    }
+  ],
+  "target": {
+    "schema_version": "1.0",
+    "id": "8a6ec06f-1529-56b9-8c71-ca59d3556159",
+    "workspace_id": "00000000-0000-4000-8000-000000000001",
+    "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+    "mode": "synthetic",
+    "created_at": "2026-11-05T12:00:00Z",
+    "target": {
+      "body": "MARS",
+      "bbox": [
+        137.0,
+        -5.0,
+        138.0,
+        -4.0
+      ],
+      "longitude_convention": "NEG180_180",
+      "latitude_type": "PLANETOCENTRIC",
+      "crs_wkt": null,
+      "vertical_datum": "SYNTHETIC_MARS_REFERENCE_SPHERE_3396190M"
+    },
+    "evidence_ids": [
+      "768bcadd-561a-5f80-8eb3-54feea06ac58"
+    ],
+    "metrics": [
+      {
+        "metric_id": "slope_area_fraction:12-18",
+        "value": 0.2,
+        "unit": "fraction",
+        "support_scale_m": 480,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      }
+    ],
+    "unavailable_dimensions": [
+      "MINERAL",
+      "THERMAL"
+    ]
+  },
+  "candidates": [
+    {
+      "schema_version": "1.0",
+      "id": "246ba06a-1cfc-568e-80df-f8a3075e6e9c",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "name": "Practice grid-r0c1",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -111.0,
+          35,
+          -110.97,
+          35.03
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": "EPSG:4326",
+        "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+      },
+      "origin": "DISCOVERED",
+      "discovery_method": "synthetic-practice-screening-v1",
+      "novelty_status": "NOT_IN_REFERENCE_LIST",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.4,
+          "unit": "fraction",
+          "support_scale_m": 60,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 3.2,
+          "unit": "deg",
+          "support_scale_m": 480,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "SYNTHETIC PRACTICE DATA \u2014 not terrain of this location",
+        "Access and permissions not assessed"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "76f3e5ed-47fc-5337-9131-d7335158c964",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "name": "Practice grid-r0c0",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -110.96,
+          35,
+          -110.92999999999999,
+          35.03
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": "EPSG:4326",
+        "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+      },
+      "origin": "DISCOVERED",
+      "discovery_method": "synthetic-practice-screening-v1",
+      "novelty_status": "NOT_IN_REFERENCE_LIST",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.11,
+          "unit": "fraction",
+          "support_scale_m": 60,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 4.1,
+          "unit": "deg",
+          "support_scale_m": 480,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "SYNTHETIC PRACTICE DATA \u2014 not terrain of this location",
+        "Access and permissions not assessed"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "d6473072-0b37-5e5d-a7ad-21c81b2dbd34",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "name": "Practice grid-r2c2",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -110.92,
+          35,
+          -110.89,
+          35.03
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": "EPSG:4326",
+        "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+      },
+      "origin": "KNOWN_CONTROL",
+      "discovery_method": "synthetic-practice-screening-v1",
+      "novelty_status": "KNOWN_ANALOG",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.08,
+          "unit": "fraction",
+          "support_scale_m": 60,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 3.9,
+          "unit": "deg",
+          "support_scale_m": 480,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "SYNTHETIC PRACTICE DATA \u2014 not terrain of this location",
+        "Access and permissions not assessed"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "fc0ec4c0-30b5-5f57-9285-c628dfd4adeb",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "name": "Practice grid-r0c2",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -110.88,
+          35,
+          -110.85,
+          35.03
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": "EPSG:4326",
+        "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+      },
+      "origin": "DISCOVERED",
+      "discovery_method": "synthetic-practice-screening-v1",
+      "novelty_status": "NOT_IN_REFERENCE_LIST",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0,
+          "unit": "fraction",
+          "support_scale_m": 60,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 8,
+          "unit": "deg",
+          "support_scale_m": 480,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "SYNTHETIC PRACTICE DATA \u2014 not terrain of this location",
+        "Access and permissions not assessed"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "5911c743-062f-594b-8022-ffd9efd51008",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "name": "Practice grid-r1c0",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -110.84,
+          35,
+          -110.81,
+          35.03
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": "EPSG:4326",
+        "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+      },
+      "origin": "DISCOVERED",
+      "discovery_method": "synthetic-practice-screening-v1",
+      "novelty_status": "NOT_IN_REFERENCE_LIST",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.03,
+          "unit": "fraction",
+          "support_scale_m": 60,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 7,
+          "unit": "deg",
+          "support_scale_m": 480,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "SYNTHETIC PRACTICE DATA \u2014 not terrain of this location",
+        "Access and permissions not assessed"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "id": "de74ca8e-95a2-5fa2-ad06-81b320f3cf4d",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "name": "Practice grid-r2c0",
+      "aoi": {
+        "body": "EARTH",
+        "bbox": [
+          -110.8,
+          35,
+          -110.77,
+          35.03
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "GEODETIC",
+        "crs_wkt": "EPSG:4326",
+        "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+      },
+      "origin": "DISCOVERED",
+      "discovery_method": "synthetic-practice-screening-v1",
+      "novelty_status": "NOT_IN_REFERENCE_LIST",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.02,
+          "unit": "fraction",
+          "support_scale_m": 60,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        },
+        {
+          "metric_id": "slope_w1_deg",
+          "value": 8,
+          "unit": "deg",
+          "support_scale_m": 480,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        }
+      ],
+      "accessibility_status": "NOT_ASSESSED",
+      "limitations": [
+        "SYNTHETIC PRACTICE DATA \u2014 not terrain of this location",
+        "Access and permissions not assessed"
+      ]
+    }
+  ],
+  "qualifications": [
+    {
+      "schema_version": "1.0",
+      "id": "26d2b4c7-e59e-592d-b52d-4396bab6acdc",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "246ba06a-1cfc-568e-80df-f8a3075e6e9c",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "PASS",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60,
+      "explanation": "MEETS_CRITERION",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "89e019a9-1601-554d-a0ba-cb2f7b472ac4",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "246ba06a-1cfc-568e-80df-f8a3075e6e9c",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "PASS",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480,
+      "explanation": "Common support comparison at 480 m",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "2310a57a-2c98-5309-8287-37e1654e174c",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "246ba06a-1cfc-568e-80df-f8a3075e6e9c",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "969c20eb-d90c-59c6-a3cd-ab7e5ca0cc76",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "246ba06a-1cfc-568e-80df-f8a3075e6e9c",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "28a7c513-2e0e-590e-a469-b0ab2fbd2511",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "246ba06a-1cfc-568e-80df-f8a3075e6e9c",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "8637cafc-fc28-5e21-9201-8f94e4b6749b",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "246ba06a-1cfc-568e-80df-f8a3075e6e9c",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "EARTH_EVIDENCE_MISSING \u2014 mineral context unavailable",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "0fd5fee2-f103-5a74-8e4b-5354c0aa6c05",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "246ba06a-1cfc-568e-80df-f8a3075e6e9c",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "SCALE_UNSUPPORTED \u2014 60 m terrain does not establish 0.02 m field clearance",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "6be9c526-8296-5dec-8d77-a4d93a40c42f",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "246ba06a-1cfc-568e-80df-f8a3075e6e9c",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "4788a2e2-7d36-542e-b07e-7556a2571e6c",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "246ba06a-1cfc-568e-80df-f8a3075e6e9c",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "2195e7d5-73f0-5b59-a7ae-60337654372e",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "76f3e5ed-47fc-5337-9131-d7335158c964",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "PASS",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60,
+      "explanation": "MEETS_CRITERION",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "500bd430-7aff-5a4e-9d7d-a488d577e0a0",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "76f3e5ed-47fc-5337-9131-d7335158c964",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "PASS",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480,
+      "explanation": "Common support comparison at 480 m",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "ea1c2f4a-2ef8-5ce2-9930-7bf926c01cbb",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "76f3e5ed-47fc-5337-9131-d7335158c964",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "5ce91c6d-00df-5ade-9ffd-97938f2f537f",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "76f3e5ed-47fc-5337-9131-d7335158c964",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "9d3d77ca-5c11-53dc-a0d0-709de894d8f7",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "76f3e5ed-47fc-5337-9131-d7335158c964",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "5912e5c5-73a6-5389-9441-2d947f8bb717",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "76f3e5ed-47fc-5337-9131-d7335158c964",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "EARTH_EVIDENCE_MISSING \u2014 mineral context unavailable",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "3ab08842-e866-5873-97fc-2b7920829629",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "76f3e5ed-47fc-5337-9131-d7335158c964",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "SCALE_UNSUPPORTED \u2014 60 m terrain does not establish 0.02 m field clearance",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "e0e9316f-e1a2-51c9-9217-a8a515093b8e",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "76f3e5ed-47fc-5337-9131-d7335158c964",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "28c20d68-55b7-50a3-9f00-6071987d710a",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "76f3e5ed-47fc-5337-9131-d7335158c964",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "4e5c1bf6-5949-5e05-a558-b05e115f1b34",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "d6473072-0b37-5e5d-a7ad-21c81b2dbd34",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "PASS",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60,
+      "explanation": "MEETS_CRITERION",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "2bc85ab6-02cd-5d74-84fc-9cbf7ca3cc45",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "d6473072-0b37-5e5d-a7ad-21c81b2dbd34",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "PASS",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480,
+      "explanation": "Common support comparison at 480 m",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "5c87b434-883f-54ae-a6ae-1f2cbc286283",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "d6473072-0b37-5e5d-a7ad-21c81b2dbd34",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "2e95e280-1172-5eb7-a4b0-bfc219774109",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "d6473072-0b37-5e5d-a7ad-21c81b2dbd34",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "d8ef3b57-a8c5-5adb-91ff-93b0d1d704d9",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "d6473072-0b37-5e5d-a7ad-21c81b2dbd34",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "c924d5dc-3abe-5be0-ab72-f2e592a773d9",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "d6473072-0b37-5e5d-a7ad-21c81b2dbd34",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "EARTH_EVIDENCE_MISSING \u2014 mineral context unavailable",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "e0b9d0d8-d9d7-5337-9196-865b3a82f1fb",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "d6473072-0b37-5e5d-a7ad-21c81b2dbd34",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "SCALE_UNSUPPORTED \u2014 60 m terrain does not establish 0.02 m field clearance",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "5a43c5df-898c-5935-bd98-0bbce45ed505",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "d6473072-0b37-5e5d-a7ad-21c81b2dbd34",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "0a0855d6-cfe7-5091-ba90-0d6023bb5f65",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "d6473072-0b37-5e5d-a7ad-21c81b2dbd34",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "cbfb8289-b81a-5d65-9371-4b921e5e792c",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "fc0ec4c0-30b5-5f57-9285-c628dfd4adeb",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "FAIL",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60,
+      "explanation": "INSUFFICIENT_EXPOSURE",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "457191be-2352-5b38-938b-b27da60e66c9",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "fc0ec4c0-30b5-5f57-9285-c628dfd4adeb",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "FAIL",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480,
+      "explanation": "Common support comparison at 480 m",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "a7270725-6ad6-5fc9-8ab1-43739e049e63",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "fc0ec4c0-30b5-5f57-9285-c628dfd4adeb",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "285822a8-9be4-5dd8-9646-1e5029612a4b",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "fc0ec4c0-30b5-5f57-9285-c628dfd4adeb",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "b1544b37-856a-5924-bfc8-cf6c2e19ff69",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "fc0ec4c0-30b5-5f57-9285-c628dfd4adeb",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "cc939672-aa5f-5787-9f00-3381292fc91f",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "fc0ec4c0-30b5-5f57-9285-c628dfd4adeb",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "EARTH_EVIDENCE_MISSING \u2014 mineral context unavailable",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "e9576e30-72cc-5eaf-a410-2c0ecd47f033",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "fc0ec4c0-30b5-5f57-9285-c628dfd4adeb",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "SCALE_UNSUPPORTED \u2014 60 m terrain does not establish 0.02 m field clearance",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "58e3c039-42ff-5408-af4d-74f88bd405a9",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "fc0ec4c0-30b5-5f57-9285-c628dfd4adeb",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "4c2ac4be-801b-5594-a618-ba067473d861",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "fc0ec4c0-30b5-5f57-9285-c628dfd4adeb",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "45930443-6378-5a38-953b-6b5124b2c7f2",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "5911c743-062f-594b-8022-ffd9efd51008",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "FAIL",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60,
+      "explanation": "INSUFFICIENT_EXPOSURE",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "20e5f752-fb73-5146-96b6-3309a0711ebf",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "5911c743-062f-594b-8022-ffd9efd51008",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "FAIL",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480,
+      "explanation": "Common support comparison at 480 m",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "f6284c7a-b5d5-5c75-bce1-3e82ce292fe1",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "5911c743-062f-594b-8022-ffd9efd51008",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "fcad08fe-d976-522a-a7c3-09a4da37518f",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "5911c743-062f-594b-8022-ffd9efd51008",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "fba5f8c2-47a8-5fc8-b57a-045d3d4bc5f0",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "5911c743-062f-594b-8022-ffd9efd51008",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "ae714463-03ab-5437-83b3-262c89accacd",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "5911c743-062f-594b-8022-ffd9efd51008",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "EARTH_EVIDENCE_MISSING \u2014 mineral context unavailable",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "0de0f00c-c7b9-53ff-aea7-eaa9dcdcc4d4",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "5911c743-062f-594b-8022-ffd9efd51008",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "SCALE_UNSUPPORTED \u2014 60 m terrain does not establish 0.02 m field clearance",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "dad9f13c-e77c-5043-8927-31050bf4b81d",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "5911c743-062f-594b-8022-ffd9efd51008",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "7b92db99-e2d8-5b22-91d4-a0af6ca1f1f1",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "5911c743-062f-594b-8022-ffd9efd51008",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "e20ff6b8-c280-54b6-a723-cc21aa24dac5",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "de74ca8e-95a2-5fa2-ad06-81b320f3cf4d",
+      "requirement_id": "R-SLOPE-AVAILABILITY",
+      "status": "FAIL",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-band-area-fraction-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 60,
+      "explanation": "INSUFFICIENT_EXPOSURE",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "79c203e3-4267-5386-af61-37289ac1a105",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "de74ca8e-95a2-5fa2-ad06-81b320f3cf4d",
+      "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+      "status": "FAIL",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "slope-w1-common-support-v1",
+      "rule_version": "1.0.0",
+      "confidence": "MEDIUM",
+      "comparison_scale_m": 480,
+      "explanation": "Common support comparison at 480 m",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "ea72a177-0241-5c8d-a6cf-26ab76a18d6e",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "de74ca8e-95a2-5fa2-ad06-81b320f3cf4d",
+      "requirement_id": "R-EXPOSURE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "7ada85be-15b3-5962-8e3e-bae7f66ac64a",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "de74ca8e-95a2-5fa2-ad06-81b320f3cf4d",
+      "requirement_id": "R-TASKS",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "f36ae263-6c6f-567a-8ead-058c83232ca6",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "de74ca8e-95a2-5fa2-ad06-81b320f3cf4d",
+      "requirement_id": "R-RESERVE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "ROUTE_NOT_VERIFIED \u2014 route-dependent requirement is preliminary",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "7b6fec81-958b-5201-aaeb-5aa6f7470291",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "de74ca8e-95a2-5fa2-ad06-81b320f3cf4d",
+      "requirement_id": "R-MINERAL",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "emit-mineral-presence-v1",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "EARTH_EVIDENCE_MISSING \u2014 mineral context unavailable",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "5d7bfc57-8402-5e1e-ac3e-dca920ebb198",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "de74ca8e-95a2-5fa2-ad06-81b320f3cf4d",
+      "requirement_id": "R-CLEARANCE",
+      "status": "UNKNOWN",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "SCALE_UNSUPPORTED \u2014 60 m terrain does not establish 0.02 m field clearance",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "ce728842-705c-578d-9d31-65daad01022d",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "de74ca8e-95a2-5fa2-ad06-81b320f3cf4d",
+      "requirement_id": "R-GRAVITY",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    },
+    {
+      "schema_version": "1.0",
+      "id": "c02ff52e-4116-5230-b4d4-ebc379a9077d",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "candidate_id": "de74ca8e-95a2-5fa2-ad06-81b320f3cf4d",
+      "requirement_id": "R-ATMOSPHERE",
+      "status": "GAP",
+      "evidence_ids": [
+        "768bcadd-561a-5f80-8eb3-54feea06ac58"
+      ],
+      "rule_id": "synthetic-display-fixture",
+      "rule_version": "1.0.0",
+      "confidence": "UNASSESSED",
+      "comparison_scale_m": 60,
+      "explanation": "PHYSICAL_GAP \u2014 not naturally reproducible on Earth",
+      "limitations": [
+        "Synthetic preview; not an empirical science result"
+      ],
+      "critic_status": "ACCEPTED",
+      "critique_evidence_ids": []
+    }
+  ],
+  "evidence": [
+    {
+      "schema_version": "1.0",
+      "id": "768bcadd-561a-5f80-8eb3-54feea06ac58",
+      "workspace_id": "00000000-0000-4000-8000-000000000001",
+      "run_id": "ec3746e2-f3ed-5c2c-a239-b704fe21c4ac",
+      "mode": "synthetic",
+      "created_at": "2026-11-05T12:00:00Z",
+      "kind": "DERIVED",
+      "artifact_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "artifact_media_type": "application/json",
+      "source_uri": null,
+      "dataset_product_id": "SYNTHETIC_PRACTICE",
+      "dataset_version": "1.0",
+      "granule_id": null,
+      "license_note": "Synthetic practice fixture",
+      "body": "MARS",
+      "aoi": {
+        "body": "MARS",
+        "bbox": [
+          137.0,
+          -5.0,
+          138.0,
+          -4.0
+        ],
+        "longitude_convention": "NEG180_180",
+        "latitude_type": "PLANETOCENTRIC",
+        "crs_wkt": null,
+        "vertical_datum": "SYNTHETIC_MARS_REFERENCE_SPHERE_3396190M"
+      },
+      "input_evidence_ids": [],
+      "parameters_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "algorithm_id": "characterize-target",
+      "algorithm_version": "1.0.0",
+      "native_resolution_m": 480,
+      "comparison_scale_m": 480,
+      "metrics": [
+        {
+          "metric_id": "slope_area_fraction:12-18",
+          "value": 0.2,
+          "unit": "fraction",
+          "support_scale_m": 480,
+          "quantity_kind": "DERIVED",
+          "method_id": "synthetic-practice-v1",
+          "valid_fraction": 1,
+          "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+        }
+      ],
+      "limitations": [
+        "SYNTHETIC PRACTICE DATA \u2014 not terrain of this location"
+      ]
+    }
+  ],
+  "excludedWindows": [
+    {
+      "window_id": "grid-r1c1",
+      "reason": "WATER_ONLY"
+    },
+    {
+      "window_id": "grid-r1c2",
+      "reason": "INSUFFICIENT_VALID_DATA"
+    },
+    {
+      "window_id": "grid-r2c1",
+      "reason": "DETAIL_CAP"
+    }
+  ]
+}

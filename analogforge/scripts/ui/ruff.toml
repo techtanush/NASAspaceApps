@@ -1,0 +1,5 @@
+extend = "../../pyproject.toml"
+# Upstream design tools are required byte-for-byte by UIX-12; lint our authored tools normally.
+[lint.per-file-ignores]
+"verify_tokens.py" = ["ALL"]
+"gen_tokens_css.py" = ["ALL"]
