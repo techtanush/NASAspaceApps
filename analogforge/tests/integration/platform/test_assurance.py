@@ -132,6 +132,13 @@ def test_honest_limited_findings_publish(status, disposition):
     assert report.publication == "LIMITED"
     assert report.claims[0].disposition == disposition
     assert len(report.claims[0].gates) == 15
+    # The published report must satisfy the frozen JSON schema, which requires a limitation on every
+    # non-supported claim (found when the real science engine produced UNKNOWN rows with no limitation text).
+    import jsonschema
+
+    schema = json.loads((Path(__file__).parents[3] / "contracts" / "scientific-assurance.schema.json").read_text())
+    jsonschema.Draft202012Validator(schema).validate(json.loads(report.model_dump_json()))
+    assert report.claims[0].limitations
 
 
 @pytest.mark.parametrize("gate_id", [f"SC-{n:02}" for n in (*range(2, 12), 13)])

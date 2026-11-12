@@ -39,8 +39,24 @@ def candidate_record(
     }
 
 
+AVAILABILITY_REQUIREMENT_ID = "R-SLOPE-AVAILABILITY"
+
+
+def availability_band_key(mission: dict[str, Any] | None) -> str | None:
+    """``ConnectedZone.band_area_m2`` key of the availability requirement's slope band (science writes ``lo-hi``)."""
+    for requirement in (mission or {}).get("requirements", []):
+        if requirement.get("id") == AVAILABILITY_REQUIREMENT_ID:
+            band = (requirement.get("parameters") or {}).get("slope_band_deg")
+            if band:
+                return f"{float(band[0]):g}-{float(band[1]):g}"
+    return None
+
+
 def eligible_replan_candidates(
-    candidates: list[dict[str, Any]], qualifications: list[dict[str, Any]], attempted_ids: set[str]
+    candidates: list[dict[str, Any]],
+    qualifications: list[dict[str, Any]],
+    attempted_ids: set[str],
+    mission: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     eligible: list[dict[str, Any]] = []
     for candidate in candidates:
@@ -49,22 +65,33 @@ def eligible_replan_candidates(
         rows = [
             q
             for q in qualifications
-            if q["candidate_id"] == candidate["id"] and q["requirement_id"] == "R-SLOPE-AVAILABILITY"
+            if q["candidate_id"] == candidate["id"] and q["requirement_id"] == AVAILABILITY_REQUIREMENT_ID
         ]
         if rows and rows[-1]["status"] == "FAIL":
             continue
         eligible.append(candidate)
 
+    band_key = availability_band_key(mission)
+
     def order(candidate: dict[str, Any]) -> tuple[float, int, str]:
+        # Architecture 40 s4 picker: start-zone band area FOR THE REQUIREMENT'S BAND (not the sum of every band key,
+        # which low-slope bands dominate), then screening rank, then window id.
         zones = candidate["analysis_payload"].get("connected_zones", [])
-        band_area = sum(sum(z["band_area_m2"].values()) for z in zones if z["contains_start"])
+        start = [z for z in zones if z["contains_start"]]
+        if band_key is not None:
+            band_area = sum(float(z["band_area_m2"].get(band_key, 0.0)) for z in start)
+        else:
+            band_area = sum(sum(z["band_area_m2"].values()) for z in start)
         return (-band_area, candidate.get("screening_rank") or 10**6, candidate["window_id"])
 
     return sorted(eligible, key=order)
 
 
 def pick_replan_candidate(
-    candidates: list[dict[str, Any]], qualifications: list[dict[str, Any]], attempted_ids: set[str]
+    candidates: list[dict[str, Any]],
+    qualifications: list[dict[str, Any]],
+    attempted_ids: set[str],
+    mission: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
-    eligible = eligible_replan_candidates(candidates, qualifications, attempted_ids)
+    eligible = eligible_replan_candidates(candidates, qualifications, attempted_ids, mission)
     return eligible[0] if eligible else None

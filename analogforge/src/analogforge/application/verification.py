@@ -32,7 +32,12 @@ def design(
                 "constraints_sha256": payload["constraints_sha256"],
                 "required_exposures": payload["required_exposures"],
                 "solver_config": c["solver"],
-                "assumptions": c["limitations"],
+                # The frozen wire model has no changed-elements field; the public record carries the attempt's
+                # changes as one "Changed elements:" line (the convention the workbench parses), "none" for attempt 1.
+                "assumptions": [
+                    *c["limitations"],
+                    "Changed elements: " + ("; ".join(changed_elements) if changed_elements else "none"),
+                ],
             }
         ).model_dump(mode="json"),
         "attempt_number": attempt_number,

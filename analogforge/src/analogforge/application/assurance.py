@@ -153,6 +153,21 @@ def _mode_and_level(snapshot: AuditSnapshot, proposal: ClaimInput) -> tuple[bool
     return True, "Immutable runtime mode and executed validation level agree."
 
 
+def _claim_limitations(proposal: ClaimInput, disposition: str, gates: Mapping[str, Gate]) -> list[str]:
+    """Limitations for a compiled claim; never empty for a non-supported disposition (assurance schema).
+
+    The proposal's own limitations come first; if a LIMITED/UNSUPPORTED/UNKNOWN/GAP/REJECTED claim states none, the
+    reasons of its unmet gates are recorded instead of publishing an unexplained restriction.
+    """
+    limitations = list(dict.fromkeys(text for text in proposal.limitations if text.strip()))
+    if limitations or disposition == "SUPPORTED":
+        return limitations
+    unmet = [f"{g.gate_id}: {g.reason}" for g in gates.values() if g.outcome in {"UNSATISFIED", "NOT_ASSESSED"}]
+    status = proposal.qualification_status or proposal.verification_status or "no status"
+    fallback = f"{proposal.claim_type.lower()} claim is {disposition.lower()} ({status}) under the accepted scope"
+    return unmet or [fallback]
+
+
 def audit(
     snapshot: AuditSnapshot, claims: Sequence[ClaimInput], receipts: Sequence[ToolReceipt]
 ) -> ScientificAssuranceArtifact:
@@ -314,7 +329,7 @@ def audit(
                 assumption_evidence_ids=list(proposal.assumption_evidence_ids),
                 gates=[gates[gate_id] for gate_id in GATE_IDS],
                 permitted_statement=_statement(proposal, disposition),
-                limitations=list(proposal.limitations),
+                limitations=_claim_limitations(proposal, disposition, gates),
             )
         )
     rejected = any(c.disposition == "REJECTED" for c in compiled)

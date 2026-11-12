@@ -21,6 +21,7 @@ from analogforge.application.seed import seed_synthetic
 from analogforge.db.store import Store
 from analogforge.jobs.worker import Worker
 from analogforge.main import create_app
+from analogforge.ports.domain_models import CritiqueIssue
 from analogforge.ports.hashing import bytes_sha256
 from analogforge.settings import Settings
 from tests.integration.platform.test_migrations import platform_store
@@ -195,6 +196,16 @@ def test_full_accepted_contract_to_immutable_passport_and_downloads(
                         and issue["resolution_evidence_ids"]
                         for issue in issues
                     )
+                # GET /critiques is the frozen ListEvidenceRecord contract: one CRITIQUE record per issue (its latest
+                # state) whose artifact is the CritiqueIssue document the UI renders as a critic card.
+                listed = get(client, f"/critiques?run_id={run_id}&limit=100")["items"]
+                assert len(listed) == len(issues) and all(record["kind"] == "CRITIQUE" for record in listed)
+                documents = [
+                    CritiqueIssue.model_validate(client.get(f"/api/v1/artifacts/{record['artifact_sha256']}").json())
+                    for record in listed
+                ]
+                assert len({str(document.issue_id) for document in documents}) == len(documents)
+                assert any(d.severity == "BLOCKING" and d.status == "RESOLVED" for d in documents)
             candidate = next(
                 (candidate for candidate in candidates if candidate["name"] == "Practice grid-r0c1"), candidates[0]
             )
@@ -223,6 +234,16 @@ def test_full_accepted_contract_to_immutable_passport_and_downloads(
         assert public_run["mission_revision_id"] == accepted["id"]
         results = [get(client, f"/test-results/{result_id}") for result_id in public_run["test_result_ids"]]
         assert [row["outcome"] for row in results] == expected_outcomes
+        # Each public test record states its replan changes on one "Changed elements:" line (none for attempt 1).
+        public_tests = [get(client, f"/tests/{test_id}") for test_id in public_run["test_ids"]]
+        change_lines = [
+            [line for line in test["assumptions"] if line.startswith("Changed elements: ")] for test in public_tests
+        ]
+        assert all(len(lines) == 1 for lines in change_lines)
+        if public_tests:
+            assert change_lines[0] == ["Changed elements: none"]
+        if len(public_tests) > 1 and scenario == "synthetic-mars-mobility-v1" and rover_file == "ares-1.json":
+            assert change_lines[1] == ["Changed elements: strategy: WAYPOINT_RETURN -> EXPOSURE_COVERAGE"]
         if scenario == "synthetic-graph-regression-v1":
             values = [{metric["metric_id"]: metric["value"] for metric in row["metrics"]} for row in results]
             assert values[0]["route_distance_m"] == 120

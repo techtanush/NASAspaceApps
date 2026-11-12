@@ -281,6 +281,13 @@ def test_runtime_rejected_claim_blocks_run_without_passport(runtime, monkeypatch
     assert run["runtime"]["stop_reason"] == "SCIENTIFIC_CLAIM_REJECTED"
     assert run["runtime"]["claim_rejection_issues"] == ["v:injected:POSITIVE_CLAIM_UNSUPPORTED"]
     assert run["passport_id"] is None
+    from analogforge.application.scheduler import WorkflowError
+    from analogforge.domain.state_machine import allowed_actions
+
+    assert "RETRY" not in allowed_actions(run)
+    with pytest.raises(WorkflowError) as refused:
+        engine.apply_action(run["id"], ws, "RETRY", {"dependency_id": "SCIENTIFIC_CLAIM_REJECTED"}, run["revision"])
+    assert refused.value.code == "INVALID_TRANSITION"
     with store.transaction(ws) as tx:
         assert tx.list("passports", {"run_id": run["id"]}) == []
         assert [e["event_type"] for e in tx.list("run_events", {"run_id": run["id"]})][-1] == "run.blocked"

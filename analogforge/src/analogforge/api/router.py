@@ -236,7 +236,10 @@ async def dispatch(request: Request, principal: Principal, operation: dict[str, 
             if "run_id" in filters:
                 uow.require("runs", filters["run_id"])
             if operation_id == "listCritiques":
-                filters["kind"] = "CRITIQUE"
+                # Latest CRITIQUE evidence per issue (each state change is a new immutable record).
+                issues = uow.list("critiques", {k: v for k, v in filters.items() if k in {"run_id", "candidate_id"}})
+                rows = [uow.require("evidence", issue["evidence_id"]) for issue in issues if issue.get("evidence_id")]
+                return JSONResponse(paginated(rows, model, request))
             rows = uow.list(kind, filters)
             if operation_id == "listRovers":
                 rows = [uow.require("rover_revisions", row["latest_revision_id"]) for row in rows]

@@ -43,7 +43,9 @@ def allowed_actions(snapshot: dict[str, Any]) -> frozenset[str]:
     if state in TERMINAL:
         return frozenset({"CANCEL"})
     actions = {"CANCEL"}
-    if state == "BLOCKED":
+    if state == "BLOCKED" and "SCIENTIFIC_CLAIM_REJECTED" not in snapshot.get("blocked_dependencies", []):
+        # A refused claim is deterministic for the frozen snapshot (architecture 33 s2/s6): re-running cannot change
+        # it, so RETRY is not offered; a new accepted revision/run is required.
         actions.add("RETRY")
     if state == "AWAITING_REVIEW":
         actions.update({"SELECT_CANDIDATE", "NOMINATE_CANDIDATE", "BUILD_PORTFOLIO", "SELECT_PORTFOLIO"})

@@ -33,3 +33,16 @@ A trial merge `main + Tanush + Ayan` running Tanush's journeys with `AF_SCIENCE_
 Results:
 * Trial merge with the real science engine: `test_runtime_journey.py` 4/4 and `test_journey_api.py` 6/6 passed. All runs end COMPLETED with audited passports: Mars mobility with ARES-1, PRACTICE-LITE, PRACTICE-NO-ENERGY-MODEL and PRACTICE-SMALL-BATTERY, graph regression and Moon gap.
 * This branch alone (fake doubles, real PostgreSQL): 281 passed / 0 skipped (278 + 3 new); kit verify PASS; ruff and mypy clean; forbidden scan 0; mutation check 20/20; `validate_docs` PASS; ownership PASS.
+
+## Third pass (2026-11-12): real-backend browser journeys against the merged stack
+Aradhya's Playwright journeys driven through this API/worker with the real science engine and real renderer (mocks off) exposed five platform defects; each is fixed by replacing the defective behavior and guarded by a test that fails on the old code:
+
+| Defect | Fix | Guard |
+| --- | --- | --- |
+| `GET /critiques` listed `CRITIQUE` evidence that was never created (critiques lived only in their table), so critic cards never appeared | every opened/resolved critique registers immutable `CRITIQUE` evidence (artifact = `CritiqueIssue` JSON); the row keeps the latest id and the endpoint returns the latest record per issue | `test_journey_api` (one record per issue, BLOCKING/RESOLVED present) |
+| Replan picker summed every `band_area_m2` key; low-slope bands dominated and the candidate switch chose the rolling window `grid-r1c0` instead of B | start-zone area of the availability requirement's own band (architecture 40 §4) | `tests/unit/platform/test_replan_picker.py` (real observed band areas) |
+| Replan changes were stored but absent from the public test record, so the workbench showed "no comparison supplied" | public `VerificationTest.assumptions` carries one `Changed elements: …` line (`none` for attempt 1) | `test_journey_api` |
+| `UNKNOWN`/`GAP` qualification claims with no limitation text made the assurance report violate the frozen schema; the workbench refused the passport (`INVALID_PASSPORT_AUDIT`) | claims fall back to the science explanation, and the audit never emits a non-supported claim without a limitation (unmet gate reasons) | `test_assurance` now validates reports against `scientific-assurance.schema.json` |
+| `RETRY` was offered for `SCIENTIFIC_CLAIM_REJECTED`, re-running an audit that cannot change | not an allowed action for that stop | `test_runtime_rejected_claim_blocks_run_without_passport` |
+
+Results: platform suite 303 passed (kit 20 passed in its own process, as the gate specifies); mutations 20/20; forbidden scan 0; validate_docs PASS; kit verify PASS; ownership PASS. Real-backend browser journeys on the merged stack: J01 and J02 pass end to end (remaining journeys: see the merge report).

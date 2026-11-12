@@ -32,13 +32,15 @@ from analogforge.ports import catalog
 from analogforge.ports.domain_models import (
     AgentAction,
     AgentRoleResult,
+    CritiqueIssue,
     DisplayLayerManifest,
+    EvidenceRecord,
     MissionTestContract,
     PlanetaryTargetProfile,
     RoverProfile,
     ToolReceipt,
 )
-from analogforge.ports.hashing import canonical_sha256
+from analogforge.ports.hashing import canonical_json_bytes, canonical_sha256
 from analogforge.ports.science import (
     EvidenceHandle,
     ScienceCancelled,
@@ -1547,6 +1549,7 @@ class WorkflowEngine:
                 candidates,
                 self._latest_qualifications(workspace_id, run_id),
                 {attempt["candidate_id"] for attempt in tests},
+                mission,
             )
             repair_targets = {
                 "NEW_ROUTE": [test["id"]],
@@ -1632,7 +1635,7 @@ class WorkflowEngine:
                 candidates = self._rows(workspace_id, "candidates", run_id)
                 attempted = {t["candidate_id"] for t in self._rows(workspace_id, "tests", run_id)}
                 eligible = discovery.eligible_replan_candidates(
-                    candidates, self._latest_qualifications(workspace_id, run_id), attempted
+                    candidates, self._latest_qualifications(workspace_id, run_id), attempted, mission
                 )
                 selected_choice = diagnosis.get("selected_candidate_id")
                 if selected_choice is not None and selected_choice not in {candidate["id"] for candidate in eligible}:
@@ -1781,6 +1784,45 @@ class WorkflowEngine:
             publish=publish,
         )
 
+    def _record_critique(self, tx: Any, issue: dict[str, Any], mission: dict[str, Any]) -> dict[str, Any]:
+        """Register the critique's current state as immutable CRITIQUE evidence.
+
+        ``GET /critiques`` returns ``ListEvidenceRecord`` (frozen contract); clients load each record's artifact as a
+        ``CritiqueIssue``. Every state (OPEN, RESOLVED, ...) is a new record; the row keeps the latest evidence id.
+        """
+        from analogforge.application.passports import register_blob
+
+        document = CritiqueIssue.model_validate({name: issue[name] for name in CritiqueIssue.model_fields}).model_dump(
+            mode="json"
+        )
+        blob = self.blobs.put_bytes(canonical_json_bytes(document), "application/json")
+        register_blob(tx, blob)
+        record = EvidenceRecord.model_validate(
+            {
+                **envelope(issue["workspace_id"], issue["run_id"], issue["mode"]),
+                "kind": "CRITIQUE",
+                "artifact_sha256": blob.sha256,
+                "artifact_media_type": "application/json",
+                "source_uri": None,
+                "dataset_product_id": None,
+                "dataset_version": None,
+                "granule_id": None,
+                "license_note": "AnalogForge scientific critic issue",
+                "body": mission["target"]["body"],
+                "aoi": None,
+                "input_evidence_ids": issue["target_evidence_ids"],
+                "parameters_sha256": canonical_sha256(document),
+                "algorithm_id": "scientific-critic",
+                "algorithm_version": "1.0",
+                "native_resolution_m": None,
+                "comparison_scale_m": None,
+                "metrics": [],
+                "limitations": [],
+            }
+        ).model_dump(mode="json")
+        tx.create("evidence", record)
+        return {**issue, "evidence_id": record["id"]}
+
     def _critic(self, run_id: str, workspace_id: str, mission: dict[str, Any], audit: dict[str, Any]) -> bool:
         run, _, _ = self._load(run_id, workspace_id)
         candidates = self._rows(workspace_id, "candidates", run_id)
@@ -1824,6 +1866,7 @@ class WorkflowEngine:
                 "seeded_citation": True,
             }
             with self.store.transaction(workspace_id) as tx:
+                issue = self._record_critique(tx, issue, mission)
                 tx.create("critiques", issue)
                 challenged = next(
                     q
@@ -1901,7 +1944,11 @@ class WorkflowEngine:
                     tx.replace(
                         "critiques",
                         issue["id"],
-                        {**issue, "status": "RESOLVED", "resolution_evidence_ids": correct["evidence_ids"]},
+                        self._record_critique(
+                            tx,
+                            {**issue, "status": "RESOLVED", "resolution_evidence_ids": correct["evidence_ids"]},
+                            mission,
+                        ),
                     )
                     current = tx.require("runs", run_id)
                     current["qualification_ids"] = [
@@ -1938,7 +1985,7 @@ class WorkflowEngine:
                 "resolution_evidence_ids": [],
             }
             with self.store.transaction(workspace_id) as tx:
-                tx.create("critiques", issue)
+                tx.create("critiques", self._record_critique(tx, issue, mission))
         self._role(
             "scientific_critic",
             "review_qualification",

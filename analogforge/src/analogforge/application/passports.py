@@ -510,7 +510,9 @@ def publish_passport(
                 qualification_status=row.status,
                 validation_level=payload.get("adequacy", {}).get("validation_level", "S0"),
                 science_gates=_science_gates(raw, run.get("audit_payload", {}), claim_id),
-                limitations=tuple(row.limitations),
+                # An UNKNOWN/GAP row may carry its reason only in the science explanation; a non-supported claim
+                # must state at least one limitation (scientific-assurance schema).
+                limitations=tuple(row.limitations) or ((row.explanation,) if row.explanation.strip() else ()),
                 nominal_model=row.status in {"PASS", "PARTIAL"} and requirement.evidence_scope == "terrain_model",
             )
         )
