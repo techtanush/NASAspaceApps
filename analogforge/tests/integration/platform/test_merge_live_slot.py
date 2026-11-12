@@ -125,7 +125,14 @@ def test_mock_nasa_drop_binds_to_local_practice_without_entering_live(tmp_path):
     assert bound['allowed_modes'] == ['synthetic']
     assert bound['target_source'] == {'kind': 'LOCAL_DATASET', 'dataset_id': identifiers[0]}
     assert bound['earth_source'] == {'kind': 'LOCAL_DATASET', 'dataset_id': identifiers[1]}
+    assert bound['search_region_set_id'] == 'local-dataset-grid-v1'
     args.scenario_id = 'live-hackathon-v1'
     with pytest.raises(DatasetError, match='Synthetic'):
         _bind(settings, args)
     assert get_scenarios(settings)['live-hackathon-v1']['allowed_modes'] == []
+    args.scenario_id = 'local-dataset-practice-v1'
+    args.target_terrain = None
+    args.earth_terrain = None
+    with pytest.raises(DatasetError) as missing:
+        _bind(settings, args)
+    assert missing.value.code == 'DATASETS_UNBOUND'

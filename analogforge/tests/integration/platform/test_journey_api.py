@@ -234,6 +234,19 @@ def test_full_accepted_contract_to_immutable_passport_and_downloads(
         assert public_run["mission_revision_id"] == accepted["id"]
         results = [get(client, f"/test-results/{result_id}") for result_id in public_run["test_result_ids"]]
         assert [row["outcome"] for row in results] == expected_outcomes
+        if expected_outcomes and expected_outcomes[-1] == "PASS":
+            winning_test = get(client, f"/tests/{results[-1]['test_id']}")
+            final_rows = [
+                get(client, f"/qualifications/{identifier}") for identifier in public_run["qualification_ids"]
+            ]
+            for requirement_id in ("R-EXPOSURE", "R-TASKS", "R-RESERVE"):
+                if requirement_id not in {row["id"] for row in content["requirements"]}:
+                    continue
+                qualified = next(
+                    row for row in final_rows
+                    if row["candidate_id"] == winning_test["candidate_id"] and row["requirement_id"] == requirement_id
+                )
+                assert qualified["status"] == "PASS", qualified
         if rover_file and ("practice-lite" in rover_file or "practice-small" in rover_file):
             # A ROVER diagnosis permits only a new contract; the published result says so (contract never relaxed).
             assert "Permitted repairs: NEW_CONTRACT_REQUIRED" in results[-1]["limitations"]

@@ -66,8 +66,8 @@ def _parser() -> argparse.ArgumentParser:
     show.add_argument("scenario_id")
     bind = scenario_sub.add_parser("bind")
     bind.add_argument("scenario_id")
-    bind.add_argument("--target-terrain", required=True)
-    bind.add_argument("--earth-terrain", required=True)
+    bind.add_argument("--target-terrain")
+    bind.add_argument("--earth-terrain")
     bind.add_argument("--earth-mineral")
     bind.add_argument("--lunar-thermal")
     bind.add_argument("--policy-id")
@@ -140,6 +140,8 @@ def _bind(settings: Settings, args: argparse.Namespace) -> dict[str, Any]:
     if args.scenario_id not in {"live-hackathon-v1", "local-dataset-practice-v1"}:
         raise DatasetError("SCENARIO_BIND_FORBIDDEN", "Only the live and local dataset scenarios are operator-bindable")
     live = args.scenario_id == "live-hackathon-v1"
+    if not (args.target_terrain or args.earth_terrain):
+        raise DatasetError("DATASETS_UNBOUND", "Bind at least one target or Earth terrain product")
     policy_id = args.policy_id or scenario["default_dataset_lock_id"]
     lock = read_lock(settings, policy_id)
     entries = {entry["dataset_id"]: entry for entry in lock["datasets"]}
@@ -178,8 +180,17 @@ def _bind(settings: Settings, args: argparse.Namespace) -> dict[str, Any]:
             )
         if option == "target_terrain" and entry["body"] != scenario["body"]:
             scenario["body"] = entry["body"]
-    scenario["target_source"] = {"kind": "LOCAL_DATASET", "dataset_id": args.target_terrain}
-    scenario["earth_source"] = {"kind": "LOCAL_DATASET", "dataset_id": args.earth_terrain}
+    scenario["target_source"] = (
+        {"kind": "LOCAL_DATASET", "dataset_id": args.target_terrain} if args.target_terrain else None
+    )
+    scenario["earth_source"] = (
+        {"kind": "LOCAL_DATASET", "dataset_id": args.earth_terrain} if args.earth_terrain else None
+    )
+    # The fixed practice recipe describes its declared fixture extent. An operator's
+    # replacement terrain must be screened over that dataset's own bounded extent.
+    scenario["search_region_set_id"] = (
+        "practice-earth-grid-v1" if args.earth_terrain == "practice-earth-grid-v1" else "local-dataset-grid-v1"
+    )
     scenario["additional_sources"] = {
         name: {"kind": "LOCAL_DATASET", "dataset_id": dataset_id}
         for name, dataset_id in requested.items()

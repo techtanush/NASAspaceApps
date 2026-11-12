@@ -30,6 +30,12 @@ test('MRG-03 real persisted attempts, frozen inputs, assurance, artifacts and ex
   expect((await api<S['EarthAnalogCandidate']>(page, `/candidates/${tests[2]!.candidate_id}`)).body.name).toBe('Practice grid-r0c0');
   const outcomes = tests.map(value => persisted.results.find(result => result.test_id === value.id)!.outcome);
   expect(outcomes).toEqual(['FAIL', 'FAIL', 'PASS']);
+  const qualifications = await Promise.all(persisted.snapshot.qualification_ids.map(async id =>
+    (await api<S['QualificationDimension']>(page, `/qualifications/${id}`)).body));
+  for (const requirement of ['R-EXPOSURE', 'R-TASKS', 'R-RESERVE']) {
+    expect(qualifications.find(row => row.candidate_id === tests[2]!.candidate_id && row.requirement_id === requirement)?.status)
+      .toBe('PASS');
+  }
   for (const attempt of tests) {
     expect(attempt.mission_revision_id).toBe(before.mission_revision_id);
     expect(attempt.rover_revision_id).toBe(before.rover_revision_id);

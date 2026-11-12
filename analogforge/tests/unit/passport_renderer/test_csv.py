@@ -81,3 +81,14 @@ def test_thermal_metric_mapping():
 def test_header_matches_the_frozen_plain_column_contract():
     content = create_passport_renderer().render(build_bundle(), [], "csv").content.decode()
     assert content.splitlines()[0] == ",".join(CSV_COLUMNS)
+
+
+def test_csv_preserves_the_matching_assurance_claim_limitations():
+    bundle = build_bundle()
+    claim = bundle.assurance.claims[0]
+    label = "TEST HARNESS — not NASA data"
+    claim.limitations.append(label)
+    rows = [row for row in csv_rows(bundle) if row["requirement_id"] == claim.requirement_id
+            and row["candidate_id"] in {str(identifier) for identifier in claim.candidate_ids}]
+    assert rows
+    assert all(label in row["limitations"] for row in rows)

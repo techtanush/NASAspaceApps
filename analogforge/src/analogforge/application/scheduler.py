@@ -844,12 +844,27 @@ class WorkflowEngine:
         target = self._rows(workspace_id, "target_profiles", run_id)[-1]
         for candidate in candidates:
             summary = (verification_by_candidate or {}).get(candidate["id"])
+            candidate_evidence_ids = list(candidate["evidence_ids"])
+            if summary is not None and summary.test_result_id is not None:
+                # A numeric summary alone cannot establish independently verified qualification.
+                # Bind only the persisted result for this candidate and run into the comparison DAG.
+                with self.store.transaction(workspace_id) as tx:
+                    result = tx.require("test_results", str(summary.test_result_id))
+                    test = tx.require("tests", result["test_id"])
+                    if (
+                        result["run_id"] != run_id or test["run_id"] != run_id
+                        or test["candidate_id"] != candidate["id"]
+                    ):
+                        raise WorkflowError(
+                            "INPUT_INVALID", "Verification evidence belongs to another candidate or run"
+                        )
+                    candidate_evidence_ids = list(dict.fromkeys([*candidate_evidence_ids, *result["evidence_ids"]]))
             for row in mission["requirements"]:
                 inputs = CompareRequirementInput(
                     requirement=row,
                     candidate=discovery.reference(candidate),
                     target_evidence_ids=target["evidence_ids"],
-                    candidate_evidence_ids=candidate["evidence_ids"],
+                    candidate_evidence_ids=candidate_evidence_ids,
                     verification=summary,
                     observable_policy_id=catalog.OBSERVABLE_POLICY_BY_OBSERVABLE.get(
                         row["observable"], "unsupported-observable"
@@ -909,7 +924,7 @@ class WorkflowEngine:
                         rover=_wire(RoverProfile, rover),
                         requirements=mission["requirements"],
                         candidate=discovery.reference(candidate),
-                        candidate_evidence_ids=candidate["evidence_ids"],
+                        candidate_evidence_ids=candidate_evidence_ids,
                         verification=summary,
                     ),
                     run_id,
@@ -964,6 +979,14 @@ class WorkflowEngine:
             )
             for r in self._rows(workspace_id, "test_results", run_id)
         )
+        if not claims:
+            _, mission, _ = self._load(run_id, workspace_id)
+            targets = self._rows(workspace_id, "target_profiles", run_id)
+            evidence_ids = targets[-1]["evidence_ids"] if targets else []
+            claims = [ClaimScope(
+                claim_id="uncovered:" + requirement["id"], claim_type="CONTEXT",
+                requirement_id=requirement["id"], candidate_window_ids=[], evidence_ids=evidence_ids,
+            ) for requirement in mission["requirements"]]
         return claims
 
     def _audit(self, run_id: str, workspace_id: str, job_id: str | None, lease_token: str | None) -> dict[str, Any]:
@@ -1144,6 +1167,23 @@ class WorkflowEngine:
                 },
             )
         if state == "CHARACTERIZING":
+            if scenario["target_source"] is None:
+                # An absent source is a data gap, never a synthetic replacement or a zero-valued measurement.
+                dimensions = sorted({row["dimension"] for row in mission["requirements"]})
+                target = PlanetaryTargetProfile.model_validate({
+                    **envelope(workspace_id, run_id, run["mode"]), "target": mission["target"],
+                    "evidence_ids": [], "metrics": [], "unavailable_dimensions": dimensions,
+                }).model_dump(mode="json")
+                target["payload"] = {"slope_histogram": None, "metrics": [], "unavailable_dimensions": [
+                    {"dimension": dimension, "reason_code": "NO_COVERAGE", "message": "No target terrain is bound."}
+                    for dimension in dimensions
+                ]}
+                with self.store.transaction(workspace_id) as tx:
+                    tx.create("target_profiles", target)
+                    current = tx.require("runs", run_id)
+                    current["target_profile_id"] = target["id"]
+                    tx.replace("runs", run_id, current, current["revision"])
+                return finish("DISCOVERING", runtime={"target_unavailable_reason": "NO_COVERAGE"})
             coverage = self._compute(
                 ResolveCoverageInput(
                     subject_kind="TARGET",
@@ -1210,6 +1250,8 @@ class WorkflowEngine:
             )
             return finish("DISCOVERING")
         if state == "DISCOVERING":
+            if scenario["earth_source"] is None:
+                return finish("BUILDING_PASSPORT", runtime={"stop_reason": "NO_COVERAGE"})
             target = self._rows(workspace_id, "target_profiles", run_id)[-1]
 
             def screen_publish(tx: Any, r: RegisteredResult) -> None:

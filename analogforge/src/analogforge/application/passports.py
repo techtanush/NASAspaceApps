@@ -548,6 +548,20 @@ def publish_passport(
                 limitations=tuple(candidate.limitations),
             )
         )
+    if not claims:
+        # Preserve an empty search as explicit unsupported context, with no invented candidate or positive claim.
+        for requirement in mission.requirements:
+            claim_id = "uncovered:" + requirement.id
+            claims.append(ClaimInput(
+                claim_id=claim_id, claim_type="CONTEXT", requirement_id=requirement.id, candidate_ids=(),
+                scope="source availability; no Earth candidate was qualified", qualification_status="UNKNOWN",
+                evidence_ids=tuple(UUID(identifier) for identifier in target_raw["evidence_ids"]) if target_raw else (),
+                validation_level="S0",
+                science_gates=_science_gates({}, run.get("audit_payload", {}), claim_id),
+                limitations=(
+                    "NO_COVERAGE: no Earth candidate was available; no qualification or verification occurred.",
+                ),
+            ))
     from analogforge.application.assurance import restrict_rehearsal_claim
 
     report = audit(audit_snapshot, [restrict_rehearsal_claim(audit_snapshot, claim) for claim in claims], receipts)

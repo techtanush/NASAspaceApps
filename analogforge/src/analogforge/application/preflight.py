@@ -403,7 +403,7 @@ def run_preflight(
             for name, key in (("target_terrain", "target_source"), ("earth_terrain", "earth_source"))
             if not scenario.get(key)
         ]
-        if missing_slots:
+        if missing_slots and not bound:
             add(
                 "DATASETS",
                 False,
@@ -412,7 +412,10 @@ def run_preflight(
                 "Required dataset slots are unbound: " + ", ".join(missing_slots),
                 "Run analogforge scenario bind",
             )
-        elif bound:
+        if missing_slots and bound:
+            add("DATASETS", True, "PARTIAL_DATASETS", ", ".join(missing_slots),
+                "Partial investigation: missing sources remain UNKNOWN / NO_COVERAGE; no substitute is used")
+        if bound:
             lock_entries = {entry["dataset_id"]: entry for entry in lock["datasets"]} if lock else {}
             missing = sorted(set(bound) - set(lock_entries))
             role_errors = []
@@ -432,7 +435,7 @@ def run_preflight(
                 else "Missing or unusable: " + ", ".join(missing + role_errors),
                 "Validate and lock the bound datasets",
             )
-        else:
+        elif not missing_slots:
             add(
                 "DATASETS",
                 True,

@@ -85,7 +85,9 @@ def create(
             "The selected source-policy lock or its dataset bytes failed validation.",
             409,
         ) from exc
-    selectors = [scenario["target_source"], scenario["earth_source"], *scenario.get("additional_sources", {}).values()]
+    selectors = [s for s in (
+        scenario["target_source"], scenario["earth_source"], *scenario.get("additional_sources", {}).values()
+    ) if s is not None]
     local_ids = [s["dataset_id"] for s in selectors if s["kind"] == "LOCAL_DATASET"]
     fixture_ids = [s["fixture_id"] for s in selectors if s["kind"] == "SYNTHETIC_FIXTURE"]
     locked_ids = {entry["dataset_id"] for entry in lock["datasets"]}

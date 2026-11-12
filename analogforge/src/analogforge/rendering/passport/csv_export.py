@@ -81,7 +81,10 @@ def render_csv(bundle: PassportExportBundle) -> bytes:
                 comparison_scale_m=row.comparison_scale_m if row else None,
                 confidence=row.confidence if row else "UNASSESSED",
                 critic_status=row.critic_status if row else "UNREVIEWED",
-                limitations=" | ".join(row.limitations) if row else "Not assessed",
+                limitations=" | ".join(dict.fromkeys([
+                    *(row.limitations if row else ["Not assessed"]),
+                    *(claim.limitations if claim else []),
+                ])),
                 evidence_ids=" | ".join(str(i) for i in row.evidence_ids) if row else "",
                 verification_outcome=latest.result.outcome if latest else "",
                 assurance_disposition=claim.disposition if claim else "",
