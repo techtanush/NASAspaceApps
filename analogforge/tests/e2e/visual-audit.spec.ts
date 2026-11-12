@@ -4,7 +4,7 @@ import { newMission, startRun, tab, prove,api,fixture } from './support/workbenc
 // The implementation is shared with the command-line audit and imports no application code.
 // @ts-expect-error JavaScript audit module exports are checked by the runtime audit.
 import {auditPage,auditGlyphs,finishAudit,THRESHOLDS,COMPONENTS,reports,installAuditInstrumentation,auditFailures,auditCancellations,waitForAuditData,auditStyleguide,captureStyleguide} from '../../scripts/ui/visual_audit.mjs';
-// Chromium's GPU process reports pixel readbacks (the audit's own C08 glyph raster check) as '[.WebGL-0x…]GL Driver Message …'
+// Chromium's GPU process reports pixel readbacks (the audit's C08 glyph raster check, MapLibre's map canvas) as '[.WebGL-0x…]GL Driver Message …'
 // on GPU-less software GL. These are browser diagnostics, not application console output; DECISIONS.md D-2026-11-12-C12.
 const CHROMIUM_GPU_DIAGNOSTIC=/^\[\.WebGL-0x[0-9a-f]+\]GL Driver Message \(/;
 test('UIX-13 complete visual audit C01–C20',async({page})=>{
