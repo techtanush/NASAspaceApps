@@ -14,9 +14,21 @@ export function useRunStream(runId:string|undefined,snapshot:Snapshot|undefined,
   const workspace=snapshot.workspace_id;
   const deliver=(value:Snapshot)=>{if(active&&online&&mountedRun.current===runId&&value.run_id===runId&&value.workspace_id===workspace)callback.current(value);};
   const load=()=>api.get<Snapshot>(`/runs/${runId}`,{signal:abort.signal});
+  let refreshQueued=false;let refreshGeneration=-1;
+  const refreshSnapshot=()=>{
+   refreshQueued=true;if(refreshGeneration===generation)return;
+   const current=generation;refreshGeneration=current;
+   void(async()=>{
+    try{
+     do{refreshQueued=false;const value=await load();if(current!==generation)return;deliver(value);}
+     while(active&&online&&current===generation&&refreshQueued);
+    }catch{if(active&&online&&current===generation)setConnection('paused');}
+    finally{if(refreshGeneration===current)refreshGeneration=-1;}
+   })();
+  };
   const launch=()=>{
    if(!active||!online)return;
-   controller=new RunStream({runId,workspaceId:workspace,cursor:0,fetchSnapshot:load,onSnapshot:deliver,onConnection:state=>{if(active&&online&&mountedRun.current===runId)setConnection(state);},onEvent:event=>{if(active&&online&&mountedRun.current===runId)eventCallback.current?.(event);void load().then(deliver).catch(()=>{if(active&&online)setConnection('paused');});}});controller.start();
+   controller=new RunStream({runId,workspaceId:workspace,cursor:0,fetchSnapshot:load,onSnapshot:deliver,onConnection:state=>{if(active&&online&&mountedRun.current===runId)setConnection(state);},onEvent:event=>{if(active&&online&&mountedRun.current===runId)eventCallback.current?.(event);refreshSnapshot();}});controller.start();
   };
   const offline=()=>{online=false;generation++;controller?.stop();abort.abort();if(active)setConnection('paused');};
   const reconnect=()=>{

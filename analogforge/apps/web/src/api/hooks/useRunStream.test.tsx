@@ -24,3 +24,18 @@ it('offline pauses and closes the stream; online refetches the snapshot before o
  act(()=>window.dispatchEvent(new Event('offline')));expect(hook.result.current).toBe('paused');expect(stop).toHaveBeenCalledTimes(1);
  await act(async()=>{window.dispatchEvent(new Event('online'));});expect(get).toHaveBeenCalledTimes(1);expect(start).toHaveBeenCalledTimes(2);hook.unmount();
 });
+
+it('coalesces replay bursts while preserving a final refresh after an in-flight snapshot',async()=>{
+ const start=vi.spyOn(RunStream.prototype,'start').mockImplementation(()=>undefined);
+ const pending:Array<(value:Snapshot)=>void>=[];
+ const get=vi.spyOn(api,'get').mockImplementation(()=>new Promise(resolve=>{pending.push(resolve as (value:Snapshot)=>void);}));
+ const receive=vi.fn();const hook=renderHook(()=>useRunStream('a',snapshot('a'),receive));
+ const controller=start.mock.contexts[0] as unknown as {options:{onEvent:()=>void}};
+ act(()=>{for(let i=0;i<25;i++)controller.options.onEvent();});
+ expect(get).toHaveBeenCalledOnce();
+ await act(async()=>{pending[0]!(snapshot('a',2));});
+ await waitFor(()=>expect(get).toHaveBeenCalledTimes(2));
+ await act(async()=>{pending[1]!(snapshot('a',3));});
+ expect(receive).toHaveBeenLastCalledWith(snapshot('a',3));
+ expect(get).toHaveBeenCalledTimes(2);hook.unmount();
+});
