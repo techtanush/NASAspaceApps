@@ -9,6 +9,9 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..');
 const require=createRequire(resolve(root,'apps/web/package.json'));
 const { PNG }=require('pngjs');
 const AxeBuilder=require('@axe-core/playwright').default;
+// Decision D-2026-11-13-GLASS: glass is permitted only on the surfaces listed in the design contract.
+const GLASS=JSON.parse(readFileSync(resolve(root,'apps/web/design/glass-surfaces.json'),'utf8'));
+export const GLASS_PARAMS=Object.freeze({glass:[...GLASS.chrome,...GLASS.panels].join(','),frames:GLASS.frames.join(','),ambient:GLASS.ambient,blurMax:GLASS.limits.blur_px_max,radiusMax:GLASS.limits.radius_px_max});
 export const THRESHOLDS=Object.freeze({minText:12,bodyText:13,contrast:4.5,largeContrast:3,grid:4,cls:0.02,target:24,touchTarget:44,radius:6,glyphIoU:0.85,viewports:[[1920,1080],[1440,900],[1280,800],[1024,768],[768,1024],[390,844]]});
 export const COMPONENTS=['AppShell','AppHeader','ModeBadge','ConnectionIndicator','RevisionBadge','StatusBadge','StatusGlyph','Button','IconButton','Input','NumberInput','Select','Segmented','FileDrop','FormField','Table','MatrixCell','SortHeader','Tabs','Banner','MockBanner','EmptyState','ErrorPanel','Skeleton','Dialog','Drawer','Tooltip','Toast','Popover','CopyHash','Mono','Quantity','Timestamp','Hash','Stepper','Timeline','Histogram','Line','Bar','DataTableToggle','LayerPanel','Legend','ScaleBar','CoordinateReadout','Attribution','KbdHint','VisuallyHidden'];
 const requiredHooks=JSON.parse(readFileSync(resolve(root,'contracts/ui-testids.json'),'utf8')).testids;
@@ -120,7 +123,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
  const screenshot=await page.screenshot();
  const png=PNG.sync.read(screenshot);
- const facts=await page.evaluate(({limits,spacing,width,requiredHooks})=>{
+ const facts=await page.evaluate(({limits,spacing,width,requiredHooks,glass})=>{
   const findings=[]; const text=[]; const all=[...document.querySelectorAll('body *')];
   const visible=e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();
    if(s.display==='none'||s.visibility==='hidden'||s.clipPath==='inset(50%)'||r.width<=0||r.height<=0)return false;
@@ -130,9 +133,13 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
   const paintedRect=e=>{const initial=e.getBoundingClientRect();const box={left:Math.max(0,initial.left),right:Math.min(innerWidth,initial.right),top:Math.max(0,initial.top),bottom:Math.min(innerHeight,initial.bottom)};for(let parent=e.parentElement;parent;parent=parent.parentElement){const style=getComputedStyle(parent),r=parent.getBoundingClientRect();if(/auto|scroll|hidden|clip/.test(style.overflowX)){box.left=Math.max(box.left,r.left+parent.clientLeft);box.right=Math.min(box.right,r.left+parent.clientLeft+parent.clientWidth);}if(/auto|scroll|hidden|clip/.test(style.overflowY)){box.top=Math.max(box.top,r.top+parent.clientTop);box.bottom=Math.min(box.bottom,r.top+parent.clientTop+parent.clientHeight);}}return box;};
   const canvasBounds=[...document.querySelectorAll('[data-testid="earth-map"] canvas,[data-testid="planetary-panel"] svg.planetary-svg')].map(canvas=>({element:canvas,rect:canvas.getBoundingClientRect()}));
   const add=(check,e,message)=>findings.push({check,selector:e.getAttribute('data-testid')||e.id||e.tagName.toLowerCase(),message});
-  const rgb=s=>{const m=s.match(/[\d.]+/g);return m?m.map(Number):[0,0,0,0];};
+  const rgb=s=>{const m=s.match(/[\d.]+/g);if(!m)return[0,0,0,0];const n=m.map(Number);return /^color\(/.test(s.trim())?[...n.slice(0,3).map(v=>v*255),...n.slice(3)]:n;};
   const lum=c=>{const s=c.slice(0,3).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});return .2126*s[0]+.7152*s[1]+.0722*s[2]};
   const ratio=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+  // Glass contract: listed selectors only; shadows must be dark, fall below the element and never glow.
+  const onGlass=e=>e.matches(glass.glass),onFrame=e=>e.matches(glass.frames);
+  const shadowLayers=text=>{const layers=[];let depth=0,current='';for(const ch of text){if(ch==='(')depth++;if(ch===')')depth--;if(ch===','&&depth===0){layers.push(current.trim());current='';}else current+=ch;}if(current.trim())layers.push(current.trim());return layers.map(layer=>{const colour=(layer.match(/(?:rgba?|color)\([^)]*\)/)||[''])[0];const lengths=(layer.replace(colour,'').match(/-?[\d.]+(?=px)/g)||[]).map(Number);return {inset:/\binset\b/.test(layer),colour:rgb(colour),x:lengths[0]||0,y:lengths[1]||0,blur:lengths[2]||0,spread:lengths[3]||0};});};
+  const neutralShadow=text=>shadowLayers(text).every(l=>l.inset?(l.blur===0&&l.spread===0):(l.x===0&&l.y>0&&l.blur>0&&l.spread<=0&&lum(l.colour)<.05));
   // SVG computed font size omits the viewBox transform. Check the rendered label size too.
   for(const label of document.querySelectorAll('[data-testid=route-playback] [data-route-label]')){
    const transform=label.getScreenCTM(),style=getComputedStyle(label),size=parseFloat(style.fontSize)*(transform?Math.hypot(transform.a,transform.b):0);
@@ -153,7 +160,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
     const family=s.fontFamily.split(',')[0].replace(/["']/g,'').trim(); if(!['Inter','Inter Variable','IBM Plex Mono'].includes(family))add('C01',e,`Font ${family}`);
     if(parseFloat(s.fontSize)<limits.minText)add('C02',e,`Text ${s.fontSize}`);
     if(e.matches('td,input,textarea,button')&&parseFloat(s.fontSize)<limits.bodyText)add('C02',e,`Body text ${s.fontSize}`);
-    let parent=e,bg=[0,0,0,0]; while(parent){const c=rgb(getComputedStyle(parent).backgroundColor); if(c.length<4||c[3]===1){bg=c;break;}parent=parent.parentElement;}
+    let parent=e,bg=[0,0,0,0],glassBacked=false; while(parent){if(onGlass(parent)||parent.matches(glass.ambient))glassBacked=true;const c=rgb(getComputedStyle(parent).backgroundColor); if(c.length<4||c[3]===1){bg=c;break;}parent=parent.parentElement;}
     const fg=rgb(s.color); const min=parseFloat(s.fontSize)>=24||(parseFloat(s.fontSize)>=18.66&&Number(s.fontWeight)>=700)?limits.largeContrast:limits.contrast;
     if(bg[3]!==0&&ratio(fg,bg)<min-.01)add('C03',e,`Contrast ${ratio(fg,bg).toFixed(2)} < ${min}`);
     for(const node of nodes){const range=document.createRange();range.selectNodeContents(node);const box=range.getBoundingClientRect();
@@ -161,7 +168,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
      // not against canvas pixels behind it or adjacent inline glyphs.
      const painted=paintedRect(e);
      const overCanvas=box.left>=painted.left&&box.right<=painted.right&&box.top>=painted.top&&box.bottom<=painted.bottom&&canvasBounds.some(({element,rect:c})=>parent?.contains(element)&&box.left>=c.left&&box.right<=c.right&&box.top>=c.top&&box.bottom<=c.bottom);
-     text.push({x:box.x,y:box.y,w:box.width,h:box.height,fg,min,text:node.textContent,selector:e.getAttribute('data-testid')||e.tagName.toLowerCase(),overCanvas});
+     text.push({x:box.x,y:box.y,w:box.width,h:box.height,fg,min,text:node.textContent,selector:e.getAttribute('data-testid')||e.tagName.toLowerCase(),overCanvas,onGlass:glassBacked&&!overCanvas});
     }
     if(/\b(NaN|undefined|null|\[object Object\])\b/.test(nodes.map(n=>n.textContent).join(' ')))add('C09',e,'Invalid rendered value');
     if(e instanceof SVGTextElement){
@@ -181,10 +188,11 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
     if(r.width<min-.5||r.height<min-.5)add('C06',e,`Target ${r.width.toFixed(1)}×${r.height.toFixed(1)} < ${min}`);
    }
    if(e.matches('td,[data-numeric]')&&/^[-+−]?[\d,.]+(?:\s*[%a-zA-Z/°]+)?$/.test(e.textContent.trim())){if(s.textAlign!=='right'||!s.fontVariantNumeric.includes('tabular-nums'))add('C09',e,'Numeric cell lacks alignment/tabular figures');}
-   if(s.backgroundImage.includes('gradient')&&e.dataset.allowed!=='scientific-ramp')add('C10',e,'Gradient');
-   if(s.backdropFilter!=='none'||s.textShadow!=='none')add('C10',e,'Backdrop or text shadow');
-   if(s.boxShadow!=='none'&&!e.closest('[role=dialog],[data-overlay], [data-testid=evidence-drawer]'))add('C10',e,'Unexpected shadow');
-   for(const prop of ['borderTopLeftRadius','borderTopRightRadius','borderBottomLeftRadius','borderBottomRightRadius'])if(parseFloat(s[prop])>limits.radius&&!(r.width<=12&&r.height<=12&&s[prop].includes('%')))add('C10',e,`${prop}=${s[prop]}`);
+   if(s.backgroundImage.includes('gradient')&&e.dataset.allowed!=='scientific-ramp'){const ambient=e.matches(glass.ambient)&&e.dataset.allowed==='ambient-canvas'&&e.getAttribute('aria-hidden')==='true'&&s.position==='fixed'&&s.pointerEvents==='none'&&!/linear-gradient|conic-gradient/.test(s.backgroundImage)&&document.querySelectorAll(glass.ambient).length===1;if(!ambient)add('C10',e,'Gradient');}
+   if(s.textShadow!=='none')add('C10',e,'Text shadow');
+   if(s.backdropFilter!=='none'){const blur=parseFloat((s.backdropFilter.match(/blur\(([\d.]+)px\)/)||[])[1]);const foreign=s.backdropFilter.replace(/blur\([^)]*\)|saturate\([^)]*\)/g,'').trim();if(!onGlass(e)||onFrame(e)||!(blur<=glass.blurMax)||foreign)add('C10',e,'Backdrop outside the glass contract: '+s.backdropFilter);}
+   if(s.boxShadow!=='none'&&!e.closest('[role=dialog],[data-overlay], [data-testid=evidence-drawer]')&&!((onGlass(e)||onFrame(e))&&neutralShadow(s.boxShadow)))add('C10',e,'Unexpected shadow');
+   for(const prop of ['borderTopLeftRadius','borderTopRightRadius','borderBottomLeftRadius','borderBottomRightRadius'])if(parseFloat(s[prop])>limits.radius&&!(r.width<=12&&r.height<=12&&s[prop].includes('%'))&&!((onGlass(e)||onFrame(e))&&parseFloat(s[prop])<=glass.radiusMax))add('C10',e,`${prop}=${s[prop]}`);
    if(/[\u{1f300}-\u{1faff}]/u.test((nodes.map(n=>n.textContent).join(' '))+['alt','title','aria-label'].map(a=>e.getAttribute(a)||'').join(' ')))add('C10',e,'Emoji');
    if(/lorem ipsum|todo|coming soon|!+\s*$/i.test(nodes.map(n=>n.textContent).join(' ')))add('C10',e,'Unfinished or promotional copy');
   }
@@ -213,8 +221,28 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
   for(const large of document.querySelectorAll('[data-size=xl]'))if(large.getAttribute('data-testid')!=='btn-prove-it')add('C13',large,'Only PROVE IT may be xl');
   const faces=[...document.fonts].filter(f=>f.status==='loaded').map(f=>f.family);if(!faces.some(f=>f.includes('Inter'))||!faces.some(f=>f.includes('Plex')))add('C01',document.body,'Self-hosted fonts not loaded');
   return {findings,text,spacing,cls:window.__auditCLS||0,layoutShifts:window.__auditShifts||[]};
- },{limits:THRESHOLDS,spacing,width,requiredHooks});
+ },{limits:THRESHOLDS,spacing,width,requiredHooks,glass:GLASS_PARAMS});
  const findings=[...facts.findings];
+ // Text backed by translucent glass is measured against the painted background itself: a second frame with every
+ // glyph transparent shows what lies behind the text (blur, tint, ambient light), free of neighbouring glyphs.
+ const glassTexts=facts.text.filter(t=>t.onGlass&&t.w>0&&t.h>0);
+ if(glassTexts.length){
+  const hide=await page.addStyleTag({content:'*,*::before,*::after{color:transparent!important;-webkit-text-fill-color:transparent!important;caret-color:transparent!important;text-shadow:none!important}svg text{fill:transparent!important;stroke:none!important}'});
+  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+  const bare=PNG.sync.read(await page.screenshot());
+  await hide.evaluate(node=>node.remove());
+  const light=c=>c.slice(0,3).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+  for(const t of glassTexts){
+   let worst=Infinity,worstSample=null,worstBackground=null;
+   for(let i=0;i<5;i++)for(let j=0;j<3;j++){
+    const x=Math.floor(t.x+(t.w-1)*(i/4)),y=Math.floor(t.y+(t.h-1)*(j===0?.25:j===1?.5:.75));
+    if(x<0||y<0||x>=bare.width||y>=bare.height)continue;
+    const p=(y*bare.width+x)*4,bg=[...bare.data.subarray(p,p+3)],a=light(t.fg),b=light(bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+    if(ratio<worst){worst=ratio;worstSample=[x,y];worstBackground=bg;}
+   }
+   if(worst<t.min-.01)findings.push({check:'C03',selector:t.selector,message:`Glass contrast ${worst.toFixed(2)} < ${t.min}`,text:t.text,box:[t.x,t.y,t.w,t.h],sample:worstSample,background:worstBackground});
+  }
+ }
  // Canvas-overlay contrast uses screenshot pixels in a four-pixel ring around the text box.
  for(const t of facts.text.filter(t=>t.overCanvas)){
   const samples=[[t.x-4,t.y+t.h/2],[t.x+t.w+4,t.y+t.h/2],[t.x+t.w/2,t.y-4],[t.x+t.w/2,t.y+t.h+4]];

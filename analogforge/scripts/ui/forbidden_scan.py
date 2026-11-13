@@ -48,6 +48,134 @@ PURE_IMPORTS = {
 }
 
 
+GLASS_CSS = "apps/web/src/styles/glass.css"
+GLASS_CONTRACT = "apps/web/design/glass-surfaces.json"
+ELEVATION_INK = {"var(--glass-ink)"}
+COLOURED_SHADOW_TOKENS = ("--accent", "--state-", "--focus", "--ambient", "--on-accent", "--glass-tint")
+
+
+def _css_rules(css: str) -> list[tuple[str, list[tuple[str, str]]]]:
+    """Flat (selector, declarations) pairs; at-rule wrappers are transparent."""
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    rules = []
+    for match in re.finditer(r"([^{}]+)\{([^{}]*)\}", css):
+        declarations = []
+        for part in match.group(2).split(";"):
+            if ":" in part:
+                name, value = part.split(":", 1)
+                declarations.append((name.strip().lower(), " ".join(value.split())))
+        rules.append((" ".join(match.group(1).split()), declarations))
+    return rules
+
+
+def _layers(value: str) -> list[str]:
+    layers, depth, current = [], 0, ""
+    for char in value:
+        depth += char == "("
+        depth -= char == ")"
+        if char == "," and depth == 0:
+            layers.append(current.strip())
+            current = ""
+        else:
+            current += char
+    return [layer for layer in [*layers, current.strip()] if layer]
+
+
+def _last_compound_classes(selector: str) -> set[str]:
+    last = re.split(r"\s*[>+~]\s*|\s+", selector.strip())[-1]
+    return set(re.findall(r"\.[A-Za-z][\w-]*", last))
+
+
+def scan_glass_stylesheet(css: str, contract: dict[str, object]) -> list[dict[str, object]]:
+    """Validate glass.css against design/glass-surfaces.json.
+
+    glass.css is the only file exempt from the decorative-effect and large-radius rules, so it is held to a stricter,
+    structural contract: bounded blur, radial gradients on the ambient element only, listed surfaces only, dark
+    below-the-element elevation shadows (no halos, no coloured shadows), token-derived colours and four fallbacks.
+    """
+    findings: list[dict[str, object]] = []
+
+    def add(rule: str, detail: str, selector: str = "") -> None:
+        findings.append({"path": GLASS_CSS, "rule": rule, "detail": detail, "selector": selector})
+
+    chrome, panels = set(contract["chrome"]), set(contract["panels"])  # type: ignore[call-overload]
+    frames, ambient = set(contract["frames"]), str(contract["ambient"])  # type: ignore[call-overload]
+    limits = contract["limits"]  # type: ignore[assignment]
+    glass = chrome | panels
+    rules = _css_rules(css)
+    properties = {name: value for _, decls in rules for name, value in decls if name.startswith("--")}
+
+    def resolve(value: str, depth: int = 0) -> str:
+        if depth > 6:
+            return value
+        return re.sub(r"var\((--[\w-]+)\)", lambda m: resolve(properties.get(m[1], m[0]), depth + 1), value)
+
+    for selector, declarations in rules:
+        selectors = [part.strip() for part in selector.split(",") if part.strip()]
+        for name, raw in declarations:
+            value = resolve(raw)
+            if name in {"backdrop-filter", "-webkit-backdrop-filter"} and value.strip() != "none":
+                for part in selectors:
+                    classes = _last_compound_classes(part)
+                    if not classes & glass:
+                        add("glass-unlisted-surface", "backdrop-filter outside chrome and panels", part)
+                    if classes & frames and not classes & glass:
+                        add("glass-blurred-data-frame", "data frames must stay opaque", part)
+                blurs = [float(number) for number in re.findall(r"blur\(\s*([\d.]+)px\s*\)", value)]
+                if not blurs or max(blurs) > float(limits["blur_px_max"]):  # type: ignore[index]
+                    add("glass-blur-unbounded", value, selector)
+                if re.sub(r"blur\([^)]*\)|saturate\(\s*(?:1(?:\.[0-6]\d*)?)\s*\)", "", value).strip():
+                    add("glass-filter-function", value, selector)
+            if "gradient" in value:
+                if re.findall(r"([\w-]*gradient)\(", value) != ["radial-gradient"] * len(re.findall(r"gradient\(", value)):
+                    add("glass-gradient-kind", "only radial gradients are permitted", selector)
+                if selectors != [ambient]:
+                    add("glass-gradient-outside-ambient", "gradients belong to the ambient element only", selector)
+            if name.endswith("radius"):
+                sizes = [float(number) for number in re.findall(r"([\d.]+)px", value)]
+                if sizes and max(sizes) > float(limits["radius_px_max"]):  # type: ignore[index]
+                    add("glass-radius-too-large", value, selector)
+                if sizes and max(sizes) > 6:
+                    for part in selectors:
+                        if not _last_compound_classes(part) & (glass | frames):
+                            add("glass-radius-unlisted", "radius above 6 px outside listed surfaces", part)
+            if name == "box-shadow" or name.startswith("--glass-shadow"):
+                # Checked on the raw value: a layer that is only var(--x) is validated where --x is defined.
+                if any(token in raw for token in COLOURED_SHADOW_TOKENS):
+                    add("glass-coloured-shadow", raw, selector)
+                for layer in _layers(raw):
+                    if layer == "none" or re.fullmatch(r"var\(--[\w-]+\)", layer):
+                        continue
+                    head = re.split(r"color-mix|var\(|#|rgb|hsl", layer)[0]
+                    lengths = [float(number) for number in re.findall(r"-?\d*\.?\d+(?=px|\s|$)", head)]
+                    lengths += [0.0] * (4 - len(lengths))
+                    x, y, blur, spread = lengths[:4]
+                    if "inset" in layer:
+                        if blur > float(limits["inset_highlight_blur_px_max"]):  # type: ignore[index]
+                            add("glass-inset-halo", layer, selector)
+                    elif not (x == 0 and y > 0 and blur > 0 and spread <= 0):
+                        add("glass-shadow-halo", f"outer shadows fall below the element: {layer}", selector)
+                    elif "var(--glass-ink)" not in layer:
+                        add("glass-shadow-ink", f"outer shadows use --glass-ink: {layer}", selector)
+    ambient_declared: dict[str, str] = {}
+    for selector, declarations in rules:
+        if [part.strip() for part in selector.split(",")] == [ambient]:
+            ambient_declared.update(dict(declarations))
+    if ambient_declared.get("position") != "fixed" or ambient_declared.get("pointer-events") != "none":
+        add("glass-ambient-interactive", "ambient layer must be fixed and non-interactive", ambient)
+    if not ambient_declared.get("z-index", "0").startswith("-"):
+        add("glass-ambient-layering", "ambient layer must sit behind content", ambient)
+    for ink in ("--glass-ink",):
+        for selector, declarations in rules:
+            for name, value in declarations:
+                if name == ink and value not in {"var(--canvas)", "var(--text-primary)"}:
+                    add("glass-shadow-ink", f"{ink} must derive from a neutral token", selector)
+    for fallback in contract["required_fallbacks"]:  # type: ignore[attr-defined]
+        if fallback not in css:
+            add("glass-missing-fallback", str(fallback))
+    return findings
+
+
 def scan(root: Path = ROOT) -> list[dict[str, object]]:
     findings: list[dict[str, object]] = []
     paths = (
@@ -90,7 +218,16 @@ def scan(root: Path = ROOT) -> list[dict[str, object]]:
                             "rule": "color-outside-tokens",
                         }
                     )
-            if re.search(r"(?:linear|radial|conic)-gradient|backdrop-filter|text-shadow:\s*(?!none)[^;]+", content):
+            is_glass = relative == GLASS_CSS
+            if is_glass:
+                contract_path = root / GLASS_CONTRACT
+                if not contract_path.is_file():
+                    findings.append({"path": relative, "rule": "glass-contract-missing"})
+                else:
+                    findings.extend(scan_glass_stylesheet(content, json.loads(contract_path.read_text())))
+                if re.search(r"text-shadow:\s*(?!none)[^;]+", content):
+                    findings.append({"path": relative, "rule": "decorative-effect"})
+            elif re.search(r"(?:linear|radial|conic)-gradient|backdrop-filter|text-shadow:\s*(?!none)[^;]+", content):
                 findings.append({"path": relative, "rule": "decorative-effect"})
             if re.search(r"Lorem ipsum|Coming soon", content, re.IGNORECASE):
                 findings.append({"path": relative, "rule": "unfinished-copy"})
@@ -101,7 +238,7 @@ def scan(root: Path = ROOT) -> list[dict[str, object]]:
                 if "/format/time." not in relative and re.search(r"Math\.random|Date\.now|new Date\(\)", content):
                     findings.append({"path": relative, "rule": "nondeterministic-display"})
             for radius in re.finditer(r"border(?:-[a-z]+)*-radius\s*:\s*(\d+(?:\.\d+)?)px", content):
-                if float(radius[1]) > 6:
+                if float(radius[1]) > 6 and not is_glass:
                     findings.append({"path": relative, "rule": "large-radius"})
             if re.search(r"[\U0001f300-\U0001faff]", content):
                 findings.append({"path": relative, "rule": "emoji"})
