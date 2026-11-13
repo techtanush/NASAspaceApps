@@ -2,7 +2,7 @@ import {describe,expect,it,vi} from 'vitest';
 import type {components} from '../generated/schema';
 import seed from '../mock/fixtures/seed.json';
 import {candidateCameraBounds} from '../maps/EarthMap';
-vi.mock('maplibre-gl',()=>({default:{}}));
+vi.mock('maplibre-gl',()=>({setWorkerUrl:vi.fn()})); // EarthMap registers the worker asset when it loads; the pure camera maths needs no map
 type Candidate=components['schemas']['EarthAnalogCandidate'];
 describe('Earth camera displays the server extents',()=>{
  it('fits small candidate windows instead of a continent-scale default',()=>{const template=seed.candidates[0] as Candidate;const west={...template,aoi:{...template.aoi,bbox:[-111,35,-110.97,35.03]}};const east={...template,aoi:{...template.aoi,bbox:[-110.8,35,-110.77,35.03]}};expect(candidateCameraBounds([west,east])).toEqual([[-111,35],[-110.77,35.03]]);expect(candidateCameraBounds([east])).toEqual([[-110.8,35],[-110.77,35.03]]);});
