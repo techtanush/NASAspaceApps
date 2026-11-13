@@ -66,6 +66,9 @@ class Settings(BaseSettings):
     compose_project_name: str = "af-integration"
     profile: str = "integration"
     scenario_default: str = "synthetic-mars-mobility-v1"
+    # Interactive API docs (/docs, /redoc, /openapi.json) are off by default: Swagger UI loads its scripts from a CDN.
+    # Set ANALOGFORGE_API_DOCS=1 to enable them. (.env.example is a frozen kit file and cannot list this switch.)
+    api_docs: bool = Field(default=False, validation_alias="ANALOGFORGE_API_DOCS")
     test_hooks: bool = Field(default=False, validation_alias="ANALOGFORGE_TEST_HOOKS")
     operator_limits_json: str | None = Field(default=None, validation_alias="ANALOGFORGE_OPERATOR_LIMITS_JSON")
     fake_openai_url: str | None = Field(default=None, repr=False, validation_alias="ANALOGFORGE_FAKE_OPENAI_URL")
@@ -152,6 +155,7 @@ class Settings(BaseSettings):
             "openai_api_key",
             "earthdata_token",
             "operator_limits_json",
+            "api_docs",
             "fake_openai_url",
             "map_tile_url",
         }

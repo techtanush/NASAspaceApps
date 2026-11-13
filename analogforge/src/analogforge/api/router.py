@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
+from datetime import datetime
 from typing import Annotated, Any
 from uuid import UUID
 
@@ -15,7 +16,7 @@ from jsonschema import ValidationError
 from analogforge.api.contracts import public_document, specification, validate
 from analogforge.api.dependencies import Principal, get_principal, runtime
 from analogforge.api.errors import ApiError
-from analogforge.api.security import read_bounded_json_body
+from analogforge.api.security import MAX_JSON_DEPTH, json_nesting_depth, read_bounded_json_body
 from analogforge.api.sse import stream
 from analogforge.application import missions, rovers, runs
 from analogforge.jobs.events import event_cursor
@@ -31,6 +32,18 @@ LISTS = {
     "listAgentActions": ("agent_actions", "AgentAction"),
     "listCritiques": ("evidence", "EvidenceRecord"),
     "listDisplayLayers": ("display_layers", "DisplayLayerManifest"),
+}
+#: Stored-only payload keys that no public model exposes (a run row alone stores about 350 kB, a passport 1.7 MB, of
+#: which the public document is a few kilobytes). Public reads and lists drop them in PostgreSQL so that a request
+#: never fetches, parses and discards megabytes. test_listing_efficiency proves none of these is a public property.
+INTERNAL_PAYLOAD_KEYS: dict[str, tuple[str, ...]] = {
+    "runs": ("runtime", "audit_payload"),
+    "passports": ("bundle",),
+    "qualifications": ("payload",),
+    "candidates": ("analysis_payload",),
+    "target_profiles": ("payload",),
+    "test_results": ("payload",),
+    "tests": ("constraints", "search_payload", "requirement_mapping", "unverified_requirement_ids"),
 }
 READS = {
     "getMission": ("missions", "MissionHeader"),
@@ -89,18 +102,35 @@ def job_public(document: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def paginated(rows: list[dict[str, Any]], model: str, request: Request) -> dict[str, Any]:
-    rows = sorted(rows, key=lambda row: (row.get("created_at", ""), row["id"]))
+def decode_cursor(request: Request) -> tuple[str, str] | None:
+    """The keyset position ``(created_at, id)`` of a list cursor, or None for the first page."""
     cursor = request.query_params.get("cursor")
-    if cursor:
-        try:
-            value = json.loads(base64.urlsafe_b64decode(cursor.encode()))
-            if value["workspace"] != request.state.workspace_id:
-                raise ValueError("cursor scope")
-            rows = [row for row in rows if (row.get("created_at", ""), row["id"]) > tuple(value["after"])]
-        except (ValueError, KeyError, TypeError) as exc:
-            raise ApiError("INPUT_INVALID", "The list cursor is invalid for this workspace.") from exc
-    limit = int(request.query_params.get("limit", "25"))
+    if not cursor:
+        return None
+    try:
+        decoded = base64.urlsafe_b64decode(cursor.encode())
+        if json_nesting_depth(decoded, 8) > 8:  # a cursor is {"workspace": id, "after": [created_at, id]}
+            raise ValueError("cursor structure")
+        value = json.loads(decoded)
+        if value["workspace"] != request.state.workspace_id:
+            raise ValueError("cursor scope")
+        created_at, row_id = value["after"]
+        if not isinstance(created_at, str) or not isinstance(row_id, str):
+            raise TypeError("cursor position")
+        datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+        UUID(row_id)
+        return created_at, row_id
+    except (ValueError, KeyError, TypeError, RecursionError) as exc:
+        raise ApiError("INPUT_INVALID", "The list cursor is invalid for this workspace.") from exc
+
+
+def page_limit(request: Request) -> int:
+    return int(request.query_params.get("limit", "25"))
+
+
+def page_response(rows: list[dict[str, Any]], model: str, request: Request) -> dict[str, Any]:
+    """One page from rows already ordered and positioned after the cursor; ``rows`` holds up to limit + 1 entries."""
+    limit = page_limit(request)
     page = rows[:limit]
     next_cursor = None
     if len(rows) > limit and page:
@@ -111,6 +141,15 @@ def paginated(rows: list[dict[str, Any]], model: str, request: Request) -> dict[
             ).encode()
         ).decode()
     return {"items": [public_document(row, model) for row in page], "next_cursor": next_cursor}
+
+
+def paginated(rows: list[dict[str, Any]], model: str, request: Request) -> dict[str, Any]:
+    """Paginate rows assembled in Python (lists that map to other records); SQL-backed lists page in the store."""
+    rows = sorted(rows, key=lambda row: (row.get("created_at", ""), row["id"]))
+    after = decode_cursor(request)
+    if after is not None:
+        rows = [row for row in rows if (row.get("created_at", ""), row["id"]) > after]
+    return page_response(rows, model, request)
 
 
 def mutate(
@@ -197,11 +236,13 @@ async def dispatch(request: Request, principal: Principal, operation: dict[str, 
         try:
             UUID(key)
             raw = await read_bounded_json_body(request)
+            if json_nesting_depth(raw, MAX_JSON_DEPTH) > MAX_JSON_DEPTH:
+                raise ValueError("request body nesting")
             body = json.loads(raw)
             canonical_sha256(body)
             body_schema = operation["requestBody"]["content"]["application/json"]["schema"]
             validate(body, body_schema)
-        except (ValueError, ValidationError) as exc:
+        except (ValueError, ValidationError, RecursionError) as exc:
             raise ApiError("INPUT_INVALID", "The request body does not satisfy the public contract.") from exc
         with rt.store.transaction(principal.workspace_id) as uow:
             previous = uow.idempotency_begin(
@@ -215,7 +256,7 @@ async def dispatch(request: Request, principal: Principal, operation: dict[str, 
     with rt.store.transaction(principal.workspace_id) as uow:
         if operation_id in READS:
             kind, model = READS[operation_id]
-            record = uow.require(kind, request.path_params["id"])
+            record = uow.require(kind, request.path_params["id"], exclude=INTERNAL_PAYLOAD_KEYS.get(kind, ()))
             if kind == "mission_revisions":
                 record = missions.accepted_contract(uow, record["id"])
             return JSONResponse(public_document(record, model))
@@ -240,12 +281,21 @@ async def dispatch(request: Request, principal: Principal, operation: dict[str, 
                 issues = uow.list("critiques", {k: v for k, v in filters.items() if k in {"run_id", "candidate_id"}})
                 rows = [uow.require("evidence", issue["evidence_id"]) for issue in issues if issue.get("evidence_id")]
                 return JSONResponse(paginated(rows, model, request))
-            rows = uow.list(kind, filters)
-            if operation_id == "listRovers":
-                rows = [uow.require("rover_revisions", row["latest_revision_id"]) for row in rows]
-            if operation_id == "listDisplayLayers":
+            if operation_id in {"listRovers", "listDisplayLayers"}:
+                rows = uow.list(kind, filters)
+                if operation_id == "listRovers":
+                    rows = [uow.require("rover_revisions", row["latest_revision_id"]) for row in rows]
+                    return JSONResponse(paginated(rows, model, request))
                 return JSONResponse({"items": [public_document(row, model) for row in rows], "next_cursor": None})
-            return JSONResponse(paginated(rows, model, request))
+            # One extra row tells page_response whether another page exists; the store pages and trims in SQL.
+            rows = uow.list(
+                kind,
+                filters,
+                exclude=INTERNAL_PAYLOAD_KEYS.get(kind, ()),
+                after=decode_cursor(request),
+                limit=page_limit(request) + 1,
+            )
+            return JSONResponse(page_response(rows, model, request))
         if operation_id == "getCompatibility":
             run_id = request.query_params["run_id"]
             run = uow.require("runs", run_id)

@@ -230,7 +230,7 @@ def test_water_mask_registration_is_checked_before_science(tmp_path: Path) -> No
     manifest = yaml.safe_load((root / "manifest.yaml").read_text())
     mask_file = next(item for item in manifest["files"] if item["role"] == "MASK")
     with rasterio.open(root / mask_file["path"], "r+") as source:
-        source.transform = source.transform * rasterio.Affine.translation(1, 0)
+        source.transform = source.transform @ rasterio.Affine.translation(1, 0)
     mask_file["sha256"] = None
     result, _ = run(
         create_science_service(), IngestLocalDatasetInput(manifest=manifest), ctx, datasets=[dataset]

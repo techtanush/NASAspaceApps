@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Iterator, Mapping
+from collections.abc import Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -13,7 +13,8 @@ from uuid import UUID, uuid4
 import sqlalchemy as sa
 from alembic import command
 from alembic.config import Config
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.dialects import postgresql
+from sqlalchemy.dialects.postgresql import JSONB, insert
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from analogforge.db.rls import configure_workspace
@@ -75,6 +76,14 @@ def _table(kind: str) -> sa.Table:
     return TABLES[ALIASES.get(kind, kind)]
 
 
+def _payload(table: sa.Table, exclude: Sequence[str]) -> sa.ColumnElement[Any]:
+    """The stored document, minus ``exclude`` keys removed by PostgreSQL (jsonb ``- text[]``)."""
+    if not exclude:
+        return table.c.document_json
+    keys = sa.cast(postgresql.array(list(exclude)), postgresql.ARRAY(sa.Text))
+    return table.c.document_json.op("-", return_type=JSONB)(keys)
+
+
 def _columns(table: sa.Table, doc: dict[str, Any]) -> dict[str, Any]:
     values: dict[str, Any] = {"document_json": doc}
     for col in table.c:
@@ -93,9 +102,11 @@ class UnitOfWork:
         self.connection = connection
         self.workspace_id = str(UUID(str(workspace_id)))
 
-    def get(self, kind: str, entity_id: str | UUID, *, lock: bool = False) -> dict[str, Any] | None:
+    def get(
+        self, kind: str, entity_id: str | UUID, *, lock: bool = False, exclude: Sequence[str] = ()
+    ) -> dict[str, Any] | None:
         table = _table(kind)
-        query = sa.select(table.c.document_json).where(
+        query = sa.select(_payload(table, exclude)).where(
             table.c.workspace_id == self.workspace_id, table.c.id == str(entity_id)
         )
         if lock:
@@ -103,15 +114,30 @@ class UnitOfWork:
         result = self.connection.execute(query).scalar_one_or_none()
         return document(result) if result is not None else None
 
-    def require(self, kind: str, entity_id: str | UUID, *, lock: bool = False) -> dict[str, Any]:
-        result = self.get(kind, entity_id, lock=lock)
+    def require(
+        self, kind: str, entity_id: str | UUID, *, lock: bool = False, exclude: Sequence[str] = ()
+    ) -> dict[str, Any]:
+        result = self.get(kind, entity_id, lock=lock, exclude=exclude)
         if result is None:
             raise NotFound()
         return result
 
-    def list(self, kind: str, filters: Mapping[str, Any] | None = None) -> list[dict[str, Any]]:
+    def list(
+        self,
+        kind: str,
+        filters: Mapping[str, Any] | None = None,
+        *,
+        exclude: Sequence[str] = (),
+        after: tuple[str, str] | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Rows of one kind in (created_at, id) order.
+
+        ``exclude`` drops stored-only payload keys inside PostgreSQL, ``after`` is a keyset position
+        ``(created_at, id)`` and ``limit`` bounds the page, so a page never loads more than it returns.
+        """
         table = _table(kind)
-        query = sa.select(table.c.document_json).where(table.c.workspace_id == self.workspace_id)
+        query = sa.select(_payload(table, exclude)).where(table.c.workspace_id == self.workspace_id)
         for name, value in (filters or {}).items():
             if name in table.c:
                 query = query.where(
@@ -123,7 +149,15 @@ class UnitOfWork:
                 )
             else:
                 query = query.where(table.c.document_json[name].astext == str(value))
+        if after is not None:
+            moment = datetime.fromisoformat(after[0].replace("Z", "+00:00"))
+            query = query.where(
+                sa.tuple_(table.c.created_at, table.c.id)
+                > sa.tuple_(sa.literal(moment, table.c.created_at.type), sa.literal(UUID(after[1]), table.c.id.type))
+            )
         query = query.order_by(table.c.created_at, table.c.id)
+        if limit is not None:
+            query = query.limit(limit)
         return [document(row) for row in self.connection.execute(query).scalars()]
 
     def create(self, kind: str, value: Mapping[str, Any] | Any) -> dict[str, Any]:

@@ -47,3 +47,9 @@ Aradhya's Playwright journeys run with mocks off against Tanush's API/worker and
 | The accepted-requirement `ASSUMPTION` record shared the `compare-requirement` id (and the verifier's accepted-energy record shared `verify-route`), so the matrix loaded the requirement JSON and showed every stage as PENDING | own sub-algorithm ids `accepted-requirement-record` / `accepted-energy-assumption` (added to the algorithm lock); the audit reads requirements from the new id | `test_catalog_algorithm_ids_always_point_at_the_operation_payload` (fails on the old code) |
 
 Gates after the change: 1008 passed / 0 skipped, mutations 16/16, ruff + strict mypy clean, forbidden scan 0, ownership PASS.
+
+## 5. Fourth pass (2026-11-13): deprecations in the merged release candidate
+The warning sweep of the 1,124-test science and renderer run found two in our own code (the rest are third-party `pvl` internals and a pytest-asyncio setting in the frozen `pyproject.toml`):
+
+* `adapters/pds/pds4.py` chose the array with `find_one(root, "Array_2D_Image") or find_one(root, "Array_2D")`. An XML element's truth value means "has child elements", not "exists", and Python is deprecating that behaviour. An empty `Array_2D_Image` was therefore silently skipped in favour of a different array. It now tests for presence explicitly, so an empty image array is a malformed label (`UNSUPPORTED_FORMAT`) and a populated one is preferred over a generic array. Guarded by `TestPds4` (the first test fails on the old code).
+* `science/raster/project.py` multiplied an affine by a coordinate pair with `*`, which `affine` 3 deprecates in favour of `@`. Verified numerically identical (including NaN positions); one test used the same deprecated form for affine composition.

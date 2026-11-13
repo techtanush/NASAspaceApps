@@ -46,7 +46,10 @@ def data_file_name(root: ET.Element) -> str:
 
 def read_product(label_path: Path) -> ProductImage:
     root = parse_xml_file(label_path)
-    array = find_one(root, "Array_2D_Image") or find_one(root, "Array_2D")
+    # Element truthiness means "has child elements", not "exists", so test for presence explicitly.
+    array = find_one(root, "Array_2D_Image")
+    if array is None:
+        array = find_one(root, "Array_2D")
     if array is None:
         raise AdapterError(
             "UNSUPPORTED_PRODUCT", "label has no Array_2D / Array_2D_Image", detail_code="UNSUPPORTED_FORMAT"

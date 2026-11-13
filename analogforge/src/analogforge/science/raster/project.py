@@ -140,7 +140,7 @@ def project_source(
                 if crs.is_geographic:
                     centre = gt[0] + width * gt[1] / 2
                     sx = sx + 360 * np.round((centre - sx) / 360)
-                sc, sr = affine_inverse * (sx, sy)
+                sc, sr = affine_inverse @ (sx, sy)
                 inside &= np.isfinite(sc) & np.isfinite(sr) & (sc >= 0) & (sr >= 0) & (sc <= width) & (sr <= height)
             valid[start:start + len(row_indices)] &= inside
         missing = ~valid | ~np.isfinite(values)

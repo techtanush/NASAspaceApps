@@ -12,6 +12,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from analogforge.api.contracts import specification
 from analogforge.api.errors import ApiError
@@ -73,7 +74,15 @@ def create_app(
 
     settings = settings or get_settings()
     store = store or Store(settings.database_url)
-    application = ContractFastAPI(title="AnalogForge", version="0.1.0")
+    # The interactive docs load their scripts from a CDN and list every operation, so they are opt-in.
+    docs = bool(getattr(settings, "api_docs", False))
+    application = ContractFastAPI(
+        title="AnalogForge",
+        version="0.1.0",
+        docs_url="/docs" if docs else None,
+        redoc_url="/redoc" if docs else None,
+        openapi_url="/openapi.json" if docs else None,
+    )
     application.state.settings = settings
     application.state.runtime = PlatformRuntime(settings, store, science, renderer)
     application.state.identity_provider = identity_provider
@@ -139,6 +148,27 @@ def create_app(
                     details={"issue_codes": error.issue_codes},
                 )
         return JSONResponse(safe.envelope(getattr(request.state, "request_id", None)), status_code=status)
+
+    @application.exception_handler(StarletteHTTPException)
+    async def framework_http_error(request: Request, error: StarletteHTTPException) -> JSONResponse:
+        """Unmatched routes and methods use the frozen envelope, not the framework's {"detail": ...} body."""
+        code, message = {
+            404: ("NOT_FOUND", "The requested resource does not exist."),
+            405: ("METHOD_NOT_ALLOWED", "This method is not supported for the resource."),
+        }.get(error.status_code, ("REQUEST_REJECTED", "The request could not be processed."))
+        safe = ApiError(code, message, error.status_code)
+        return JSONResponse(
+            safe.envelope(getattr(request.state, "request_id", None)),
+            status_code=error.status_code,
+            headers={key: value for key, value in (error.headers or {}).items() if key.lower() == "allow"},
+        )
+
+    @application.exception_handler(Exception)
+    async def unexpected_error(request: Request, error: Exception) -> JSONResponse:
+        """Anything unforeseen is a contract-shaped 500 that reveals nothing; the traceback stays in the server log."""
+        request_id = getattr(request.state, "request_id", None) or str(uuid4())
+        safe = ApiError("INTERNAL_ERROR", "The service could not complete the request.", 500)
+        return JSONResponse(safe.envelope(request_id), status_code=500, headers=response_headers(request_id))
 
     @application.exception_handler(RequestValidationError)
     async def invalid_request(request: Request, error: RequestValidationError) -> JSONResponse:

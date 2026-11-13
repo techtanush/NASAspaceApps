@@ -1022,6 +1022,34 @@ class TestPds4:
         out = pds.decode(lbl, pds.PdsDecodeParams("mars_mola_megdr", "MARS", "height"))
         np.testing.assert_allclose(out.data, raw.astype(float))
 
+    def test_an_empty_image_array_is_a_malformed_label_not_a_cue_to_read_another_array(self, tmp_path):
+        """Element truthiness means 'has children', not 'exists': an empty Array_2D_Image must not fall through."""
+        raw = np.arange(16, dtype=np.int16).reshape(4, 4)
+        lbl = write_pds4(tmp_path, "e", raw, ">i2")
+        text = lbl.read_text(encoding="utf-8")
+        assert "<Array_2D_Image>" in text
+        # A valid generic Array_2D follows an empty Array_2D_Image: the specialised element wins, and it is unusable.
+        lbl.write_text(
+            text.replace("<Array_2D_Image>", "<Array_2D_Image/><Array_2D>", 1).replace(
+                "</Array_2D_Image>", "</Array_2D>", 1
+            ),
+            encoding="utf-8",
+        )
+        with fails("UNSUPPORTED_PRODUCT", "UNSUPPORTED_FORMAT"):
+            pds.decode(lbl, pds.PdsDecodeParams("mars_mola_megdr", "MARS", "height"))
+
+    def test_the_image_array_is_preferred_over_a_generic_array_when_both_are_present(self, tmp_path):
+        raw = np.arange(16, dtype=np.int16).reshape(4, 4)
+        lbl = write_pds4(tmp_path, "p", raw, ">i2")
+        text = lbl.read_text(encoding="utf-8")
+        decoy = (
+            "<Array_2D><axes>2</axes>"
+            "<Axis_Array><axis_name>Line</axis_name><elements>1</elements></Axis_Array></Array_2D>"
+        )
+        lbl.write_text(text.replace("<Array_2D_Image>", decoy + "<Array_2D_Image>", 1), encoding="utf-8")
+        out = pds.decode(lbl, pds.PdsDecodeParams("mars_mola_megdr", "MARS", "height"))
+        assert out.valid.sum() == 16 and out.data.shape == (4, 4)
+
     def test_external_entity_and_dtd_are_never_processed(self, tmp_path):
         secret = tmp_path / "secret.txt"
         secret.write_text("TOP-SECRET")
