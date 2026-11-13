@@ -69,6 +69,7 @@ MUTATIONS = {
     "shadow-ink-from-a-brand-colour": (":root { --glass-ink: var(--accent); }", {"glass-shadow-ink"}),
     "ambient-layer-captures-pointer": (".ambient-canvas { pointer-events: auto; }", {"glass-ambient-interactive"}),
     "ambient-layer-above-content": (".ambient-canvas { z-index: 5; }", {"glass-ambient-layering"}),
+    "theme-dependent-value-declared-on-root-only": (":root { --glass-panel: color-mix(in srgb, var(--surface-1) 50%, transparent); }", {"glass-theme-scope"}),
     "text-shadow": (".panel { text-shadow: 0 1px 2px var(--canvas); }", {"decorative-effect"}),
     "hex-colour": (".panel { border-color: #ff00ff; }", {"color-outside-tokens"}),
     "rgb-colour": (".panel { border-color: rgb(255 0 255); }", {"color-outside-tokens"}),

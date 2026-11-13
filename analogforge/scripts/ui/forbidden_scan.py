@@ -157,6 +157,14 @@ def scan_glass_stylesheet(css: str, contract: dict[str, object]) -> list[dict[st
                         add("glass-shadow-halo", f"outer shadows fall below the element: {layer}", selector)
                     elif "var(--glass-ink)" not in layer:
                         add("glass-shadow-ink", f"outer shadows use --glass-ink: {layer}", selector)
+    # A custom property that references other variables is resolved where it is declared and inherited as a fixed value.
+    # Theme-dependent glass values must therefore be declared on themed elements, or a nested data-theme section
+    # (the style guide renders both themes on one page) inherits the page theme's colours.
+    for selector, declarations in rules:
+        for name, value in declarations:
+            if name.startswith("--") and re.search(r"var\(--(?:surface|text|accent|canvas|state|glass-ink)", value):
+                if "[data-theme" not in selector:
+                    add("glass-theme-scope", f"{name} depends on theme tokens; declare it on themed elements", selector)
     ambient_declared: dict[str, str] = {}
     for selector, declarations in rules:
         if [part.strip() for part in selector.split(",")] == [ambient]:

@@ -160,15 +160,17 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
     const family=s.fontFamily.split(',')[0].replace(/["']/g,'').trim(); if(!['Inter','Inter Variable','IBM Plex Mono'].includes(family))add('C01',e,`Font ${family}`);
     if(parseFloat(s.fontSize)<limits.minText)add('C02',e,`Text ${s.fontSize}`);
     if(e.matches('td,input,textarea,button')&&parseFloat(s.fontSize)<limits.bodyText)add('C02',e,`Body text ${s.fontSize}`);
-    let parent=e,bg=[0,0,0,0],glassBacked=false; while(parent){if(onGlass(parent)||parent.matches(glass.ambient))glassBacked=true;const c=rgb(getComputedStyle(parent).backgroundColor); if(c.length<4||c[3]===1){bg=c;break;}parent=parent.parentElement;}
+    let parent=e,bg=[0,0,0,0],glassBacked=false,backing=null; while(parent){const glassHere=onGlass(parent)||parent.matches(glass.ambient);const c=rgb(getComputedStyle(parent).backgroundColor);if(glassHere&&!(c.length<4||c[3]===1))glassBacked=true;if(!backing&&(glassHere||c.length<4||c[3]===1))backing=parent; if(c.length<4||c[3]===1){bg=c;break;}parent=parent.parentElement;}
     const fg=rgb(s.color); const min=parseFloat(s.fontSize)>=24||(parseFloat(s.fontSize)>=18.66&&Number(s.fontWeight)>=700)?limits.largeContrast:limits.contrast;
-    if(bg[3]!==0&&ratio(fg,bg)<min-.01)add('C03',e,`Contrast ${ratio(fg,bg).toFixed(2)} < ${min}`);
+    if(!glassBacked&&bg[3]!==0&&ratio(fg,bg)<min-.01)add('C03',e,`Contrast ${ratio(fg,bg).toFixed(2)} < ${min}`);
     for(const node of nodes){const range=document.createRange();range.selectNodeContents(node);const box=range.getBoundingClientRect();
      // An opaque foreground plate is measured above against its own background,
      // not against canvas pixels behind it or adjacent inline glyphs.
      const painted=paintedRect(e);
-     const overCanvas=box.left>=painted.left&&box.right<=painted.right&&box.top>=painted.top&&box.bottom<=painted.bottom&&canvasBounds.some(({element,rect:c})=>parent?.contains(element)&&box.left>=c.left&&box.right<=c.right&&box.top>=c.top&&box.bottom<=c.bottom);
-     text.push({x:box.x,y:box.y,w:box.width,h:box.height,fg,min,text:node.textContent,selector:e.getAttribute('data-testid')||e.tagName.toLowerCase(),overCanvas,onGlass:glassBacked&&!overCanvas});
+     const overCanvas=box.left>=painted.left&&box.right<=painted.right&&box.top>=painted.top&&box.bottom<=painted.bottom&&canvasBounds.some(({element,rect:c})=>(backing||parent)?.contains(element)&&box.left>=c.left&&box.right<=c.right&&box.top>=c.top&&box.bottom<=c.bottom);
+     // Text covered by another element or scrolled out of view cannot be read, so its background is not measured.
+     const hit=box.width>0&&box.height>0?document.elementFromPoint(Math.min(innerWidth-1,Math.max(0,box.left+box.width/2)),Math.min(innerHeight-1,Math.max(0,box.top+box.height/2))):null;const exposed=!!hit&&(e.contains(hit)||hit.contains(e))&&box.bottom>0&&box.right>0&&box.top<innerHeight&&box.left<innerWidth;
+     text.push({x:box.x,y:box.y,w:box.width,h:box.height,fg,min,text:node.textContent,selector:e.getAttribute('data-testid')||e.tagName.toLowerCase(),overCanvas,onGlass:glassBacked&&!overCanvas&&exposed});
     }
     if(/\b(NaN|undefined|null|\[object Object\])\b/.test(nodes.map(n=>n.textContent).join(' ')))add('C09',e,'Invalid rendered value');
     if(e instanceof SVGTextElement){
@@ -283,11 +285,17 @@ export async function captureStyleguide(page,{theme,density,directory=resolve(ro
  const size=await page.evaluate(()=>({width:document.documentElement.clientWidth,height:Math.max(document.documentElement.scrollHeight,document.body.scrollHeight)}));
  const midpoint=Math.floor(size.height/2),clips=[{x:0,y:0,width:size.width,height:Math.min(size.height,midpoint+24)},{x:0,y:Math.max(0,midpoint-24),width:size.width,height:size.height-Math.max(0,midpoint-24)}];
  mkdirSync(directory,{recursive:true});const captures=[];
+ // The committed component captures document components, not page decoration. A full-page capture expands the viewport to the
+ // page height, so the ambient layer's soft gradients cover a very large dithered area and inflate each PNG by about 40 percent.
+ // The ambient layer stays present in every audited state and in the S01-S12 captures; the 400 KB budget is unchanged.
+ const withoutAmbient=await page.addStyleTag({content:`${GLASS.ambient}{display:none!important}`});
+ try{
  for(const [index,clip]of clips.entries()){
   const file=resolve(directory,`styleguide-${theme}-${density}-part-${index+1}.png`),pixels=await page.screenshot({fullPage:true,clip,path:file});
   if(pixels.length>400000)throw new Error(`Component guide part exceeds400KB: ${file} (${pixels.length} bytes)`);
   const capture={file,screen:`styleguide-full-part-${index+1}`,theme,density,width:clip.width,height:clip.height,y:clip.y,full_height:size.height,sha256:hash(pixels),bytes:pixels.length};manifest.push(capture);captures.push(capture);
  }
+ }finally{await withoutAmbient.evaluate(node=>node.remove());}
  return captures;
 }
 export function finishAudit(){

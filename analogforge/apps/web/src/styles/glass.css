@@ -21,6 +21,13 @@
   --glass-saturate: 1.3;
   --radius-panel: 12px;
   --radius-overlay: 14px;
+}
+
+/* Theme-dependent values are declared on every themed element, exactly as tokens.css does. A custom property that
+   references other variables is resolved where it is declared, so a root-level declaration would hand a nested
+   data-theme section the page theme's colours (light text on light glass, or the reverse). */
+:root,
+[data-theme="dark"] {
   --glass-ink: var(--canvas);
   --glass-chrome: color-mix(in srgb, var(--surface-1) 66%, transparent);
   --glass-panel: color-mix(in srgb, var(--surface-1) 72%, transparent);
@@ -54,6 +61,11 @@
   --ambient-b: color-mix(in srgb, var(--state-pending) 18%, transparent);
   --ambient-c: color-mix(in srgb, var(--state-pass) 9%, transparent);
   --ambient-d: color-mix(in srgb, var(--accent) 9%, transparent);
+}
+
+/* A nested theme scope is its own canvas: another theme's page never shows through it. */
+:not(html)[data-theme] {
+  background-color: var(--canvas);
 }
 
 /* ---- Ambient backdrop: one static element, decorative, never interactive ------------------------------------ */
