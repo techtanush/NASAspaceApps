@@ -42,7 +42,9 @@ Also run the **one-product-at-a-time variants** the hackathon may force: Earth-o
 ANALOGFORGE_TEST_HOOKS=1 ANALOGFORGE_ALLOW_TEST_HARNESS_PROVIDER=1 ANALOGFORGE_FAKE_OPENAI_URL=http://127.0.0.1:<port> \
   uv run pytest tests/integration/platform/test_live_rehearsal.py -q
 ```
-Confirm: with the hooks the **live** role loop (strict tool calls, refusal/malformed/timeout handling, budgets) runs against the local fake Responses server; outputs are labeled `TEST HARNESS — not NASA data`; without the hooks the harness provider is rejected. Then run `analogforge preflight --mode live --scenario live-hackathon-v1` **without** keys/datasets and confirm it fails listing *exactly* `DATASETS_UNBOUND`, `MODEL_KEY_MISSING`, `MODEL_NAME_MISSING` (and nothing about the application itself).
+Confirm: with the hooks the **live** role loop (strict tool calls, refusal/malformed/timeout handling, budgets) runs against the local fake Responses server; outputs are labeled `TEST HARNESS — not NASA data`; without the hooks the harness provider is rejected. Then run `analogforge preflight --mode live --scenario live-hackathon-v1` **without** keys/datasets and confirm it fails and names at least `DATASETS_UNBOUND`, `MODEL_KEY_MISSING` and `MODEL_NAME_MISSING`. The architecture requires actionable dependency reporting, so the prerequisites derived from them (unavailable scenario, absent source-policy lock, unbound products) may appear too. Do not fabricate a lock or hide a real finding to force a count of three. Nothing may be reported about the application itself (found in the 2026-11-13 merge, `team handoffs/merging/DECISIONS.md` item 6).
+
+To bind a live slot for J13 and the live rehearsal without real data, use the supported guarded commands, not a config edit: `ANALOGFORGE_TEST_HOOKS=1 ANALOGFORGE_ALLOW_TEST_HARNESS_PROVIDER=1 analogforge rehearsal bind-live-slot` and later `restore-live-slot`. They need local auth, an isolated `CONFIG_DIR` copy shared with the running API, and an unbound live scenario. Everything bound this way is labelled `TEST HARNESS — not NASA data` and capped at S0/S1.
 
 ## 5. NASA-READY checklist (print this in the final summary with evidence pointers)
 
@@ -53,7 +55,7 @@ Confirm: with the hooks the **live** role loop (strict tool calls, refusal/malfo
 | N-3 | Bad data is rejected with a named check; synthetic data cannot enter live | mock drop steps 3, 6 |
 | N-4 | Tampered locked data blocks truthfully | step 7 |
 | N-5 | Live code path (roles, registrar, budgets) works against a fake Responses server | PLT-21 |
-| N-6 | Preflight for the live scenario names exactly the missing items | §4 |
+| N-6 | Preflight for the live scenario names every missing prerequisite (at least key, model, datasets) and nothing about the application | §4 |
 | N-7 | Perturbations change outcomes (no hardcoding) | §2 |
 | N-8 | Honest results: FAIL/UNKNOWN/INCONCLUSIVE/GAP publish as limited/negative passports with full exports | P3–P8 |
 | N-9 | Clean checkout rebuilds and passes | MRG-06 |

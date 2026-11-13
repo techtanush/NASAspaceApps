@@ -37,6 +37,8 @@ E2E_TARGET=real E2E_BASE_URL=http://localhost:5173 E2E_API_URL=http://localhost:
    --reporter=json,html --output ../out/playwright
 ```
 
+Run the real-backend browser suite on **`journeys` and `integration` only** (`playwright test journeys integration`). The other specs under `tests/e2e/` (a11y, audit cohorts, layout, design-smoke and the rest) drive the mock service worker and are mock-mode gates; run against the real backend they fail by design (for example `navigator.serviceWorker.controller` is false). Export `E2E_API_URL` to the real API (`http://127.0.0.1:<API_PORT>/api/v1`): MRG-03 finishes by shelling out to `wire_check.py --api`, whose default is port 8000, so any other port fails the last line of an otherwise passing test. The mock passport renderer (a Vite middleware) also needs `<repo>/.venv/bin/python`; a checkout without the virtualenv returns 503 `MOCK_RENDERER_UNAVAILABLE` and no mock run completes.
+
 Preconditions found in the 2026-11-12 trial merge (all three branches, real science and renderer, mocks off):
 * **J13** needs a scenario whose `allowed_modes` contains `live`; otherwise `live` is correctly not offered and the journey cannot select it. Bind one first, through the MRG-05b TEST_HARNESS rehearsal (§05 4) or real NASA data. Do not edit `config/scenarios.yaml` to fake a binding.
 * **J11** creates and locks the practice datasets itself (`datasets generate-practice`, `validate` ×3, `lock --datasets …`); point `ANALOGFORGE_CLI` at the merged venv if it is not `analogforge/.venv/bin/analogforge`.
@@ -46,7 +48,7 @@ Preconditions found in the 2026-11-12 trial merge (all three branches, real scie
 Requirements while running:
 * The mock banner must be **absent**; every request goes to `E2E_API_URL`; assert in the harness that `window.__MSW__` is undefined.
 * For each journey also execute the **real-only assertions** behind `isMock()` (persisted job/receipt/evidence ids retrievable via the API; exports' digests; SSE sequence integrity; no secret strings in network logs).
-* **Added assertions** you write in `tests/e2e/integration/merge-assertions.spec.ts` (merging-owned; commit it): after J01 completes, query the API directly and assert: `attempt` count = 3 with the order and outcomes of architecture 40 §6; contract/rover hashes identical across attempts (`GET /tests` → `mission_revision_id`, rover id same; `GET /missions/{id}`/`/mission-revisions/{id}` hash unchanged); the assurance artifact validates against `scientific-assurance.schema.json`; the passport has `assurance_evidence_id` ∈ `evidence_ids`; `manifest_sha256` reproduces; the three exports' bytes hash to their `X-Artifact-SHA256`; every UI-readable artifact parses (architecture 35 §5b).
+* **Added assertions** you write in `tests/e2e/integration/merge-assertions.spec.ts` (merging-owned; commit it): after the J01 run reaches its final state (COMPLETED, after PROVE IT), query the API directly and assert: `attempt` count = 3 with the order and outcomes of architecture 40 §6; contract/rover hashes identical across attempts (`GET /tests` → `mission_revision_id`, rover id same; `GET /missions/{id}`/`/mission-revisions/{id}` hash unchanged); the assurance artifact validates against `scientific-assurance.schema.json`; the passport has `assurance_evidence_id` ∈ `evidence_ids`; `manifest_sha256` reproduces; the three exports' bytes hash to their `X-Artifact-SHA256`; every UI-readable artifact parses (architecture 35 §5b).
 * Run each journey **twice** (second run on a fresh mission) to catch order/idempotency dependence.
 * Failures: save the Playwright trace and DOM; triage with `06`; fix the root cause at the owner's code; re-run the whole journey set after any fix.
 
@@ -70,7 +72,7 @@ Requirements while running:
 
 ### Additional scenario runs (API or UI)
 
-`PRACTICE-SMALL-BATTERY` (ROVER, `C-ENERGY-RESERVE`), search-limit run with `ANALOGFORGE_TEST_HOOKS=1 ANALOGFORGE_OPERATOR_LIMITS_JSON='{"search_max_expansions":1}'` (INCONCLUSIVE/SEARCH_LIMIT, `empty-state[data-reason=SEARCH_LIMIT]`), portfolio build after J01 (`BUILD_PORTFOLIO` over the shortlist: selected `[Practice grid-r0c0]` only, residuals = unknown/gap rows, coupled group verified at B), nomination of a user AOI (`NOMINATE_CANDIDATE` ⇒ origin `USER_SUPPLIED`).
+`PRACTICE-SMALL-BATTERY` (ROVER, `C-ENERGY-RESERVE`), search-limit run with `ANALOGFORGE_TEST_HOOKS=1 ANALOGFORGE_OPERATOR_LIMITS_JSON='{"search_max_expansions":1}'` (INCONCLUSIVE/SEARCH_LIMIT, `empty-state[data-reason=SEARCH_LIMIT]`), portfolio build at the `AWAITING_REVIEW` checkpoint before PROVE IT (`BUILD_PORTFOLIO` and nominations are legal only there: a COMPLETED run and its published passport are immutable, so never reopen one to satisfy this row) (`BUILD_PORTFOLIO` over the shortlist: selected `[Practice grid-r0c0]` only, residuals = unknown/gap rows, coupled group verified at B), nomination of a user AOI at the same checkpoint (`NOMINATE_CANDIDATE` ⇒ origin `USER_SUPPLIED`, an explicit CONTEXT claim, never a DISCOVERY).
 
 ## 4. Hands-on click-through (supplement, not replacement)
 
