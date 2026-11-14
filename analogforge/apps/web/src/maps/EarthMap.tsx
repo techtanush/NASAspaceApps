@@ -1,11 +1,18 @@
 import { formatCoordinatePair } from '../format/coordinates';
 import { useEffect, useRef, useState } from 'react';
-import maplibregl, { type Map as MapInstance } from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
+import type { Map as MapInstance } from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import type { components } from '../generated/schema';
 import { Attribution, CoordinateReadout, ErrorPanel, IconButton, Legend, Quantity } from '../components/ui';
 import { Minus, Plus, RotateCcw } from 'lucide-react';
 import { api } from '../api/client';
 import { validateEarthLayer } from './layerRegistry';
+
+// MapLibre 6 loads its web worker from a separate file whose URL it computes at run time (new URL('./maplibre-gl-worker.mjs',
+// import.meta.url)). A bundler cannot see that, so the worker would never be emitted: the map would fail to start in the
+// production build and in the pre-bundled dev server. Importing the file as an asset makes the bundler emit and serve it.
+maplibregl.setWorkerUrl(maplibreWorkerUrl);
 type Candidate=components['schemas']['EarthAnalogCandidate'];
 type Layer=components['schemas']['DisplayLayerManifest'];
 /** Camera geometry only: no scientific quantity or qualification is derived here. */

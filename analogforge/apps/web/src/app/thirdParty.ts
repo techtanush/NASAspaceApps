@@ -76,6 +76,16 @@ export const thirdParty=[
     "licence": "MIT"
   },
   {
+    "name": "ajv",
+    "version": "8.20.0",
+    "licence": "MIT"
+  },
+  {
+    "name": "ajv-formats",
+    "version": "3.0.1",
+    "licence": "MIT"
+  },
+  {
     "name": "clsx",
     "version": "2.1.1",
     "licence": "MIT"
@@ -117,7 +127,7 @@ export const thirdParty=[
   },
   {
     "name": "maplibre-gl",
-    "version": "5.12.0",
+    "version": "6.18.0",
     "licence": "BSD-3-Clause"
   },
   {
@@ -132,7 +142,7 @@ export const thirdParty=[
   },
   {
     "name": "react-router-dom",
-    "version": "7.9.6",
+    "version": "7.18.5",
     "licence": "MIT"
   }
 ] as const;
