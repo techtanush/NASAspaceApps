@@ -3,7 +3,7 @@
 Read `UI-PLAN.md` first. This file says how far the build is and how to continue. Update it with every push.
 
 ## State at this commit
-Read this with `UI-PLAN.md`. Plan Part D6 build order: **steps 1–3 work in mock mode; steps 4–5 (run progress, tour) are written but NOT yet visually verified; steps 6–8 not started.**
+Read this with `UI-PLAN.md`. Plan Part D6 build order: **steps 1–3 work in mock mode; steps 4–5 (run progress, tour) are written and the tour's top half is verified; steps 6–8 not started.**
 
 | Piece | File(s) under `analogforge/apps/web/` | State |
 |---|---|---|
@@ -16,7 +16,7 @@ Read this with `UI-PLAN.md`. Plan Part D6 build order: **steps 1–3 work in moc
 | Place `/start/place` | `PlaceStep.tsx`, `coordinates.ts`, `namedSites.ts`, `coverage.ts` | done, reviewed (Mars and Moon) |
 | Mission, Rover, Review | `MissionStep.tsx`, `RoverStep.tsx`, `ReviewStep.tsx`, `scenario.ts` | verified in mock mode through requirement proposal; summary-collapse fix applied but not re-screenshotted |
 | Run data hook | `useRunData.ts` | written, typechecks, unverified |
-| Run progress + Tour `/runs/:id/tour` | `TourView.tsx`, `tour.ts`, `narrator.ts` | **written, typecheck + lint pass, never viewed in a browser.** Nearby sites share one globe ticker and a local SVG map in the panel |
+| Run progress + Tour `/runs/:id/tour` | `TourView.tsx`, `tour.ts`, `narrator.ts` | **renders in mock mode** (checked at 1440×900 after this code was pushed): globe switches to Earth, clustered ticker, guide text, requirement coverage, Next/Previous. **Not yet inspected:** the progress view, the local site map, the site card and its actions (below the fold), and the tour with spread-out sites. Guide text is too long when requirement labels are long |
 | Report `/runs/:id/report` | — | **not started** (the tour's "Open report" link points to it and will 404) |
 | Styles | `src/styles/mission-control.css` | covers all of the above; mobile only roughly |
 | Routing | `src/app/router.tsx`, `src/app/App.tsx` | stage routes added; old home moved to `/workbench` |
