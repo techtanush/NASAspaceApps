@@ -136,8 +136,8 @@ MUTANTS = (
         "M13",
         "bind synthetic data to live slot",
         "cli.py",
-        "if load_manifest(settings, dataset_id).is_synthetic:",
-        "if False:",
+        "if synthetic and live:",
+        "if False and live:",
         "tests/integration/platform/test_dataset_cli.py::test_live_slot_rejects_synthetic_lock",
     ),
     Mutant(
@@ -153,8 +153,8 @@ MUTANTS = (
         "M15",
         "remove workspace filter from list",
         "db/store.py",
-        "query = sa.select(table.c.document_json).where(table.c.workspace_id == self.workspace_id)",
-        "query = sa.select(table.c.document_json).where(sa.true())",
+        "query = sa.select(_payload(table, exclude)).where(table.c.workspace_id == self.workspace_id)",
+        "query = sa.select(_payload(table, exclude)).where(sa.true())",
         "tests/integration/platform/test_workspace_isolation.py::test_workspace_get_and_lists_never_leak",
     ),
     Mutant(

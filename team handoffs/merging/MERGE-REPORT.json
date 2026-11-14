@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "merged_at": "2026-11-12T23:52:41.868832+00:00",
+  "merged_at": "2026-11-14T03:11:21.453911+00:00",
   "repository": "https://github.com/techtanush/NASAspaceApps",
   "kit_version": "1.0.0",
   "kit_changes": [],
@@ -69,11 +69,35 @@
       "pure_scope": "Repaired component in the tested integrated RC; original refs retained for provenance.",
       "original_full_acceptance_status": "FAILED_BEFORE_REPAIR",
       "original_mutation_baseline_note": "Original-head preview persistence failed an unchanged browser baseline. Fixed on RC/private repair branch; final 130-unit + 3-browser controls and 36/36 mutants passed. Structural purity alone was not full acceptance."
+    },
+    "backend_hardening": {
+      "branch": "fix/rc-backend-hardening",
+      "sha_merged": "eab4847b493cf2cd2e9287a85b136560f299bd68",
+      "repairs": [
+        "MERGE-33",
+        "MERGE-34",
+        "MERGE-35",
+        "MERGE-36"
+      ]
+    },
+    "frontend_dependencies": {
+      "branch": "fix/rc-frontend-dependencies",
+      "sha_merged": "8ccea1bda18cf04ba4a9b16f20dccf8e28a242b4",
+      "repairs": [
+        "MERGE-37"
+      ]
+    },
+    "premium_glass": {
+      "branch": "ui/premium-glass",
+      "sha_merged": "d3456b672babb6d529c23768d322e984a29199db",
+      "repairs": [
+        "MERGE-38"
+      ]
     }
   },
   "integration_branch": "integration/rc",
-  "integration_sha": "5e08b801f84625bc930b2be43974766a7f6c08ca",
-  "tag": "rc-20261112-5e08b80",
+  "integration_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+  "tag": "rc-20261114-02a67f6",
   "environment": {
     "python": "3.13.12",
     "uv": "uv 0.10.12 (Homebrew 2026-03-19 aarch64-apple-darwin)",
@@ -164,20 +188,21 @@
   },
   "suites": {
     "platform": {
-      "passed": 310,
+      "passed": 366,
       "failed": 0,
       "skipped": 0,
-      "seconds": 714.203
+      "seconds": 1543.45,
+      "note": "fourth full invocation; see out/final-integration.json history"
     },
     "science": {
-      "passed": 1012,
+      "passed": 1165,
       "failed": 0,
-      "skipped": 0
+      "skipped": 0,
+      "scope": "science, property, replay, renderer and UI-contract suites"
     },
     "renderer": {
-      "passed": 112,
-      "failed": 0,
-      "skipped": 0
+      "included_in": "science",
+      "note": "unit/passport_renderer is part of the 1165"
     },
     "frontend": {
       "passed": 134,
@@ -529,11 +554,11 @@
     "OPENAI_API_KEY and OPENAI_MODEL in analogforge/.env",
     "NASA dataset files and manifest.yaml per product"
   ],
-  "main_advanced": false,
+  "main_advanced": "by the user-authorized merge of PR 1; see git history for the merge commit",
   "visual_review": {
     "d01_purity": "PASSED",
     "audit_visual_mock": "PASSED",
-    "real_backend_screenshots": "/Users/tanushchokshi/Downloads/TKS/NASAspaceApps-clean-release/analogforge/out/visual",
+    "real_backend_screenshots": "out/visual (not committed; summaries only)",
     "mock_vs_real_defects_fixed": [
       "MERGE-15",
       "MERGE-21",
@@ -556,7 +581,7 @@
     ],
     "final_scores": {
       "status": "PASSED",
-      "tested_commit_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+      "tested_commit_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
       "reviewers": 1,
       "independent_reviewers": 0,
       "user_override": "No subagents; one reviewer used3perspectives, not3independent reviews",
@@ -633,15 +658,16 @@
     },
     "review_file": "team handoffs/merging/DESIGN-REVIEW-MERGED.md",
     "print_check": "PASSED",
-    "own_checklist_all_yes": true
+    "own_checklist_all_yes": true,
+    "glass_layer": "D-2026-11-13-GLASS: 501 reports, 0 findings, 0 skipped"
   },
-  "tested_executable_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "tested_executable_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
   "accepted_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
   "declared_scope": "Local synthetic/generated-data software integrity and modeled terrain-feasibility workflow; no real NASA-source, external model, or physical validation claim",
   "ready_for_declared_scope": true,
   "guide_branch": {
     "branch": "merging-branch",
-    "sha_merged": "edd0f26f4731e8adb4b9f835832e539f759995f4"
+    "sha_merged": "2a8340d256f33296116f7b7211e0759be118d51b"
   },
   "wiring_evidence": {
     "structural": "out/wire-final.json",
@@ -653,77 +679,71 @@
     "generated_client_and_production": "out/final-hygiene.json"
   },
   "additional_suites": {
-    "j12_harness_preview": {
-      "startTime": "2026-11-12T23:32:36.020Z",
-      "duration": 12441.912,
-      "expected": 2,
-      "skipped": 0,
-      "unexpected": 0,
-      "flaky": 0
-    },
-    "j12_harness_real": {
-      "startTime": "2026-11-12T23:32:34.939Z",
-      "duration": 12345.776,
-      "expected": 2,
-      "skipped": 0,
-      "unexpected": 0,
-      "flaky": 0
-    },
     "kit": {
       "passed": 20,
       "failed": 0,
-      "skipped": 0,
-      "seconds": 0.042
-    },
-    "browser_real": {
-      "expected": 34,
-      "unexpected": 0,
-      "flaky": 0,
       "skipped": 0
     },
-    "browser_mock": {
-      "startTime": "2026-11-12T22:52:19.256Z",
-      "duration": 1740444.069,
-      "expected": 41,
-      "skipped": 0,
+    "browser_real": {
+      "expected": 17,
       "unexpected": 0,
-      "flaky": 0
+      "flaky": 0,
+      "skipped": 0,
+      "passes": 2,
+      "note": "journeys + integration, two complete passes on fresh data"
+    },
+    "browser_mock": {
+      "expected": 41,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "note": "40 preview cases plus the 501-check visual audit"
     },
     "frontend_mutations": {
       "killed": 36,
       "total": 36,
-      "executed_at": "c263d2a; after paginated-rover repair"
+      "executed_at": "02a67f6720a5d431ba79bf55ad66f5d746d3225a"
     },
     "terminal_stream_protocol": {
       "passed": 8,
       "failed": 0,
-      "skipped": 0,
-      "evidence": "out/stream-audit.json"
+      "skipped": 0
     },
     "merger_mutations": {
       "killed": 9,
-      "total": 9
+      "total": 9,
+      "executed_at": "02a67f6720a5d431ba79bf55ad66f5d746d3225a"
+    },
+    "api_display_mutations": {
+      "killed": 6,
+      "total": 6,
+      "executed_at": "02a67f6720a5d431ba79bf55ad66f5d746d3225a"
+    },
+    "science_mutations": {
+      "killed": 16,
+      "total": 16,
+      "executed_at": "02a67f6720a5d431ba79bf55ad66f5d746d3225a"
+    },
+    "platform_mutations": {
+      "killed": 20,
+      "total": 20,
+      "executed_at": "02a67f6720a5d431ba79bf55ad66f5d746d3225a"
     }
   },
   "validation_accounting": {
-    "backend_executed_sha": "ed903b62d7968c0dcc420a557662f0c688c1b7ad",
-    "backend_source_equivalence": "out/source-equivalence.json",
-    "frontend_executed_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
-    "release_changes_after_executable_validation": [
-      "analogforge/apps/web/docs/design-review/styleguide-light-comfortable-part-1.png",
-      "analogforge/apps/web/docs/design-review/styleguide-light-default-part-1.png",
-      "analogforge/tests/e2e/journeys/J12-unbound-live.spec.ts"
-    ],
-    "note": "The complete matrix was rerun successfully at ed903b6, whose backend/config/contract bytes matchc263d2a, after the contended attempts were excluded. The final frontend-only rover pagination repair has its own full134-test unit, contract/build/type/lint,41-case preview,36-mutant and fresh34-case real-browser gates, plus repeated full501-frame audits. The backend remains byte-identical to the completed1434-case matrix. Changes afterc263d2a are two design-review PNGs and a test-onlyJ12entity-selection repair. The full remaining24realcases and focusedreal/previewJ12eachran twice after the harness repair; no product source changed."
+    "backend_executed_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+    "frontend_executed_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+    "evidence": "out/final-integration.json",
+    "note": "Every gate was rerun on the combined source. Earlier results (1434 Python tests at ed903b6, 501-check audits at c263d2a) are historical. Excluded invocations are listed with reasons in out/final-integration.json."
   },
   "journey_repetitions": 2,
   "practice_evidence": "out/rehearsals.json; real journeys; final real-producer API/Python matrix. P10 includes PERT01/03/04/07 through actual handlers; other perturbations covered by source oracles.",
   "nasa_ready_scope": "Software and dataset-slot readiness on generated/practice data only; no real NASA scientific validation. N6 retains additional truthful derived missing prerequisites rather than hiding them to force exactly three messages; see DECISIONS.md.",
   "repair_summary": {
-    "total": 32,
+    "total": 39,
     "by_severity": {
-      "S1": 20,
-      "S2": 12
+      "S1": 21,
+      "S2": 18
     }
   },
   "environment_warnings": [
@@ -743,5 +763,19 @@
     "executed_independent_reviewers": 0,
     "actual_reviewers": 1,
     "reason": "User explicitly requested no subagents; no independent review claimed."
-  }
+  },
+  "previous_candidate": {
+    "sha": "5e08b801f84625bc930b2be43974766a7f6c08ca",
+    "tag": "rc-20261112-5e08b80",
+    "preserved": true
+  },
+  "main_merge": {
+    "authorized_by_user": true,
+    "method": "merge of PR 1 (no force push)",
+    "accepted_main_sha_before": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0"
+  },
+  "open_observations": [
+    "Two of five full platform invocations each failed a single worker-driven test (transport journey; journey-API small-battery case) while other science and browser workloads ran. Both runs recorded a run in state FAILED (fail-closed: never a wrong PASS). The exception type of the first is unknown; the second logged AssertionError. Neither reproduced in isolation, under parallel stress, or in the next full run. Root cause is not established. An earlier candidate recorded one similar sanitized worker error that also did not reproduce."
+  ],
+  "tag_note": "The tag names the tested source SHA; it points at the release commit that adds only evidence and the test/mutant-catalog fixes listed above."
 }

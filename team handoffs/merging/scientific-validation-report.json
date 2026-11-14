@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
   "scope": "Local synthetic/generated-data software integrity and modeled terrain-feasibility workflow; no real NASA-source, external model, or physical validation claim",
-  "tested_commit_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "tested_commit_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
   "accepted_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
-  "created_at": "2026-11-12T23:52:41.107046+00:00",
+  "created_at": "2026-11-14T03:11:21.453911+00:00",
   "locks": {
     "schema_sha256": "cd051f476020752eca804d65ee2bb693c39109523a2d3bd69f49f3e923c6ecdf",
     "science_port_sha256": "db5a08e1cd74c9e78aa4d12895e9f2c38b76067c280b3141fa54a3a6de149b47",
@@ -681,8 +681,8 @@
     "NOT_IMPLEMENTED"
   ],
   "note": "Observed report for the declared local software scope. External and physical gates remain explicit; no unexecuted stage is marked passed.",
-  "integration_sha": "5e08b801f84625bc930b2be43974766a7f6c08ca",
-  "backend_executed_commit_sha": "ed903b62d7968c0dcc420a557662f0c688c1b7ad",
+  "integration_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+  "backend_executed_commit_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
   "lock_scope": {
     "schema_file": "analogforge/contracts/domain.schema.json",
     "assurance_schema_sha256": "f88986b65b31ac8fbd2e6ad0fa05b31792a1b065786983789d174dec2008fa65",
