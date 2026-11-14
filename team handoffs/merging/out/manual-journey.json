@@ -1,0 +1,97 @@
+{
+  "status": "PASSED",
+  "tested_product_commit_sha": "f628943950289a5c0777149a617c39129c17efa2",
+  "tested_executable_sha": "398ad7f50a44a654553a9ca3af40706d8dea2923",
+  "product_bytes_identical_between_those_commits": true,
+  "scope": "Actual manual IAB clicks against a fresh native real-backend checkout; mocks off; no test hooks.",
+  "run_id": "6e7ba18e-46b1-4804-a736-50c2e364e1d1",
+  "mission_id": "afd9ed1a-de9f-4f58-b584-569a9ed87f7e",
+  "mission_revision": 2,
+  "rover_import": "Committed ARES-1 JSON934bytes, reviewed and saved viaUI",
+  "accepted_benchmarks": {
+    "unique_exposure_m": 100,
+    "slope_band_deg": [
+      12,
+      18
+    ],
+    "science_tasks": 2,
+    "reserve_pct": 20
+  },
+  "outcomes": [
+    "FAIL",
+    "FAIL",
+    "PASS"
+  ],
+  "candidate_path": [
+    "Practice grid-r0c1",
+    "Practice grid-r0c1",
+    "Practice grid-r0c0"
+  ],
+  "publication": "LIMITED",
+  "claim_levels": [
+    "S0",
+    "S1"
+  ],
+  "manifest_sha256": "2c3fed3b3c4eb26276176c04f7bba27ffd2dc10f4038fd4d636c85532b6867e3",
+  "assurance_evidence_id": "80362fcd-270e-4712-8a25-cb632923dd2f",
+  "exports": {
+    "html": {
+      "sha256": "15a6e8c95237884bebe2c0087e0736ec199212fa8b49d93ddf6f38c5563d6ef9",
+      "bytes": 1619333,
+      "browser_state": "ready",
+      "local_download": "/Users/tanushchokshi/Downloads/analogforge-passport-synthetic-68dcccec-2c3fed3b.html"
+    },
+    "json": {
+      "sha256": "d8a2fb5caa7900f503cc325685030f377a48c75e87d1d8737a69f7a5751bc307",
+      "bytes": 2386048,
+      "browser_state": "ready",
+      "local_download": "/Users/tanushchokshi/Downloads/analogforge-passport-synthetic-68dcccec-2c3fed3b.json"
+    },
+    "csv": {
+      "sha256": "28bc3dd50f072aa86b200fb6c4fd8c29193bae9b15cd2faa2039de0cd6fc9029",
+      "bytes": 33549,
+      "browser_state": "ready",
+      "local_download": "/Users/tanushchokshi/Downloads/analogforge-passport-synthetic-68dcccec-2c3fed3b.csv"
+    }
+  },
+  "views_reviewed": [
+    "Authoring",
+    "Target",
+    "Analogs",
+    "Qualification",
+    "Evidence receipt",
+    "Compatibility",
+    "Portfolio empty state",
+    "Test lab",
+    "Route playback",
+    "Operations",
+    "Passport"
+  ],
+  "current_qualification_cells": 54,
+  "winning_candidate_states": [
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "UNKNOWN",
+    "UNKNOWN",
+    "GAP",
+    "GAP"
+  ],
+  "operations_unique_sequence_rows": 156,
+  "playback": "Next sample moved to2of34;170s,85m,3.2Wh,99.8percent reserve; committed data only.",
+  "draft_restart": "Saved mission draft and rover data survived the planned development restart; draft reopened through the mission list.",
+  "screenshot": "/Users/tanushchokshi/Downloads/TKS/NASAspaceApps-final-clean-51d6d77/analogforge/out/manual-passport.png",
+  "observations": [
+    "The two failed attempts remain visible before the winning B attempt.",
+    "Missing mineral/clearance evidence and Earth gravity/atmosphere gaps remain explicit.",
+    "Some compatibility identifiers are technical and the committed telemetry table retains full elapsed-time precision; the primary readout uses bounded seconds. These are minor presentation observations.",
+    "Passport claims are numerous and their detailed site/validation scope is available through disclosures. The route diagram is dense in print; complete numeric samples remain available."
+  ],
+  "later_frontend_change_scope": {
+    "commit": "c263d2affedfcb17b9e9adb69765f832019650a7",
+    "change": "RoverEditor now follows paginated revisions and retains selected saved profile. The manually inspected run/qualification/testlab/playback/operations/passport and export implementations remain unchanged.",
+    "verification": "Current real J09 keyboard authoring after first25saved profiles, plus full fresh34real/41previewcases and501-frame audits; see final browser summaries."
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "tested_commit_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "final_executable_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "stats": {
+    "startTime": "2026-11-12T23:32:34.939Z",
+    "duration": 12345.776,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "cases": [
+    {
+      "title": "J12 live dataset slot is explicitly unavailable and cannot start an accepted contract",
+      "file": "journeys/J12-unbound-live.spec.ts",
+      "repeat_index": null,
+      "seconds": 5.436
+    },
+    {
+      "title": "J12 live dataset slot is explicitly unavailable and cannot start an accepted contract",
+      "file": "journeys/J12-unbound-live.spec.ts",
+      "repeat_index": null,
+      "seconds": 4.186
+    }
+  ]
+}

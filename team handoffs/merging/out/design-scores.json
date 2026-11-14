@@ -1,0 +1,77 @@
+{
+  "status": "PASSED",
+  "tested_commit_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "reviewers": 1,
+  "independent_reviewers": 0,
+  "user_override": "No subagents; one reviewer used3perspectives, not3independent reviews",
+  "scale": "0\u20134",
+  "criteria": [
+    {
+      "criterion": "hierarchy",
+      "score": 4,
+      "evidence": "S07-1440-dark-default.png; S11-390-light-default.png; .run-shell-header separates lifecycle from latest modeled test; immutable attempt history remains below"
+    },
+    {
+      "criterion": "restraint",
+      "score": 4,
+      "evidence": "S01\u2013S12 light/dark; state badges use word+glyph+border; neutral panels and a single blue primary action per active region"
+    },
+    {
+      "criterion": "typography",
+      "score": 4,
+      "evidence": "S03-1440-light-default.png; S07-1440-dark-default.png; numeric columns and units, locally bundled type, stable table styles; audit font/contrast/geometry checks pass"
+    },
+    {
+      "criterion": "density_spacing",
+      "score": 3,
+      "evidence": "S07-1440-light-default.png; S12-390-dark-default.png; dense qualification/passport content uses labelled scrolling and disclosure. Printed route labels remain compact; numeric sample table follows"
+    },
+    {
+      "criterion": "tables",
+      "score": 4,
+      "evidence": "S05-390-light-default.png; S07-1440-dark-default.png; S10-1440-light-default.png; right-aligned values, unit headers, current qualification rows only, labelled native scrolling"
+    },
+    {
+      "criterion": "states",
+      "score": 4,
+      "evidence": "S09-1440-dark-default.png empty portfolio; S10 PROVEIT pending/disabled; S11 completed attempts. Full501frame catalog covers loading/error/disabled and their explanations"
+    },
+    {
+      "criterion": "copy",
+      "score": 3,
+      "evidence": "S08-390-light-default.png .compatibility-panel retains technical metric IDs; definitions/provenance explain them. Other primary copy distinguishes screening, Unknown, modeled verification and physical limits"
+    },
+    {
+      "criterion": "consistency",
+      "score": 4,
+      "evidence": "S01\u2013S12 desktop/narrow, light/dark; same controls, tables, spacing and status vocabulary; styleguide all3densities regenerated"
+    },
+    {
+      "criterion": "map_chart_integrity",
+      "score": 3,
+      "evidence": "S05-1440-light-default.png histogram units/support and uniform elevation legend; S06 candidate geometry explicitly labelled offline/synthetic.33page print route is dense, with committed numeric samples retained"
+    },
+    {
+      "criterion": "accessibility",
+      "score": 4,
+      "evidence": "J09 narrow/keyboard/zoom; audited focus/help/textspacing/reducedmotion/glyphsilhouettes/contrast. Boththemes501frames0findings; manual narrow-tab navigation reaches passport and downloads"
+    },
+    {
+      "criterion": "credibility",
+      "score": 4,
+      "evidence": "S12-1440-light-default.png; printedpage1 synthetic/LIMITED/fullmanifest. Scientific Unknown/GAP and native support remain visible; credibility applies to an engineering demonstration, not NASA endorsement or physical certification"
+    },
+    {
+      "criterion": "slop_absence",
+      "score": 4,
+      "evidence": "S01\u2013S12 and styleguide; neutral engineering surfaces, no promotional decoration/emoji/gradient, no nonlocal font/image requests; forbidden-pattern and production checks pass"
+    }
+  ],
+  "mean": 3.75,
+  "minimum": 3,
+  "inspection": "AllS01\u2013S12 inspected at398ad7f. Atc263d2a, the affected authoring/library plus qualification/passport screens were visually rechecked at1440and390 in boththemes;6contact sheets cover all33newPDFpages plus enlargedpage1. Full501real catalog and preview501catalog plus120supplemental records (621total) passed with0findings/0skips; every screenshot hash verified. Unchanged component source equivalence is recorded.",
+  "remaining_minor_observations": [
+    "Some compatibility dimensions expose technical metric names with definitions/provenance.",
+    "Printed route figure is dense; exact numeric route samples and independent receipts remain available."
+  ]
+}

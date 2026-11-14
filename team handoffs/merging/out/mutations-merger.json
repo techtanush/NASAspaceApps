@@ -1,0 +1,215 @@
+{
+  "status": "PASSED",
+  "mutants": 9,
+  "killed": 9,
+  "records": [
+    {
+      "mutant_id": "MP1",
+      "description": "Re-enable inactive integration cluster version mismatch",
+      "file": "analogforge/settings.py",
+      "tests": [
+        "tests/unit/platform/test_merge_bootstrap.py"
+      ],
+      "killed": true,
+      "baseline": {
+        "exit_code": 0,
+        "tests": 1,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "mutant": {
+        "exit_code": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "mutant_id": "MP2",
+      "description": "Accept TEST_HARNESS without explicit hooks",
+      "file": "analogforge/application/datasets.py",
+      "tests": [
+        "tests/integration/platform/test_merge_live_slot.py::test_test_harness_manifest_requires_both_explicit_local_hooks"
+      ],
+      "killed": true,
+      "baseline": {
+        "exit_code": 0,
+        "tests": 1,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "mutant": {
+        "exit_code": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "mutant_id": "MP3",
+      "description": "Promote rehearsal data to S4",
+      "file": "analogforge/application/assurance.py",
+      "tests": [
+        "tests/integration/platform/test_merge_live_slot.py::test_harness_cannot_establish_real_source_validation_or_unlabelled_claims"
+      ],
+      "killed": true,
+      "baseline": {
+        "exit_code": 0,
+        "tests": 1,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "mutant": {
+        "exit_code": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "mutant_id": "MS1",
+      "description": "Lose Wasserstein symmetry by retaining signed CDF differences",
+      "file": "analogforge/science/comparison/w1.py",
+      "tests": [
+        "tests/unit/science/test_comparison.py::test_w1_matches_scipy_on_random_distributions_and_nonuniform_bins"
+      ],
+      "killed": true,
+      "baseline": {
+        "exit_code": 0,
+        "tests": 1,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "mutant": {
+        "exit_code": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "mutant_id": "MS2",
+      "description": "Compare histograms at incompatible support",
+      "file": "analogforge/science/comparison/w1.py",
+      "tests": [
+        "tests/unit/science/test_comparison.py::test_w1_missing_evidence_scale_and_coverage_paths"
+      ],
+      "killed": true,
+      "baseline": {
+        "exit_code": 0,
+        "tests": 1,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "mutant": {
+        "exit_code": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "mutant_id": "MS3",
+      "description": "Hide an overdrawn battery by clamping negative reserve",
+      "file": "analogforge/science/energy.py",
+      "tests": [
+        "tests/unit/science/test_energy.py::test_negative_reserve_is_reported_never_clamped"
+      ],
+      "killed": true,
+      "baseline": {
+        "exit_code": 0,
+        "tests": 1,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "mutant": {
+        "exit_code": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "mutant_id": "MR1",
+      "description": "Mislabel filenames as synthetic in every mode",
+      "file": "analogforge/rendering/passport/renderer.py",
+      "tests": [
+        "tests/unit/passport_renderer/test_determinism.py"
+      ],
+      "killed": true,
+      "baseline": {
+        "exit_code": 0,
+        "tests": 28,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "mutant": {
+        "exit_code": 1,
+        "tests": 22,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "mutant_id": "MR2",
+      "description": "Omit audit-to-rover hash binding",
+      "file": "analogforge/rendering/passport/renderer.py",
+      "tests": [
+        "tests/unit/passport_renderer/test_errors.py"
+      ],
+      "killed": true,
+      "baseline": {
+        "exit_code": 0,
+        "tests": 20,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "mutant": {
+        "exit_code": 1,
+        "tests": 17,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "mutant_id": "MR3",
+      "description": "Report manifest hash as the file digest",
+      "file": "analogforge/rendering/passport/renderer.py",
+      "tests": [
+        "tests/unit/passport_renderer/test_determinism.py"
+      ],
+      "killed": true,
+      "baseline": {
+        "exit_code": 0,
+        "tests": 28,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "mutant": {
+        "exit_code": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "scope": "Independent added mutations, three per owner; original executed source predates final display-only and HTTP image-delivery repairs. Mutation target modules are unchanged."
+}

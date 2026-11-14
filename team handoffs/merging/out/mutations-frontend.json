@@ -1,0 +1,148 @@
+{
+  "status": "PASSED",
+  "frontend_commit": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "baseline": {
+    "status": "PASS",
+    "checks": [
+      {
+        "kind": "unit",
+        "status": "PASS",
+        "exit_code": 0,
+        "output_file": "out/mutations/baseline-unit.log"
+      },
+      {
+        "kind": "browser",
+        "status": "PASS",
+        "exit_code": 0,
+        "output_file": "out/mutations/baseline-browser.log"
+      }
+    ]
+  },
+  "independent_browser_control_stats": {
+    "startTime": "2026-11-12T22:53:02.800Z",
+    "duration": 84448.738,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "independent_unit_control_counts": {
+    "numTotalTests": 134,
+    "numPassedTests": 134,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "mutants": 36,
+  "killed": 36,
+  "browser_assertions_independently_checked": [
+    {
+      "id": "M6",
+      "stats": {
+        "startTime": "2026-11-12T22:54:34.515Z",
+        "duration": 22167.716,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "setup_errors": 0
+    },
+    {
+      "id": "M24",
+      "stats": {
+        "startTime": "2026-11-12T22:55:15.966Z",
+        "duration": 12142.828,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "setup_errors": 0
+    },
+    {
+      "id": "M26",
+      "stats": {
+        "startTime": "2026-11-12T22:55:31.017Z",
+        "duration": 27037.694,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "setup_errors": 0
+    },
+    {
+      "id": "M27",
+      "stats": {
+        "startTime": "2026-11-12T22:55:59.298Z",
+        "duration": 9072.222,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "setup_errors": 0
+    },
+    {
+      "id": "M28",
+      "stats": {
+        "startTime": "2026-11-12T22:56:09.584Z",
+        "duration": 28050.8,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "setup_errors": 0
+    },
+    {
+      "id": "M32",
+      "stats": {
+        "startTime": "2026-11-12T22:56:42.298Z",
+        "duration": 8950.763,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "setup_errors": 0
+    },
+    {
+      "id": "M33",
+      "stats": {
+        "startTime": "2026-11-12T22:56:52.363Z",
+        "duration": 11683.425,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "setup_errors": 0
+    },
+    {
+      "id": "M35",
+      "stats": {
+        "startTime": "2026-11-12T22:57:05.216Z",
+        "duration": 8087.428999999999,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "setup_errors": 0
+    },
+    {
+      "id": "M36",
+      "stats": {
+        "startTime": "2026-11-12T22:57:14.304Z",
+        "duration": 46219.078,
+        "expected": 0,
+        "skipped": 0,
+        "unexpected": 1,
+        "flaky": 0
+      },
+      "setup_errors": 0
+    }
+  ],
+  "scope": "Full36 catalog atc263d2a in isolated copies after paginated-rover repair.134unit+3browser controls;9browser kills independently checked. Full backend matrix source equivalence is recorded separately."
+}

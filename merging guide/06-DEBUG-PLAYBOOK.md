@@ -80,8 +80,26 @@ Always: reproduce with the smallest case, read the actual payload/receipt/log, c
 | Port in use | pick the next profile ports; update `API_PORT/WEB_PORT/DB_PORT`, CORS and Vite proxy together; do not kill unknown processes |
 | Merged tree: `ModuleNotFoundError: No module named 'passport_renderer'` while collecting `tests/unit/passport_renderer` (passes on Aradhya's branch alone) | Tanush adds `tests/__init__.py` and `tests/unit/__init__.py`, so pytest imports the renderer tests as `tests.unit.passport_renderer`; a top-level `from passport_renderer…` import then fails. **Fixed on Aradhya's branch 2026-11-12**: the renderer tests use relative imports (`from .fixtures.builders import …`), which work in both layouts. Its scripts add `tests/unit` to `sys.path` themselves |
 | `pyproject.toml` add/add conflict in the `extra-*` lists | expected: each builder fills only their own list; keep each person's line from their own branch |
+| `K-kit-verify FAIL: DRIFT: <file> differs from the frozen kit` in `wire_check` (MRG-03's last line fails) | a kit-owned file was edited, even for documentation. `analogforge/.env.example`, `pyproject.toml` (apart from the three `extra-*` lists) and everything under `contracts/` are byte-frozen; the static kit check passes if it ran before the edit, so re-run `materialize.py --verify` after every change | whoever edited | revert it; document the setting in code or the owner's review notes, or file a change request (`01` §2) |
+| `purity_check` G-04 `SKIPPED_TEST` on a new test | `pytest.mark.skipif`, `skip`, `xfail` are forbidden anywhere: a skip hides a failure. A test that needs a repository file should assert it exists | test author | remove the marker; assert the precondition |
+| A major-version dependency bump builds but the shipped app breaks | the library computes a runtime URL a bundler cannot see (MapLibre 6's web worker: the build succeeds and emits no worker; dev-server tests pass) | Aradhya | import the file as an asset (`?url`) and register it; prove it on the **production build** against the real backend (worker request `200`, canvas drawn, no console errors), not only the dev server |
+| `pnpm audit` reports advisories | upgrade within the current major where a patch exists and prove it with the full browser gates; for each remaining advisory record reachability and why it stays | Aradhya | see `team handoffs/aradhya/DEPENDENCY-UPGRADE.md` |
 | `uv lock` conflicts after merging extras | resolve by relaxing only the conflicting *extra* dependency pins in the owner's list; never touch kit dependencies |
 
 ## F. Escalation rule
 
 If a defect needs a kit change, follow `01` §2: reproduce, minimal change request, `tools/build_kit.py`, kit tests, update all consumers, re-run **everything** (purity rows G-02, wiring W-01…W-15, journeys), and record it in the report under `kit_changes`.
+
+
+### Saved rover label is blank after repeated real journeys
+
+Evidence from the merge: the local library had more than25immutable rover revisions. `GET /rovers` returned a non-null `next_cursor`; a newly created revision was absent from the first page. The API saved and pinned the correct revision, while the dropdown had no option for its selected ID. J09 correctly failed its visible-label assertion. Clearing the database would mask the defect.
+
+Repair (`c263d2a`, MERGE-31): consume opaque collection cursors, de-duplicate revisions by ID, preserve the just-saved/edited selected profile during refresh, and show collection failures. Cursor cycles and the explicit loading bound must fail visibly rather than silently truncate. The exact UI regression was red before repair; later-page/cursor/error tests and the real keyboard/zoom journeys verify it after repair. Re-run the full frontend, mutation, preview/real browser and visual gates; preserve the failed invocation separately. No scientific thresholds or frozen inputs change.
+
+
+### J12 expects nine requirements but reopens an older Moon contract
+
+Check the entity before altering an assertion or resetting the database. The original J12 created a Mars mission, then selected the first accepted item in `GET /missions`. On a persistent library that item can be an older Moon mission with five requirements. The app may correctly show AWAITING_DATASETS and disabled Start while the test's unrelated nine-row expectation fails.
+
+MERGE-32 (`5e08b80`) captures the exact 201 creation response, confirms that mission was accepted, and reopens its ID. All nine-row and unavailable-slot assertions remain. Preserve the failing DOM, verify the same older-Moon counterexample in real mode and the updated preview twice, then repeat the full affected real batch. No app behavior or scientific thresholds change.

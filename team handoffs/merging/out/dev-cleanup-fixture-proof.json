@@ -1,0 +1,10 @@
+{
+  "status": "PASSED",
+  "negative_mutation": "terminate only launcher instead of its entire process group",
+  "expected_assertion_failure_detected": true,
+  "unchanged_assertions": [
+    "parent exited",
+    "nested child pid disappears within original5seconds"
+  ],
+  "fixture_change": "Parent handles group SIGTERM and reaps its own child; no reliance on launchd zombie reaping."
+}
