@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "decision": "D-2026-11-13-GLASS",
+  "rationale": "User-directed premium visual layer. Glass is confined to application chrome and panel frames over one static ambient backdrop. Tables, charts, maps and every scientific value stay on solid surfaces. Text on glass is verified against painted pixels, not computed colours. Frames are opaque data containers: they may be rounded and softly elevated but never use backdrop-filter.",
+  "chrome": [
+    ".app-header",
+    ".context-column",
+    ".drawer",
+    ".dialog",
+    ".popover",
+    ".select-content",
+    ".toast",
+    ".mock-banner",
+    ".operations-bar",
+    ".drawer-right",
+    ".drawer-bottom"
+  ],
+  "panels": [
+    ".panel",
+    ".run-state",
+    ".metric",
+    ".critic-card",
+    ".attempt-card",
+    ".review-panel",
+    ".banner",
+    ".empty-state",
+    ".error-panel",
+    ".practice-presets",
+    ".map-layer-controls"
+  ],
+  "frames": [
+    ".table-frame",
+    ".table-caption",
+    ".table-scroll",
+    ".map-region",
+    ".map-canvas"
+  ],
+  "ambient": ".ambient-canvas",
+  "limits": {
+    "blur_px_max": 24,
+    "radius_px_max": 14,
+    "inset_highlight_blur_px_max": 0
+  },
+  "stylesheet": "apps/web/src/styles/glass.css",
+  "required_fallbacks": [
+    "@supports not",
+    "prefers-reduced-transparency",
+    "forced-colors",
+    "@media print"
+  ]
+}

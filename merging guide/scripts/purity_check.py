@@ -193,6 +193,10 @@ UI_SLOP_PATTERNS = {
     'UI_NASA_INSIGNIA': re.compile(r'meatball|nasa[-_]?logo|nasa[-_]?worm', re.I),
 }
 UI_SLOP_SKIP = ('/generated/', '/styles/tokens.css', '/maps/', '/mock/fixtures/', '/test/', '/styleguide/')
+# Decision D-2026-11-13-GLASS (architecture 41 section 5.5): the glass layer is the one stylesheet allowed to use these three
+# effects, and only while the structural contract in design/glass-surfaces.json holds (checked by scripts/ui/forbidden_scan.py).
+UI_GLASS_CSS = UI_SRC_PREFIX + 'styles/glass.css'
+UI_GLASS_PERMITS = {'UI_GRADIENT', 'UI_BACKDROP_FILTER', 'UI_BIG_RADIUS'}
 UI_SLOP_NOT_IN_TESTS = True
 
 
@@ -208,12 +212,29 @@ def ui_design_findings(repo: Path, files: list[str]) -> list[dict]:
             lines = (repo / rel).read_text(errors='ignore').splitlines()
         except OSError:
             continue
+        permitted = UI_GLASS_PERMITS if rel == UI_GLASS_CSS else set()
         for number, line in enumerate(lines, 1):
             if 'allowed:' in line:
                 continue
             for name, rx in UI_SLOP_PATTERNS.items():
-                if rx.search(line):
+                if name not in permitted and rx.search(line):
                     findings.append({'file': rel, 'line': number, 'pattern': name, 'text': line.strip()[:160]})
+        if rel == UI_GLASS_CSS:
+            # The exemption holds only while the glass contract does: listed surfaces, bounded blur and radius, radial gradient
+            # on the ambient element only, dark non-halo shadows, token-derived colours, required fallbacks.
+            scanner = repo / 'analogforge/scripts/ui/forbidden_scan.py'
+            if not scanner.is_file():
+                findings.append({'file': rel, 'line': 0, 'pattern': 'GLASS_CONTRACT', 'text': 'scripts/ui/forbidden_scan.py is missing'})
+            else:
+                code, out = run([sys.executable, str(scanner)])
+                try:
+                    report = json.loads(out[out.index('{'):])
+                except ValueError:
+                    report = {'status': 'FAIL', 'findings': [{'rule': 'unparsable scanner output', 'detail': out[-200:]}]}
+                for item in report.get('findings', []):
+                    if code != 0 and str(item.get('rule', '')).startswith('glass-'):
+                        findings.append({'file': rel, 'line': 0, 'pattern': 'GLASS_CONTRACT',
+                                         'text': f"{item['rule']}: {str(item.get('detail', ''))[:120]} {item.get('selector', '')}"[:160]})
     return findings
 
 
