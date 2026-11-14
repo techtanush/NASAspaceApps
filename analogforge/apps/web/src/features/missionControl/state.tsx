@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import type { GlobeBody } from '../../maps/globeAssets';
 import type { GlobeScene } from '../../maps/GlobeStage';
 import { areaBox, type BoxResult } from './coordinates';
@@ -20,7 +20,9 @@ export function MissionControlProvider({ children }: { children: ReactNode }) {
   const [scene, setScene] = useState<GlobeScene>({ body: 'EARTH', autoRotate: true, layout: 'hero', focus: { lat: 18, lng: -40, altitude: 2.3 } });
   const [handlers, setHandlers] = useState<Control['handlers']>({});
   const box = useMemo(() => (plan.lat === null || plan.lng === null ? null : areaBox(plan.body, plan.lat, plan.lng, plan.sizeKm)), [plan.body, plan.lat, plan.lng, plan.sizeKm]);
-  const value = useMemo<Control>(() => ({ plan, update: patch => setPlan(current => ({ ...current, ...patch })), reset: () => setPlan(initial), box, scene, setScene, handlers, setHandlers }), [plan, box, scene, handlers]);
+  const update = useCallback((patch: Partial<Plan>) => setPlan(current => ({ ...current, ...patch })), []);
+  const reset = useCallback(() => setPlan(initial), []);
+  const value = useMemo<Control>(() => ({ plan, update, reset, box, scene, setScene, handlers, setHandlers }), [plan, update, reset, box, scene, handlers]);
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 export function useMissionControl(): Control { const value = useContext(Context); if (!value) throw new Error('Mission Control context is required'); return value; }

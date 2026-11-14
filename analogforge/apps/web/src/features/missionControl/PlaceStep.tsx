@@ -15,7 +15,7 @@ export function PlaceStep() {
   const place = useCallback((lat: number, lng: number, siteId: string | null = null) => update({ lat: Number(lat.toFixed(4)), lng: Number(lng.toFixed(4)), latText: lat.toFixed(4), lngText: lng.toFixed(4), siteId, confirmed: false }), [update]);
   const onPick = useCallback((lat: number, lng: number) => place(lat, lng), [place]);
   const hasPoint = plan.lat !== null && plan.lng !== null; const validBox = box?.ok === true;
-  useScene({ body: plan.body, layout: 'panel', autoRotate: !hasPoint, focus: hasPoint ? { lat: plan.lat!, lng: plan.lng!, altitude: plan.sizeKm >= 40 ? 1.25 : 0.95 } : { lat: 5, lng: plan.body === 'MARS' ? 120 : 10, altitude: 2.1 }, pin: hasPoint ? { lat: plan.lat!, lng: plan.lng! } : null, box: validBox ? box.bbox : null }, { onPick });
+  useScene({ body: plan.body, layout: 'panel', autoRotate: !hasPoint, focus: hasPoint ? { lat: plan.lat!, lng: plan.lng!, altitude: 1.7 } : { lat: 5, lng: plan.body === 'MARS' ? 120 : 10, altitude: 2.1 }, pin: hasPoint ? { lat: plan.lat!, lng: plan.lng! } : null, box: validBox ? box.bbox : null }, { onPick });
   const coverage = useCoverage(plan.body, validBox ? box.bbox : null);
   const typed = (latText: string, lngText: string) => {
     const lat = parseAngle(latText), lng = normalizeLongitude(parseAngle(lngText)); const ok = validLatitude(lat) && Number.isFinite(lng);
