@@ -3,35 +3,37 @@
 Read `UI-PLAN.md` first. This file says how far the build is and how to continue. Update it with every push.
 
 ## State at this commit
-Build order step (plan Part D6): **steps 1–3 done in mock mode** (globe, shell, Welcome, Place, Mission, Rover, Review incl. requirement proposal). Run progress, Tour, Report, responsive pass, tests and e2e repointing are not started unless listed below.
+Read this with `UI-PLAN.md`. Plan Part D6 build order: **steps 1–3 work in mock mode; steps 4–5 (run progress, tour) are written but NOT yet visually verified; steps 6–8 not started.**
 
-| Piece | File(s) | State |
+| Piece | File(s) under `analogforge/apps/web/` | State |
 |---|---|---|
-| Dependency `globe.gl` | `apps/web/package.json`, `pnpm-lock.yaml` | added (not yet listed in `src/app/thirdParty.ts`) |
-| Globe textures | `apps/web/public/globe/*`, `scripts/ui/generate_planet_textures.py` | Earth + starfield real; Mars/Moon generated placeholders |
+| Dependency `globe.gl` | `package.json`, `../../pnpm-lock.yaml` | added; **not yet listed in `src/app/thirdParty.ts`** |
+| Textures | `public/globe/*`, `../../scripts/ui/generate_planet_textures.py` | Earth + starfield real; Mars/Moon generated placeholders |
 | Imagery manifest (plug-in point) | `src/maps/globeAssets.ts` | done |
-| Globe component | `src/maps/GlobeStage.tsx` | works: body switch, fly-to, pin drop, area box, pulse ring, click-to-pick, layout offset, no-WebGL fallback. Tickers untested until the Tour exists. |
-| State + scene controller | `src/features/missionControl/state.tsx` | done |
-| Shell (header, panel, step rail, guide, choice) | `src/features/missionControl/StageShell.tsx` | done |
-| Coordinates maths | `src/features/missionControl/coordinates.ts` | done, **no unit tests yet** |
-| Named sites, coverage slot | `namedSites.ts`, `coverage.ts` | done (coverage returns UNKNOWN by design) |
-| Welcome (`/`) | `Welcome.tsx` | done, reviewed at 1440×900 |
-| Mission, Rover, Review steps | `MissionStep.tsx`, `RoverStep.tsx`, `ReviewStep.tsx`, `scenario.ts` | work in mock mode: create draft → propose requirements → review. `Accept and start` navigates to `/runs/:id/tour`, which does not exist yet |
-| Tour logic (pure) | `tour.ts` | benchmark text, site status, coverage written; **no unit tests yet**; not yet used by a Tour screen |
-| Place step (`/start/place`) | `PlaceStep.tsx` | works in mock mode (reviewed at 1440×900) |
-| Styles | `src/styles/mission-control.css` | covers shell, welcome, place, rail, pin, tickers, mobile basics |
+| Globe | `src/maps/GlobeStage.tsx` | verified: body switch, fly-to, pin drop, area box, pulse ring, click-to-pick, layout offset, fallback. Tickers written, unverified |
+| State, shell, panel, step rail, guide | `src/features/missionControl/state.tsx`, `StageShell.tsx` | done |
+| Welcome `/` | `Welcome.tsx` | done, reviewed at 1440×900 |
+| Place `/start/place` | `PlaceStep.tsx`, `coordinates.ts`, `namedSites.ts`, `coverage.ts` | done, reviewed (Mars and Moon) |
+| Mission, Rover, Review | `MissionStep.tsx`, `RoverStep.tsx`, `ReviewStep.tsx`, `scenario.ts` | verified in mock mode through requirement proposal; summary-collapse fix applied but not re-screenshotted |
+| Run data hook | `useRunData.ts` | written, typechecks, unverified |
+| Run progress + Tour `/runs/:id/tour` | `TourView.tsx`, `tour.ts`, `narrator.ts` | **written, typecheck + lint pass, never viewed in a browser.** Nearby sites share one globe ticker and a local SVG map in the panel |
+| Report `/runs/:id/report` | — | **not started** (the tour's "Open report" link points to it and will 404) |
+| Styles | `src/styles/mission-control.css` | covers all of the above; mobile only roughly |
 | Routing | `src/app/router.tsx`, `src/app/App.tsx` | stage routes added; old home moved to `/workbench` |
 
 ## Checks at this commit
-typecheck pass · lint pass · unit tests 144 pass · `scripts/ui/forbidden_scan.py` PASS.
-**Not yet done / expected to fail until fixed:** e2e specs and helpers that open `/` expecting the old workspace (`tests/e2e/support/workbench.ts`, `journeyChecks.ts`, `a11y.spec.ts`, `list-loading-presets.spec.ts`, `J01-golden.spec.ts`, `integration/merge-assertions.spec.ts`) must be repointed to `/workbench`; visual audit not extended; no tests for the new code.
+typecheck pass · lint pass. Unit tests (144) and `scripts/ui/forbidden_scan.py` passed at the previous commit and were **not re-run** after adding the tour files.
+**Known failing / not done:** e2e specs and helpers that open `/` expecting the old workspace (`tests/e2e/support/workbench.ts`, `journeyChecks.ts`, `a11y.spec.ts`, `list-loading-presets.spec.ts`, `journeys/J01-golden.spec.ts`, `integration/merge-assertions.spec.ts`) must be repointed to `/workbench`; no tests exist for any new code; visual audit not extended; nothing tested against the real backend.
 
 ## Next steps, in order
-1. Add unit tests for `coordinates.ts`, `tour.ts`, `scenario.ts`.
-2. Repoint the e2e entry paths to `/workbench`.
-3. Verify the wizard against the real synthetic backend (custom target box acceptance, plan F4).
-4. `useRunData`, Run progress, Tour, site card, coverage strip, narrator (B6–B7).
-5. Report page (B8). 6. Responsive/a11y/motion pass. 7. Tests and audits (Part E). 8. Add `globe.gl`/three.js to `thirdParty.ts`.
+1. Open the tour in mock mode (flow: `/start/place` → Gale → Confirm → example chip → Continue → pick a rover → Continue → Prepare requirements → Accept and start) and fix what is wrong in `TourView.tsx`. Check the "Prove it here" behaviour: it currently selects the site and links to the workbench test lab.
+2. Re-run unit tests and `scripts/ui/forbidden_scan.py`; fix findings.
+3. Build `ReportPage.tsx` (plan B8) and its route; make `App.tsx` render it without chrome.
+4. Repoint the e2e entry paths to `/workbench`.
+5. Unit tests for `coordinates.ts`, `tour.ts`, `scenario.ts`, `narrator.ts`; component tests with `vi.mock('globe.gl')`.
+6. Verify against the real synthetic backend (custom target box acceptance, plan F4).
+7. Responsive (390 px), accessibility and motion pass; add `globe.gl`/three.js to `thirdParty.ts`; extend the visual audit.
+8. Write the backend merging guide from plan Part F.
 
 ## How to run
 ```bash
