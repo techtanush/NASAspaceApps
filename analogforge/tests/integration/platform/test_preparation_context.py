@@ -5,11 +5,13 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 from uuid import uuid4
 
 import pytest
 import sqlalchemy as sa
+from pydantic import SecretStr
 
 from analogforge.application import missions
 from analogforge.application.seed import seed_synthetic
@@ -21,6 +23,7 @@ from analogforge.jobs.handlers.prepare_fingerprint import (
     handle,
 )
 from analogforge.main import PlatformRuntime
+from analogforge.ports import catalog
 from analogforge.ports.hashing import canonical_sha256
 from analogforge.settings import Settings
 from tests.integration.platform.test_journey_api import FIXTURES, journey_store
@@ -57,7 +60,7 @@ def dispatch(preparation: dict[str, Any]) -> dict[str, Any]:
         payload = {
             "mission_id": preparation["header"]["id"],
             "expected_revision": preparation["header"]["revision"],
-            "mode": "synthetic",
+            "mode": preparation["record"]["mode"],
             "rover_revision_id": None,
         }
         job = unit.enqueue("PREPARE_FINGERPRINT", payload, preparation_id=preparation["record"]["id"])
@@ -65,6 +68,81 @@ def dispatch(preparation: dict[str, Any]) -> dict[str, Any]:
     assert leased and leased["id"] == job["id"]
     handle(runtime, leased)
     return dict(leased)
+
+
+@pytest.mark.db
+@pytest.mark.parametrize("case", ["generated_observable", "generated_rule", "supplied_unknown"])
+def test_live_preparation_rejects_invented_measurements_but_preserves_user_unknowns(
+    preparation: dict[str, Any], monkeypatch: pytest.MonkeyPatch, case: str
+) -> None:
+    runtime, workspace = preparation["runtime"], preparation["workspace"]
+    supplied = case == "supplied_unknown"
+    requirement = {
+        **preparation["draft"]["requirements"][0],
+        "origin": "USER",
+        "observable": "user_instrument_observable" if supplied else "unique_slope_exposure_m",
+        "parameters": {
+            **preparation["draft"]["requirements"][0]["parameters"],
+            "comparison_rule_id": "user-rule-v1" if supplied else None,
+        },
+    }
+    source = {
+        "name": "Live terrain draft", "objective": "Compare measured terrain without assuming waypoint locations",
+        "target": {**preparation["draft"]["target"], "vertical_datum": "MOLA areoid"},
+        "requirements": [requirement] if supplied else [],
+        "assumptions": ["User supplied source scope"],
+    }
+    proposal = runtime.engine.prepare({**source, "id": str(uuid4()), "requirements": [requirement]}, workspace)
+    if case == "generated_observable":
+        proposal["requirements"][0]["observable"] = "no_rover_experiment"
+    elif case == "generated_rule":
+        proposal["requirements"][0]["parameters"]["comparison_rule_id"] = "scope-exclusion-v1"
+    else:
+        # The model may not replace the user's unsupported row with a supported one.
+        proposal["requirements"][0]["observable"] = "unique_slope_exposure_m"
+        proposal["requirements"][0]["parameters"]["comparison_rule_id"] = None
+    with runtime.store.transaction(workspace) as unit:
+        header = missions.create(unit, workspace, source)
+        record = unit.create(
+            "preparations",
+            {"mission_draft_revision_id": header["current_draft_id"], "mode": "live", "status": "QUEUED"},
+        )
+    runtime.settings.openai_api_key = SecretStr("local-test-only")
+    runtime.settings.openai_model = "test-model"
+    calls: list[dict[str, Any]] = []
+
+    def create(**kwargs: Any) -> dict[str, Any]:
+        calls.append(json.loads(kwargs["input"]))
+        return {"status": "completed", "output": [{"type": "message", "content": [
+            {"type": "output_text", "text": json.dumps(proposal)},
+        ]}]}
+
+    monkeypatch.setattr(runtime.engine, "_provider_client", lambda: SimpleNamespace(create=create))
+    selected: list[str] = []
+    real_scenario = runtime.engine._scenario
+
+    def scenario(identifier: str) -> dict[str, Any]:
+        selected.append(identifier)
+        return dict(real_scenario(identifier))
+
+    monkeypatch.setattr(runtime.engine, "_scenario", scenario)
+    dispatch({**preparation, "header": header, "record": record})
+    assert selected == [catalog.SCENARIO_LIVE_HACKATHON]
+    assert calls[0]["mode"] == "live" and "example_structure" not in calls[0]
+    with runtime.store.transaction(workspace) as unit:
+        result = unit.require("preparations", record["id"])
+        invocation = unit.list("agent_invocations", {"preparation_id": record["id"]})[0]
+        if supplied:
+            assert result["status"] == "SUCCEEDED"
+            revision = unit.require("mission_revisions", result["proposed_revision_id"])
+            assert revision["requirements"] == source["requirements"]
+            assert revision["assumptions"] == source["assumptions"]
+            assert revision["accepted_at"] is None
+        else:
+            assert result["status"] == "FAILED" and result["error"]["code"] == "MODEL_OUTPUT_INVALID"
+            assert unit.list("mission_revisions") == []
+            assert invocation["role_result"]["payload"]["proposed_contract"] is None
+        assert unit.list("mission_acceptances") == []
 
 
 @pytest.mark.db

@@ -15,6 +15,7 @@ import numpy as np
 import pytest
 import rasterio
 import yaml
+from pyproj import CRS
 from rasterio.transform import Affine, from_origin
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "fixtures" / "science" / "datasets"))
@@ -110,6 +111,23 @@ def test_scale_offset_applied_exactly_once_on_reader_side(tmp_path: Path) -> Non
     assert np.isnan(r.raster.values[0, 0])
     assert np.array_equal(r.raster.values[1:, :], expected[1:, :])  # scaled once, not twice
     assert r.scale_decision is not None and not r.scale_decision.ambiguous
+
+
+def test_body_consistent_source_frame_requires_explicit_normalization_before_quantitative_use(tmp_path: Path) -> None:
+    manifest = build(tmp_path, "geotiff_mars_scaled")
+    source_wkt = CRS.from_proj4("+proj=longlat +R=3396000 +no_defs").to_wkt()
+    path = tmp_path / manifest["dataset_id"] / "mola.tif"
+    with rasterio.open(path, "r+") as raster:
+        raster.crs = rasterio.crs.CRS.from_wkt(source_wkt)
+    manifest["crs"] = {"wkt": source_wkt}
+    manifest["files"][0]["sha256"] = file_sha256(path)
+    result = run(tmp_path, manifest)
+    assert status(result)["body_consistent"] == "PASS"
+    assert status(result)["crs_resolved"] == "FAIL"
+    assert not result.usable_for_quantitative_claims
+    assert "explicit source-frame normalization" in next(
+        c.message for c in result.checks if c.check_id == "crs_resolved"
+    )
 
 
 def test_manifest_scale_applied_on_analysis_side_when_file_has_none(tmp_path: Path) -> None:

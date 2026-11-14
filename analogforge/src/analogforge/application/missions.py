@@ -103,7 +103,13 @@ def save_draft(uow: Any, mission_id: str, body: dict[str, Any]) -> dict[str, Any
     uow.replace(
         "missions",
         mission_id,
-        {**mission, "revision": draft["revision"], "name": body["draft"]["name"], "current_draft_id": draft["id"]},
+        {
+            **mission,
+            "revision": draft["revision"],
+            "name": body["draft"]["name"],
+            "current_draft_id": draft["id"],
+            "current_contract_id": None,
+        },
         body["expected_revision"],
     )
     return draft

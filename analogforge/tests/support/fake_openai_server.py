@@ -9,6 +9,8 @@ from contextlib import contextmanager
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 
+from analogforge.agents.runtime.openai_provider import _expand_wire_task
+
 
 @contextmanager
 def fake_responses_server(mode: str = "normal", transform_submission=None):
@@ -21,6 +23,18 @@ def fake_responses_server(mode: str = "normal", transform_submission=None):
         def do_POST(self):
             body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
             requests.append(body)
+            if mode == "strict_wire_aliases" and any(
+                "async_" in item for item in body.get("input", []) if isinstance(item, dict)
+            ):
+                encoded = json.dumps(
+                    {"error": {"message": "Unknown parameter: async_", "type": "invalid_request_error"}}
+                ).encode()
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(encoded)))
+                self.end_headers()
+                self.wfile.write(encoded)
+                return
             if mode == "timeout":
                 time.sleep(0.15)
             task = None
@@ -28,6 +42,8 @@ def fake_responses_server(mode: str = "normal", transform_submission=None):
                 if item.get("role") == "user":
                     try:
                         task = json.loads(item["content"]).get("task")
+                        if isinstance(task, dict) and "_wire_encoding" in task:
+                            task = _expand_wire_task(task)
                     except (json.JSONDecodeError, TypeError):
                         task = None
             response = {
@@ -85,6 +101,8 @@ def fake_responses_server(mode: str = "normal", transform_submission=None):
                         "status": "completed",
                     }
                 ]
+                if mode == "strict_wire_aliases":
+                    response["output"][0]["async"] = False
             encoded = json.dumps(response).encode()
             try:
                 self.send_response(200)

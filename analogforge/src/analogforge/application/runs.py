@@ -14,11 +14,11 @@ from analogforge.ports.passport_renderer import PassportRenderer
 from analogforge.ports.science import ScienceOperation, ScienceService, SourcePolicy
 
 
-def load_entry_point(path: str, error_code: str) -> Any:
+def load_entry_point(path: str, error_code: str, **factory_kwargs: Any) -> Any:
     module, name = path.split(":", 1)
     try:
         factory = getattr(importlib.import_module(module), name)
-        return factory()
+        return factory(**factory_kwargs)
     except Exception as exc:
         raise ApiError(
             error_code,
@@ -104,7 +104,11 @@ def create(
         allow_network=bool(lock["allow_network"]) and body["mode"] == "live",
     ).model_dump(mode="json")
     if science is None:
-        science = load_entry_point("analogforge.science.facade:create_science_service", "SCIENCE_FACADE_MISSING")
+        science = load_entry_point(
+            "analogforge.science.facade:create_science_service",
+            "SCIENCE_FACADE_MISSING",
+            config_dir=settings.config_dir,
+        )
     if not isinstance(science, ScienceService) or science.supported_operations() != frozenset(ScienceOperation):
         raise ApiError("SCIENCE_FACADE_MISSING", "The science entry point does not satisfy the frozen port.", 503)
     if renderer is None:

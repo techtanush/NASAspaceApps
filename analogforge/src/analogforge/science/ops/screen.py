@@ -234,7 +234,8 @@ def run_screen(env: OpEnv) -> OpOutcome:
         windows_out.append(
             ScreenedWindow(
                 window_id=spec.window_id,
-                name=catalog.PRACTICE_CANDIDATE_NAME_PREFIX + spec.window_id,
+                name=(catalog.PRACTICE_CANDIDATE_NAME_PREFIX if src.manifest.is_synthetic else "Terrain ")
+                + spec.window_id,
                 aoi=aoi,
                 origin=origin,
                 novelty_status=novelty,

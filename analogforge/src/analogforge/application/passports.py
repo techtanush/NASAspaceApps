@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -356,6 +356,36 @@ def _claim_validation_level(run: Mapping[str, Any], claim_id: str, real_level: s
     return real_level
 
 
+def _publication_input_digest(unit: UnitOfWork, raw_run: Mapping[str, Any]) -> str:
+    """Pin scientific inputs while allowing only the review's operational bookkeeping to advance."""
+    run = dict(raw_run)
+    run.pop("revision", None)
+    run.pop("last_event_seq", None)
+    runtime = dict(run.get("runtime", {}))
+    runtime.pop("budget", None)
+    run["runtime"] = runtime
+    run_id = str(run["id"])
+    tables = {}
+    for kind in ("candidates", "qualifications", "evidence", "critiques", "tests", "test_results",
+                 "target_profiles", "portfolios", "compatibility", "tool_receipts"):
+        rows = unit.list(kind, {"run_id": run_id})
+        if kind == "tool_receipts":
+            # _role adds one read-only contract-inspection receipt; it establishes no scientific evidence.
+            rows = [row for row in rows if row["tool_name"] != "inspect_contract" or row["evidence_ids"]]
+        tables[kind] = sorted(rows, key=lambda row: str(row["id"]))
+    artifact_hashes = {row["artifact_sha256"] for row in tables["evidence"] if row.get("artifact_sha256")}
+    inputs = {
+        "run": run,
+        "mission": unit.require("mission_revisions", run["mission_revision_id"]),
+        "acceptances": sorted(unit.list("mission_acceptances", {"mission_revision_id": run["mission_revision_id"]}),
+                              key=lambda row: str(row["id"])),
+        "rover": unit.require("rover_revisions", run["rover_revision_id"]) if run.get("rover_revision_id") else None,
+        "artifacts": {sha: unit.list("artifacts", {"sha256": sha}) for sha in sorted(artifact_hashes)},
+        "tables": tables,
+    }
+    return canonical_sha256(inputs)
+
+
 def publish_passport(
     store: Store,
     workspace_id: str | UUID,
@@ -366,11 +396,14 @@ def publish_passport(
     job_id: str | UUID | None = None,
     lease_token: str | UUID | None = None,
     config_dir: Path | None = None,
+    before_publish: Callable[[PassportExportBundle], None] | None = None,
 ) -> PassportExportBundle:
     """Freeze and publish under revision/lease fencing; renderer runs in a separate job.
 
     Passing a renderer never performs rendering inside this transaction. It only allows
     the caller to retain the same explicit seam when enqueueing export work.
+    An optional role review receives a private draft copy outside every transaction;
+    publication requires its acceptance and unchanged scientific inputs afterwards.
     """
     del renderer
     with store.transaction(workspace_id) as unit:
@@ -382,6 +415,7 @@ def publish_passport(
             saved = unit.require("passports", run["passport_id"])
             return PassportExportBundle.model_validate(saved["bundle"])
         revision = run["revision"]
+        input_digest = _publication_input_digest(unit, unit.require("runs", run_id)) if before_publish else None
         mission = public_model(MissionTestContract, accepted_contract(unit, run["mission_revision_id"]))
         rover = (
             public_model(RoverProfile, unit.require("rover_revisions", run["rover_revision_id"]))
@@ -488,9 +522,6 @@ def publish_passport(
             and run.get("rover_content_sha256", rover.content_sha256 if rover else None)
             == (rover.content_sha256 if rover else None)
         ),
-        validation_receipts={
-            key: tuple(UUID(value) for value in values) for key, values in run.get("validation_receipts", {}).items()
-        },
         created_at=created_at,
     )
     claims = []
@@ -633,6 +664,9 @@ def publish_passport(
     manifest_blob = blob_store.put_bytes(bundle.canonical_manifest_json.encode(), "application/json")
     if (job_id is None) != (lease_token is None):
         raise ValueError("job_id and lease_token must be supplied together")
+    if before_publish is not None:
+        # The reviewed bundle stays private and unchanged even if a reviewer mutates its own copy.
+        before_publish(bundle.model_copy(deep=True))
     context = (
         store.publication(workspace_id, job_id, lease_token)
         if job_id is not None and lease_token is not None
@@ -640,6 +674,12 @@ def publish_passport(
     )
     with context as unit:
         latest = unit.require("runs", run_id, lock=True)
+        if before_publish is not None:
+            if (_publication_input_digest(unit, latest) != input_digest
+                    or assurance_policy_digest(config_dir) != policy_sha):
+                raise ScientificClaimRejected(["SC-01:STALE_OR_CANCELLED_PUBLICATION"])
+            # The review may charge budgets and retain a role event; the scientific snapshot is still exact.
+            revision = latest["revision"]
         if latest["revision"] != revision or latest["state"] in {"CANCELLED", "FAILED"}:
             raise ScientificClaimRejected(["SC-01:STALE_OR_CANCELLED_PUBLICATION"])
         register_blob(unit, assurance_blob)

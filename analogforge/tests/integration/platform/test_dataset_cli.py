@@ -77,7 +77,11 @@ def test_validation_uses_facade_and_lock_detects_byte_tamper(tmp_path, monkeypat
                 payload=payload,
             )
 
-    monkeypatch.setattr(datasets, "_entrypoint", lambda module, name: lambda: Science())
+    def science_factory(*, config_dir):
+        assert config_dir == settings.config_dir
+        return Science()
+
+    monkeypatch.setattr(datasets, "_entrypoint", lambda module, name: science_factory)
     report = datasets.validate_dataset(settings, "test-mars-terrain")
     assert report["status"] == "PASS"
     assert called == [("INGEST_LOCAL_DATASET", root)]

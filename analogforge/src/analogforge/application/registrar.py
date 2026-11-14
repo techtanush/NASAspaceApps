@@ -21,6 +21,8 @@ from analogforge.ports.hashing import canonical_sha256
 from analogforge.ports.science import ScienceComputationResult, ScienceRequest
 
 MEDIA_TYPES = frozenset({"application/json", "image/png", "image/tiff", "application/x-npz", "text/csv"})
+# Dataset-specific origins registered by the PDS adapters and NASADEM intake.
+SOURCE_HOSTS = frozenset({"pds-geosciences.wustl.edu", "nasademeuwest.blob.core.windows.net"})
 
 
 class RegistrationRejected(ValueError):
@@ -233,7 +235,7 @@ class Registrar:
                     raise RegistrationRejected("Source URI is malformed") from exc
                 if uri and (uri.scheme != "https" or not uri.hostname or not uri.netloc):
                     raise RegistrationRejected("Source URI requires an approved HTTPS origin")
-                if uri and not any(
+                if uri and uri.hostname not in SOURCE_HOSTS and not any(
                     uri.hostname == domain or str(uri.hostname).endswith("." + domain)
                     for domain in ("nasa.gov", "usgs.gov", "asu.edu", "usra.edu", "caltech.edu", "arizona.edu")
                 ):

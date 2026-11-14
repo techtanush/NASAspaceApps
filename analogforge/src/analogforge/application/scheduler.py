@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import importlib
 import json
+import logging
 import tempfile
 import time
-from contextlib import nullcontext
+from collections.abc import Iterator
+from contextlib import contextmanager, nullcontext
 from contextvars import ContextVar
 from pathlib import Path
 from typing import Any, cast
@@ -215,24 +217,48 @@ class WorkflowEngine:
             scenario_config_id
             or mission.get("scenario_config_id")
             or (
-                catalog.SCENARIO_MOON_GAP
+                catalog.SCENARIO_LIVE_HACKATHON
+                if mode == "live"
+                else catalog.SCENARIO_MOON_GAP
                 if mission.get("target", {}).get("body") == "MOON"
                 else catalog.DEFAULT_SCENARIO
             )
         )
         scenario = self._scenario(scenario_id)
-        preset_name = scenario["mission_preset"]
-        preset_path = Path(self.settings.config_dir) / "presets" / "missions" / Path(preset_name).name
-        if not preset_path.exists():
-            raise WorkflowError("INPUT_INVALID", "Configured mission preset is missing")
-        preset = json.loads(preset_path.read_text())
-        if preset["target"]["body"] != mission["target"]["body"]:
-            raise WorkflowError("INPUT_INVALID", "NEEDS_USER_REVIEW: target body differs from preset")
+        if mode != "live":
+            preset_name = scenario["mission_preset"]
+            preset_path = Path(self.settings.config_dir) / "presets" / "missions" / Path(preset_name).name
+            if not preset_path.exists():
+                raise WorkflowError("INPUT_INVALID", "Configured mission preset is missing")
+            preset = json.loads(preset_path.read_text())
+            if preset["target"]["body"] != mission["target"]["body"]:
+                raise WorkflowError("INPUT_INVALID", "NEEDS_USER_REVIEW: target body differs from preset")
         if mode == "live":
             # Live drafting must be explicit; no scripted defaults can masquerade as live inference.
-
             if not getattr(self.settings, "openai_api_key", None) or not getattr(self.settings, "openai_model", None):
                 raise WorkflowError("PROVIDER_AUTH_FAILED", "Live preparation requires configured provider")
+            algorithms = yaml.safe_load((Path(self.settings.config_dir) / "algorithms.yaml").read_text())
+            operators = {
+                "slope-band-area-fraction-v1": ["GTE"],
+                "slope-w1-common-support-v1": ["LTE"],
+                "route-exposure-v1": ["GTE"],
+                "route-tasks-v1": ["GTE"],
+                "route-reserve-v1": ["GTE"],
+                "mineral-presence-v1": ["PRESENT"],
+                "thermal-min-v1": ["GTE", "LTE", "BETWEEN"],
+                "clearance-scale-v1": ["GTE"],
+                "physical-gap-v1": ["NOT_NATURALLY_REPRODUCIBLE"],
+            }
+            policy_catalog = {
+                observable: {
+                    **algorithms["observable_policies"][policy_id],
+                    "observable": observable,
+                    "policy_id": policy_id,
+                    "operators": operators[policy_id],
+                }
+                for observable, policy_id in catalog.OBSERVABLE_POLICY_BY_OBSERVABLE.items()
+                if policy_id in algorithms["observable_policies"]
+            }
             # Run preparation through strict structured output, then the same deterministic validator.
             client = self._provider_client()
             from analogforge.tools.registry import strict_schema
@@ -242,11 +268,39 @@ class WorkflowEngine:
                 input=json.dumps(
                     {
                         "instruction": (
-                            "Propose a mission contract; preserve supplied objective and target, "
-                            "mark assumptions proposed. No acceptance."
+                            "Propose an unaccepted live mission contract. Preserve supplied name, objective, target, "
+                            "requirements and assumptions exactly. Use only the observable_policy_catalog for new "
+                            "requirements; comparison_rule_id must be null or the observable's exact policy_id. "
+                            "Use the declared units and operators. GTE requires lower, LTE upper, BETWEEN both. "
+                            "Every newly proposed threshold and support scale is an unmeasured proposal for explicit "
+                            "user review: mark origin PROPOSED_DEFAULT and state this in acceptance_note. "
+                            "No terrain measurements, source availability, synthetic-data assumptions, rover, energy "
+                            "model, sampling tasks or waypoint locations may be inferred from a practice preset. "
+                            "Do not invent waypoints or claim that generated fixtures represent the user's data. "
+                            "Scope statements and exclusions, including no rover experiment, belong in proposed "
+                            "assumptions, never fictitious measurement requirements. Policies with unresolved rules "
+                            "or unavailable evidence cannot promise qualification. No acceptance or measured facts."
                         ),
+                        "mode": mode,
                         "draft": mission,
-                        "example_structure": preset,
+                        "algorithm_config_version": algorithms["config_version"],
+                        "algorithm_config_sha256": canonical_sha256(algorithms),
+                        "observable_policy_catalog": policy_catalog,
+                        "parameter_guidance": {
+                            "slope_band_deg": "Two ordered angles in [0, 90], required for slope fraction or exposure",
+                            "exposure_counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE for unique slope exposure",
+                            "task_ids": "Only explicitly supplied task identifiers; do not invent tasks or locations",
+                            "co_location_group": "Only group requirements that must hold at the same site",
+                            "temporal_support": "Use source-documented temporal support; do not invent it",
+                            "support_scales": (
+                                "Copy explicitly requested comparison scales faithfully as reviewable analysis "
+                                "constraints, distinct from source native resolution. Exactly 500 m means "
+                                "minimum_support_scale_m=500 and maximum_support_scale_m=500; no finer than 500 m "
+                                "means minimum_support_scale_m=500; no coarser than 500 m means "
+                                "maximum_support_scale_m=500. Do not infer measured native resolution from these "
+                                "requests. Unrequested scale choices are unmeasured proposals for user review."
+                            ),
+                        },
                     }
                 ),
                 text={
@@ -276,6 +330,23 @@ class WorkflowEngine:
             if supplied_requirements
             else [{**row, "origin": "PROPOSED_DEFAULT"} for row in preset["requirements"]]
         )
+        if mode == "live" and not supplied_requirements:
+            for row in requirements:
+                policy = policy_catalog.get(row["observable"])
+                if policy is None or row["parameters"].get("comparison_rule_id") not in {None, policy["policy_id"]}:
+                    raise WorkflowError("MODEL_OUTPUT_INVALID", "Proposed requirement has no supported observable rule")
+                if row["operator"] not in policy["operators"] or (
+                    policy["units"] != "*" and row["unit"] != policy["units"]
+                ):
+                    raise WorkflowError(
+                        "MODEL_OUTPUT_INVALID", "Proposed requirement has unsupported units or operator"
+                    )
+        if supplied_requirements:
+            assumptions = mission.get("assumptions", [])
+        elif mode == "live" and "assumptions" in mission:
+            assumptions = mission["assumptions"]
+        else:
+            assumptions = list(dict.fromkeys(preset.get("assumptions", []) + mission.get("assumptions", [])))
         result = {
             **preset,
             **{k: mission[k] for k in ("name", "objective", "target") if k in mission},
@@ -287,9 +358,7 @@ class WorkflowEngine:
             "created_at": utc_now(),
             "accepted_at": None,
             "requirements": requirements,
-            "assumptions": mission.get("assumptions", [])
-            if supplied_requirements
-            else list(dict.fromkeys(preset.get("assumptions", []) + mission.get("assumptions", []))),
+            "assumptions": assumptions,
         }
         result["content_sha256"] = content_hash(result, "mission")
         issues = validate_mission_content(result)
@@ -434,7 +503,9 @@ class WorkflowEngine:
         service = self.science
         if service is None:
             try:
-                service = importlib.import_module("analogforge.science.facade").create_science_service()
+                service = importlib.import_module("analogforge.science.facade").create_science_service(
+                    config_dir=Path(self.settings.config_dir)
+                )
             except (ModuleNotFoundError, AttributeError) as exc:
                 raise WorkflowError("SCIENCE_FACADE_MISSING", "Scientific entry point is unavailable") from exc
         if ScienceOperation(inputs.operation) not in service.supported_operations():
@@ -519,21 +590,43 @@ class WorkflowEngine:
                 sorted(sources, key=lambda e: e["id"])
             )
             tx.replace("runs", run_id, current, current["revision"])
+            # A published BLOCKED result completes the call; its scientific outcome stays on the receipt/operation.
+            tx.replace(
+                "invocations",
+                invocation_id,
+                {
+                    **tx.require("invocations", invocation_id, lock=True),
+                    "status": "FAILED" if registered.status == "FAILED" else "SUCCEEDED",
+                },
+            )
             if publish is not None and registered.payload is not None:
                 publish(tx, registered)
 
-        return self.registrar.register(
-            request,
-            result,
-            scratch_dir=scratch,
-            workspace_id=workspace_id,
-            run_id=run_id,
-            invocation_id=invocation_id,
-            tool_name=OPERATION_TO_TOOL[request.operation],
-            job_id=job_id,
-            lease_token=lease_token,
-            apply_payload=apply,
-        )
+        try:
+            return self.registrar.register(
+                request,
+                result,
+                scratch_dir=scratch,
+                workspace_id=workspace_id,
+                run_id=run_id,
+                invocation_id=invocation_id,
+                tool_name=OPERATION_TO_TOOL[request.operation],
+                job_id=job_id,
+                lease_token=lease_token,
+                apply_payload=apply,
+            )
+        except Exception:  # noqa: BLE001 - every rejected publication terminates its diagnostic invocation
+            try:
+                with self.store.transaction(workspace_id) as tx:
+                    tx.replace(
+                        "invocations", invocation_id, {**tx.require("invocations", invocation_id), "status": "FAILED"}
+                    )
+            except Exception as exc:  # noqa: BLE001 - cleanup must preserve the original registration failure
+                logging.getLogger(__name__).error(
+                    "science.invocation_finalize_failed",
+                    extra={"invocation_id": invocation_id, "error_type": type(exc).__name__},
+                )
+            raise
 
     def _scratch_root(self) -> Path:
         root = Path(self.settings.data_root) / "scratch"
@@ -551,6 +644,23 @@ class WorkflowEngine:
             selected[row["candidate_id"], row["requirement_id"]] = row
         return list(selected.values())
 
+    @contextmanager
+    def _role_attempt(self, workspace_id: str, invocation_id: str) -> Iterator[None]:
+        try:
+            yield
+        except Exception:  # noqa: BLE001 - provider, validation and publication failures all finish diagnostics
+            try:
+                with self.store.transaction(workspace_id) as tx:
+                    invocation = tx.require("invocations", invocation_id, lock=True)
+                    if invocation["status"] == "RUNNING":
+                        tx.replace("invocations", invocation_id, {**invocation, "status": "FAILED"})
+            except Exception as exc:  # noqa: BLE001 - cleanup cannot hide the original rejection
+                logging.getLogger(__name__).error(
+                    "role.invocation_finalize_failed",
+                    extra={"invocation_id": invocation_id, "error_type": type(exc).__name__},
+                )
+            raise
+
     def _role(
         self, role: str, task_kind: str, run_id: str, workspace_id: str, extra: dict[str, Any] | None = None
     ) -> RoleSubmission:
@@ -558,7 +668,21 @@ class WorkflowEngine:
 
         run, mission, rover = self._load(run_id, workspace_id)
         scenario = self._scenario(run["scenario_config_id"])
+        if (mission["id"] != run["mission_revision_id"] or mission["content_sha256"]
+                != run.get("runtime", {}).get("mission_content_sha256")):
+            raise WorkflowError("REVISION_CONFLICT", "Role contract differs from the run's pinned revision or hash")
         with self.store.transaction(workspace_id) as tx:
+            acceptances = tx.list("mission_acceptances", {"mission_revision_id": mission["id"]})
+            if not acceptances or not acceptances[0].get("accepted_at"):
+                raise WorkflowError("CONTRACT_NOT_ACCEPTED", "Role tasks require acceptance of the pinned contract")
+            acceptance = {
+                "acceptance_id": acceptances[0]["id"],
+                "accepted_at": acceptances[0]["accepted_at"],
+                "mission_revision_id": mission["id"],
+                "contract_sha256": mission["content_sha256"],
+                "scope": "OPERATOR_CRITERIA_FOR_PINNED_REVISION",
+                "scientific_validation": False,
+            }
             evidences = tx.list("evidence", {"run_id": run_id})
             receipts = tx.list("tool_receipts", {"run_id": run_id})
             established = {
@@ -628,6 +752,11 @@ class WorkflowEngine:
             "next_action": None,
             "payload": payload,
         }
+        authoritative_claims = (
+            [claim.model_dump(mode="json") for claim in self._claims(workspace_id, run_id)]
+            if role in {"scientific_critic", "evidence_passport"}
+            else []
+        )
         invocation_id = new_id()
         ledger = BudgetLedger.from_document(run.get("runtime", {}).get("budget"))
         task = AgentTask(
@@ -652,6 +781,9 @@ class WorkflowEngine:
             payload={
                 "prepared_submission": proposal,
                 "authoritative_submission": proposal,
+                "authoritative_claims": authoritative_claims,
+                "scientific_audit": (extra or {}).get("scientific_audit"),
+                "contract_acceptance": acceptance,
                 "untrusted_sources": [],
                 "authoritative_rover": rover,
                 "permitted_repairs": (extra or {}).get("diagnosis", {}).get("permitted_repairs", []),
@@ -710,7 +842,9 @@ class WorkflowEngine:
             {
                 "get_run_snapshot": lambda args: {"run_revision": run["revision"], "snapshot": run},
                 "inspect_contract": lambda args: {
-                    "accepted": bool(mission.get("accepted_at")),
+                    "accepted": True,
+                    "acceptance": acceptance,
+                    "contract_revision_id": mission["id"],
                     "hash": mission["content_sha256"],
                     "requirements": mission["requirements"],
                 },
@@ -741,95 +875,110 @@ class WorkflowEngine:
                     "input_hash": canonical_sha256(task),
                 },
             )
-        submission = RoleSubmission.model_validate(provider.run(task, registry, context))
-        rejected_seed = False
-        try:
-            validate_submission(task, submission)
-        except PolicyViolation as exc:
-            if not seeded_defect or exc.detail_code != "COMPARISON_CITATION_CHANGED":
-                raise
-            rejected_seed = True
-        evaluate_transition(
-            run,
-            submission.model_dump(mode="json"),
-            receipts,
-            evidence={e["id"]: e for e in evidences},
-            allowed_actions=task.allowed_actions,
-        )
-        result = AgentRoleResult.model_validate(
-            {
-                **envelope(workspace_id, run_id, run["mode"]),
-                "invocation_id": invocation_id,
-                "role": role,
-                "status": "BLOCKED" if rejected_seed or submission.disposition != "COMPLETE" else "SUCCEEDED",
-                "proposed_next_state": None,
-                "evidence_ids": [str(e) for e in submission.evidence_ids],
-                "receipt_ids": [r["id"] for r in receipts],
-                "summary": submission.summary,
-                "payload": submission.model_dump(mode="json"),
-                "error_code": "SCALE_INCOMPATIBLE" if rejected_seed else None,
-            }
-        ).model_dump(mode="json")
-        active_job, active_token = self._job_context.get()
-        publication = (
-            self.store.publication(workspace_id, active_job, active_token)
-            if active_job and active_token
-            else self.store.transaction(workspace_id)
-        )
-        with publication as tx:
-            authoritative = tx.require("runs", run_id, lock=True)
-            if authoritative["state"] == "CANCELLED" or authoritative.get("cancel_requested_at"):
-                raise ScienceCancelled()
-            if any(
-                authoritative.get(key) != run.get(key)
-                for key in (
-                    "state",
-                    "mission_revision_id",
-                    "rover_revision_id",
-                    "selected_candidate_id",
-                    "qualification_ids",
-                    "test_ids",
-                    "test_result_ids",
+        with self._role_attempt(workspace_id, invocation_id):
+            submission = RoleSubmission.model_validate(provider.run(task, registry, context))
+            rejected_seed = False
+            try:
+                validate_submission(task, submission)
+            except PolicyViolation as exc:
+                if not seeded_defect or exc.detail_code != "COMPARISON_CITATION_CHANGED":
+                    raise
+                rejected_seed = True
+            evaluate_transition(
+                run,
+                submission.model_dump(mode="json"),
+                receipts,
+                evidence={e["id"]: e for e in evidences},
+                allowed_actions=task.allowed_actions,
+            )
+            completion_requires_review = submission.disposition == "COMPLETE" and (
+                any(issue.severity == "BLOCKING" for issue in submission.issues)
+                or role == "evidence_passport" and not submission.payload["ready_to_publish"]
+            )
+            result = AgentRoleResult.model_validate(
+                {
+                    **envelope(workspace_id, run_id, run["mode"]),
+                    "invocation_id": invocation_id,
+                    "role": role,
+                    "status": "BLOCKED"
+                    if rejected_seed or submission.disposition != "COMPLETE" or completion_requires_review
+                    else "SUCCEEDED",
+                    "proposed_next_state": None,
+                    "evidence_ids": [str(e) for e in submission.evidence_ids],
+                    "receipt_ids": [r["id"] for r in receipts],
+                    "summary": submission.summary,
+                    "payload": submission.model_dump(mode="json"),
+                    "error_code": "SCALE_INCOMPATIBLE" if rejected_seed else None,
+                }
+            ).model_dump(mode="json")
+            active_job, active_token = self._job_context.get()
+            publication = (
+                self.store.publication(workspace_id, active_job, active_token)
+                if active_job and active_token
+                else self.store.transaction(workspace_id)
+            )
+            with publication as tx:
+                authoritative = tx.require("runs", run_id, lock=True)
+                if authoritative["state"] == "CANCELLED" or authoritative.get("cancel_requested_at"):
+                    raise ScienceCancelled()
+                if any(
+                    authoritative.get(key) != run.get(key)
+                    for key in (
+                        "state",
+                        "mission_revision_id",
+                        "rover_revision_id",
+                        "selected_candidate_id",
+                        "qualification_ids",
+                        "test_ids",
+                        "test_result_ids",
+                    )
+                ):
+                    raise WorkflowError("REVISION_CONFLICT", "Role proposal used a stale scientific snapshot")
+                tx.create("role_results", result)
+                if rejected_seed:
+                    authoritative.setdefault("runtime", {})["seeded_defect_staged"] = True
+                    tx.replace("runs", run_id, authoritative, authoritative["revision"])
+                tx.create(
+                    "agent_actions",
+                    AgentAction.model_validate(
+                        {
+                            **envelope(workspace_id, run_id, run["mode"]),
+                            "agent_role": role,
+                            "invocation_id": invocation_id,
+                            "action_type": "DECISION",
+                            "tool_name": None,
+                            "tool_receipt_id": None,
+                            "summary": submission.summary,
+                            "evidence_ids": [str(e) for e in submission.evidence_ids],
+                            "status": (
+                                "BLOCKED"
+                                if rejected_seed or submission.disposition != "COMPLETE" or completion_requires_review
+                                else "SUCCEEDED"
+                            ),
+                        }
+                    ).model_dump(mode="json"),
                 )
-            ):
-                raise WorkflowError("REVISION_CONFLICT", "Role proposal used a stale scientific snapshot")
-            tx.create("role_results", result)
-            if rejected_seed:
-                authoritative.setdefault("runtime", {})["seeded_defect_staged"] = True
-                tx.replace("runs", run_id, authoritative, authoritative["revision"])
-            tx.create(
-                "agent_actions",
-                AgentAction.model_validate(
-                    {
-                        **envelope(workspace_id, run_id, run["mode"]),
-                        "agent_role": role,
-                        "invocation_id": invocation_id,
-                        "action_type": "DECISION",
-                        "tool_name": None,
-                        "tool_receipt_id": None,
-                        "summary": submission.summary,
-                        "evidence_ids": [str(e) for e in submission.evidence_ids],
-                        "status": "BLOCKED" if rejected_seed or submission.disposition != "COMPLETE" else "SUCCEEDED",
-                    }
-                ).model_dump(mode="json"),
-            )
-            tx.replace(
-                "invocations", invocation_id, {**tx.require("invocations", invocation_id), "status": "SUCCEEDED"}
-            )
-            tx.append_event(
-                run_id,
-                "agent.proposal_rejected" if rejected_seed else "agent.completed",
-                {"role": role, "invocation_id": invocation_id, "summary": submission.summary},
-                run["mode"],
-            )
+                tx.replace(
+                    "invocations", invocation_id, {**tx.require("invocations", invocation_id), "status": "SUCCEEDED"}
+                )
+                tx.append_event(
+                    run_id,
+                    "agent.proposal_rejected" if rejected_seed else "agent.completed",
+                    {"role": role, "invocation_id": invocation_id, "summary": submission.summary},
+                    run["mode"],
+                )
 
-        if submission.disposition != "COMPLETE" or submission.next_action in {
-            "request_review",
-            "stop_investigation",
-            "record_unknown",
-        }:
-            raise WorkflowRolePaused(submission.disposition, submission.summary)
-        return submission
+            if completion_requires_review:
+                raise WorkflowRolePaused(
+                    "NEEDS_USER_REVIEW", "Role submission requires operator review before continuation."
+                )
+            if submission.disposition != "COMPLETE" or submission.next_action in {
+                "request_review",
+                "stop_investigation",
+                "record_unknown",
+            }:
+                raise WorkflowRolePaused(submission.disposition, submission.summary)
+            return submission
 
     def _qualify(
         self,
@@ -1267,13 +1416,14 @@ class WorkflowEngine:
                     },
                 )
                 ids = []
-                for window in r.required_payload["windows"]:
-                    if window["window_id"] in r.required_payload["shortlist_window_ids"]:
-                        candidate = discovery.candidate_record(
-                            window, workspace_id, run_id, run["mode"], list(r.evidence_ids)
-                        )
-                        tx.create("candidates", candidate)
-                        ids.append(candidate["id"])
+                windows = {window["window_id"]: window for window in r.required_payload["windows"]}
+                # Science has already ranked and tie-broken this shortlist; the windows remain in grid order.
+                for window_id in r.required_payload["shortlist_window_ids"]:
+                    candidate = discovery.candidate_record(
+                        windows[window_id], workspace_id, run_id, run["mode"], list(r.evidence_ids)
+                    )
+                    tx.create("candidates", candidate)
+                    ids.append(candidate["id"])
                 current = tx.require("runs", run_id)
                 current["candidate_ids"] = ids
                 tx.replace("runs", run_id, current, current["revision"])
@@ -1293,7 +1443,11 @@ class WorkflowEngine:
                 publish=screen_publish,
                 **kwargs,
             )
-            candidates = self._rows(workspace_id, "candidates", run_id)
+            with self.store.transaction(workspace_id) as tx:
+                candidates = [
+                    tx.require("candidates", identifier)
+                    for identifier in tx.require("runs", run_id)["candidate_ids"]
+                ]
             for candidate in candidates:
 
                 def analysis_publish(tx: Any, r: RegisteredResult, candidate: dict[str, Any] = candidate) -> None:
@@ -1733,6 +1887,19 @@ class WorkflowEngine:
             )
             from analogforge.application.passports import publish_passport
 
+            def review_passport(draft: Any) -> None:
+                self._role(
+                    "evidence_passport",
+                    "assemble_passport",
+                    run_id,
+                    workspace_id,
+                    {
+                        "passport": draft.passport.model_dump(mode="json"),
+                        "qualifications": self._latest_qualifications(workspace_id, run_id),
+                        "scientific_audit": audit,
+                    },
+                )
+
             bundle = publish_passport(
                 self.store,
                 workspace_id,
@@ -1742,16 +1909,7 @@ class WorkflowEngine:
                 job_id=job_id,
                 lease_token=lease_token,
                 config_dir=Path(self.settings.config_dir),
-            )
-            self._role(
-                "evidence_passport",
-                "assemble_passport",
-                run_id,
-                workspace_id,
-                {
-                    "passport": bundle.passport.model_dump(mode="json"),
-                    "qualifications": self._latest_qualifications(workspace_id, run_id),
-                },
+                before_publish=review_passport,
             )
             return finish("COMPLETED", passport_id=str(bundle.passport.id), pending_review=None)
         raise WorkflowError("INVALID_TRANSITION", f"No worker step for state {state}")
@@ -2031,13 +2189,16 @@ class WorkflowEngine:
             }
             with self.store.transaction(workspace_id) as tx:
                 tx.create("critiques", self._record_critique(tx, issue, mission))
-        self._role(
+        review = self._role(
             "scientific_critic",
             "review_qualification",
             run_id,
             workspace_id,
-            {"review_revision_id": new_id(), "objections": []},
+            {"review_revision_id": new_id(), "objections": [], "scientific_audit": audit},
         )
+        if review.payload["objections"] or review.payload["gate_recommendation"] == "REPAIR_REQUIRED":
+            # Retain the validated role proposal for review; a model concern is not a computed scientific finding.
+            raise WorkflowRolePaused("NEEDS_USER_REVIEW", "Scientific critic concerns require operator review.")
         return False
 
     def apply_action(
@@ -2105,6 +2266,7 @@ class WorkflowEngine:
             elif action == "RETRY":
                 run["state"] = run["runtime"]["resume_state"]
                 run["blocked_dependencies"] = []
+                run["runtime"].pop("role_disposition", None)
             elif action in {"BUILD_PORTFOLIO", "NOMINATE_CANDIDATE"}:
                 if action == "BUILD_PORTFOLIO":
                     requested = set(payload.get("candidate_ids", []))

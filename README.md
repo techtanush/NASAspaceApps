@@ -3,7 +3,7 @@
 **Challenge:** *Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars.*
 **Product:** AnalogForge, a mission-conditioned Earth-analog qualification and test-design workbench: Mission Fingerprint → planetary target characterization → Earth candidate discovery → requirement-by-requirement qualification (PASS / PARTIAL / FAIL / GAP / UNKNOWN) → **PROVE IT** (deterministic, independently verified route/energy/exposure experiment with diagnosis and bounded replanning) → Analog Passport (HTML/JSON/CSV). *A place can look like Mars and still be useless for the test; AnalogForge checks the test, not the resemblance.*
 
-The application is **not implemented yet**: this repository contains the complete specification, a frozen contract kit, and one-shot build guides for three parallel coding agents plus a merging guide. Everything except the NASA-provided dataset is built and rehearsed on synthetic practice data; the dataset plugs into a prepared slot at the hackathon.
+The merged application is implemented in [`analogforge/`](analogforge/). It includes the backend, science engine, Agent Council, React workbench, and passport renderer. Start with the [application run instructions](analogforge/README.md). Synthetic practice works without API credentials; live operation requires an explicit OpenAI model and validated, locked real datasets. The architecture and contributor guides remain the implementation reference.
 
 ## Branches and who runs them
 
@@ -13,9 +13,9 @@ The application is **not implemented yet**: this repository contains the complet
 | `ayan/science-data-verification` | Ayan | [team guides/Ayan/README.md](team%20guides/Ayan/README.md) | Scientific library behind the `ScienceService` port, dataset slot, route verifier, generators |
 | `aradhya/frontend-experience` | Aradhya | [team guides/Aradhya/README.md](team%20guides/Aradhya/README.md) | React workbench, maps, mock backend, pure passport renderer, browser journeys |
 | `merging-branch` | merging agent | `merging guide/README.md` on that branch | Purity checks, wiring, combined tests, release candidate |
-| `main` | — | this README | Shared specification and guides |
+| `main` | team | [analogforge/README.md](analogforge/README.md) | Merged application, shared specification and guides |
 
-Each person clones their branch and pastes **one prompt** (`team guides/<Name>/CODING-AGENT-PROMPT.md`) into Claude Code or Codex. The agent runs unattended (with subagents as needed) until its definition of done, then pushes with a filled `STATUS.json`. When all three are ready, the merging agent (one prompt) fuses them.
+The contributor branches and one-shot prompts above describe the original parallel build. Their work is now integrated into `main`; use the merging guide for subsequent cross-component validation and preserve the frozen contracts.
 
 ## Read order
 

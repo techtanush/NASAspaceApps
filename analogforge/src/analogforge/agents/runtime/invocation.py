@@ -48,6 +48,13 @@ def validate_authoritative_payload(task: AgentTask, submission: RoleSubmission) 
     expected = task.payload.get("authoritative_submission", task.payload.get("prepared_submission", {})).get(
         "payload", {}
     )
+    claim_ids = {claim["claim_id"] for claim in task.payload.get("authoritative_claims", [])}
+    referenced_claims = [row["claim_id"] for row in submission.payload.get("claim_annotations", [])]
+    referenced_claims.extend(submission.payload.get("accepted_claim_ids", []))
+    referenced_claims.extend(row["claim_id"] for row in submission.payload.get("objections", [])
+                             if row["claim_id"] is not None)
+    if any(claim_id not in claim_ids for claim_id in referenced_claims):
+        raise PolicyViolation("CLAIM_REFERENCE_NOT_AUTHORIZED")
     receipt_ids.update(identifier for field, identifier in _nested_references(expected) if "receipt_id" in field)
     for field, identifier in _nested_references(submission.payload):
         allowed = receipt_ids if "receipt_id" in field else evidence

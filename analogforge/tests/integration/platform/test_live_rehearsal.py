@@ -1,5 +1,6 @@
 """Live provider rehearsed through real local HTTP with no external credentials."""
 
+import json
 from uuid import uuid4
 
 import pytest
@@ -74,6 +75,8 @@ def test_live_responses_loop_serial_tools_and_call_id_correlation():
     assert calls == [{"sections": ["contract"]}]
     assert len(requests) == 2
     assert all(r["store"] is False and r["parallel_tool_calls"] is False for r in requests)
+    assert all({tool["name"] for tool in request["tools"]} == {"get_run_snapshot", "submit_role_result"}
+               for request in requests)
     outputs = [i for i in requests[1]["input"] if i.get("type") == "function_call_output"]
     assert outputs[0]["call_id"] == "opaque-call-1"
     assert counts.count("model_requests_per_run") == 2
@@ -107,12 +110,63 @@ def test_live_one_schema_correction_is_counted():
     assert counts.count("model_requests_per_run") == 2
 
 
+def test_live_next_action_schema_and_correction_use_exact_task_actions():
+    task, context, registry, counts, _ = task_and_context()
+    task = task.model_copy(update={"allowed_actions": ["continue", "request_review"]})
+    attempts = []
+
+    def submission(arguments, _task):
+        attempts.append(True)
+        return {**arguments, "disposition": "NEEDS_USER_REVIEW", "next_action": (
+            "Request review of req-1 threshold and support-scale assumptions." if len(attempts) == 1
+            else "request_review"
+        )}
+
+    with fake_responses_server(transform_submission=submission) as (url, requests):
+        result = OpenAIProvider(
+            ResponsesClient("local-test-credential", "configured-test-model", base_url=url), sleep=lambda _: None
+        ).run(task, registry, context)
+    terminal = next(tool for tool in requests[0]["tools"] if tool["name"] == "submit_role_result")
+    action_schema = terminal["parameters"]["properties"]["next_action"]
+    assert set(action_schema["enum"]) == {"continue", "request_review", None}
+    feedback = [item for item in requests[-1]["input"] if item.get("type") == "function_call_output"][-1]
+    details = json.loads(feedback["output"])["error"]["details"]
+    assert details == [{"field": "next_action", "code": "unlisted_action",
+                        "allowed_values": ["continue", "request_review", None]}]
+    assert result.next_action == "request_review" and result.disposition == "NEEDS_USER_REVIEW"
+    assert counts.count("model_requests_per_run") == 3
+
+
+def test_live_repeated_free_text_next_action_remains_rejected():
+    task, context, registry, _, _ = task_and_context()
+    with fake_responses_server(transform_submission=lambda args, _task: {**args, "next_action": "Ask a reviewer"}) as (
+        url, requests,
+    ):
+        with pytest.raises(ProviderError, match="Repeated invalid") as caught:
+            OpenAIProvider(
+                ResponsesClient("local-test-credential", "configured-test-model", base_url=url), sleep=lambda _: None
+            ).run(task, registry, context)
+    assert caught.value.code == "MODEL_OUTPUT_INVALID"
+    assert len(requests) == 3
+
+
 def test_model_capability_probe_uses_strict_tool_and_structured_result():
     with fake_responses_server() as (url, requests):
         assert (
             probe(ResponsesClient("local-test-credential", "configured-test-model", base_url=url))["status"] == "PASSED"
         )
     assert len(requests) == 2
+
+
+def test_model_capability_probe_preserves_response_wire_aliases():
+    with fake_responses_server("strict_wire_aliases") as (url, requests):
+        assert (
+            probe(ResponsesClient("local-test-credential", "configured-test-model", base_url=url))["status"] == "PASSED"
+        )
+    assert len(requests) == 2
+    call = next(item for item in requests[1]["input"] if item.get("type") == "function_call")
+    assert call["async"] is False
+    assert "async_" not in call
 
 
 @pytest.mark.parametrize("role", ROLE_KEYS)

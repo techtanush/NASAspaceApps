@@ -41,7 +41,7 @@ def _gate(
 def _science_check(settings: Settings) -> tuple[bool, str, str]:
     try:
         module = importlib.import_module("analogforge.science.facade")
-        service = module.create_science_service()
+        service = module.create_science_service(config_dir=settings.config_dir)
     except (ImportError, AttributeError) as exc:
         return False, "SCIENCE_FACADE_MISSING", f"Science facade entry point unavailable: {type(exc).__name__}"
     try:

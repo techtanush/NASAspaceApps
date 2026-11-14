@@ -154,7 +154,8 @@ class ToolRegistry:
         context.calls[call_id] = {"input_sha256": digest, "result": result}
         return result
 
-    def schemas(self, role: str, preparation: bool = False) -> list[dict[str, Any]]:
+    def schemas(self, role: str, preparation: bool = False, *, available_only: bool = False) -> list[dict[str, Any]]:
+        """Return the role catalog, optionally restricted to this stage's registered handlers."""
         return [
             {
                 "type": "function",
@@ -164,5 +165,5 @@ class ToolRegistry:
                 "parameters": strict_schema(ARG_MODELS[name].model_json_schema()),
             }
             for name in sorted(allowed_tools(role, preparation))
-            if name in ARG_MODELS
+            if name in ARG_MODELS and (not available_only or name in self.handlers)
         ]
