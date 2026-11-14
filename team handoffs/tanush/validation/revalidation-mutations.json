@@ -1,0 +1,145 @@
+{
+  "mutants": [
+    {
+      "baseline": "PASS",
+      "description": "skip artifact rehash",
+      "id": "M1",
+      "status": "KILLED",
+      "test": "tests/unit/platform/test_registrar.py::test_rejections_do_not_publish_domain_or_evidence"
+    },
+    {
+      "baseline": "PASS",
+      "description": "ignore idempotency body hash",
+      "id": "M2",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_idempotency_revisions.py::test_idempotency_hash_and_original_response"
+    },
+    {
+      "baseline": "PASS",
+      "description": "remove lease token predicate",
+      "id": "M3",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_jobs_leases.py::test_unexpired_lease_requires_exact_owner_token"
+    },
+    {
+      "baseline": "PASS",
+      "description": "accept foreign workspace evidence",
+      "id": "M4",
+      "status": "KILLED",
+      "test": "tests/unit/platform/test_policy.py::test_fabricated_or_foreign_evidence_cannot_support_claim"
+    },
+    {
+      "baseline": "PASS",
+      "description": "permit fourth replan",
+      "id": "M5",
+      "status": "KILLED",
+      "test": "tests/unit/platform/test_budgets.py::test_route_and_candidate_replans_share_total_cap"
+    },
+    {
+      "baseline": "PASS",
+      "description": "treat missing science gate as satisfied",
+      "id": "M6",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_assurance.py::test_missing_gate_is_not_assessed_not_success"
+    },
+    {
+      "baseline": "PASS",
+      "description": "include foreign bytes in manifest digest",
+      "id": "M7",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_passport_assembly.py::test_manifest_is_independently_reproducible_and_acyclic"
+    },
+    {
+      "baseline": "PASS",
+      "description": "allow live run without key",
+      "id": "M8",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_seed_and_capabilities.py::test_live_run_requires_each_model_dependency"
+    },
+    {
+      "baseline": "PASS",
+      "description": "advance SSE cursor on heartbeat",
+      "id": "M9",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_sse.py::test_actual_stream_heartbeat_does_not_skip_next_committed_event"
+    },
+    {
+      "baseline": "PASS",
+      "description": "inject wall clock into frozen export input",
+      "id": "M10",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_exports.py::test_platform_passes_frozen_export_time_to_renderer"
+    },
+    {
+      "baseline": "PASS",
+      "description": "accept PROVE_IT without rover",
+      "id": "M11",
+      "status": "KILLED",
+      "test": "tests/unit/platform/test_policy.py::test_prove_it_requires_rover_at_action_boundary"
+    },
+    {
+      "baseline": "PASS",
+      "description": "skip frozen contract hash on repair",
+      "id": "M12",
+      "status": "KILLED",
+      "test": "tests/unit/platform/test_policy.py::test_immutable_contract_and_unpermitted_repair"
+    },
+    {
+      "baseline": "PASS",
+      "description": "bind synthetic data to live slot",
+      "id": "M13",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_dataset_cli.py::test_live_slot_rejects_synthetic_lock"
+    },
+    {
+      "baseline": "PASS",
+      "description": "write DSN to application log",
+      "id": "M14",
+      "status": "KILLED",
+      "test": "tests/unit/platform/test_secrets.py::test_secret_values_absent_from_public_surfaces"
+    },
+    {
+      "baseline": "PASS",
+      "description": "remove workspace filter from list",
+      "id": "M15",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_workspace_isolation.py::test_workspace_get_and_lists_never_leak"
+    },
+    {
+      "baseline": "PASS",
+      "description": "default unknown observable to slope policy",
+      "id": "M16",
+      "status": "KILLED",
+      "test": "tests/unit/platform/test_policy.py::test_unknown_observable_selects_unsupported_policy"
+    },
+    {
+      "baseline": "PASS",
+      "description": "ignore open blocking critic",
+      "id": "M17",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_assurance.py::test_unresolved_critic_rejects_positive_but_preserves_negative"
+    },
+    {
+      "baseline": "PASS",
+      "description": "ignore cancellation at publication",
+      "id": "M18",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_jobs_leases.py::test_cancellation_marker_fences_even_when_job_lease_is_valid"
+    },
+    {
+      "baseline": "PASS",
+      "description": "accept wrong science input hash",
+      "id": "M19",
+      "status": "KILLED",
+      "test": "tests/unit/platform/test_registrar.py::test_rejections_do_not_publish_domain_or_evidence"
+    },
+    {
+      "baseline": "PASS",
+      "description": "make passport assurance FK nullable",
+      "id": "M20",
+      "status": "KILLED",
+      "test": "tests/integration/platform/test_seed_and_capabilities.py::test_passport_metadata_requires_assurance_evidence"
+    }
+  ],
+  "status": "PASS"
+}

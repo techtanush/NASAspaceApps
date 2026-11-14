@@ -1,0 +1,38 @@
+{
+  "tested_commit_sha": "adb076e99103a3a42fa77c0a823826075a60a997",
+  "current_verification_source": "adb076e99103a3a42fa77c0a823826075a60a997",
+  "browser_delivery": {
+    "source": "adb076e99103a3a42fa77c0a823826075a60a997",
+    "tests_passed": 41,
+    "tests_failed": 0,
+    "tests_skipped": 0,
+    "flaky": 0,
+    "output_files": [
+      "out/e2e-results-visual-review11-complete.json",
+      "out/e2e-results-visual-review11-regression.json",
+      "out/e2e-results-visual-review11-graph-corrected.json"
+    ],
+    "note": "41 distinct cases verified:1 full audit,39 passing regression cases and1 corrected J02 rerun. Initial regression failed only because J02 searched for raw visible identifiers after readable-label change. Test now locates exact retained IDs in details and also asserts readable label; all numerical and persisted graph-oracle assertions retained. Application source unchanged; no case skipped. This is not a single all-green40-test invocation.",
+    "initial_regression": {
+      "passed": 39,
+      "failed": 1,
+      "failed_case": "J02 graph regression: obsolete raw-visible-label selector",
+      "corrected_rerun_passed": 1,
+      "app_source_changed": false
+    }
+  },
+  "current_frontend_verification": {
+    "source": "adb076e99103a3a42fa77c0a823826075a60a997",
+    "unit_tests": 90,
+    "unit_files": 22,
+    "typecheck": "PASSED",
+    "lint": "PASSED",
+    "production_build": "PASSED",
+    "build_evidence": "out/review11-full.log",
+    "unit_evidence": "out/review11-unit-final.log",
+    "typecheck_evidence": "out/review11-typecheck-final.log",
+    "lint_evidence": "out/review11-lint-final.log",
+    "note": "Python131-test,36-mutant and27-export/27-tamper baseline evidence belongs to4c801f4; not rerun in this presentation follow-up. Renderer source unchanged in this follow-up."
+  },
+  "completion_scope": "Frontend contributor acceptance passes: current complete visual audit, three fresh image reviews and41 distinct browser cases including corrected J02 rerun. This is contributor readiness only; MRG-03 real-backend integration remains BLOCKED_ENVIRONMENT and owned by the merging agent."
+}

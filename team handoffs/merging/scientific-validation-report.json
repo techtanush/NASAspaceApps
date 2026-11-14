@@ -1,0 +1,693 @@
+{
+  "schema_version": "1.0",
+  "scope": "Local synthetic/generated-data software integrity and modeled terrain-feasibility workflow; no real NASA-source, external model, or physical validation claim",
+  "tested_commit_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+  "accepted_main_sha": "36cd52c85b8dd19ab1abd6e23f8a94bb82f6bca0",
+  "created_at": "2026-11-14T03:11:21.453911+00:00",
+  "locks": {
+    "schema_sha256": "cd051f476020752eca804d65ee2bb693c39109523a2d3bd69f49f3e923c6ecdf",
+    "science_port_sha256": "db5a08e1cd74c9e78aa4d12895e9f2c38b76067c280b3141fa54a3a6de149b47",
+    "assurance_policy_sha256": "621cc0079f55150a2752f3f27647778858422ab52cc30d41499d3874f6dd5dc9",
+    "algorithm_lock_sha256": "86dca862ab5b305174d27f808af86a7d6c05e85bd886afdc036c26ff4464dac4",
+    "dataset_policy_sha256": "902a2ede4276d6615417f4825a87ea7a6d11e4233f8def9db9ce17b999027ca2",
+    "acquired_manifest_sha256": "1a01f27780fa041ae12a2837f1f5970eda327f809c170ce19dfbc5e15109a3bc"
+  },
+  "integrity_tests": [
+    {
+      "test_id": "SCI-01",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/integration/science/test_validate_sources.py",
+        "analogforge/tests/integration/platform/test_assurance_atomicity.py",
+        "analogforge/tests/unit/platform/test_http_security.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 11,
+      "representative_executed_cases": [
+        "tests.unit.platform.test_http_security::test_artifact_ranges_missing_bytes_tamper_and_workspace_authorization",
+        "tests.unit.platform.test_http_security::test_display_png_is_readable_only_through_its_workspace_publication",
+        "tests.unit.platform.test_http_security::test_sse_rejects_invalid_cursors_before_streaming_and_honors_header",
+        "tests.unit.platform.test_http_security::test_local_http_origin_and_request_limits",
+        "tests.unit.platform.test_http_security::test_oidc_real_http_login_callback_pkce_membership_csrf_and_logout",
+        "tests.unit.platform.test_http_security::test_oidc_cookie_workspace_tamper_viewer_and_expiry"
+      ]
+    },
+    {
+      "test_id": "SCI-02",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/unit/science/test_geometry.py",
+        "analogforge/tests/integration/science/test_dataset_validation.py",
+        "analogforge/tests/integration/science/test_review_source_pipeline.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 191,
+      "representative_executed_cases": [
+        "tests.unit.science.test_geometry::test_moon_longitude_wrap_zero_360_bounds_are_analytic",
+        "tests.unit.science.test_geometry::test_wrap_equals_unwrapped_neighbour_longitudes",
+        "tests.unit.science.test_geometry::test_antimeridian_split_and_normalisation",
+        "tests.unit.science.test_geometry::test_south_polar_wedge_bounds_match_stereographic_formula",
+        "tests.unit.science.test_geometry::test_polar_aoi_containing_the_pole_gives_full_longitude_range",
+        "tests.unit.science.test_geometry::test_planetary_frames_never_use_earth_crs"
+      ]
+    },
+    {
+      "test_id": "SCI-03",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/unit/science/test_routing_support.py",
+        "analogforge/tests/unit/science/test_comparison.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 51,
+      "representative_executed_cases": [
+        "tests.unit.science.test_comparison::test_slope_band_pass_fail_and_inclusive_boundary",
+        "tests.unit.science.test_comparison::test_slope_band_unknown_values_are_never_zero",
+        "tests.unit.science.test_comparison::test_slope_band_scale_coverage_and_confidence_rubric",
+        "tests.unit.science.test_comparison::test_slope_band_metadata_consistency_failures",
+        "tests.unit.science.test_comparison::test_slope_band_underspecified_requirements",
+        "tests.unit.science.test_comparison::test_thresholds_come_from_the_versioned_policy_file"
+      ]
+    },
+    {
+      "test_id": "SCI-04",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/unit/science/test_routing_supercover.py",
+        "analogforge/tests/unit/science/test_routing_raster.py",
+        "analogforge/tests/integration/science/test_user_nomination.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 32,
+      "representative_executed_cases": [
+        "tests.unit.science.test_routing_raster::test_design_places_waypoints_by_the_rule_and_records_assumptions",
+        "tests.unit.science.test_routing_raster::test_design_requirement_mapping_and_hash",
+        "tests.unit.science.test_routing_raster::test_design_is_deterministic_and_input_dependent",
+        "tests.unit.science.test_routing_raster::test_design_blocks_without_an_analysis_grid",
+        "tests.unit.science.test_routing_raster::test_corridor_window_fails_first_attempt_then_passes_with_exposure_coverage",
+        "tests.unit.science.test_routing_raster::test_exposure_route_is_shortest_by_independent_check"
+      ]
+    },
+    {
+      "test_id": "SCI-05",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/integration/science/test_optional_layers.py",
+        "analogforge/tests/integration/platform/test_partial_dataset_runs.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 6,
+      "representative_executed_cases": [
+        "tests.integration.platform.test_partial_dataset_runs::test_single_product_keeps_missing_side_unknown_and_publishes_limited[earth]",
+        "tests.integration.platform.test_partial_dataset_runs::test_single_product_keeps_missing_side_unknown_and_publishes_limited[target]",
+        "tests.integration.science.test_optional_layers::test_partial_mineral_coverage_is_reported_as_a_fraction_not_as_absence",
+        "tests.integration.science.test_optional_layers::test_window_without_retrievals_is_unknown_not_zero",
+        "tests.integration.science.test_optional_layers::test_categorical_ids_are_counted_never_interpolated",
+        "tests.integration.science.test_optional_layers::test_thermal_row_stays_unknown_even_when_the_target_has_a_thermal_metric"
+      ]
+    },
+    {
+      "test_id": "SCI-06",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/unit/science/test_comparison.py",
+        "analogforge/tests/unit/science/test_qualification.py",
+        "analogforge/tests/integration/platform/test_assurance.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 138,
+      "representative_executed_cases": [
+        "tests.integration.platform.test_assurance::test_supported_negative_is_allowed_and_does_not_become_success",
+        "tests.integration.platform.test_assurance::test_negative_findings_cannot_invent_evidence_or_relabel_missing_data_as_failure",
+        "tests.integration.platform.test_assurance::test_honest_limited_findings_publish[UNKNOWN-UNKNOWN]",
+        "tests.integration.platform.test_assurance::test_honest_limited_findings_publish[GAP-GAP]",
+        "tests.integration.platform.test_assurance::test_honest_limited_findings_publish[PARTIAL-LIMITED]",
+        "tests.integration.platform.test_assurance::test_every_scientific_gate_blocks_an_unearned_positive[SC-02]"
+      ]
+    },
+    {
+      "test_id": "SCI-07",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/unit/science/test_energy.py",
+        "analogforge/tests/integration/platform/test_journey_api.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 43,
+      "representative_executed_cases": [
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-ares-1.json-expected_outcomes0]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-graph-regression-v1-mission-graph-regression.json-ares-1.json-expected_outcomes1]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-moon-gap-v1-mission-moon-gap.json-None-expected_outcomes2]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-practice-lite.json-expected_outcomes3]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-practice-no-energy-model.json-expected_outcomes4]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-practice-small-battery.json-expected_outcomes5]"
+      ]
+    },
+    {
+      "test_id": "SCI-08",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/unit/science/test_audit.py",
+        "analogforge/tests/unit/science/test_comparison.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 68,
+      "representative_executed_cases": [
+        "tests.unit.science.test_audit::test_clean_comparison_claim_satisfies_every_applicable_gate_and_lists_exactly_the_science_gates",
+        "tests.unit.science.test_audit::test_sc04_scale_mismatch_finer_and_coarser_and_perturbation",
+        "tests.unit.science.test_audit::test_sc02_provenance_missing_ids_mode_and_artifact_hash",
+        "tests.unit.science.test_audit::test_sc03_body_and_units",
+        "tests.unit.science.test_audit::test_sc05_coverage_zero_filled_and_threshold_from_policy",
+        "tests.unit.science.test_audit::test_sc06_temporal"
+      ]
+    },
+    {
+      "test_id": "SCI-09",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/unit/science/test_verifier_independence.py",
+        "analogforge/tests/unit/science/test_search_limits.py",
+        "analogforge/tests/property/science/test_routing_properties.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 40,
+      "representative_executed_cases": [
+        "tests.unit.science.test_search_limits::test_one_expansion_is_budget_exhausted_never_infeasible",
+        "tests.unit.science.test_search_limits::test_budget_never_exceeds_the_frozen_solver_config",
+        "tests.unit.science.test_search_limits::test_wall_clock_budget_uses_the_injected_clock",
+        "tests.unit.science.test_search_limits::test_lossy_pruning_never_yields_exhaustive_infeasible",
+        "tests.unit.science.test_search_limits::test_payload_validator_forbids_infeasible_with_lossy_pruning",
+        "tests.unit.science.test_search_limits::test_certificate_proofs_are_lossless_and_sound_against_brute_force"
+      ]
+    },
+    {
+      "test_id": "SCI-10",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/unit/science/test_graph_oracle.py",
+        "analogforge/tests/integration/platform/test_journey_api.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 32,
+      "representative_executed_cases": [
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-ares-1.json-expected_outcomes0]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-graph-regression-v1-mission-graph-regression.json-ares-1.json-expected_outcomes1]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-moon-gap-v1-mission-moon-gap.json-None-expected_outcomes2]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-practice-lite.json-expected_outcomes3]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-practice-no-energy-model.json-expected_outcomes4]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-practice-small-battery.json-expected_outcomes5]"
+      ]
+    },
+    {
+      "test_id": "SCI-11",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/integration/platform/test_live_choices.py",
+        "analogforge/tests/integration/platform/test_assurance.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 36,
+      "representative_executed_cases": [
+        "tests.integration.platform.test_assurance::test_supported_negative_is_allowed_and_does_not_become_success",
+        "tests.integration.platform.test_assurance::test_negative_findings_cannot_invent_evidence_or_relabel_missing_data_as_failure",
+        "tests.integration.platform.test_assurance::test_honest_limited_findings_publish[UNKNOWN-UNKNOWN]",
+        "tests.integration.platform.test_assurance::test_honest_limited_findings_publish[GAP-GAP]",
+        "tests.integration.platform.test_assurance::test_honest_limited_findings_publish[PARTIAL-LIMITED]",
+        "tests.integration.platform.test_assurance::test_every_scientific_gate_blocks_an_unearned_positive[SC-02]"
+      ]
+    },
+    {
+      "test_id": "SCI-12",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/integration/platform/test_assurance_atomicity.py",
+        "analogforge/tests/integration/platform/test_process_recovery.py",
+        "analogforge/tests/integration/platform/test_workspace_isolation.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 7,
+      "representative_executed_cases": [
+        "tests.integration.platform.test_assurance_atomicity::test_invalid_positive_rolls_back_evidence_receipt_and_public_qualification",
+        "tests.integration.platform.test_assurance_atomicity::test_supported_negative_has_persisted_audit_before_public_row",
+        "tests.integration.platform.test_process_recovery::test_api_sigkill_restart_preserves_snapshot_and_sse_cursor",
+        "tests.integration.platform.test_process_recovery::test_worker_sigkill_reap_replacement_publishes_once",
+        "tests.integration.platform.test_workspace_isolation::test_workspace_get_and_lists_never_leak",
+        "tests.integration.platform.test_workspace_isolation::test_cross_workspace_and_mode_edges_and_assurance_rejected"
+      ]
+    },
+    {
+      "test_id": "SCI-13",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/integration/platform/test_merge_live_slot.py",
+        "analogforge/tests/unit/science/test_audit.py",
+        "analogforge/tests/unit/passport_renderer/test_csv.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 38,
+      "representative_executed_cases": [
+        "tests.integration.platform.test_merge_live_slot::test_test_harness_manifest_requires_both_explicit_local_hooks",
+        "tests.integration.platform.test_merge_live_slot::test_rehearsal_binds_through_validated_lock_and_restores_only_its_scenario",
+        "tests.integration.platform.test_merge_live_slot::test_rehearsal_requires_hooks_and_an_isolated_config",
+        "tests.integration.platform.test_merge_live_slot::test_harness_cannot_establish_real_source_validation_or_unlabelled_claims",
+        "tests.integration.platform.test_merge_live_slot::test_rehearsal_cli_and_newer_binding_protection",
+        "tests.integration.platform.test_merge_live_slot::test_mock_nasa_drop_binds_to_local_practice_without_entering_live"
+      ]
+    },
+    {
+      "test_id": "SCI-14",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/integration/science/test_screening.py",
+        "analogforge/tests/integration/science/test_storylines.py",
+        "analogforge/tests/unit/science/test_audit.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 33,
+      "representative_executed_cases": [
+        "tests.unit.science.test_audit::test_clean_comparison_claim_satisfies_every_applicable_gate_and_lists_exactly_the_science_gates",
+        "tests.unit.science.test_audit::test_sc04_scale_mismatch_finer_and_coarser_and_perturbation",
+        "tests.unit.science.test_audit::test_sc02_provenance_missing_ids_mode_and_artifact_hash",
+        "tests.unit.science.test_audit::test_sc03_body_and_units",
+        "tests.unit.science.test_audit::test_sc05_coverage_zero_filled_and_threshold_from_policy",
+        "tests.unit.science.test_audit::test_sc06_temporal"
+      ]
+    },
+    {
+      "test_id": "SCI-15",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/integration/platform/test_assurance.py",
+        "analogforge/tests/unit/passport_renderer/test_csv.py",
+        "analogforge/tests/integration/platform/test_passport_assembly.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 61,
+      "representative_executed_cases": [
+        "tests.integration.platform.test_assurance::test_supported_negative_is_allowed_and_does_not_become_success",
+        "tests.integration.platform.test_assurance::test_negative_findings_cannot_invent_evidence_or_relabel_missing_data_as_failure",
+        "tests.integration.platform.test_assurance::test_honest_limited_findings_publish[UNKNOWN-UNKNOWN]",
+        "tests.integration.platform.test_assurance::test_honest_limited_findings_publish[GAP-GAP]",
+        "tests.integration.platform.test_assurance::test_honest_limited_findings_publish[PARTIAL-LIMITED]",
+        "tests.integration.platform.test_assurance::test_every_scientific_gate_blocks_an_unearned_positive[SC-02]"
+      ]
+    },
+    {
+      "test_id": "SCI-16",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/integration/platform/test_journey_api.py",
+        "analogforge/tests/integration/platform/test_partial_dataset_runs.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 8,
+      "representative_executed_cases": [
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-ares-1.json-expected_outcomes0]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-graph-regression-v1-mission-graph-regression.json-ares-1.json-expected_outcomes1]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-moon-gap-v1-mission-moon-gap.json-None-expected_outcomes2]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-practice-lite.json-expected_outcomes3]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-practice-no-energy-model.json-expected_outcomes4]",
+        "tests.integration.platform.test_journey_api::test_full_accepted_contract_to_immutable_passport_and_downloads[synthetic-mars-mobility-v1-mission-mars-mobility.json-practice-small-battery.json-expected_outcomes5]"
+      ]
+    },
+    {
+      "test_id": "SCI-17",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/integration/science/test_determinism.py",
+        "analogforge/tests/unit/science/test_fixtures_determinism.py",
+        "analogforge/tests/unit/passport_renderer/test_determinism.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 46,
+      "representative_executed_cases": [
+        "tests.unit.science.test_fixtures_determinism::test_generate_all_returns_every_dataset_of_arch_40",
+        "tests.unit.science.test_fixtures_determinism::test_two_runs_are_byte_identical",
+        "tests.unit.science.test_fixtures_determinism::test_seed_and_parameters_change_the_right_bytes",
+        "tests.unit.science.test_fixtures_determinism::test_manifests_validate_and_are_synthetic",
+        "tests.unit.science.test_fixtures_determinism::test_moon_target_uses_scale_offset_once_and_no_file_scale_tags",
+        "tests.unit.science.test_fixtures_determinism::test_in_memory_fixture_equals_the_file_read_through_the_dataset_path[practice-mars-target-v1]"
+      ]
+    },
+    {
+      "test_id": "SCI-18",
+      "status": "PASSED",
+      "test_path": [
+        "analogforge/tests/integration/platform/test_assurance_atomicity.py",
+        "analogforge/tests/integration/platform/test_exports.py",
+        "analogforge/tests/integration/platform/test_passport_assembly.py"
+      ],
+      "command": "make check at ed903b6 (backend matchesc263d2a; deterministic test-fixture follow-up; full frontend checks atc263d2a); real-browser gates repeated",
+      "exit_code": 0,
+      "mode": "synthetic/local generated fixtures; real science and renderer in platform integration",
+      "evidence_ids": [
+        "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+      ],
+      "notes": [
+        "Executed testcase index: out/python-cases.json; counts: out/suites.json; component hashes: out/source-equivalence.json.",
+        "Passing this integrity test can require a scientific FAIL, UNKNOWN, GAP or INCONCLUSIVE. It does not establish S2\u2013S5 real-source or physical validation."
+      ],
+      "executed_case_count": 24,
+      "representative_executed_cases": [
+        "tests.integration.platform.test_assurance_atomicity::test_invalid_positive_rolls_back_evidence_receipt_and_public_qualification",
+        "tests.integration.platform.test_assurance_atomicity::test_supported_negative_has_persisted_audit_before_public_row",
+        "tests.integration.platform.test_exports::test_platform_passes_frozen_export_time_to_renderer",
+        "tests.integration.platform.test_exports::test_renderer_seam_has_exact_deterministic_bytes_and_separate_file_digest[html]",
+        "tests.integration.platform.test_exports::test_renderer_seam_has_exact_deterministic_bytes_and_separate_file_digest[json]",
+        "tests.integration.platform.test_exports::test_renderer_seam_has_exact_deterministic_bytes_and_separate_file_digest[csv]"
+      ]
+    }
+  ],
+  "validation_levels": {
+    "S0": {
+      "status": "PASSED",
+      "evidence": [
+        "Analytic graph/raster oracles, independent verifier, fixed-input and cross-process reproduction; out/suites.json; out/reproducibility.json"
+      ]
+    },
+    "S1": {
+      "status": "PASSED",
+      "evidence": [
+        "Actual generated/format-faithful bytes decoded and checked; source hashes, masks, units/scale and fixture lineage retained. TEST_HARNESS claims capped at S0/S1; out/rehearsals.json."
+      ]
+    },
+    "S2": {
+      "status": "BLOCKED_EXTERNAL",
+      "evidence": [
+        "Actual NASA product/granule bytes and completed provenance manifests have not been supplied. Generated or replay fixtures are not substituted."
+      ]
+    },
+    "S3": {
+      "status": "BLOCKED_EXTERNAL",
+      "evidence": [
+        "No demonstrated real-source Earth/Moon/Mars comparison and no empirical held-out controls."
+      ]
+    },
+    "S4": {
+      "status": "BLOCKED_EXTERNAL",
+      "evidence": [
+        "Synthetic independent modeled-route verification passed; real-source experiment validation is not established."
+      ]
+    },
+    "S5": {
+      "status": "NOT_IMPLEMENTED",
+      "evidence": [
+        "No physical rover execution, calibrated field trial or hardware certification is part of this baseline."
+      ]
+    }
+  },
+  "source_paths": {
+    "Earth": {
+      "status": "BLOCKED_EXTERNAL",
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": [],
+      "notes": [
+        "Generated and replay source-path software tests executed. No actual NASA acquired asset or reproduced real-source observable is claimed."
+      ]
+    },
+    "Moon": {
+      "status": "BLOCKED_EXTERNAL",
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": [],
+      "notes": [
+        "Generated and replay source-path software tests executed. No actual NASA acquired asset or reproduced real-source observable is claimed."
+      ]
+    },
+    "Mars": {
+      "status": "BLOCKED_EXTERNAL",
+      "assets": [],
+      "decoder_receipts": [],
+      "derived_observables": [],
+      "notes": [
+        "Generated and replay source-path software tests executed. No actual NASA acquired asset or reproduced real-source observable is claimed."
+      ]
+    }
+  },
+  "controls": {
+    "status": "BLOCKED_EXTERNAL",
+    "manifest_sha256": "e87ce0611fe9ac6df8681e5870ed9d7e2ab8b3dbc68af43f4f86b891bd3969d5",
+    "tuning_ids": [],
+    "held_out_ids": [],
+    "positive_control_evidence": [
+      "Designed synthetic graph/practice controls and the current audited run f5a498b8-6fe2-4526-8777-6816b6e0bd5f"
+    ],
+    "negative_control_evidence": [
+      "Computed synthetic negative controls, support/coverage failures, and published truthful negative paths; out/suites.json"
+    ],
+    "mission_sensitivity_evidence": [
+      "PERT-01/03/04/07 real-application rehearsals; out/rehearsals.json"
+    ],
+    "ancestry_or_selection_limitations": [
+      "No empirical tuning or held-out split is asserted. Designed fixture controls are not independent real observations.",
+      "Shared NASADEM/SRTM ancestry guard was exercised; no confidence upgrade from duplicated real-source ancestry is claimed."
+    ],
+    "software_controls_status": "PASSED",
+    "manifest_scope": "Versioned designed-fixture candidate configuration, not a real-source control manifest"
+  },
+  "published_examples": {
+    "supported_positive": [
+      {
+        "run_id": "f5a498b8-6fe2-4526-8777-6816b6e0bd5f",
+        "passport_id": "cc275ecd-5a08-4b10-a0e5-fa10fa4233eb",
+        "assurance_evidence_id": "6b36bc79-ebce-44e1-a9cc-34633a6beb45",
+        "publication": "LIMITED",
+        "claim_levels": [
+          "S0",
+          "S1"
+        ],
+        "scope": "Nominal synthetic terrain-model verification; all prior failed attempts preserved"
+      }
+    ],
+    "supported_negative": [
+      "Real API/browser PRACTICE-LITE and small-battery scenarios; negative results published with three digest-checked exports. See out/journeys-real.json and out/rehearsals.json."
+    ],
+    "limited_unknown": [
+      "Moon no-rover, uncalibrated energy, Earth-only and target-only data bindings; full final Python/browser matrix."
+    ],
+    "rejected_claim_audits": [
+      "Fabricated/foreign evidence, missing/unknown gates, changed policy/audit/input context, inflated mode/S-level and lost lease rejected by executed assurance tests; rejected transactions publish no artifact."
+    ],
+    "ui_export_comparisons": [
+      {
+        "run_id": "f5a498b8-6fe2-4526-8777-6816b6e0bd5f",
+        "manifest_sha256": "df186d9815ab46d835cda15c299552710a3f07a6f5a7dee9724eb208661e886d",
+        "export_sha256": {
+          "html": "d5b1783176d387705f7c45dee5bb2d77ec0dea8c7b7c04f89b4d1bdeff12a143",
+          "json": "af6e40b19b73b3a224aa0b194e5f65f9c7f6b8457cfd12f38599a3e4e8b8f4ff",
+          "csv": "852cc9a7dd2d7f9abb2fcaf80f20a216162780dd57d2cbb80a6f5f32eb0a5b07"
+        },
+        "evidence": "Independent real merger assertions check API, visible rows, frozen inputs, assurance schema, canonical manifest and downloaded bytes."
+      }
+    ]
+  },
+  "live_model": {
+    "status": "BLOCKED_EXTERNAL",
+    "receipts": [],
+    "local_protocol_rehearsal": {
+      "status": "PASSED",
+      "provider": "Local fake Responses server only",
+      "requests": 38,
+      "request_budget": 40,
+      "label": "TEST HARNESS \u2014 not NASA data",
+      "evidence": "out/rehearsals.json"
+    }
+  },
+  "blockers": [
+    "Actual NASA product files plus completed manifests/provenance for real-source validation.",
+    "OPENAI_API_KEY and an explicitly configured OPENAI_MODEL for an external live-model run.",
+    "Physical validation is not implemented or claimed."
+  ],
+  "limitations": [
+    "S0/S1 apply only to the executed local/generated/replay fixture scope.",
+    "Energy coefficients are assumed; uncertainty is not calibrated; native terrain cannot resolve sub-cell rover obstacles.",
+    "Discovery is finite and mission-conditioned. A user nomination is explicit context, not global novelty.",
+    "Portfolios retain per-site/coupling responsibilities and residuals; no unrun or physical multi-site experiment is certified.",
+    "Backend suites executed at ed903b6; all backend, configuration, contract, dependency-lock and Python-test bytes matchc263d2a. The later frontend-only rover pagination repair has complete separate current-source frontend, mutation, preview/real browser and visual verification. See out/source-equivalence.json.",
+    "A 40-request local fake-provider budget exhaustion and resource-contended/invalid-setup invocations are retained as failed/excluded evidence, not counted as green runs."
+  ],
+  "permitted_release_claims": [
+    "Locally tested mission-conditioned qualification and immutable evidence/passport workflow.",
+    "Deterministic independent modeled route verification with frozen criteria and preserved failure/repair history.",
+    "Generated-data format, integrity, scope, missing-data and export behavior verified by executed checks."
+  ],
+  "prohibited_or_unproven_claims": [
+    "NASA approval or NASA-validated analog quality.",
+    "Real-source S2/S3/S4, independent empirical held-out performance, global novelty, or physical rover readiness.",
+    "External OpenAI model quality or real provider authentication proved by the local fake server.",
+    "A single percent-Mars score, unknown clearance treated as safe, or uncalibrated energy treated as certification."
+  ],
+  "ready_for_declared_scope": true,
+  "status_vocabulary": [
+    "NOT_RUN",
+    "PASSED",
+    "FAILED",
+    "BLOCKED_EXTERNAL",
+    "SKIPPED",
+    "NOT_IMPLEMENTED"
+  ],
+  "note": "Observed report for the declared local software scope. External and physical gates remain explicit; no unexecuted stage is marked passed.",
+  "integration_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+  "backend_executed_commit_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+  "lock_scope": {
+    "schema_file": "analogforge/contracts/domain.schema.json",
+    "assurance_schema_sha256": "f88986b65b31ac8fbd2e6ad0fa05b31792a1b065786983789d174dec2008fa65",
+    "algorithm_lock": "Versioned algorithm/policy configuration. Executable source is additionally pinned by the tested Git SHA.",
+    "audit_run_id": "f5a498b8-6fe2-4526-8777-6816b6e0bd5f",
+    "assurance_evidence_id": "6b36bc79-ebce-44e1-a9cc-34633a6beb45"
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "$defs": {
+    "TelemetrySample": {
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "minimum": 0,
+          "title": "Index",
+          "type": "integer"
+        },
+        "node_id": {
+          "title": "Node Id",
+          "type": "string"
+        },
+        "cumulative_distance_m": {
+          "minimum": 0,
+          "title": "Cumulative Distance M",
+          "type": "number"
+        },
+        "elapsed_s": {
+          "minimum": 0,
+          "title": "Elapsed S",
+          "type": "number"
+        },
+        "lon": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lon"
+        },
+        "lat": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Lat"
+        },
+        "elevation_m": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Elevation M"
+        },
+        "segment_surface_slope_deg": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Segment Surface Slope Deg"
+        },
+        "cumulative_energy_conservative_wh": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cumulative Energy Conservative Wh"
+        },
+        "reserve_pct": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reserve Pct"
+        },
+        "in_band_requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "In Band Requirement Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "index",
+        "node_id",
+        "cumulative_distance_m",
+        "elapsed_s"
+      ],
+      "title": "TelemetrySample",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Independently recomputed per-node telemetry (role TELEMETRY), drawn by the Test Lab.",
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "route_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Route Sha256",
+      "type": "string"
+    },
+    "constraints_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Constraints Sha256",
+      "type": "string"
+    },
+    "samples": {
+      "items": {
+        "$ref": "#/$defs/TelemetrySample"
+      },
+      "minItems": 1,
+      "title": "Samples",
+      "type": "array"
+    }
+  },
+  "required": [
+    "route_sha256",
+    "constraints_sha256",
+    "samples"
+  ],
+  "title": "TelemetryArtifact",
+  "type": "object",
+  "$comment": "Generated from analogforge.ports models by kit/tools/build_kit.py. Do not edit."
+}

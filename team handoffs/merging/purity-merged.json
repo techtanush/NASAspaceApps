@@ -1,0 +1,25 @@
+{
+  "person": "merging",
+  "repo": "/Users/tanushchokshi/Downloads/TKS/NASAspaceApps-clean-release",
+  "head": "5e08b801f84625bc930b2be43974766a7f6c08ca",
+  "branch": "integration/rc",
+  "checks": {
+    "G-04": {
+      "status": "PASS",
+      "notes": "merged-tree forbidden patterns",
+      "findings": []
+    },
+    "D-01": {
+      "status": "PASS",
+      "notes": "merged-tree design standard (architecture 41)",
+      "findings": []
+    },
+    "G-05": {
+      "status": "PASS",
+      "notes": "secrets/data/build output",
+      "findings": []
+    }
+  },
+  "status": "PASS",
+  "note": "Structural checks only. Run the builder gates (G-08), mutation checks (G-10) and hunts (G-11) separately."
+}

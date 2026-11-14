@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.006" timestamp="2026-11-09T23:00:01.659084-08:00" hostname="Tanushs-MacBook-Air.local"><testcase classname="tests.integration.science.test_review_source_pipeline" name="test_metric_units_do_not_waive_ground_distance_distortion" time="0.217"><failure message="AssertionError: assert ('SUCCEEDED' == 'BLOCKED'&#10;  &#10;  - BLOCKED&#10;  + SUCCEEDED)">tests/integration/science/test_review_source_pipeline.py:263: in test_metric_units_do_not_waive_ground_distance_distortion
+    assert result.status.value == "BLOCKED" and result.payload is None
+E   AssertionError: assert ('SUCCEEDED' == 'BLOCKED'
+E     
+E     - BLOCKED
+E     + SUCCEEDED)</failure></testcase></testsuite></testsuites>

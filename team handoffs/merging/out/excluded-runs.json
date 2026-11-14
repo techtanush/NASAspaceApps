@@ -1,0 +1,95 @@
+{
+  "accounting": "Failed, interrupted and superseded-source runs are retained honestly. None supplies a final passing gate. Raw credential-bearing process logs remain local.",
+  "runs": [
+    {
+      "source": "d88bc51",
+      "gate": "real heavy repeat batch",
+      "observed": "9 passed, 1 J11 startup timeout at the unchanged180-second deadline",
+      "disposition": "Failed run, excluded. Replaced by final-source fresh repetitions; no budget inflation."
+    },
+    {
+      "source": "d88bc51",
+      "gate": "real remaining repeat batch",
+      "observed": "20 passing cases observed; J09b startup timeout; batch interrupted before completion",
+      "disposition": "Failed/incomplete old-source run, excluded."
+    },
+    {
+      "source": "d88bc51",
+      "gate": "preview40 browser tests",
+      "observed": "39 passed, 1 stale loading-hint assertion expected zero retained hints",
+      "disposition": "Failed run, excluded. Assertion updated to the intended stable-help contract, retaining all row/geometry checks; final40 now pass."
+    },
+    {
+      "source": "d88bc51",
+      "gate": "real visual audit",
+      "observed": "501 frames,14 C12 terminal-stream abort findings,0skips",
+      "disposition": "Failed run. Fixed terminal batch aggregation in0134083; no SSE-error blanket exception added."
+    },
+    {
+      "source": "0134083",
+      "gate": "real visual / preview browser reruns",
+      "observed": "Interrupted after adding independently reproduced event-refresh coalescing repair",
+      "disposition": "Superseded/incomplete; not counted as final passes."
+    },
+    {
+      "source": "51d6d77",
+      "gate": "first heavy real browser batch",
+      "observed": "First merger startup exceeded180seconds while full Python, additional real runs, visual crawl, preview tests and mutation checks competed",
+      "disposition": "Failed/contended, interrupted; final repetitions must be fresh and scheduled after the full backend matrix."
+    },
+    {
+      "source": "51d6d77",
+      "gate": "first real visual attempt",
+      "observed": "Startup remained QUALIFYING at unchanged180seconds; audit failed before final crawl",
+      "disposition": "Failed under combined load; final full audit still required."
+    },
+    {
+      "source": "0134083 backend /51d6d77 frontend",
+      "gate": "contended clean make check",
+      "observed": "An existing full API journey hit the300-second test timeout; run stopped, exit2",
+      "disposition": "Failed/incomplete, notgreen. A fresh whole makecheck on51d6d77 is required without competing heavy checks."
+    },
+    {
+      "source": "earlier rehearsal revisions",
+      "gate": "local fake provider",
+      "observed": "Longer positive-repair chain exhausted the fixed40-model-request cap",
+      "disposition": "Truthful blocked scientific workflow, retained. Separate38-request positive local-protocol rehearsal passed. No external-model claim."
+    },
+    {
+      "source": "earlier launchers",
+      "gate": "supplemental real rehearsals",
+      "observed": "Three launchers omitted explicit real-factory flags",
+      "disposition": "Setup-invalid invocations stopped and excluded; launcher now rejects absent flags, later real repetitions passed."
+    },
+    {
+      "source": "51d6d77",
+      "gate": "final real visual before causal transport audit",
+      "observed": "501frames,23C12SSEnotifications,0skips; independent raw fetch reached normalEOF and fullpayload",
+      "disposition": "Failed; excluded.398ad7f requires independent exact-response protocol/snapshot proof,8tests and an actual abort negative control. Final501real/mock audits separately pass."
+    },
+    {
+      "source": "51d6d77/initial0134083",
+      "gate": "search-limit native rehearsal",
+      "observed": "API override appeared1 but independent worker loaded raw200000; binding helper had masked the seam by persisting effective limits",
+      "disposition": "Not passing native proof. f628943 centralizes effective limits and rawconfigwrites; fresh separate-process UI/API/export rehearsal passed with rawconfigunchanged."
+    },
+    {
+      "source": "398ad7f",
+      "gate": "full platform fixture readiness",
+      "observed": "309passed,1failed ValueError reading emptyPIDfile; makecheckexit2 before remaining suites",
+      "disposition": "Failed; excluded. ed903b6 makes fixture readiness atomic and cooperatively reaps fixturechild while preserving original assertions/deadlines. Five positive repetitions and a deliberate broken-parent control passed; full final matrix rerun."
+    },
+    {
+      "source": "398ad7f/product0b3eb7c",
+      "gate": "final34realbrowser batches",
+      "observed": "Rest batch7passed then J09/J09b failed blank saved-rover label after library exceeded first25items; heavybatch interrupted as superseded.",
+      "disposition": "Failed/incomplete, excluded. c263d2a fixes actual pagination and selected-profile display; exact red/green regression and full fresh frontend/browser/visual/mutation gates follow."
+    },
+    {
+      "source": "c263d2a product / ea44bfe captures; original J12 harness",
+      "gate": "remaining24realbrowsercases",
+      "observed": "J12 reopened an older Moon mission from the first accepted collection item and failed its9-vs5requirement assertion. The unbound live-slot badge/disabled/API behavior was correct. Batch stopped as failed.",
+      "disposition": "Excluded; no passing claim for this failed/incomplete batch.5e08b80 pins the exact created mission and retains all assertions. Focused real/preview counterexamples and a whole fresh24-case real batch must pass before publication."
+    }
+  ]
+}

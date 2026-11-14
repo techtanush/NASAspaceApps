@@ -1,0 +1,45 @@
+{
+  "person": "tanush",
+  "repo": "/Users/tanushchokshi/Downloads/TKS/NASAspaceApps-verify-tanush",
+  "head": "038c6174263fcbe6a67d66578b3287a3eeee04dc",
+  "branch": "tanush/platform-agents-integration",
+  "checks": {
+    "G-01": {
+      "status": "PASS",
+      "notes": "HEAD 038c6174263fcbe6a67d66578b3287a3eeee04dc",
+      "findings": []
+    },
+    "G-02": {
+      "status": "PASS",
+      "notes": "kit verified",
+      "findings": []
+    },
+    "G-03": {
+      "status": "PASS",
+      "notes": "ownership + kit integrity",
+      "findings": []
+    },
+    "G-06": {
+      "status": "PASS",
+      "notes": "dependency files ok",
+      "findings": []
+    },
+    "G-04": {
+      "status": "PASS",
+      "notes": "186 files scanned",
+      "findings": []
+    },
+    "G-09": {
+      "status": "PASS",
+      "notes": "STATUS.json internal coherence (NOT a substitute for re-running gates)",
+      "findings": []
+    },
+    "G-05": {
+      "status": "PASS",
+      "notes": "secrets/data/build output",
+      "findings": []
+    }
+  },
+  "status": "PASS",
+  "note": "Structural checks only. Run the builder gates (G-08), mutation checks (G-10) and hunts (G-11) separately."
+}

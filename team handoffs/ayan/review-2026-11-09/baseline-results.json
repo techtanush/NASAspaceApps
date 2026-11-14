@@ -1,0 +1,97 @@
+{
+  "source_sha": "6856046",
+  "checks": [
+    {
+      "check": "kit-verify",
+      "command": [
+        ".venv/bin/python",
+        "../architecture files/contracts/kit/materialize.py",
+        "--verify"
+      ],
+      "exit_code": 0,
+      "seconds": 0.05
+    },
+    {
+      "check": "kit",
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/contracts/kit",
+        "-q",
+        "-p",
+        "no:randomly",
+        "--junitxml=data/out/ayan-review-baseline/kit.xml"
+      ],
+      "exit_code": 0,
+      "seconds": 1.8
+    },
+    {
+      "check": "science",
+      "command": [
+        ".venv/bin/python",
+        "scripts/science/run_oracles.py",
+        "--junit",
+        "data/out/ayan-review-baseline/science.xml",
+        "--json",
+        "data/out/ayan-review-baseline/oracles.json"
+      ],
+      "exit_code": 0,
+      "seconds": 91.12
+    },
+    {
+      "check": "ruff",
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "src/analogforge/science",
+        "src/analogforge/adapters/earthdata",
+        "src/analogforge/adapters/pds",
+        "src/analogforge/adapters/emit",
+        "src/analogforge/adapters/diviner",
+        "src/analogforge/adapters/user_survey",
+        "src/analogforge/adapters/source_http",
+        "src/analogforge/rendering/tiles",
+        "tests/unit/science",
+        "tests/property/science"
+      ],
+      "exit_code": 0,
+      "seconds": 0.36
+    },
+    {
+      "check": "mypy",
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "mypy",
+        "src/analogforge/science"
+      ],
+      "exit_code": 0,
+      "seconds": 3.96
+    },
+    {
+      "check": "forbidden",
+      "command": [
+        ".venv/bin/python",
+        "scripts/science/forbidden_scan.py",
+        "--json",
+        "data/out/ayan-review-baseline/forbidden.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.49
+    },
+    {
+      "check": "mutations",
+      "command": [
+        ".venv/bin/python",
+        "scripts/science/mutation_check.py",
+        "--json",
+        "data/out/ayan-review-baseline/mutations.json"
+      ],
+      "exit_code": 0,
+      "seconds": 13.25
+    }
+  ]
+}

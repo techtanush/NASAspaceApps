@@ -1,0 +1,176 @@
+{
+  "schema_version": "1.0",
+  "merged_at": null,
+  "repository": null,
+  "kit_version": null,
+  "kit_changes": [],
+  "branches": {
+    "tanush": {
+      "branch": "tanush/platform-agents-integration",
+      "sha_merged": null,
+      "pure": null,
+      "repairs": []
+    },
+    "ayan": {
+      "branch": "ayan/science-data-verification",
+      "sha_merged": null,
+      "pure": null,
+      "repairs": []
+    },
+    "aradhya": {
+      "branch": "aradhya/frontend-experience",
+      "sha_merged": null,
+      "pure": null,
+      "repairs": []
+    }
+  },
+  "integration_branch": "integration/rc",
+  "integration_sha": null,
+  "tag": null,
+  "environment": {
+    "python": null,
+    "uv": null,
+    "node": null,
+    "pnpm": null,
+    "postgres_method": null,
+    "postgres_version": null,
+    "postgis_version": null,
+    "chromium": null,
+    "gdal": null,
+    "os": null
+  },
+  "wiring": {
+    "W-01": "NOT_RUN",
+    "W-02": "NOT_RUN",
+    "W-03": "NOT_RUN",
+    "W-04": "NOT_RUN",
+    "W-05": "NOT_RUN",
+    "W-06": "NOT_RUN",
+    "W-07": "NOT_RUN",
+    "W-08": "NOT_RUN",
+    "W-09": "NOT_RUN",
+    "W-10": "NOT_RUN",
+    "W-11": "NOT_RUN",
+    "W-12": "NOT_RUN",
+    "W-13": "NOT_RUN",
+    "W-14": "NOT_RUN",
+    "W-15": "NOT_RUN"
+  },
+  "catalog": {
+    "MRG-01": {
+      "status": "NOT_RUN"
+    },
+    "MRG-02": {
+      "status": "NOT_RUN"
+    },
+    "MRG-03": {
+      "status": "NOT_RUN"
+    },
+    "MRG-04": {
+      "status": "NOT_RUN"
+    },
+    "MRG-05": {
+      "status": "NOT_RUN"
+    },
+    "MRG-06": {
+      "status": "NOT_RUN"
+    },
+    "MRG-07": {
+      "status": "NOT_RUN"
+    },
+    "MRG-08": {
+      "status": "NOT_RUN"
+    },
+    "MRG-09": {
+      "status": "NOT_RUN"
+    },
+    "MRG-10": {
+      "status": "NOT_RUN"
+    },
+    "MRG-11": {
+      "status": "NOT_RUN"
+    }
+  },
+  "suites": {
+    "platform": null,
+    "science": null,
+    "renderer": null,
+    "frontend": null
+  },
+  "journeys_real_mode": {
+    "J01": "NOT_RUN",
+    "J02": "NOT_RUN",
+    "J03": "NOT_RUN",
+    "J04": "NOT_RUN",
+    "J05": "NOT_RUN",
+    "J06": "NOT_RUN",
+    "J07": "NOT_RUN",
+    "J08": "NOT_RUN",
+    "J09": "NOT_RUN",
+    "J10": "NOT_RUN",
+    "J11": "NOT_RUN",
+    "J12": "NOT_RUN",
+    "J13": "NOT_RUN"
+  },
+  "practice_matrix": {
+    "P1": "NOT_RUN",
+    "P2": "NOT_RUN",
+    "P3": "NOT_RUN",
+    "P4": "NOT_RUN",
+    "P5": "NOT_RUN",
+    "P6": "NOT_RUN",
+    "P7": "NOT_RUN",
+    "P8": "NOT_RUN",
+    "P9": "NOT_RUN",
+    "P10": "NOT_RUN"
+  },
+  "nasa_ready": {
+    "N-1": "NOT_RUN",
+    "N-2": "NOT_RUN",
+    "N-3": "NOT_RUN",
+    "N-4": "NOT_RUN",
+    "N-5": "NOT_RUN",
+    "N-6": "NOT_RUN",
+    "N-7": "NOT_RUN",
+    "N-8": "NOT_RUN",
+    "N-9": "NOT_RUN",
+    "N-10": "NOT_RUN"
+  },
+  "status_values": [
+    "PASSED",
+    "FAILED",
+    "BLOCKED_ENVIRONMENT",
+    "BLOCKED_EXTERNAL",
+    "NOT_IMPLEMENTED",
+    "NOT_RUN"
+  ],
+  "requirements_ledger": {
+    "path": "team handoffs/merging/requirements-ledger.csv",
+    "verified": null,
+    "implemented": null,
+    "blocked": null,
+    "not_implemented": null,
+    "total": 58
+  },
+  "scientific_report": "team handoffs/merging/scientific-validation-report.json",
+  "wiring_edits": [],
+  "judgment_calls": [],
+  "hands_on_observations": [],
+  "unmet_gates": [],
+  "human_inputs_still_required": [
+    "OPENAI_API_KEY and OPENAI_MODEL in analogforge/.env",
+    "NASA dataset files and manifest.yaml per product"
+  ],
+  "main_advanced": false,
+  "visual_review": {
+    "d01_purity": "NOT_RUN",
+    "audit_visual_mock": "NOT_RUN",
+    "real_backend_screenshots": null,
+    "mock_vs_real_defects_fixed": [],
+    "reviewers": [],
+    "final_scores": {},
+    "review_file": "team handoffs/merging/DESIGN-REVIEW-MERGED.md",
+    "print_check": "NOT_RUN",
+    "own_checklist_all_yes": null
+  }
+}

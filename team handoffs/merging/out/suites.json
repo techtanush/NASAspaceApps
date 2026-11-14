@@ -1,0 +1,41 @@
+{
+  "tested_commit_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "command": "make check at ed903b6 (backend bytes identical currentc263d2a), plus complete frontend checks atc263d2a",
+  "exit_code": 0,
+  "backend_executed_commit_sha": "ed903b62d7968c0dcc420a557662f0c688c1b7ad",
+  "backend_source_equivalence": "out/source-equivalence.json",
+  "platform": {
+    "passed": 310,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 714.203
+  },
+  "science": {
+    "passed": 1012,
+    "failed": 0,
+    "skipped": 0
+  },
+  "renderer": {
+    "passed": 112,
+    "failed": 0,
+    "skipped": 0
+  },
+  "contract_kit": {
+    "passed": 20,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 0.042
+  },
+  "frontend": {
+    "passed": 134,
+    "failed": 0,
+    "skipped": 0
+  },
+  "terminal_stream_protocol": {
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0
+  },
+  "owned_python_total": 1434,
+  "frozen_kit_separate_process": true
+}

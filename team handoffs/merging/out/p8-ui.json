@@ -1,0 +1,26 @@
+{
+  "status": "PASSED",
+  "tested_commit_sha": "f628943950289a5c0777149a617c39129c17efa2",
+  "run_id": "bcbe1beb-3bf5-4f6f-ad28-7f08be366511",
+  "search_max_expansions": 1,
+  "raw_file_budget": 200000,
+  "raw_config_unchanged": true,
+  "outcomes": [
+    "INCONCLUSIVE",
+    "INCONCLUSIVE",
+    "INCONCLUSIVE"
+  ],
+  "failure_categories": [
+    "SEARCH_LIMIT",
+    "SEARCH_LIMIT",
+    "SEARCH_LIMIT"
+  ],
+  "visible_search_limit_states": 3,
+  "publication": "LIMITED",
+  "manifest_sha256": "43ca5d56cbdc408cf8e66fd577e4ed3519bd6219bdd46d7f52ed752fb1065a3f",
+  "exports": {
+    "html": "31d0af85164e5c701e941a3a02c66aef919381b1164a43244ce18ebf539ff807",
+    "json": "2b01ad97d36e475e5e443eeaed2743f0b6f0f3ae421f83666cc98e52d815d298",
+    "csv": "a002c32fbaf2314589d5a161534a8d629f32ca85d8379592e334c71af8ef8178"
+  }
+}

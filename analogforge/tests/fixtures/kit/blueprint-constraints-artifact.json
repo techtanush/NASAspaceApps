@@ -1,0 +1,49 @@
+{
+  "artifact_kind": "SYNTHETIC_GRAPH_REGRESSION",
+  "schema_version": "1.0",
+  "mode": "synthetic",
+  "mission_revision_id": "00000000-0000-4000-8000-000000000002",
+  "rover_revision_id": "00000000-0000-4000-8000-000000000004",
+  "fixture_id": "unique-exposure-fail-repair-v1",
+  "resource_provider": "TEST_ONLY_MOCK_GRAPH",
+  "start_node": "S",
+  "return_node": "S",
+  "required_task_ids": [
+    "W1",
+    "W2"
+  ],
+  "waypoint_tolerance_m": 0,
+  "task_dwell_seconds": {
+    "W1": 0,
+    "W2": 0
+  },
+  "task_incremental_mock_energy_wh": {
+    "W1": 10,
+    "W2": 10
+  },
+  "surface_slope_cap_deg": 18,
+  "exposure": {
+    "metric_id": "surface_slope_deg",
+    "band_deg": [
+      12,
+      18
+    ],
+    "minimum_distance_m": 100,
+    "counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE"
+  },
+  "max_distance_m": 400,
+  "max_duration_s": null,
+  "max_undirected_edge_traversals": 2,
+  "forbidden_edges": [],
+  "unknown_edges_are_blocked": true,
+  "solver_budget": {
+    "max_expansions": 200000,
+    "max_seconds": 30,
+    "max_labels_per_node": 32,
+    "seed": 0
+  },
+  "limitations": [
+    "This artifact is for graph regression only.",
+    "Production raster constraints require actual Earth geometry, masks, sampling policy, calibrated or accepted energy assumptions and source evidence."
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "operation_count": 43,
+  "bundled_document_equal": true,
+  "scope": "Feature branch frozen C2; strict corrected C3 proof lives in integration preview"
+}

@@ -1,0 +1,16 @@
+{
+  "python": "3.12.13",
+  "rasterio": "1.4.4",
+  "gdal": "3.10.3",
+  "pyproj": "3.8.0",
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "drivers": [
+    "GTiff",
+    "SRTMHGT",
+    "PDS",
+    "PDS4",
+    "netCDF",
+    "AAIGrid"
+  ]
+}

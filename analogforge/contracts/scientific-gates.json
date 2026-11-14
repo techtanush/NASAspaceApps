@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "scientific-assurance",
+  "policy_version": "1.0",
+  "authority": "33-SCIENTIFIC-CREDIBILITY-AND-CLAIM-GATES.md",
+  "outcomes": [
+    "SATISFIED",
+    "UNSATISFIED",
+    "NOT_ASSESSED",
+    "NOT_APPLICABLE"
+  ],
+  "required_gate_ids": [
+    "SC-01",
+    "SC-02",
+    "SC-03",
+    "SC-04",
+    "SC-05",
+    "SC-06",
+    "SC-07",
+    "SC-08",
+    "SC-09",
+    "SC-10",
+    "SC-11",
+    "SC-12",
+    "SC-13",
+    "SC-14",
+    "SC-15"
+  ],
+  "semantics": {
+    "all_claims": "Each gate exactly once; explicit applicability reason; missing policy or gate never defaults to success.",
+    "applicability": "Frozen observable policy determines applicability. ALL always applies. NOT_APPLICABLE is invalid for required applicable gates.",
+    "negative_findings": "A supported FAIL statement can publish. Missing data constrains positive claims, not truthful UNKNOWN reporting.",
+    "numerical_cutoffs": "Owned observable policies define scientific thresholds, units, coverage, uncertainty and support. No universal credibility score.",
+    "publication": "Integrity defects or included unsupported/contradictory positive claims block; limited honest unknowns/gaps require LIMITED."
+  },
+  "gates": [
+    {
+      "gate_id": "SC-01",
+      "name": "Frozen scope",
+      "applicability": "ALL",
+      "rule": "Reject stale revisions, altered accepted inputs and unpinned applicable policy."
+    },
+    {
+      "gate_id": "SC-02",
+      "name": "Source integrity",
+      "applicability": "DATA_DEPENDENT",
+      "rule": "Exclude invalid assets; dependent finding UNKNOWN; fabricated lineage blocks publication."
+    },
+    {
+      "gate_id": "SC-03",
+      "name": "Physical semantics",
+      "applicability": "MEASUREMENT_COMPARISON",
+      "rule": "Unknown body/frame/units/quantity prevents a supported metric."
+    },
+    {
+      "gate_id": "SC-04",
+      "name": "Spatial support",
+      "applicability": "SPATIAL",
+      "rule": "Restrict scope or UNKNOWN; resampling never upgrades source support."
+    },
+    {
+      "gate_id": "SC-05",
+      "name": "Coverage and quality",
+      "applicability": "SPATIAL",
+      "rule": "Apply versioned observable-specific denominator/minimum; no zero-filled nodata."
+    },
+    {
+      "gate_id": "SC-06",
+      "name": "Temporal support",
+      "applicability": "TIME_DEPENDENT",
+      "rule": "Restrict claim or UNKNOWN for incompatible temporal quantities/support."
+    },
+    {
+      "gate_id": "SC-07",
+      "name": "Assumptions and proxies",
+      "applicability": "ALL",
+      "rule": "Required material assumptions need acceptance; proxies stay proxies."
+    },
+    {
+      "gate_id": "SC-08",
+      "name": "Uncertainty and decision",
+      "applicability": "NUMERICAL_CONCLUSION",
+      "rule": "Use frozen interval/nominal rule; disclose unquantified uncertainty and sensitivity."
+    },
+    {
+      "gate_id": "SC-09",
+      "name": "Numerical reproducibility",
+      "applicability": "NUMERICAL_CONCLUSION",
+      "rule": "Reject nonfinite, unversioned, unreproducible or dimensionally invalid calculations."
+    },
+    {
+      "gate_id": "SC-10",
+      "name": "Source independence",
+      "applicability": "CORROBORATION",
+      "rule": "Shared ancestry cannot count as independent replication or confidence upgrade."
+    },
+    {
+      "gate_id": "SC-11",
+      "name": "Independent experiment check",
+      "applicability": "VERIFICATION",
+      "rule": "Independent recomputation required; no solver self-certification or search-cap infeasibility proof."
+    },
+    {
+      "gate_id": "SC-12",
+      "name": "Challenge resolution",
+      "applicability": "ALL",
+      "rule": "Material unresolved challenge restricts dependent claims; review cannot waive it."
+    },
+    {
+      "gate_id": "SC-13",
+      "name": "Discovery and controls",
+      "applicability": "DISCOVERY_OR_VALIDATION_CLAIM",
+      "rule": "Bound novelty to reference/search scope; preserve held-out/control and mission-sensitivity evidence."
+    },
+    {
+      "gate_id": "SC-14",
+      "name": "Mode and validation level",
+      "applicability": "ALL",
+      "rule": "Reject synthetic/replay/live or S0-S4 laundering; no baseline S5 claim."
+    },
+    {
+      "gate_id": "SC-15",
+      "name": "Claim and export consistency",
+      "applicability": "ALL",
+      "rule": "Reject contradiction, hidden required outcomes, false readiness and omitted material limitations."
+    }
+  ]
+}

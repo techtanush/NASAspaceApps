@@ -1,0 +1,462 @@
+{
+  "$defs": {
+    "Acquisition": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start"
+        },
+        "end": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        }
+      },
+      "title": "Acquisition",
+      "type": "object"
+    },
+    "CrsSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "epsg": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Epsg"
+        },
+        "wkt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Wkt"
+        }
+      },
+      "title": "CrsSpec",
+      "type": "object"
+    },
+    "DatasetFile": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "role": {
+          "default": "DATA",
+          "enum": [
+            "DATA",
+            "LABEL",
+            "METADATA",
+            "MASK",
+            "DOCUMENTATION"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "media_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Media Type"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "DatasetFile",
+      "type": "object"
+    },
+    "ProductIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "product_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Id"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Version"
+        },
+        "granule_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Granule Ids",
+          "type": "array"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doi"
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Url"
+        }
+      },
+      "title": "ProductIdentity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "manifest_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Manifest Version",
+      "type": "string"
+    },
+    "dataset_id": {
+      "pattern": "^[a-z0-9][a-z0-9-]{2,63}$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "provider": {
+      "minLength": 1,
+      "title": "Provider",
+      "type": "string"
+    },
+    "is_synthetic": {
+      "title": "Is Synthetic",
+      "type": "boolean"
+    },
+    "body": {
+      "enum": [
+        "EARTH",
+        "MOON",
+        "MARS"
+      ],
+      "title": "Body",
+      "type": "string"
+    },
+    "role": {
+      "enum": [
+        "TARGET_TERRAIN",
+        "EARTH_TERRAIN",
+        "EARTH_MINERAL",
+        "LUNAR_THERMAL",
+        "CONTEXT_ONLY"
+      ],
+      "title": "Role",
+      "type": "string"
+    },
+    "format": {
+      "enum": [
+        "GEOTIFF",
+        "COG",
+        "HGT",
+        "HGT_ZIP",
+        "PDS4_IMG",
+        "PDS3_IMG",
+        "NETCDF",
+        "HDF5",
+        "ASCII_GRID",
+        "OTHER"
+      ],
+      "title": "Format",
+      "type": "string"
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/DatasetFile"
+      },
+      "minItems": 1,
+      "title": "Files",
+      "type": "array"
+    },
+    "primary_file": {
+      "title": "Primary File",
+      "type": "string"
+    },
+    "band": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Band",
+      "type": "integer"
+    },
+    "variable": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Variable"
+    },
+    "quantity": {
+      "enum": [
+        "ELEVATION",
+        "RADIUS",
+        "SLOPE_DEG",
+        "MINERAL_CLASS",
+        "BAND_DEPTH",
+        "TEMPERATURE_K",
+        "OTHER"
+      ],
+      "title": "Quantity",
+      "type": "string"
+    },
+    "units": {
+      "enum": [
+        "m",
+        "km",
+        "deg",
+        "K",
+        "class",
+        "dimensionless"
+      ],
+      "title": "Units",
+      "type": "string"
+    },
+    "scale_factor": {
+      "default": 1.0,
+      "title": "Scale Factor",
+      "type": "number"
+    },
+    "offset": {
+      "default": 0.0,
+      "title": "Offset",
+      "type": "number"
+    },
+    "scale_already_applied": {
+      "default": false,
+      "title": "Scale Already Applied",
+      "type": "boolean"
+    },
+    "nodata_value": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Nodata Value"
+    },
+    "reference_radius_m": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reference Radius M"
+    },
+    "vertical_reference": {
+      "minLength": 1,
+      "title": "Vertical Reference",
+      "type": "string"
+    },
+    "crs": {
+      "$ref": "#/$defs/CrsSpec"
+    },
+    "longitude_convention": {
+      "enum": [
+        "NEG180_180",
+        "ZERO_360",
+        "PROJECTED"
+      ],
+      "title": "Longitude Convention",
+      "type": "string"
+    },
+    "longitude_direction": {
+      "default": "POSITIVE_EAST",
+      "enum": [
+        "POSITIVE_EAST",
+        "POSITIVE_WEST"
+      ],
+      "title": "Longitude Direction",
+      "type": "string"
+    },
+    "latitude_type": {
+      "enum": [
+        "PLANETOCENTRIC",
+        "PLANETOGRAPHIC",
+        "GEODETIC"
+      ],
+      "title": "Latitude Type",
+      "type": "string"
+    },
+    "pixel_registration": {
+      "default": "UNKNOWN",
+      "enum": [
+        "CENTER",
+        "CORNER",
+        "UNKNOWN"
+      ],
+      "title": "Pixel Registration",
+      "type": "string"
+    },
+    "declared_native_resolution_m": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Declared Native Resolution M"
+    },
+    "acquisition": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Acquisition"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "product_identity": {
+      "$ref": "#/$defs/ProductIdentity"
+    },
+    "license_note": {
+      "minLength": 1,
+      "title": "License Note",
+      "type": "string"
+    },
+    "citation": {
+      "minLength": 1,
+      "title": "Citation",
+      "type": "string"
+    },
+    "notes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Notes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "dataset_id",
+    "title",
+    "provider",
+    "is_synthetic",
+    "body",
+    "role",
+    "format",
+    "files",
+    "primary_file",
+    "quantity",
+    "units",
+    "vertical_reference",
+    "crs",
+    "longitude_convention",
+    "latitude_type",
+    "license_note",
+    "citation"
+  ],
+  "title": "DatasetManifest",
+  "type": "object",
+  "$comment": "Generated from analogforge.ports models by kit/tools/build_kit.py. Do not edit."
+}

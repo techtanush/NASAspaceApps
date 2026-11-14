@@ -1,0 +1,260 @@
+{
+  "tested_commit_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "final_executable_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "stats": {
+    "startTime": "2026-11-12T22:52:19.256Z",
+    "duration": 1740444.069,
+    "expected": 41,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "cases": [
+    {
+      "title": "UIX-07 S01\u2013S12 accessible at 1440",
+      "file": "a11y.spec.ts",
+      "repeat_index": null,
+      "seconds": 24.591
+    },
+    {
+      "title": "UIX-07 S01\u2013S12 accessible at 900",
+      "file": "a11y.spec.ts",
+      "repeat_index": null,
+      "seconds": 25.127
+    },
+    {
+      "title": "UIX-07 S01\u2013S12 accessible at 390",
+      "file": "a11y.spec.ts",
+      "repeat_index": null,
+      "seconds": 27.471
+    },
+    {
+      "title": "UIX-07 keyboard focus, help, reduced motion and text spacing",
+      "file": "a11y.spec.ts",
+      "repeat_index": null,
+      "seconds": 10.911
+    },
+    {
+      "title": "fresh audit cohorts retain the controlled document and loaded heading",
+      "file": "audit-cohort-navigation.spec.ts",
+      "repeat_index": null,
+      "seconds": 126.063
+    },
+    {
+      "title": "authoring digest and acceptance controls stay clear of header controls when scrolled",
+      "file": "authoring-scroll-layout.spec.ts",
+      "repeat_index": null,
+      "seconds": 19.779
+    },
+    {
+      "title": "screening placeholders retain committed row geometry",
+      "file": "candidate-loading-layout.spec.ts",
+      "repeat_index": null,
+      "seconds": 33.848
+    },
+    {
+      "title": "pending rank and committed status remain contained with expanded text spacing",
+      "file": "candidate-loading-layout.spec.ts",
+      "repeat_index": null,
+      "seconds": 9.641
+    },
+    {
+      "title": "chart prose wraps independently of horizontally scrolling plot data",
+      "file": "chart-narrative-layout.spec.ts",
+      "repeat_index": null,
+      "seconds": 12.504
+    },
+    {
+      "title": "review scope APPROVE_EVIDENCE preserves frozen scientific results",
+      "file": "contract-edges.spec.ts",
+      "repeat_index": null,
+      "seconds": 8.489
+    },
+    {
+      "title": "review scope REJECT_EVIDENCE preserves frozen scientific results",
+      "file": "contract-edges.spec.ts",
+      "repeat_index": null,
+      "seconds": 8.633
+    },
+    {
+      "title": "blocked dependency retry retains accepted inputs and reaches review",
+      "file": "contract-edges.spec.ts",
+      "repeat_index": null,
+      "seconds": 7.242
+    },
+    {
+      "title": "portfolio action exposes per-requirement coverage and residual gaps",
+      "file": "contract-edges.spec.ts",
+      "repeat_index": null,
+      "seconds": 7.642
+    },
+    {
+      "title": "editing an existing rover creates a new immutable revision with the frozen request shape",
+      "file": "contract-edges.spec.ts",
+      "repeat_index": null,
+      "seconds": 2.633
+    },
+    {
+      "title": "job success keeps run settings locked until the proposed contract arrives",
+      "file": "contract-edges.spec.ts",
+      "repeat_index": null,
+      "seconds": 5.621
+    },
+    {
+      "title": "design rules reject visual regressions on the shell and full component kit",
+      "file": "design-smoke.spec.ts",
+      "repeat_index": null,
+      "seconds": 35.394
+    },
+    {
+      "title": "nonmodal operations persist outside focus and reopen with explicit dismissal",
+      "file": "drawer-reopen.spec.ts",
+      "repeat_index": null,
+      "seconds": 9.042
+    },
+    {
+      "title": "J01 full Mars investigation, immutable fail/replan/pass and independently verified exports",
+      "file": "journeys/J01-golden.spec.ts",
+      "repeat_index": null,
+      "seconds": 19.439
+    },
+    {
+      "title": "J02 graph regression preserves exact independent graph oracle",
+      "file": "journeys/J02-graph-regression.spec.ts",
+      "repeat_index": null,
+      "seconds": 10.03
+    },
+    {
+      "title": "J03 Moon site-only keeps unknown thermal, natural gaps and complete exports",
+      "file": "journeys/J03-moon-site-only.spec.ts",
+      "repeat_index": null,
+      "seconds": 10.425
+    },
+    {
+      "title": "J04 invalid imports preserve typed fields and never persist",
+      "file": "journeys/J04-rover-import-errors.spec.ts",
+      "repeat_index": null,
+      "seconds": 3.01
+    },
+    {
+      "title": "J05 rover conflict never relaxes exposure contract",
+      "file": "journeys/J05-rover-conflict.spec.ts",
+      "repeat_index": null,
+      "seconds": 10.395
+    },
+    {
+      "title": "J06 no energy calibration is inconclusive and never zero",
+      "file": "journeys/J06-no-energy.spec.ts",
+      "repeat_index": null,
+      "seconds": 10.254
+    },
+    {
+      "title": "J07 cancellation retains committed evidence and cannot later pass",
+      "file": "journeys/J07-cancellation.spec.ts",
+      "repeat_index": null,
+      "seconds": 9.041
+    },
+    {
+      "title": "J08 offline reconnect resynchronizes with strictly unique persisted events",
+      "file": "journeys/J08-connection-recovery.spec.ts",
+      "repeat_index": null,
+      "seconds": 12.728
+    },
+    {
+      "title": "J08b reload during verification resumes immutable attempts without duplication",
+      "file": "journeys/J08-connection-recovery.spec.ts",
+      "repeat_index": null,
+      "seconds": 10.007
+    },
+    {
+      "title": "J09 keyboard-only authoring and qualification work at 390px",
+      "file": "journeys/J09-keyboard-zoom.spec.ts",
+      "repeat_index": null,
+      "seconds": 9.032
+    },
+    {
+      "title": "J09b 200 percent zoom reflow retains primary actions and keyboard focus",
+      "file": "journeys/J09-keyboard-zoom.spec.ts",
+      "repeat_index": null,
+      "seconds": 8.02
+    },
+    {
+      "title": "J10 editing creates a new draft while accepted run inputs remain immutable",
+      "file": "journeys/J10-immutability.spec.ts",
+      "repeat_index": null,
+      "seconds": 10.079
+    },
+    {
+      "title": "J11 local dataset practice matches synthetic qualifications and attempts",
+      "file": "journeys/J11-local-dataset-parity.spec.ts",
+      "repeat_index": null,
+      "seconds": 18.414
+    },
+    {
+      "title": "J12 live dataset slot is explicitly unavailable and cannot start an accepted contract",
+      "file": "journeys/J12-unbound-live.spec.ts",
+      "repeat_index": null,
+      "seconds": 5.466
+    },
+    {
+      "title": "J13 live without credentials fails without creating a run or scripted fallback",
+      "file": "journeys/J13-missing-live-credentials.spec.ts",
+      "repeat_index": null,
+      "seconds": 4.639
+    },
+    {
+      "title": "text spacing preserves scientific column ownership and active navigation",
+      "file": "layout-spacing.spec.ts",
+      "repeat_index": null,
+      "seconds": 13.825
+    },
+    {
+      "title": "candidate metadata fits the 40/60 split and four loading rows remain complete",
+      "file": "list-loading-presets.spec.ts",
+      "repeat_index": null,
+      "seconds": 20.378
+    },
+    {
+      "title": "mobile workspace exposes work, keeps captions readable and groups passport assessments",
+      "file": "mobile-workspace-layout.spec.ts",
+      "repeat_index": null,
+      "seconds": 25.723
+    },
+    {
+      "title": "preview worker survives rapid document replacement without update errors",
+      "file": "mock-worker-reload.spec.ts",
+      "repeat_index": null,
+      "seconds": 16.596
+    },
+    {
+      "title": "authoring groups stay bounded and pinned contract identity remains inspectable",
+      "file": "presentation-identities.spec.ts",
+      "repeat_index": null,
+      "seconds": 5.399
+    },
+    {
+      "title": "declaring an optional rover value never invents a zero measurement",
+      "file": "rover-declared-values.spec.ts",
+      "repeat_index": null,
+      "seconds": 2.631
+    },
+    {
+      "title": "displayed slope boundaries and submeter rover clearance preserve the supplied engineering meaning",
+      "file": "scientific-display.spec.ts",
+      "repeat_index": null,
+      "seconds": 6.789
+    },
+    {
+      "title": "UIX-13 complete visual audit C01\u2013C20",
+      "file": "visual-audit.spec.ts",
+      "repeat_index": null,
+      "seconds": 1106.424
+    },
+    {
+      "title": "UIX-11 WebGL failure preserves list, matrix, benchmarks and exports",
+      "file": "webgl-fallback.spec.ts",
+      "repeat_index": null,
+      "seconds": 11.397
+    }
+  ]
+}

@@ -1,0 +1,3404 @@
+{
+  "7474bf104317c21c339607c48bfc970aec8df851d243f451b71cf6e514a8191c": {
+    "operation": "CHARACTERIZE_TARGET",
+    "profile_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "metrics": [
+      {
+        "metric_id": "slope_area_fraction:12-18",
+        "value": 0.2,
+        "unit": "fraction",
+        "support_scale_m": 480,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      }
+    ],
+    "slope_histogram": {
+      "metric_id": "surface_slope_deg",
+      "edges": [
+        0,
+        2,
+        5,
+        8,
+        12,
+        15,
+        18,
+        25,
+        35,
+        90
+      ],
+      "area_fraction": [
+        0,
+        0.4,
+        0.3,
+        0,
+        0.2,
+        0,
+        0.1,
+        0,
+        0
+      ],
+      "unit": "deg",
+      "support_scale_m": 480,
+      "valid_area_m2": 1000000
+    },
+    "comparison_support_m": 480,
+    "unavailable_dimensions": [
+      {
+        "dimension": "MINERAL",
+        "reason_code": "NOT_REQUESTED",
+        "message": "Mineral context unavailable"
+      }
+    ]
+  },
+  "c69911ad48bdf0de76f3b30a26f0e01d88ef59eb16dfc057b6505c710d353266": {
+    "operation": "SCREEN_CANDIDATES",
+    "screened_count": 9,
+    "windows": [
+      {
+        "window_id": "grid-r0c1",
+        "name": "Practice grid-r0c1",
+        "aoi": {
+          "body": "EARTH",
+          "bbox": [
+            -111,
+            35,
+            -110.97,
+            35.03
+          ],
+          "longitude_convention": "NEG180_180",
+          "latitude_type": "GEODETIC",
+          "crs_wkt": "EPSG:4326",
+          "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+        },
+        "origin": "DISCOVERED",
+        "novelty_status": "NOT_IN_REFERENCE_LIST",
+        "rank": 1,
+        "excluded": false,
+        "exclusion_reason": null,
+        "feature_scores": {
+          "terrain_screening_order": 1
+        },
+        "is_negative_control": false,
+        "evidence": {
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
+        }
+      },
+      {
+        "window_id": "grid-r0c0",
+        "name": "Practice grid-r0c0",
+        "aoi": {
+          "body": "EARTH",
+          "bbox": [
+            -110.96,
+            35,
+            -110.92999999999999,
+            35.03
+          ],
+          "longitude_convention": "NEG180_180",
+          "latitude_type": "GEODETIC",
+          "crs_wkt": "EPSG:4326",
+          "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+        },
+        "origin": "DISCOVERED",
+        "novelty_status": "NOT_IN_REFERENCE_LIST",
+        "rank": 2,
+        "excluded": false,
+        "exclusion_reason": null,
+        "feature_scores": {
+          "terrain_screening_order": 2
+        },
+        "is_negative_control": false,
+        "evidence": {
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
+        }
+      },
+      {
+        "window_id": "grid-r2c2",
+        "name": "Practice grid-r2c2",
+        "aoi": {
+          "body": "EARTH",
+          "bbox": [
+            -110.92,
+            35,
+            -110.89,
+            35.03
+          ],
+          "longitude_convention": "NEG180_180",
+          "latitude_type": "GEODETIC",
+          "crs_wkt": "EPSG:4326",
+          "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+        },
+        "origin": "KNOWN_CONTROL",
+        "novelty_status": "KNOWN_ANALOG",
+        "rank": 3,
+        "excluded": false,
+        "exclusion_reason": null,
+        "feature_scores": {
+          "terrain_screening_order": 3
+        },
+        "is_negative_control": false,
+        "evidence": {
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
+        }
+      },
+      {
+        "window_id": "grid-r0c2",
+        "name": "Practice grid-r0c2",
+        "aoi": {
+          "body": "EARTH",
+          "bbox": [
+            -110.88,
+            35,
+            -110.85,
+            35.03
+          ],
+          "longitude_convention": "NEG180_180",
+          "latitude_type": "GEODETIC",
+          "crs_wkt": "EPSG:4326",
+          "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+        },
+        "origin": "DISCOVERED",
+        "novelty_status": "NOT_IN_REFERENCE_LIST",
+        "rank": 4,
+        "excluded": false,
+        "exclusion_reason": null,
+        "feature_scores": {
+          "terrain_screening_order": 4
+        },
+        "is_negative_control": true,
+        "evidence": {
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
+        }
+      },
+      {
+        "window_id": "grid-r1c0",
+        "name": "Practice grid-r1c0",
+        "aoi": {
+          "body": "EARTH",
+          "bbox": [
+            -110.84,
+            35,
+            -110.81,
+            35.03
+          ],
+          "longitude_convention": "NEG180_180",
+          "latitude_type": "GEODETIC",
+          "crs_wkt": "EPSG:4326",
+          "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+        },
+        "origin": "DISCOVERED",
+        "novelty_status": "NOT_IN_REFERENCE_LIST",
+        "rank": 5,
+        "excluded": false,
+        "exclusion_reason": null,
+        "feature_scores": {
+          "terrain_screening_order": 5
+        },
+        "is_negative_control": false,
+        "evidence": {
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
+        }
+      },
+      {
+        "window_id": "grid-r2c0",
+        "name": "Practice grid-r2c0",
+        "aoi": {
+          "body": "EARTH",
+          "bbox": [
+            -110.8,
+            35,
+            -110.77,
+            35.03
+          ],
+          "longitude_convention": "NEG180_180",
+          "latitude_type": "GEODETIC",
+          "crs_wkt": "EPSG:4326",
+          "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+        },
+        "origin": "DISCOVERED",
+        "novelty_status": "NOT_IN_REFERENCE_LIST",
+        "rank": 6,
+        "excluded": false,
+        "exclusion_reason": null,
+        "feature_scores": {
+          "terrain_screening_order": 6
+        },
+        "is_negative_control": false,
+        "evidence": {
+          "evidence_id": "00000000-0000-4000-8000-000000001030"
+        }
+      },
+      {
+        "window_id": "grid-r1c1",
+        "name": "Practice grid-r1c1",
+        "aoi": {
+          "body": "EARTH",
+          "bbox": [
+            -111,
+            35,
+            -110.97,
+            35.03
+          ],
+          "longitude_convention": "NEG180_180",
+          "latitude_type": "GEODETIC",
+          "crs_wkt": "EPSG:4326",
+          "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+        },
+        "origin": "SYNTHETIC_CONTROL",
+        "novelty_status": "NOT_ASSESSED",
+        "rank": null,
+        "excluded": true,
+        "exclusion_reason": "WATER_ONLY",
+        "feature_scores": {},
+        "is_negative_control": false,
+        "evidence": null
+      },
+      {
+        "window_id": "grid-r1c2",
+        "name": "Practice grid-r1c2",
+        "aoi": {
+          "body": "EARTH",
+          "bbox": [
+            -111,
+            35,
+            -110.97,
+            35.03
+          ],
+          "longitude_convention": "NEG180_180",
+          "latitude_type": "GEODETIC",
+          "crs_wkt": "EPSG:4326",
+          "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+        },
+        "origin": "SYNTHETIC_CONTROL",
+        "novelty_status": "NOT_ASSESSED",
+        "rank": null,
+        "excluded": true,
+        "exclusion_reason": "INSUFFICIENT_VALID_DATA",
+        "feature_scores": {},
+        "is_negative_control": false,
+        "evidence": null
+      },
+      {
+        "window_id": "grid-r2c1",
+        "name": "Practice grid-r2c1",
+        "aoi": {
+          "body": "EARTH",
+          "bbox": [
+            -111,
+            35,
+            -110.97,
+            35.03
+          ],
+          "longitude_convention": "NEG180_180",
+          "latitude_type": "GEODETIC",
+          "crs_wkt": "EPSG:4326",
+          "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+        },
+        "origin": "SYNTHETIC_CONTROL",
+        "novelty_status": "NOT_ASSESSED",
+        "rank": null,
+        "excluded": true,
+        "exclusion_reason": "DETAIL_CAP",
+        "feature_scores": {},
+        "is_negative_control": false,
+        "evidence": null
+      }
+    ],
+    "shortlist_window_ids": [
+      "grid-r0c1",
+      "grid-r0c0",
+      "grid-r2c2",
+      "grid-r0c2",
+      "grid-r1c0",
+      "grid-r2c0"
+    ],
+    "stop_reason": "GRID_EXHAUSTED",
+    "search_extent": {
+      "body": "EARTH",
+      "bbox": [
+        -111,
+        35,
+        -110.97,
+        35.03
+      ],
+      "longitude_convention": "NEG180_180",
+      "latitude_type": "GEODETIC",
+      "crs_wkt": "EPSG:4326",
+      "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+    },
+    "limitations": [
+      "SYNTHETIC PRACTICE DATA — not terrain of this location"
+    ]
+  },
+  "4e7a1400e46fbf4c56c3017252692831b14773580679c84ed1d8b929e57882a2": {
+    "operation": "ANALYZE_CANDIDATE",
+    "analysis_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "analysis_grid_artifact_key": null,
+    "metrics": [
+      {
+        "metric_id": "slope_area_fraction:12-18",
+        "value": 0.4,
+        "unit": "fraction",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      },
+      {
+        "metric_id": "slope_w1_deg",
+        "value": 3.2,
+        "unit": "deg",
+        "support_scale_m": 480,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      }
+    ],
+    "slope_histogram": {
+      "metric_id": "surface_slope_deg",
+      "edges": [
+        0,
+        2,
+        5,
+        8,
+        12,
+        15,
+        18,
+        25,
+        35,
+        90
+      ],
+      "area_fraction": [
+        0,
+        0.4,
+        0.3,
+        0,
+        0.2,
+        0,
+        0.1,
+        0,
+        0
+      ],
+      "unit": "deg",
+      "support_scale_m": 480,
+      "valid_area_m2": 1000000
+    },
+    "connected_zones": [],
+    "coverage_fraction": 1,
+    "limitations": [
+      "SYNTHETIC PRACTICE DATA — not terrain of this location",
+      "Access and permissions not assessed"
+    ]
+  },
+  "8fd748d27da5442b06c9d163a2626e5560f4ef502ae0156897ea745f3e6174c3": {
+    "operation": "ANALYZE_CANDIDATE",
+    "analysis_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "analysis_grid_artifact_key": null,
+    "metrics": [
+      {
+        "metric_id": "slope_area_fraction:12-18",
+        "value": 0.11,
+        "unit": "fraction",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      },
+      {
+        "metric_id": "slope_w1_deg",
+        "value": 4.1,
+        "unit": "deg",
+        "support_scale_m": 480,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      }
+    ],
+    "slope_histogram": {
+      "metric_id": "surface_slope_deg",
+      "edges": [
+        0,
+        2,
+        5,
+        8,
+        12,
+        15,
+        18,
+        25,
+        35,
+        90
+      ],
+      "area_fraction": [
+        0,
+        0.4,
+        0.3,
+        0,
+        0.2,
+        0,
+        0.1,
+        0,
+        0
+      ],
+      "unit": "deg",
+      "support_scale_m": 480,
+      "valid_area_m2": 1000000
+    },
+    "connected_zones": [],
+    "coverage_fraction": 1,
+    "limitations": [
+      "SYNTHETIC PRACTICE DATA — not terrain of this location",
+      "Access and permissions not assessed"
+    ]
+  },
+  "ed94c1c61896485a9ea8c51fb868d75099ef2624eb56b4bbb3063675befcdc50": {
+    "operation": "ANALYZE_CANDIDATE",
+    "analysis_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "analysis_grid_artifact_key": null,
+    "metrics": [
+      {
+        "metric_id": "slope_area_fraction:12-18",
+        "value": 0.08,
+        "unit": "fraction",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      },
+      {
+        "metric_id": "slope_w1_deg",
+        "value": 3.9,
+        "unit": "deg",
+        "support_scale_m": 480,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      }
+    ],
+    "slope_histogram": {
+      "metric_id": "surface_slope_deg",
+      "edges": [
+        0,
+        2,
+        5,
+        8,
+        12,
+        15,
+        18,
+        25,
+        35,
+        90
+      ],
+      "area_fraction": [
+        0,
+        0.4,
+        0.3,
+        0,
+        0.2,
+        0,
+        0.1,
+        0,
+        0
+      ],
+      "unit": "deg",
+      "support_scale_m": 480,
+      "valid_area_m2": 1000000
+    },
+    "connected_zones": [],
+    "coverage_fraction": 1,
+    "limitations": [
+      "SYNTHETIC PRACTICE DATA — not terrain of this location",
+      "Access and permissions not assessed"
+    ]
+  },
+  "13c9ae662f3a2a550bb3867661f3b090c9952b25eb6938465c33847c5ec5364f": {
+    "operation": "ANALYZE_CANDIDATE",
+    "analysis_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "analysis_grid_artifact_key": null,
+    "metrics": [
+      {
+        "metric_id": "slope_area_fraction:12-18",
+        "value": 0,
+        "unit": "fraction",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      },
+      {
+        "metric_id": "slope_w1_deg",
+        "value": 8,
+        "unit": "deg",
+        "support_scale_m": 480,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      }
+    ],
+    "slope_histogram": {
+      "metric_id": "surface_slope_deg",
+      "edges": [
+        0,
+        2,
+        5,
+        8,
+        12,
+        15,
+        18,
+        25,
+        35,
+        90
+      ],
+      "area_fraction": [
+        0,
+        0.4,
+        0.3,
+        0,
+        0.2,
+        0,
+        0.1,
+        0,
+        0
+      ],
+      "unit": "deg",
+      "support_scale_m": 480,
+      "valid_area_m2": 1000000
+    },
+    "connected_zones": [],
+    "coverage_fraction": 1,
+    "limitations": [
+      "SYNTHETIC PRACTICE DATA — not terrain of this location",
+      "Access and permissions not assessed"
+    ]
+  },
+  "fc64c510d9830e34bb75ab40269003ed0f39e57588c2070b7d3246aa54a71a98": {
+    "operation": "ANALYZE_CANDIDATE",
+    "analysis_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "analysis_grid_artifact_key": null,
+    "metrics": [
+      {
+        "metric_id": "slope_area_fraction:12-18",
+        "value": 0.03,
+        "unit": "fraction",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      },
+      {
+        "metric_id": "slope_w1_deg",
+        "value": 7,
+        "unit": "deg",
+        "support_scale_m": 480,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      }
+    ],
+    "slope_histogram": {
+      "metric_id": "surface_slope_deg",
+      "edges": [
+        0,
+        2,
+        5,
+        8,
+        12,
+        15,
+        18,
+        25,
+        35,
+        90
+      ],
+      "area_fraction": [
+        0,
+        0.4,
+        0.3,
+        0,
+        0.2,
+        0,
+        0.1,
+        0,
+        0
+      ],
+      "unit": "deg",
+      "support_scale_m": 480,
+      "valid_area_m2": 1000000
+    },
+    "connected_zones": [],
+    "coverage_fraction": 1,
+    "limitations": [
+      "SYNTHETIC PRACTICE DATA — not terrain of this location",
+      "Access and permissions not assessed"
+    ]
+  },
+  "de365aedce3e6e64e6b03d9e1d18481ceae3b3f98d7b843297483536da442664": {
+    "operation": "ANALYZE_CANDIDATE",
+    "analysis_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "analysis_grid_artifact_key": null,
+    "metrics": [
+      {
+        "metric_id": "slope_area_fraction:12-18",
+        "value": 0.02,
+        "unit": "fraction",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      },
+      {
+        "metric_id": "slope_w1_deg",
+        "value": 8,
+        "unit": "deg",
+        "support_scale_m": 480,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-v1",
+        "valid_fraction": 1,
+        "uncertainty_note": "Synthetic practice fixture; uncertainty unquantified"
+      }
+    ],
+    "slope_histogram": {
+      "metric_id": "surface_slope_deg",
+      "edges": [
+        0,
+        2,
+        5,
+        8,
+        12,
+        15,
+        18,
+        25,
+        35,
+        90
+      ],
+      "area_fraction": [
+        0,
+        0.4,
+        0.3,
+        0,
+        0.2,
+        0,
+        0.1,
+        0,
+        0
+      ],
+      "unit": "deg",
+      "support_scale_m": 480,
+      "valid_area_m2": 1000000
+    },
+    "connected_zones": [],
+    "coverage_fraction": 1,
+    "limitations": [
+      "SYNTHETIC PRACTICE DATA — not terrain of this location",
+      "Access and permissions not assessed"
+    ]
+  },
+  "fb19d7c9d7b2809d419984c3b6c96cce5547835f791ca2925fb087b1d92c7450": {
+    "mockImage": {
+      "mediaType": "image/png",
+      "sha256": "fb19d7c9d7b2809d419984c3b6c96cce5547835f791ca2925fb087b1d92c7450",
+      "contentBase64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAh0lEQVR42u3QMQ2AMBBA0fPCjAIcVAMemDCBCcaKqAY00YSpK7mpyRv+8scXy7q9mcp+/CmGvnded6ranlQBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzA/QAQtp5t1uT7/pAAAAAElFTkSuQmCC",
+      "width": 64,
+      "height": 64,
+      "mask": {
+        "encoding": "ALPHA",
+        "transparent_pixel_count": 192,
+        "meaning": "Water, nodata or outside valid target wedge; no values inferred"
+      }
+    }
+  },
+  "d01234cfbfa098d4f970243fd8da1a4ffc0890264972f7a5b8846ef2b96aa43c": {
+    "mockImage": {
+      "mediaType": "image/png",
+      "sha256": "d01234cfbfa098d4f970243fd8da1a4ffc0890264972f7a5b8846ef2b96aa43c",
+      "contentBase64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAe0lEQVR42u3aIRUAIBBEweuCJgENyEAH+itIAIJ7DzXi2xWjN0pt67U+5rHM7s8CAAAAAAAAAAAAAAAAAAAA+AIQlwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/AAAAAAAAAAAAAAAAAAAAAAAAAADpNl7ZusL9GtMRAAAAAElFTkSuQmCC",
+      "width": 64,
+      "height": 64,
+      "mask": {
+        "encoding": "ALPHA",
+        "transparent_pixel_count": 217,
+        "meaning": "Water, nodata or outside valid target wedge; no values inferred"
+      }
+    }
+  },
+  "2504354bc4034e1ac8da1acc223d49118f3eb6de72bbd6649f294620c46c562d": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-SLOPE-AVAILABILITY",
+    "proposed_status": "PASS",
+    "reason_code": "MEETS_CRITERION",
+    "evaluation_stage": "FINAL",
+    "confidence": "MEDIUM",
+    "comparison_scale_m": 60,
+    "measured_value": 0.4,
+    "measured_unit": "fraction",
+    "threshold_lower": 0.05,
+    "threshold_upper": null,
+    "explanation": "MEETS_CRITERION",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "slope-band-area-fraction-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "399d7000cdb2e620b2783a6cda3100aadaa093ed6eb8321a65745307914729ea": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+    "proposed_status": "PASS",
+    "reason_code": "MEETS_CRITERION",
+    "evaluation_stage": "FINAL",
+    "confidence": "MEDIUM",
+    "comparison_scale_m": 480,
+    "measured_value": 3.2,
+    "measured_unit": "deg",
+    "threshold_lower": null,
+    "threshold_upper": 6,
+    "explanation": "Common support comparison at 480 m",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "slope-w1-common-support-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "ca31c682181ac4e36ec78ecfa88540a187f3c99e01266b4442f70a560163d4db": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-EXPOSURE",
+    "proposed_status": "UNKNOWN",
+    "reason_code": "ROUTE_NOT_VERIFIED",
+    "evaluation_stage": "PRELIMINARY",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": null,
+    "measured_unit": "m",
+    "threshold_lower": 100,
+    "threshold_upper": null,
+    "explanation": "ROUTE_NOT_VERIFIED — route-dependent requirement is preliminary",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "bf1ce9330de52f27d75e9cb0a180c2de69273eb94965bb39015e7def2ac21f07": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-TASKS",
+    "proposed_status": "UNKNOWN",
+    "reason_code": "ROUTE_NOT_VERIFIED",
+    "evaluation_stage": "PRELIMINARY",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": null,
+    "measured_unit": "count",
+    "threshold_lower": 2,
+    "threshold_upper": null,
+    "explanation": "ROUTE_NOT_VERIFIED — route-dependent requirement is preliminary",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "7143c7040e70036c6a5f38f1470b00b737553aa0265442e5799423fa885734d3": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-RESERVE",
+    "proposed_status": "UNKNOWN",
+    "reason_code": "ROUTE_NOT_VERIFIED",
+    "evaluation_stage": "PRELIMINARY",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": null,
+    "measured_unit": "percent",
+    "threshold_lower": 20,
+    "threshold_upper": null,
+    "explanation": "ROUTE_NOT_VERIFIED — route-dependent requirement is preliminary",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "7f4a9f549af0f61679b0eb329e91064e0926463847c333dbe93a6bb8e20e0b5b": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-MINERAL",
+    "proposed_status": "UNKNOWN",
+    "reason_code": "EARTH_EVIDENCE_MISSING",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": null,
+    "measured_unit": "class",
+    "threshold_lower": null,
+    "threshold_upper": null,
+    "explanation": "EARTH_EVIDENCE_MISSING — mineral context unavailable",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "emit-mineral-presence-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "522b9fd49b36bca78e134ab77cecd32b2dc533ea8877a86aafb875792e02af86": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-CLEARANCE",
+    "proposed_status": "UNKNOWN",
+    "reason_code": "SCALE_UNSUPPORTED",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": null,
+    "measured_unit": "m",
+    "threshold_lower": 0.2,
+    "threshold_upper": null,
+    "explanation": "SCALE_UNSUPPORTED — 60 m terrain does not establish 0.02 m field clearance",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "64ebef33616c0db7675c36831df3ed074ba67fd2415a34c2368d3f01d24d5066": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-GRAVITY",
+    "proposed_status": "GAP",
+    "reason_code": "PHYSICAL_GAP",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": null,
+    "measured_unit": "m/s2",
+    "threshold_lower": null,
+    "threshold_upper": null,
+    "explanation": "PHYSICAL_GAP — not naturally reproducible on Earth",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "ba5e7ac60ef4be9df0f084568a12435212edb03be548257758a3a1dd17fb6366": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-ATMOSPHERE",
+    "proposed_status": "GAP",
+    "reason_code": "PHYSICAL_GAP",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": null,
+    "measured_unit": "Pa",
+    "threshold_lower": null,
+    "threshold_upper": null,
+    "explanation": "PHYSICAL_GAP — not naturally reproducible on Earth",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "1e1762c2cfc81f02ddba26a85b64c14902503138c24b4fe1d2bcf0537c85ef8d": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-SLOPE-AVAILABILITY",
+    "proposed_status": "PASS",
+    "reason_code": "MEETS_CRITERION",
+    "evaluation_stage": "FINAL",
+    "confidence": "MEDIUM",
+    "comparison_scale_m": 60,
+    "measured_value": 0.11,
+    "measured_unit": "fraction",
+    "threshold_lower": 0.05,
+    "threshold_upper": null,
+    "explanation": "MEETS_CRITERION",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "slope-band-area-fraction-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "e9d0bbee3ced1ece82610b46de0aa54b967cd15d18a827a7d0c2d57bfdea08d8": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+    "proposed_status": "PASS",
+    "reason_code": "MEETS_CRITERION",
+    "evaluation_stage": "FINAL",
+    "confidence": "MEDIUM",
+    "comparison_scale_m": 480,
+    "measured_value": 4.1,
+    "measured_unit": "deg",
+    "threshold_lower": null,
+    "threshold_upper": 6,
+    "explanation": "Common support comparison at 480 m",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "slope-w1-common-support-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "d6b803ac04deefd856632c00301befc2b3c7c19cf849460da5d96a75c3f463b0": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-SLOPE-AVAILABILITY",
+    "proposed_status": "PASS",
+    "reason_code": "MEETS_CRITERION",
+    "evaluation_stage": "FINAL",
+    "confidence": "MEDIUM",
+    "comparison_scale_m": 60,
+    "measured_value": 0.08,
+    "measured_unit": "fraction",
+    "threshold_lower": 0.05,
+    "threshold_upper": null,
+    "explanation": "MEETS_CRITERION",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "slope-band-area-fraction-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "f9fd6cde7c68b063f6809b31f692c7408ec3f808a5ec466acb961c41fdc83705": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+    "proposed_status": "PASS",
+    "reason_code": "MEETS_CRITERION",
+    "evaluation_stage": "FINAL",
+    "confidence": "MEDIUM",
+    "comparison_scale_m": 480,
+    "measured_value": 3.9,
+    "measured_unit": "deg",
+    "threshold_lower": null,
+    "threshold_upper": 6,
+    "explanation": "Common support comparison at 480 m",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "slope-w1-common-support-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "940f3f8c45ff5545bd34ff160f8f8386a25654b6d54ed0ceb489403ed486d061": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-SLOPE-AVAILABILITY",
+    "proposed_status": "FAIL",
+    "reason_code": "INSUFFICIENT_EXPOSURE",
+    "evaluation_stage": "FINAL",
+    "confidence": "MEDIUM",
+    "comparison_scale_m": 60,
+    "measured_value": 0,
+    "measured_unit": "fraction",
+    "threshold_lower": 0.05,
+    "threshold_upper": null,
+    "explanation": "INSUFFICIENT_EXPOSURE",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "slope-band-area-fraction-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "02a3270674d7c71c191fa2ddb03c5e1823b6c43698843325dcec1fb866871631": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+    "proposed_status": "FAIL",
+    "reason_code": "INSUFFICIENT_EXPOSURE",
+    "evaluation_stage": "FINAL",
+    "confidence": "MEDIUM",
+    "comparison_scale_m": 480,
+    "measured_value": 8,
+    "measured_unit": "deg",
+    "threshold_lower": null,
+    "threshold_upper": 6,
+    "explanation": "Common support comparison at 480 m",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "slope-w1-common-support-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "ebb4e022c327475729013d40916c992527942e4e7c36a13d2d26bae55c5d4220": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-SLOPE-AVAILABILITY",
+    "proposed_status": "FAIL",
+    "reason_code": "INSUFFICIENT_EXPOSURE",
+    "evaluation_stage": "FINAL",
+    "confidence": "MEDIUM",
+    "comparison_scale_m": 60,
+    "measured_value": 0.03,
+    "measured_unit": "fraction",
+    "threshold_lower": 0.05,
+    "threshold_upper": null,
+    "explanation": "INSUFFICIENT_EXPOSURE",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "slope-band-area-fraction-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "072d66db086ece0580ca701994fbe9d18be5282007ea86445a38d8cb46b7110a": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+    "proposed_status": "FAIL",
+    "reason_code": "INSUFFICIENT_EXPOSURE",
+    "evaluation_stage": "FINAL",
+    "confidence": "MEDIUM",
+    "comparison_scale_m": 480,
+    "measured_value": 7,
+    "measured_unit": "deg",
+    "threshold_lower": null,
+    "threshold_upper": 6,
+    "explanation": "Common support comparison at 480 m",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "slope-w1-common-support-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "c467100a668b28a5da266b19d42e6a827545ef59d8a8ed222ebffbf130ffa6c9": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-SLOPE-AVAILABILITY",
+    "proposed_status": "FAIL",
+    "reason_code": "INSUFFICIENT_EXPOSURE",
+    "evaluation_stage": "FINAL",
+    "confidence": "MEDIUM",
+    "comparison_scale_m": 60,
+    "measured_value": 0.02,
+    "measured_unit": "fraction",
+    "threshold_lower": 0.05,
+    "threshold_upper": null,
+    "explanation": "INSUFFICIENT_EXPOSURE",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "adequacy": {
+      "observable_policy_id": "slope-band-area-fraction-v1",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "c071397d690f4a381d313b5405be32fa1fc37cfd0eb7914258970e6c44519d20": {
+    "issue_id": "00000000-0000-4000-8000-0000000010c3",
+    "run_id": "00000000-0000-4000-8000-000000001027",
+    "candidate_id": "00000000-0000-4000-8000-00000000102a",
+    "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+    "target_evidence_ids": [
+      "00000000-0000-4000-8000-000000001084"
+    ],
+    "reason_code": "SCALE_MISMATCH",
+    "severity": "BLOCKING",
+    "status": "OPEN",
+    "summary": "60 m evidence cannot support the accepted 480 m comparison. Correct common-support evidence required.",
+    "repair_request": "Cite the 480 m common-support comparison evidence",
+    "resolution_evidence_ids": []
+  },
+  "1b9344e61d4168df8da743f2288fa2c99a53eb8b4e3c6d32c18150c72df5158b": {
+    "issue_id": "00000000-0000-4000-8000-0000000010c4",
+    "run_id": "00000000-0000-4000-8000-000000001027",
+    "candidate_id": "00000000-0000-4000-8000-00000000102a",
+    "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+    "target_evidence_ids": [
+      "00000000-0000-4000-8000-000000001084"
+    ],
+    "reason_code": "SCALE_MISMATCH",
+    "severity": "BLOCKING",
+    "status": "RESOLVED",
+    "summary": "60 m evidence cannot support the accepted 480 m comparison. Correct common-support evidence required.",
+    "repair_request": "Cite the 480 m common-support comparison evidence",
+    "resolution_evidence_ids": [
+      "00000000-0000-4000-8000-000000001084"
+    ]
+  },
+  "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b": {
+    "schema_version": "1.0",
+    "artifact_kind": "RASTER_ROUTE_TEST",
+    "mode": "synthetic",
+    "resource_provider": "PHYSICAL_EARTH_MODEL",
+    "mission_revision_id": "00000000-0000-4000-8000-000000001016",
+    "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
+    "rover_revision_id": "00000000-0000-4000-8000-000000001020",
+    "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
+    "candidate_window_id": "grid-r0c1",
+    "test_revision": 1,
+    "strategy": "WAYPOINT_RETURN",
+    "grid": {
+      "analysis_evidence_id": "00000000-0000-4000-8000-00000000106f",
+      "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "crs_wkt": "EPSG:32612",
+      "cell_size_m": 60,
+      "width": 64,
+      "height": 64
+    },
+    "graph": null,
+    "start": {
+      "node_id": null,
+      "lon": -111,
+      "lat": 35,
+      "x_m": 494240,
+      "y_m": 3900000
+    },
+    "return_required": true,
+    "tasks": [
+      {
+        "task_id": "W1",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.99,
+          "lat": 35.01,
+          "x_m": 494840,
+          "y_m": 3899400
+        },
+        "tolerance_m": 60,
+        "dwell_s": 60,
+        "incremental_energy_wh": 10,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      },
+      {
+        "task_id": "W2",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.98,
+          "lat": 35.01,
+          "x_m": 495440,
+          "y_m": 3899400
+        },
+        "tolerance_m": 60,
+        "dwell_s": 60,
+        "incremental_energy_wh": 10,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      }
+    ],
+    "surface_slope_cap_deg": 18,
+    "exposures": [
+      {
+        "requirement_id": "R-EXPOSURE",
+        "metric_id": "surface_slope_deg",
+        "band_deg": [
+          12,
+          18
+        ],
+        "upper_inclusive": true,
+        "minimum_distance_m": 100,
+        "counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE"
+      }
+    ],
+    "max_distance_m": 8000,
+    "max_duration_s": null,
+    "max_undirected_edge_traversals": 2,
+    "unknown_is_forbidden": true,
+    "footprint_dilation_m": 0,
+    "blocked_edge_ids": [],
+    "energy": {
+      "model": {
+        "model_id": "earth-simple-v1",
+        "rolling_coefficient": 0.06,
+        "drive_efficiency": 0.65,
+        "idle_power_w": 35,
+        "science_task_wh": 10,
+        "roughness_multiplier": 1,
+        "uncertainty_fraction": 0.25,
+        "calibration_status": "ASSUMED",
+        "calibration_evidence_id": null
+      },
+      "battery_wh": 1800,
+      "min_reserve_pct": 20,
+      "rover_mass_kg": 42,
+      "nominal_speed_mps": 0.5,
+      "gravity_mps2": 9.80665
+    },
+    "solver": {
+      "max_expansions": 100000,
+      "max_seconds": 60,
+      "max_labels_per_node": 100,
+      "seed": 20261105
+    },
+    "limitations": [
+      "Authored mock practice constraints; not a scientific computation",
+      "An unspecified rover maximum route uses the recorded 8000 m design default"
+    ]
+  },
+  "5faa491ea9facff23d05f0c3cb7f45a62230d53f1c4855b948ed0b66df70609b": {
+    "start": {
+      "node_id": null,
+      "lon": -111,
+      "lat": 35,
+      "x_m": 494240,
+      "y_m": 3900000
+    },
+    "tasks": [
+      {
+        "task_id": "W1",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.99,
+          "lat": 35.01,
+          "x_m": 494840,
+          "y_m": 3899400
+        },
+        "tolerance_m": 60,
+        "dwell_s": 60,
+        "incremental_energy_wh": 10,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      },
+      {
+        "task_id": "W2",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.98,
+          "lat": 35.01,
+          "x_m": 495440,
+          "y_m": 3899400
+        },
+        "tolerance_m": 60,
+        "dwell_s": 60,
+        "incremental_energy_wh": 10,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      }
+    ]
+  },
+  "47f919a6a3db0ddc6bba307b87a874bfc8cd13ef3044feb8a836d1f424f22c17": {
+    "operation": "DESIGN_BENCHMARK",
+    "constraints": {
+      "schema_version": "1.0",
+      "artifact_kind": "RASTER_ROUTE_TEST",
+      "mode": "synthetic",
+      "resource_provider": "PHYSICAL_EARTH_MODEL",
+      "mission_revision_id": "00000000-0000-4000-8000-000000001016",
+      "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
+      "rover_revision_id": "00000000-0000-4000-8000-000000001020",
+      "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
+      "candidate_window_id": "grid-r0c1",
+      "test_revision": 1,
+      "strategy": "WAYPOINT_RETURN",
+      "grid": {
+        "analysis_evidence_id": "00000000-0000-4000-8000-00000000106f",
+        "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+        "crs_wkt": "EPSG:32612",
+        "cell_size_m": 60,
+        "width": 64,
+        "height": 64
+      },
+      "graph": null,
+      "start": {
+        "node_id": null,
+        "lon": -111,
+        "lat": 35,
+        "x_m": 494240,
+        "y_m": 3900000
+      },
+      "return_required": true,
+      "tasks": [
+        {
+          "task_id": "W1",
+          "requirement_ids": [
+            "R-TASKS"
+          ],
+          "kind": "SAMPLING",
+          "location": {
+            "node_id": null,
+            "lon": -110.99,
+            "lat": 35.01,
+            "x_m": 494840,
+            "y_m": 3899400
+          },
+          "tolerance_m": 60,
+          "dwell_s": 60,
+          "incremental_energy_wh": 10,
+          "required_capability": "geological_sampling",
+          "evidence_origin": "SYNTHETIC_FIXTURE"
+        },
+        {
+          "task_id": "W2",
+          "requirement_ids": [
+            "R-TASKS"
+          ],
+          "kind": "SAMPLING",
+          "location": {
+            "node_id": null,
+            "lon": -110.98,
+            "lat": 35.01,
+            "x_m": 495440,
+            "y_m": 3899400
+          },
+          "tolerance_m": 60,
+          "dwell_s": 60,
+          "incremental_energy_wh": 10,
+          "required_capability": "geological_sampling",
+          "evidence_origin": "SYNTHETIC_FIXTURE"
+        }
+      ],
+      "surface_slope_cap_deg": 18,
+      "exposures": [
+        {
+          "requirement_id": "R-EXPOSURE",
+          "metric_id": "surface_slope_deg",
+          "band_deg": [
+            12,
+            18
+          ],
+          "upper_inclusive": true,
+          "minimum_distance_m": 100,
+          "counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE"
+        }
+      ],
+      "max_distance_m": 8000,
+      "max_duration_s": null,
+      "max_undirected_edge_traversals": 2,
+      "unknown_is_forbidden": true,
+      "footprint_dilation_m": 0,
+      "blocked_edge_ids": [],
+      "energy": {
+        "model": {
+          "model_id": "earth-simple-v1",
+          "rolling_coefficient": 0.06,
+          "drive_efficiency": 0.65,
+          "idle_power_w": 35,
+          "science_task_wh": 10,
+          "roughness_multiplier": 1,
+          "uncertainty_fraction": 0.25,
+          "calibration_status": "ASSUMED",
+          "calibration_evidence_id": null
+        },
+        "battery_wh": 1800,
+        "min_reserve_pct": 20,
+        "rover_mass_kg": 42,
+        "nominal_speed_mps": 0.5,
+        "gravity_mps2": 9.80665
+      },
+      "solver": {
+        "max_expansions": 100000,
+        "max_seconds": 60,
+        "max_labels_per_node": 100,
+        "seed": 20261105
+      },
+      "limitations": [
+        "Authored mock practice constraints; not a scientific computation",
+        "An unspecified rover maximum route uses the recorded 8000 m design default"
+      ]
+    },
+    "constraints_artifact_key": "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b",
+    "constraints_sha256": "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b",
+    "required_exposures": [
+      {
+        "requirement_id": "R-EXPOSURE",
+        "metric_id": "unique_slope_exposure_m",
+        "lower": 12,
+        "upper": 18,
+        "minimum_distance_m": 100
+      }
+    ],
+    "requirement_mapping": [
+      {
+        "requirement_id": "R-SLOPE-AVAILABILITY",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-EXPOSURE",
+        "constraint_ids": [
+          "C-EXPOSURE-R-EXPOSURE"
+        ],
+        "treatment": "VERIFIED_BY_TOOL",
+        "limitation": null
+      },
+      {
+        "requirement_id": "R-TASKS",
+        "constraint_ids": [
+          "C-TASKS"
+        ],
+        "treatment": "VERIFIED_BY_TOOL",
+        "limitation": null
+      },
+      {
+        "requirement_id": "R-RESERVE",
+        "constraint_ids": [
+          "C-ENERGY-RESERVE"
+        ],
+        "treatment": "VERIFIED_BY_TOOL",
+        "limitation": null
+      },
+      {
+        "requirement_id": "R-MINERAL",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-CLEARANCE",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-GRAVITY",
+        "constraint_ids": [],
+        "treatment": "GAP",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-ATMOSPHERE",
+        "constraint_ids": [],
+        "treatment": "GAP",
+        "limitation": "Not verified by this modeled route"
+      }
+    ],
+    "unverified_requirement_ids": [
+      "R-SLOPE-AVAILABILITY",
+      "R-TARGET-SLOPE-CONTEXT",
+      "R-MINERAL",
+      "R-CLEARANCE",
+      "R-GRAVITY",
+      "R-ATMOSPHERE"
+    ],
+    "blockers": []
+  },
+  "3d94c59986d3c84cd0a702a6a81d395f6c3fe9df05afce3edf404f19b9736f3c": {
+    "schema_version": "1.0",
+    "route_key": "grid-r0c1-attempt-1",
+    "mode": "synthetic",
+    "constraints_sha256": "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b",
+    "strategy": "WAYPOINT_RETURN",
+    "graph_revision": "synthetic-practice-grid-v1",
+    "node_sequence": [
+      "S",
+      "A",
+      "W1",
+      "W2",
+      "W1",
+      "A",
+      "S"
+    ],
+    "task_events": [
+      {
+        "task_id": "W1",
+        "node_id": "W1",
+        "arrival_distance_m": 40,
+        "dwell_s": 60
+      },
+      {
+        "task_id": "W2",
+        "node_id": "W2",
+        "arrival_distance_m": 60,
+        "dwell_s": 60
+      }
+    ],
+    "display_geometry": {
+      "type": "LineString",
+      "coordinates": [
+        [
+          -111,
+          35
+        ],
+        [
+          -110.995,
+          35.005
+        ],
+        [
+          -111,
+          35
+        ]
+      ]
+    },
+    "solver_claimed": {
+      "distance_m": 120,
+      "energy_conservative_wh": 26,
+      "unique_exposure_m": {
+        "R-EXPOSURE": 0
+      }
+    }
+  },
+  "7b2fb5515319fe22e5b2bd5248e9978a2bda444901b623f713a2c102a71e8b80": {
+    "operation": "SEARCH_ROUTE",
+    "search_status": "FOUND",
+    "route": {
+      "schema_version": "1.0",
+      "route_key": "grid-r0c1-attempt-1",
+      "mode": "synthetic",
+      "constraints_sha256": "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b",
+      "strategy": "WAYPOINT_RETURN",
+      "graph_revision": "synthetic-practice-grid-v1",
+      "node_sequence": [
+        "S",
+        "A",
+        "W1",
+        "W2",
+        "W1",
+        "A",
+        "S"
+      ],
+      "task_events": [
+        {
+          "task_id": "W1",
+          "node_id": "W1",
+          "arrival_distance_m": 40,
+          "dwell_s": 60
+        },
+        {
+          "task_id": "W2",
+          "node_id": "W2",
+          "arrival_distance_m": 60,
+          "dwell_s": 60
+        }
+      ],
+      "display_geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -111,
+            35
+          ],
+          [
+            -110.995,
+            35.005
+          ],
+          [
+            -111,
+            35
+          ]
+        ]
+      },
+      "solver_claimed": {
+        "distance_m": 120,
+        "energy_conservative_wh": 26,
+        "unique_exposure_m": {
+          "R-EXPOSURE": 0
+        }
+      }
+    },
+    "route_artifact_key": "3d94c59986d3c84cd0a702a6a81d395f6c3fe9df05afce3edf404f19b9736f3c",
+    "route_sha256": "3d94c59986d3c84cd0a702a6a81d395f6c3fe9df05afce3edf404f19b9736f3c",
+    "counters": {
+      "expansions": 150,
+      "labels_created": 200,
+      "labels_pruned_dominated": 0,
+      "labels_pruned_lossy": 0,
+      "elapsed_ms": 1
+    },
+    "approximation_flags": [],
+    "optimistic_exposure_bound_m": {},
+    "termination_reason": "EXPOSURE_SHORTFALL"
+  },
+  "83047f7f134a041c74d47e3f2d4762ae598a0301e38204d49f4d560733fe1e36": {
+    "operation": "DIAGNOSE_RESULT",
+    "primary_category": "ROUTE",
+    "secondary_categories": [],
+    "violated_constraint_ids": [
+      "C-EXPOSURE-R-EXPOSURE"
+    ],
+    "permitted_repairs": [
+      "NEW_ROUTE"
+    ],
+    "recommended_repair": "NEW_ROUTE",
+    "recommended_strategy": "EXPOSURE_COVERAGE",
+    "proof_scope": "evaluated route only",
+    "explanation": "EXPOSURE_SHORTFALL",
+    "diagnosis_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    }
+  },
+  "1f2837bfb68e1e0fed394aa88934c089d16ad7dde9b75680ac03d4b2533a8236": {
+    "operation": "VERIFY_ROUTE",
+    "outcome": "FAIL",
+    "failure_category": "ROUTE",
+    "search_status": "FOUND",
+    "verified_route_sha256": "3d94c59986d3c84cd0a702a6a81d395f6c3fe9df05afce3edf404f19b9736f3c",
+    "metrics": [
+      {
+        "metric_id": "route_distance_m",
+        "value": 120,
+        "unit": "m",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "energy_conservative_wh",
+        "value": 26,
+        "unit": "Wh",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "unique_exposure_m:R-EXPOSURE",
+        "value": 0,
+        "unit": "m",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "tasks_completed",
+        "value": 2,
+        "unit": "count",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "reserve_pct",
+        "value": 98.33333333333333,
+        "unit": "percent",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      }
+    ],
+    "violations": [
+      {
+        "code": "EXPOSURE_SHORTFALL",
+        "requirement_id": "R-EXPOSURE",
+        "constraint_id": "C-EXPOSURE-R-EXPOSURE",
+        "observed": 0,
+        "threshold": 100,
+        "unit": "m",
+        "segment_from_index": null,
+        "segment_to_index": null,
+        "message": "EXPOSURE_SHORTFALL"
+      }
+    ],
+    "benchmark_rows": [
+      {
+        "constraint_id": "C-EXPOSURE-R-EXPOSURE",
+        "requirement_id": "R-EXPOSURE",
+        "rule": "≥ 100 m unique exposure in [12,18] deg",
+        "measured": 0,
+        "threshold": 100,
+        "unit": "m",
+        "margin": -100,
+        "status": "FAIL"
+      },
+      {
+        "constraint_id": "C-TASKS",
+        "requirement_id": "R-TASKS",
+        "rule": "Visit W1 and W2 on the same route",
+        "measured": 2,
+        "threshold": 2,
+        "unit": "count",
+        "margin": 0,
+        "status": "PASS"
+      },
+      {
+        "constraint_id": "C-ENERGY-RESERVE",
+        "requirement_id": "R-RESERVE",
+        "rule": "Return with at least 20 percent modeled battery reserve",
+        "measured": 98.33333333333333,
+        "threshold": 20,
+        "unit": "percent",
+        "margin": 78.33333333333333,
+        "status": "PASS"
+      }
+    ],
+    "telemetry_artifact_key": "telemetry",
+    "verification_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "limitations": [
+      "Modeled terrain-feasibility verification — not physical rover execution",
+      "Strategy: WAYPOINT_RETURN",
+      "Proof scope: evaluated route only",
+      "Changed elements: none"
+    ]
+  },
+  "3e8a993baf3323c547aad3278586e542c0fc5dc78e77708ee527e8538a967214": {
+    "schema_version": "1.0",
+    "route_sha256": "3d94c59986d3c84cd0a702a6a81d395f6c3fe9df05afce3edf404f19b9736f3c",
+    "constraints_sha256": "c85521a5f6669a7a6aaa44a5bab0fe056c1f04d070661472a3ea6f865152e11b",
+    "samples": [
+      {
+        "index": 0,
+        "node_id": "S",
+        "cumulative_distance_m": 0,
+        "elapsed_s": 0,
+        "lon": -111,
+        "lat": 35,
+        "elevation_m": 0,
+        "segment_surface_slope_deg": 0,
+        "cumulative_energy_conservative_wh": 0,
+        "reserve_pct": 100,
+        "in_band_requirement_ids": []
+      },
+      {
+        "index": 1,
+        "node_id": "W1",
+        "cumulative_distance_m": 60,
+        "elapsed_s": 120,
+        "lon": -110.995,
+        "lat": 35.005,
+        "elevation_m": 3,
+        "segment_surface_slope_deg": 15,
+        "cumulative_energy_conservative_wh": 12,
+        "reserve_pct": 99,
+        "in_band_requirement_ids": [
+          "R-EXPOSURE"
+        ]
+      },
+      {
+        "index": 2,
+        "node_id": "S",
+        "cumulative_distance_m": 120,
+        "elapsed_s": 460,
+        "lon": -111,
+        "lat": 35,
+        "elevation_m": 0,
+        "segment_surface_slope_deg": 0,
+        "cumulative_energy_conservative_wh": 26,
+        "reserve_pct": 98.33333333333333,
+        "in_band_requirement_ids": []
+      }
+    ]
+  },
+  "a82c28cbd52c314f2e8195a45195a3cc8658aaeaccc1f92a1823a0d2175754d3": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-EXPOSURE",
+    "proposed_status": "FAIL",
+    "reason_code": "ROUTE_FAILED",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": 0,
+    "measured_unit": "m",
+    "threshold_lower": 100,
+    "threshold_upper": null,
+    "explanation": "FINAL — EXPOSURE_SHORTFALL",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-00000000110c"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "093842748bf9b01778b552f133c1621500c1e2cec7fbb1d75f0299652432a426": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-TASKS",
+    "proposed_status": "PASS",
+    "reason_code": "ROUTE_FAILED",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": 2,
+    "measured_unit": "count",
+    "threshold_lower": 2,
+    "threshold_upper": null,
+    "explanation": "FINAL — EXPOSURE_SHORTFALL",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-00000000110c"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "15f5fb0afb74bf95d27ed534eb1e66508c33d26fecd2e530f080dc9525cb69a5": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-RESERVE",
+    "proposed_status": "PASS",
+    "reason_code": "ROUTE_FAILED",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": 98.33333333333333,
+    "measured_unit": "percent",
+    "threshold_lower": 20,
+    "threshold_upper": null,
+    "explanation": "FINAL — EXPOSURE_SHORTFALL",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-00000000110c"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "807a8e32766a39a87c6ff34f7a60aa6da7139b53186bb30cde9acba3879bd7e7": {
+    "schema_version": "1.0",
+    "artifact_kind": "RASTER_ROUTE_TEST",
+    "mode": "synthetic",
+    "resource_provider": "PHYSICAL_EARTH_MODEL",
+    "mission_revision_id": "00000000-0000-4000-8000-000000001016",
+    "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
+    "rover_revision_id": "00000000-0000-4000-8000-000000001020",
+    "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
+    "candidate_window_id": "grid-r0c1",
+    "test_revision": 2,
+    "strategy": "EXPOSURE_COVERAGE",
+    "grid": {
+      "analysis_evidence_id": "00000000-0000-4000-8000-00000000106f",
+      "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "crs_wkt": "EPSG:32612",
+      "cell_size_m": 60,
+      "width": 64,
+      "height": 64
+    },
+    "graph": null,
+    "start": {
+      "node_id": null,
+      "lon": -111,
+      "lat": 35,
+      "x_m": 494240,
+      "y_m": 3900000
+    },
+    "return_required": true,
+    "tasks": [
+      {
+        "task_id": "W1",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.99,
+          "lat": 35.01,
+          "x_m": 494840,
+          "y_m": 3899400
+        },
+        "tolerance_m": 60,
+        "dwell_s": 60,
+        "incremental_energy_wh": 10,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      },
+      {
+        "task_id": "W2",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.98,
+          "lat": 35.01,
+          "x_m": 495440,
+          "y_m": 3899400
+        },
+        "tolerance_m": 60,
+        "dwell_s": 60,
+        "incremental_energy_wh": 10,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      }
+    ],
+    "surface_slope_cap_deg": 18,
+    "exposures": [
+      {
+        "requirement_id": "R-EXPOSURE",
+        "metric_id": "surface_slope_deg",
+        "band_deg": [
+          12,
+          18
+        ],
+        "upper_inclusive": true,
+        "minimum_distance_m": 100,
+        "counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE"
+      }
+    ],
+    "max_distance_m": 8000,
+    "max_duration_s": null,
+    "max_undirected_edge_traversals": 2,
+    "unknown_is_forbidden": true,
+    "footprint_dilation_m": 0,
+    "blocked_edge_ids": [],
+    "energy": {
+      "model": {
+        "model_id": "earth-simple-v1",
+        "rolling_coefficient": 0.06,
+        "drive_efficiency": 0.65,
+        "idle_power_w": 35,
+        "science_task_wh": 10,
+        "roughness_multiplier": 1,
+        "uncertainty_fraction": 0.25,
+        "calibration_status": "ASSUMED",
+        "calibration_evidence_id": null
+      },
+      "battery_wh": 1800,
+      "min_reserve_pct": 20,
+      "rover_mass_kg": 42,
+      "nominal_speed_mps": 0.5,
+      "gravity_mps2": 9.80665
+    },
+    "solver": {
+      "max_expansions": 100000,
+      "max_seconds": 60,
+      "max_labels_per_node": 100,
+      "seed": 20261105
+    },
+    "limitations": [
+      "Authored mock practice constraints; not a scientific computation",
+      "An unspecified rover maximum route uses the recorded 8000 m design default"
+    ]
+  },
+  "7ed4333ff7d4f29cd6001a3a8e3bfe639822f238d36f7997bcc2846f00c43524": {
+    "operation": "DESIGN_BENCHMARK",
+    "constraints": {
+      "schema_version": "1.0",
+      "artifact_kind": "RASTER_ROUTE_TEST",
+      "mode": "synthetic",
+      "resource_provider": "PHYSICAL_EARTH_MODEL",
+      "mission_revision_id": "00000000-0000-4000-8000-000000001016",
+      "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
+      "rover_revision_id": "00000000-0000-4000-8000-000000001020",
+      "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
+      "candidate_window_id": "grid-r0c1",
+      "test_revision": 2,
+      "strategy": "EXPOSURE_COVERAGE",
+      "grid": {
+        "analysis_evidence_id": "00000000-0000-4000-8000-00000000106f",
+        "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+        "crs_wkt": "EPSG:32612",
+        "cell_size_m": 60,
+        "width": 64,
+        "height": 64
+      },
+      "graph": null,
+      "start": {
+        "node_id": null,
+        "lon": -111,
+        "lat": 35,
+        "x_m": 494240,
+        "y_m": 3900000
+      },
+      "return_required": true,
+      "tasks": [
+        {
+          "task_id": "W1",
+          "requirement_ids": [
+            "R-TASKS"
+          ],
+          "kind": "SAMPLING",
+          "location": {
+            "node_id": null,
+            "lon": -110.99,
+            "lat": 35.01,
+            "x_m": 494840,
+            "y_m": 3899400
+          },
+          "tolerance_m": 60,
+          "dwell_s": 60,
+          "incremental_energy_wh": 10,
+          "required_capability": "geological_sampling",
+          "evidence_origin": "SYNTHETIC_FIXTURE"
+        },
+        {
+          "task_id": "W2",
+          "requirement_ids": [
+            "R-TASKS"
+          ],
+          "kind": "SAMPLING",
+          "location": {
+            "node_id": null,
+            "lon": -110.98,
+            "lat": 35.01,
+            "x_m": 495440,
+            "y_m": 3899400
+          },
+          "tolerance_m": 60,
+          "dwell_s": 60,
+          "incremental_energy_wh": 10,
+          "required_capability": "geological_sampling",
+          "evidence_origin": "SYNTHETIC_FIXTURE"
+        }
+      ],
+      "surface_slope_cap_deg": 18,
+      "exposures": [
+        {
+          "requirement_id": "R-EXPOSURE",
+          "metric_id": "surface_slope_deg",
+          "band_deg": [
+            12,
+            18
+          ],
+          "upper_inclusive": true,
+          "minimum_distance_m": 100,
+          "counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE"
+        }
+      ],
+      "max_distance_m": 8000,
+      "max_duration_s": null,
+      "max_undirected_edge_traversals": 2,
+      "unknown_is_forbidden": true,
+      "footprint_dilation_m": 0,
+      "blocked_edge_ids": [],
+      "energy": {
+        "model": {
+          "model_id": "earth-simple-v1",
+          "rolling_coefficient": 0.06,
+          "drive_efficiency": 0.65,
+          "idle_power_w": 35,
+          "science_task_wh": 10,
+          "roughness_multiplier": 1,
+          "uncertainty_fraction": 0.25,
+          "calibration_status": "ASSUMED",
+          "calibration_evidence_id": null
+        },
+        "battery_wh": 1800,
+        "min_reserve_pct": 20,
+        "rover_mass_kg": 42,
+        "nominal_speed_mps": 0.5,
+        "gravity_mps2": 9.80665
+      },
+      "solver": {
+        "max_expansions": 100000,
+        "max_seconds": 60,
+        "max_labels_per_node": 100,
+        "seed": 20261105
+      },
+      "limitations": [
+        "Authored mock practice constraints; not a scientific computation",
+        "An unspecified rover maximum route uses the recorded 8000 m design default"
+      ]
+    },
+    "constraints_artifact_key": "807a8e32766a39a87c6ff34f7a60aa6da7139b53186bb30cde9acba3879bd7e7",
+    "constraints_sha256": "807a8e32766a39a87c6ff34f7a60aa6da7139b53186bb30cde9acba3879bd7e7",
+    "required_exposures": [
+      {
+        "requirement_id": "R-EXPOSURE",
+        "metric_id": "unique_slope_exposure_m",
+        "lower": 12,
+        "upper": 18,
+        "minimum_distance_m": 100
+      }
+    ],
+    "requirement_mapping": [
+      {
+        "requirement_id": "R-SLOPE-AVAILABILITY",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-EXPOSURE",
+        "constraint_ids": [
+          "C-EXPOSURE-R-EXPOSURE"
+        ],
+        "treatment": "VERIFIED_BY_TOOL",
+        "limitation": null
+      },
+      {
+        "requirement_id": "R-TASKS",
+        "constraint_ids": [
+          "C-TASKS"
+        ],
+        "treatment": "VERIFIED_BY_TOOL",
+        "limitation": null
+      },
+      {
+        "requirement_id": "R-RESERVE",
+        "constraint_ids": [
+          "C-ENERGY-RESERVE"
+        ],
+        "treatment": "VERIFIED_BY_TOOL",
+        "limitation": null
+      },
+      {
+        "requirement_id": "R-MINERAL",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-CLEARANCE",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-GRAVITY",
+        "constraint_ids": [],
+        "treatment": "GAP",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-ATMOSPHERE",
+        "constraint_ids": [],
+        "treatment": "GAP",
+        "limitation": "Not verified by this modeled route"
+      }
+    ],
+    "unverified_requirement_ids": [
+      "R-SLOPE-AVAILABILITY",
+      "R-TARGET-SLOPE-CONTEXT",
+      "R-MINERAL",
+      "R-CLEARANCE",
+      "R-GRAVITY",
+      "R-ATMOSPHERE"
+    ],
+    "blockers": []
+  },
+  "0193bae9aac638b38a6ab7e6c6a5a0abeeb91dfe17670b244b3a3fd4aeae244d": {
+    "operation": "SEARCH_ROUTE",
+    "search_status": "EXHAUSTIVE_INFEASIBLE",
+    "route": null,
+    "route_artifact_key": null,
+    "route_sha256": null,
+    "counters": {
+      "expansions": 150,
+      "labels_created": 200,
+      "labels_pruned_dominated": 0,
+      "labels_pruned_lossy": 0,
+      "elapsed_ms": 1
+    },
+    "approximation_flags": [],
+    "optimistic_exposure_bound_m": {
+      "R-EXPOSURE": 0
+    },
+    "termination_reason": "Unreachable slope band enclosed by water moat"
+  },
+  "20e5560e70363183bda479933d7c2a61ad5801927fd7ac5435478b0c96a7346c": {
+    "operation": "DIAGNOSE_RESULT",
+    "primary_category": "ANALOG",
+    "secondary_categories": [],
+    "violated_constraint_ids": [
+      "C-EXPOSURE-R-EXPOSURE"
+    ],
+    "permitted_repairs": [
+      "NEW_CANDIDATE"
+    ],
+    "recommended_repair": "NEW_CANDIDATE",
+    "recommended_strategy": "EXPOSURE_COVERAGE",
+    "proof_scope": "discrete candidate domain under frozen constraints",
+    "explanation": "Unreachable slope band enclosed by water moat",
+    "diagnosis_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    }
+  },
+  "8c3dd731405b2cee527b23ccb4845db9c89a51d47be5f6a2f53c2d8509e3632f": {
+    "operation": "VERIFY_ROUTE",
+    "outcome": "FAIL",
+    "failure_category": "ANALOG",
+    "search_status": "EXHAUSTIVE_INFEASIBLE",
+    "verified_route_sha256": null,
+    "metrics": [
+      {
+        "metric_id": "route_distance_m",
+        "value": null,
+        "unit": "m",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "energy_conservative_wh",
+        "value": null,
+        "unit": "Wh",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "unique_exposure_m:R-EXPOSURE",
+        "value": 0,
+        "unit": "m",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "tasks_completed",
+        "value": null,
+        "unit": "count",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "reserve_pct",
+        "value": null,
+        "unit": "percent",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      }
+    ],
+    "violations": [],
+    "benchmark_rows": [
+      {
+        "constraint_id": "C-EXPOSURE-R-EXPOSURE",
+        "requirement_id": "R-EXPOSURE",
+        "rule": "≥ 100 m unique exposure in [12,18] deg",
+        "measured": 0,
+        "threshold": 100,
+        "unit": "m",
+        "margin": -100,
+        "status": "FAIL"
+      },
+      {
+        "constraint_id": "C-TASKS",
+        "requirement_id": "R-TASKS",
+        "rule": "Visit W1 and W2 on the same route",
+        "measured": null,
+        "threshold": 2,
+        "unit": "count",
+        "margin": null,
+        "status": "INCONCLUSIVE"
+      },
+      {
+        "constraint_id": "C-ENERGY-RESERVE",
+        "requirement_id": "R-RESERVE",
+        "rule": "Return with at least 20 percent modeled battery reserve",
+        "measured": null,
+        "threshold": 20,
+        "unit": "percent",
+        "margin": null,
+        "status": "INCONCLUSIVE"
+      }
+    ],
+    "telemetry_artifact_key": "telemetry",
+    "verification_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "limitations": [
+      "Modeled terrain-feasibility verification — not physical rover execution",
+      "Strategy: EXPOSURE_COVERAGE",
+      "Proof scope: discrete candidate domain under frozen constraints",
+      "Changed elements: strategy: WAYPOINT_RETURN → EXPOSURE_COVERAGE"
+    ]
+  },
+  "bf8c40e60885ad9b349e8dc8fd88c830da54a262a9b3cbc6a3d045df601faa1c": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-EXPOSURE",
+    "proposed_status": "FAIL",
+    "reason_code": "ROUTE_FAILED",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": 0,
+    "measured_unit": "m",
+    "threshold_lower": 100,
+    "threshold_upper": null,
+    "explanation": "FINAL — Unreachable slope band enclosed by water moat",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-00000000111b"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "203594b2557408d678ee59aefcabed041bc35c9f4024db6969939f8d351a7073": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-TASKS",
+    "proposed_status": "PASS",
+    "reason_code": "ROUTE_FAILED",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": null,
+    "measured_unit": "count",
+    "threshold_lower": 2,
+    "threshold_upper": null,
+    "explanation": "FINAL — Unreachable slope band enclosed by water moat",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-00000000111b"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "06de2a5000c9a67c5a9ee1aeff0cef41539b4448eaafb313613e27367ee7f4cb": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-RESERVE",
+    "proposed_status": "PASS",
+    "reason_code": "ROUTE_FAILED",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": null,
+    "measured_unit": "percent",
+    "threshold_lower": 20,
+    "threshold_upper": null,
+    "explanation": "FINAL — Unreachable slope band enclosed by water moat",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-00000000111b"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70": {
+    "schema_version": "1.0",
+    "artifact_kind": "RASTER_ROUTE_TEST",
+    "mode": "synthetic",
+    "resource_provider": "PHYSICAL_EARTH_MODEL",
+    "mission_revision_id": "00000000-0000-4000-8000-000000001016",
+    "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
+    "rover_revision_id": "00000000-0000-4000-8000-000000001020",
+    "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
+    "candidate_window_id": "grid-r0c0",
+    "test_revision": 3,
+    "strategy": "EXPOSURE_COVERAGE",
+    "grid": {
+      "analysis_evidence_id": "00000000-0000-4000-8000-000000001070",
+      "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "crs_wkt": "EPSG:32612",
+      "cell_size_m": 60,
+      "width": 64,
+      "height": 64
+    },
+    "graph": null,
+    "start": {
+      "node_id": null,
+      "lon": -111,
+      "lat": 35,
+      "x_m": 494240,
+      "y_m": 3900000
+    },
+    "return_required": true,
+    "tasks": [
+      {
+        "task_id": "W1",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.99,
+          "lat": 35.01,
+          "x_m": 494840,
+          "y_m": 3899400
+        },
+        "tolerance_m": 60,
+        "dwell_s": 60,
+        "incremental_energy_wh": 10,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      },
+      {
+        "task_id": "W2",
+        "requirement_ids": [
+          "R-TASKS"
+        ],
+        "kind": "SAMPLING",
+        "location": {
+          "node_id": null,
+          "lon": -110.98,
+          "lat": 35.01,
+          "x_m": 495440,
+          "y_m": 3899400
+        },
+        "tolerance_m": 60,
+        "dwell_s": 60,
+        "incremental_energy_wh": 10,
+        "required_capability": "geological_sampling",
+        "evidence_origin": "SYNTHETIC_FIXTURE"
+      }
+    ],
+    "surface_slope_cap_deg": 18,
+    "exposures": [
+      {
+        "requirement_id": "R-EXPOSURE",
+        "metric_id": "surface_slope_deg",
+        "band_deg": [
+          12,
+          18
+        ],
+        "upper_inclusive": true,
+        "minimum_distance_m": 100,
+        "counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE"
+      }
+    ],
+    "max_distance_m": 8000,
+    "max_duration_s": null,
+    "max_undirected_edge_traversals": 2,
+    "unknown_is_forbidden": true,
+    "footprint_dilation_m": 0,
+    "blocked_edge_ids": [],
+    "energy": {
+      "model": {
+        "model_id": "earth-simple-v1",
+        "rolling_coefficient": 0.06,
+        "drive_efficiency": 0.65,
+        "idle_power_w": 35,
+        "science_task_wh": 10,
+        "roughness_multiplier": 1,
+        "uncertainty_fraction": 0.25,
+        "calibration_status": "ASSUMED",
+        "calibration_evidence_id": null
+      },
+      "battery_wh": 1800,
+      "min_reserve_pct": 20,
+      "rover_mass_kg": 42,
+      "nominal_speed_mps": 0.5,
+      "gravity_mps2": 9.80665
+    },
+    "solver": {
+      "max_expansions": 100000,
+      "max_seconds": 60,
+      "max_labels_per_node": 100,
+      "seed": 20261105
+    },
+    "limitations": [
+      "Authored mock practice constraints; not a scientific computation",
+      "An unspecified rover maximum route uses the recorded 8000 m design default"
+    ]
+  },
+  "768b73b011c9828f498ad23d70045a8c822b2932a0f07e28b038c98c33fcaa47": {
+    "operation": "DESIGN_BENCHMARK",
+    "constraints": {
+      "schema_version": "1.0",
+      "artifact_kind": "RASTER_ROUTE_TEST",
+      "mode": "synthetic",
+      "resource_provider": "PHYSICAL_EARTH_MODEL",
+      "mission_revision_id": "00000000-0000-4000-8000-000000001016",
+      "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
+      "rover_revision_id": "00000000-0000-4000-8000-000000001020",
+      "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
+      "candidate_window_id": "grid-r0c0",
+      "test_revision": 3,
+      "strategy": "EXPOSURE_COVERAGE",
+      "grid": {
+        "analysis_evidence_id": "00000000-0000-4000-8000-000000001070",
+        "analysis_grid_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+        "crs_wkt": "EPSG:32612",
+        "cell_size_m": 60,
+        "width": 64,
+        "height": 64
+      },
+      "graph": null,
+      "start": {
+        "node_id": null,
+        "lon": -111,
+        "lat": 35,
+        "x_m": 494240,
+        "y_m": 3900000
+      },
+      "return_required": true,
+      "tasks": [
+        {
+          "task_id": "W1",
+          "requirement_ids": [
+            "R-TASKS"
+          ],
+          "kind": "SAMPLING",
+          "location": {
+            "node_id": null,
+            "lon": -110.99,
+            "lat": 35.01,
+            "x_m": 494840,
+            "y_m": 3899400
+          },
+          "tolerance_m": 60,
+          "dwell_s": 60,
+          "incremental_energy_wh": 10,
+          "required_capability": "geological_sampling",
+          "evidence_origin": "SYNTHETIC_FIXTURE"
+        },
+        {
+          "task_id": "W2",
+          "requirement_ids": [
+            "R-TASKS"
+          ],
+          "kind": "SAMPLING",
+          "location": {
+            "node_id": null,
+            "lon": -110.98,
+            "lat": 35.01,
+            "x_m": 495440,
+            "y_m": 3899400
+          },
+          "tolerance_m": 60,
+          "dwell_s": 60,
+          "incremental_energy_wh": 10,
+          "required_capability": "geological_sampling",
+          "evidence_origin": "SYNTHETIC_FIXTURE"
+        }
+      ],
+      "surface_slope_cap_deg": 18,
+      "exposures": [
+        {
+          "requirement_id": "R-EXPOSURE",
+          "metric_id": "surface_slope_deg",
+          "band_deg": [
+            12,
+            18
+          ],
+          "upper_inclusive": true,
+          "minimum_distance_m": 100,
+          "counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE"
+        }
+      ],
+      "max_distance_m": 8000,
+      "max_duration_s": null,
+      "max_undirected_edge_traversals": 2,
+      "unknown_is_forbidden": true,
+      "footprint_dilation_m": 0,
+      "blocked_edge_ids": [],
+      "energy": {
+        "model": {
+          "model_id": "earth-simple-v1",
+          "rolling_coefficient": 0.06,
+          "drive_efficiency": 0.65,
+          "idle_power_w": 35,
+          "science_task_wh": 10,
+          "roughness_multiplier": 1,
+          "uncertainty_fraction": 0.25,
+          "calibration_status": "ASSUMED",
+          "calibration_evidence_id": null
+        },
+        "battery_wh": 1800,
+        "min_reserve_pct": 20,
+        "rover_mass_kg": 42,
+        "nominal_speed_mps": 0.5,
+        "gravity_mps2": 9.80665
+      },
+      "solver": {
+        "max_expansions": 100000,
+        "max_seconds": 60,
+        "max_labels_per_node": 100,
+        "seed": 20261105
+      },
+      "limitations": [
+        "Authored mock practice constraints; not a scientific computation",
+        "An unspecified rover maximum route uses the recorded 8000 m design default"
+      ]
+    },
+    "constraints_artifact_key": "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70",
+    "constraints_sha256": "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70",
+    "required_exposures": [
+      {
+        "requirement_id": "R-EXPOSURE",
+        "metric_id": "unique_slope_exposure_m",
+        "lower": 12,
+        "upper": 18,
+        "minimum_distance_m": 100
+      }
+    ],
+    "requirement_mapping": [
+      {
+        "requirement_id": "R-SLOPE-AVAILABILITY",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-EXPOSURE",
+        "constraint_ids": [
+          "C-EXPOSURE-R-EXPOSURE"
+        ],
+        "treatment": "VERIFIED_BY_TOOL",
+        "limitation": null
+      },
+      {
+        "requirement_id": "R-TASKS",
+        "constraint_ids": [
+          "C-TASKS"
+        ],
+        "treatment": "VERIFIED_BY_TOOL",
+        "limitation": null
+      },
+      {
+        "requirement_id": "R-RESERVE",
+        "constraint_ids": [
+          "C-ENERGY-RESERVE"
+        ],
+        "treatment": "VERIFIED_BY_TOOL",
+        "limitation": null
+      },
+      {
+        "requirement_id": "R-MINERAL",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-CLEARANCE",
+        "constraint_ids": [],
+        "treatment": "UNKNOWN",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-GRAVITY",
+        "constraint_ids": [],
+        "treatment": "GAP",
+        "limitation": "Not verified by this modeled route"
+      },
+      {
+        "requirement_id": "R-ATMOSPHERE",
+        "constraint_ids": [],
+        "treatment": "GAP",
+        "limitation": "Not verified by this modeled route"
+      }
+    ],
+    "unverified_requirement_ids": [
+      "R-SLOPE-AVAILABILITY",
+      "R-TARGET-SLOPE-CONTEXT",
+      "R-MINERAL",
+      "R-CLEARANCE",
+      "R-GRAVITY",
+      "R-ATMOSPHERE"
+    ],
+    "blockers": []
+  },
+  "daa4ff76e7951900a6f85380c295a9b0cf4a4c8225a2794fe4247c16063f5932": {
+    "schema_version": "1.0",
+    "route_key": "grid-r0c0-attempt-3",
+    "mode": "synthetic",
+    "constraints_sha256": "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70",
+    "strategy": "EXPOSURE_COVERAGE",
+    "graph_revision": "synthetic-practice-grid-v1",
+    "node_sequence": [
+      "S",
+      "A",
+      "W1",
+      "W2",
+      "W1",
+      "C",
+      "B",
+      "S"
+    ],
+    "task_events": [
+      {
+        "task_id": "W1",
+        "node_id": "W1",
+        "arrival_distance_m": 40,
+        "dwell_s": 60
+      },
+      {
+        "task_id": "W2",
+        "node_id": "W2",
+        "arrival_distance_m": 60,
+        "dwell_s": 60
+      }
+    ],
+    "display_geometry": {
+      "type": "LineString",
+      "coordinates": [
+        [
+          -111,
+          35
+        ],
+        [
+          -110.995,
+          35.005
+        ],
+        [
+          -111,
+          35
+        ]
+      ]
+    },
+    "solver_claimed": {
+      "distance_m": 230,
+      "energy_conservative_wh": 30,
+      "unique_exposure_m": {
+        "R-EXPOSURE": 150
+      }
+    }
+  },
+  "cfb62ba822b5ae6423b41dcd4940be8c7b24d136feeca248a8e2452d134f49b1": {
+    "operation": "SEARCH_ROUTE",
+    "search_status": "FOUND",
+    "route": {
+      "schema_version": "1.0",
+      "route_key": "grid-r0c0-attempt-3",
+      "mode": "synthetic",
+      "constraints_sha256": "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70",
+      "strategy": "EXPOSURE_COVERAGE",
+      "graph_revision": "synthetic-practice-grid-v1",
+      "node_sequence": [
+        "S",
+        "A",
+        "W1",
+        "W2",
+        "W1",
+        "C",
+        "B",
+        "S"
+      ],
+      "task_events": [
+        {
+          "task_id": "W1",
+          "node_id": "W1",
+          "arrival_distance_m": 40,
+          "dwell_s": 60
+        },
+        {
+          "task_id": "W2",
+          "node_id": "W2",
+          "arrival_distance_m": 60,
+          "dwell_s": 60
+        }
+      ],
+      "display_geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -111,
+            35
+          ],
+          [
+            -110.995,
+            35.005
+          ],
+          [
+            -111,
+            35
+          ]
+        ]
+      },
+      "solver_claimed": {
+        "distance_m": 230,
+        "energy_conservative_wh": 30,
+        "unique_exposure_m": {
+          "R-EXPOSURE": 150
+        }
+      }
+    },
+    "route_artifact_key": "daa4ff76e7951900a6f85380c295a9b0cf4a4c8225a2794fe4247c16063f5932",
+    "route_sha256": "daa4ff76e7951900a6f85380c295a9b0cf4a4c8225a2794fe4247c16063f5932",
+    "counters": {
+      "expansions": 150,
+      "labels_created": 200,
+      "labels_pruned_dominated": 0,
+      "labels_pruned_lossy": 0,
+      "elapsed_ms": 1
+    },
+    "approximation_flags": [],
+    "optimistic_exposure_bound_m": {},
+    "termination_reason": "ROUTE_VERIFIED"
+  },
+  "309880ddd78db8db710ce1700c09e9dabb7974c85b68af656958e9515a4fea1d": {
+    "operation": "DIAGNOSE_RESULT",
+    "primary_category": null,
+    "secondary_categories": [],
+    "violated_constraint_ids": [],
+    "permitted_repairs": [],
+    "recommended_repair": null,
+    "recommended_strategy": null,
+    "proof_scope": "evaluated route only",
+    "explanation": "ROUTE_VERIFIED",
+    "diagnosis_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    }
+  },
+  "16a5941b211e5fbbc65bd68b9ff148bf96ee196de5447f224204f70e2397093f": {
+    "operation": "VERIFY_ROUTE",
+    "outcome": "PASS",
+    "failure_category": null,
+    "search_status": "FOUND",
+    "verified_route_sha256": "daa4ff76e7951900a6f85380c295a9b0cf4a4c8225a2794fe4247c16063f5932",
+    "metrics": [
+      {
+        "metric_id": "route_distance_m",
+        "value": 230,
+        "unit": "m",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "energy_conservative_wh",
+        "value": 30,
+        "unit": "Wh",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "unique_exposure_m:R-EXPOSURE",
+        "value": 150,
+        "unit": "m",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "tasks_completed",
+        "value": 2,
+        "unit": "count",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      },
+      {
+        "metric_id": "reserve_pct",
+        "value": 98.33333333333333,
+        "unit": "percent",
+        "support_scale_m": 60,
+        "quantity_kind": "DERIVED",
+        "method_id": "synthetic-practice-replay",
+        "valid_fraction": 1,
+        "uncertainty_note": "Unquantified; authored synthetic replay fixture"
+      }
+    ],
+    "violations": [],
+    "benchmark_rows": [
+      {
+        "constraint_id": "C-EXPOSURE-R-EXPOSURE",
+        "requirement_id": "R-EXPOSURE",
+        "rule": "≥ 100 m unique exposure in [12,18] deg",
+        "measured": 150,
+        "threshold": 100,
+        "unit": "m",
+        "margin": 50,
+        "status": "PASS"
+      },
+      {
+        "constraint_id": "C-TASKS",
+        "requirement_id": "R-TASKS",
+        "rule": "Visit W1 and W2 on the same route",
+        "measured": 2,
+        "threshold": 2,
+        "unit": "count",
+        "margin": 0,
+        "status": "PASS"
+      },
+      {
+        "constraint_id": "C-ENERGY-RESERVE",
+        "requirement_id": "R-RESERVE",
+        "rule": "Return with at least 20 percent modeled battery reserve",
+        "measured": 98.33333333333333,
+        "threshold": 20,
+        "unit": "percent",
+        "margin": 78.33333333333333,
+        "status": "PASS"
+      }
+    ],
+    "telemetry_artifact_key": "telemetry",
+    "verification_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001030"
+    },
+    "limitations": [
+      "Modeled terrain-feasibility verification — not physical rover execution",
+      "Strategy: EXPOSURE_COVERAGE",
+      "Proof scope: evaluated route only",
+      "Changed elements: candidate: Practice grid-r0c1 → Practice grid-r0c0"
+    ]
+  },
+  "b5e77b244c1dc7789737712b66e563eacbce387f28c258deeca9df2a07f27b64": {
+    "schema_version": "1.0",
+    "route_sha256": "daa4ff76e7951900a6f85380c295a9b0cf4a4c8225a2794fe4247c16063f5932",
+    "constraints_sha256": "326cf7f21d89e03ac2afc631cdfa44214cb5fbb8c6874c1b78a4e4b28181fd70",
+    "samples": [
+      {
+        "index": 0,
+        "node_id": "S",
+        "cumulative_distance_m": 0,
+        "elapsed_s": 0,
+        "lon": -111,
+        "lat": 35,
+        "elevation_m": 0,
+        "segment_surface_slope_deg": 0,
+        "cumulative_energy_conservative_wh": 0,
+        "reserve_pct": 100,
+        "in_band_requirement_ids": []
+      },
+      {
+        "index": 1,
+        "node_id": "W1",
+        "cumulative_distance_m": 60,
+        "elapsed_s": 120,
+        "lon": -110.995,
+        "lat": 35.005,
+        "elevation_m": 3,
+        "segment_surface_slope_deg": 15,
+        "cumulative_energy_conservative_wh": 12,
+        "reserve_pct": 99,
+        "in_band_requirement_ids": [
+          "R-EXPOSURE"
+        ]
+      },
+      {
+        "index": 2,
+        "node_id": "S",
+        "cumulative_distance_m": 230,
+        "elapsed_s": 460,
+        "lon": -111,
+        "lat": 35,
+        "elevation_m": 0,
+        "segment_surface_slope_deg": 0,
+        "cumulative_energy_conservative_wh": 30,
+        "reserve_pct": 98.33333333333333,
+        "in_band_requirement_ids": []
+      }
+    ]
+  },
+  "d164ab1e04a861b76fff991e837e634fffc39eef85ec6f6a8dea25ecdd970a31": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-EXPOSURE",
+    "proposed_status": "PASS",
+    "reason_code": "ROUTE_VERIFIED",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": 150,
+    "measured_unit": "m",
+    "threshold_lower": 100,
+    "threshold_upper": null,
+    "explanation": "FINAL — ROUTE_VERIFIED",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001129"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "ba48a43a52657e630073bdbf3b40ed296428fe831cad758a41e5f84a12ae6ed9": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-TASKS",
+    "proposed_status": "PASS",
+    "reason_code": "ROUTE_VERIFIED",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": 2,
+    "measured_unit": "count",
+    "threshold_lower": 2,
+    "threshold_upper": null,
+    "explanation": "FINAL — ROUTE_VERIFIED",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001129"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "3a0cdf45a15302dd122ade776a2707295e863eb161bfd9ba4ededf04b865e084": {
+    "operation": "COMPARE_REQUIREMENT",
+    "requirement_id": "R-RESERVE",
+    "proposed_status": "PASS",
+    "reason_code": "ROUTE_VERIFIED",
+    "evaluation_stage": "FINAL",
+    "confidence": "UNASSESSED",
+    "comparison_scale_m": 60,
+    "measured_value": 98.33333333333333,
+    "measured_unit": "percent",
+    "threshold_lower": 20,
+    "threshold_upper": null,
+    "explanation": "FINAL — ROUTE_VERIFIED",
+    "limitations": [
+      "Synthetic preview; not an empirical science result"
+    ],
+    "comparison_evidence": {
+      "evidence_id": "00000000-0000-4000-8000-000000001129"
+    },
+    "adequacy": {
+      "observable_policy_id": "synthetic-display-fixture",
+      "policy_sha256": "c042b712dff2c7e7d1d12fa2230d222f5fa794c4f9fc71c8235bc6a4521f915d",
+      "gates": [],
+      "validation_level": "S0"
+    }
+  },
+  "c31caf41e639528616e62cbb03a8d5e846bcbfa382176dee64bd965804f658ad": {
+    "acquired_manifest_sha256": "5555555555555555555555555555555555555555555555555555555555555555",
+    "algorithm_lock_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+    "assurance_policy_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+    "audit_id": "70000000-0000-4000-8000-000000000028",
+    "blocking_issue_codes": [],
+    "claims": [
+      {
+        "assumption_evidence_ids": [],
+        "candidate_ids": [
+          "00000000-0000-4000-8000-00000000102a",
+          "00000000-0000-4000-8000-00000000102b",
+          "00000000-0000-4000-8000-00000000102c",
+          "00000000-0000-4000-8000-00000000102d",
+          "00000000-0000-4000-8000-00000000102e",
+          "00000000-0000-4000-8000-00000000102f"
+        ],
+        "claim_id": "clearance-unknown",
+        "claim_type": "QUALIFICATION",
+        "disposition": "UNKNOWN",
+        "evidence_ids": [
+          "00000000-0000-4000-8000-000000001030"
+        ],
+        "gates": [
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-01",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-02",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-03",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "Abstract synthetic graph has no body-specific raster or physical coordinate frame."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-04",
+            "outcome": "UNSATISFIED",
+            "reason": "Synthetic inadequacy fixture: requested obstacle scale is finer than source support."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-05",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "No masked raster/AOI is used in this abstract graph regression."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-06",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "No time-varying measured source is used."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-07",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-08",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-09",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-10",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "No independent source corroboration is claimed."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-11",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "No rover supplied; site-only missing-evidence finding, no experiment verification claim."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-12",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-13",
+            "outcome": "NOT_APPLICABLE",
+            "reason": "No candidate discovery or held-out real-source validation is claimed."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-14",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts."
+          },
+          {
+            "evidence_ids": [
+              "00000000-0000-4000-8000-000000001030"
+            ],
+            "gate_id": "SC-15",
+            "outcome": "SATISFIED",
+            "reason": "Synthetic fixture assertion only; implementation must supply actual typed receipts."
+          }
+        ],
+        "limitations": [
+          "Fixture support is insufficient for the requested obstacle scale; no physical clearance claim is permitted."
+        ],
+        "permitted_statement": "Physical obstacle clearance is UNKNOWN at 60 m support.",
+        "qualification_status": "UNKNOWN",
+        "requirement_id": "R-CLEARANCE",
+        "scope": "Synthetic test of inadequate terrain support for physical clearance.",
+        "validation_level": "S0",
+        "verification_status": null
+      }
+    ],
+    "created_at": "2026-11-08T12:00:00Z",
+    "critique_evidence_ids": [],
+    "dataset_policy_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "limitations": [
+      "Blueprint fixture only: UUIDs and hash strings are synthetic test identifiers, not executed application evidence.",
+      "Essential clearance evidence is unavailable; no blanket mission qualification or PROVE IT without rover."
+    ],
+    "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
+    "mode": "synthetic",
+    "publication": "LIMITED",
+    "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
+    "run_id": "00000000-0000-4000-8000-000000001027",
+    "schema_version": "1.0",
+    "snapshot_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "workspace_id": "00000000-0000-4000-8000-000000000001"
+  }
+}

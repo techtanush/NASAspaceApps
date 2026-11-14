@@ -1,0 +1,456 @@
+{
+  "operation_count": 43,
+  "covered_operation_ids": [
+    "acceptMissionRevision",
+    "createMission",
+    "createMissionRevision",
+    "createRover",
+    "createRoverRevision",
+    "createRun",
+    "getAnalogPassport",
+    "getArtifact",
+    "getCapabilities",
+    "getCompatibility",
+    "getCompositePortfolio",
+    "getEarthAnalogCandidate",
+    "getEvidenceRecord",
+    "getJob",
+    "getMission",
+    "getMissionDraft",
+    "getMissionRevision",
+    "getPassportExport",
+    "getQualificationDimension",
+    "getReview",
+    "getRover",
+    "getRoverRevision",
+    "getRun",
+    "getScenarioConfig",
+    "getTargetProfile",
+    "getTestResult",
+    "getToolReceipt",
+    "getVerificationTest",
+    "healthLive",
+    "healthReady",
+    "listAgentActions",
+    "listCritiques",
+    "listDisplayLayers",
+    "listEarthAnalogCandidate",
+    "listMissions",
+    "listQualificationDimension",
+    "listRovers",
+    "listRuns",
+    "listVerificationTest",
+    "prepareMissionFingerprint",
+    "saveMissionDraft",
+    "streamRunEvents",
+    "submitRunAction"
+  ],
+  "responses": [
+    {
+      "operation_id": "healthLive",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "healthReady",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getCapabilities",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getScenarioConfig",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createMission",
+      "status": 201,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createMission",
+      "status": 201,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createMission",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "saveMissionDraft",
+      "status": 201,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "saveMissionDraft",
+      "status": 201,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "saveMissionDraft",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "saveMissionDraft",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getMissionDraft",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getMission",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createMissionRevision",
+      "status": 201,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createMissionRevision",
+      "status": 201,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createMissionRevision",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createMissionRevision",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getMission",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "prepareMissionFingerprint",
+      "status": 202,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "prepareMissionFingerprint",
+      "status": 202,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "prepareMissionFingerprint",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getJob",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "prepareMissionFingerprint",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getMission",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createMissionRevision",
+      "status": 201,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getMission",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "acceptMissionRevision",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "acceptMissionRevision",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "acceptMissionRevision",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "acceptMissionRevision",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getMissionRevision",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createRover",
+      "status": 201,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createRover",
+      "status": 201,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createRover",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createRoverRevision",
+      "status": 201,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createRoverRevision",
+      "status": 201,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createRoverRevision",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createRoverRevision",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getRover",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getRoverRevision",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createRun",
+      "status": 202,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createRun",
+      "status": 202,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "createRun",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "listEarthAnalogCandidate",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "submitRunAction",
+      "status": 202,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "submitRunAction",
+      "status": 202,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "submitRunAction",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "submitRunAction",
+      "status": 409,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getRun",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "listMissions",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "listRovers",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "listRuns",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "listQualificationDimension",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "listVerificationTest",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "listAgentActions",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "listCritiques",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "listDisplayLayers",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getEarthAnalogCandidate",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getQualificationDimension",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getQualificationDimension",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getQualificationDimension",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getQualificationDimension",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getQualificationDimension",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getVerificationTest",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getVerificationTest",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getTestResult",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getTestResult",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getTargetProfile",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getCompatibility",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getToolReceipt",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getEvidenceRecord",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getReview",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getCompositePortfolio",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getAnalogPassport",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getEvidenceRecord",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getArtifact",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getPassportExport",
+      "status": 202,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getPassportExport",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getPassportExport",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "getPassportExport",
+      "status": 200,
+      "schema": "PASSED"
+    },
+    {
+      "operation_id": "streamRunEvents",
+      "status": 200,
+      "schema": "PASSED"
+    }
+  ],
+  "known_contract_conflicts": []
+}

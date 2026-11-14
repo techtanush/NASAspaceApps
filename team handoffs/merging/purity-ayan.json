@@ -1,0 +1,45 @@
+{
+  "person": "ayan",
+  "repo": "/Users/tanushchokshi/Downloads/TKS/NASAspaceApps-verify-ayan",
+  "head": "ba22a4a72da6664f4a420c547cdcdf34016c6e4c",
+  "branch": "ayan/science-data-verification",
+  "checks": {
+    "G-01": {
+      "status": "PASS",
+      "notes": "HEAD ba22a4a72da6664f4a420c547cdcdf34016c6e4c",
+      "findings": []
+    },
+    "G-02": {
+      "status": "PASS",
+      "notes": "kit verified",
+      "findings": []
+    },
+    "G-03": {
+      "status": "PASS",
+      "notes": "ownership + kit integrity",
+      "findings": []
+    },
+    "G-06": {
+      "status": "PASS",
+      "notes": "dependency files ok",
+      "findings": []
+    },
+    "G-04": {
+      "status": "PASS",
+      "notes": "161 files scanned",
+      "findings": []
+    },
+    "G-09": {
+      "status": "PASS",
+      "notes": "STATUS.json internal coherence (NOT a substitute for re-running gates)",
+      "findings": []
+    },
+    "G-05": {
+      "status": "PASS",
+      "notes": "secrets/data/build output",
+      "findings": []
+    }
+  },
+  "status": "PASS",
+  "note": "Structural checks only. Run the builder gates (G-08), mutation checks (G-10) and hunts (G-11) separately."
+}

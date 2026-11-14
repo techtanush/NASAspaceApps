@@ -1,0 +1,86 @@
+[
+  {
+    "title": "does not redirect a newer tab navigation when a candidate acknowledgement finishes in the same turn",
+    "status": "passed"
+  },
+  {
+    "title": "still records acknowledged candidate selection in the URL while the user stays on Analogs",
+    "status": "passed"
+  },
+  {
+    "title": "shows the permitted positive cover only for a matching valid audit",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a unrecognized publication audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a missing claims audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a wrong run audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a wrong workspace audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a promoted mode audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a missing report timestamp audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a invalid report timestamp audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a malformed claims audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a non-array claims audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a missing limitations audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a wrong accepted rover audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "keeps a wrong accepted mission audit incomplete instead of presenting a qualified headline",
+    "status": "passed"
+  },
+  {
+    "title": "loads the new mission identity when route parameters change without unmounting the editor",
+    "status": "passed"
+  },
+  {
+    "title": "saves the latest edit after a slow initial draft receipt finishes",
+    "status": "passed"
+  },
+  {
+    "title": "does not offer an obsolete fingerprint after the draft changes during preparation",
+    "status": "passed"
+  },
+  {
+    "title": "does not restore an accepted revision into a draft edited while acceptance was pending",
+    "status": "passed"
+  },
+  {
+    "title": "keeps an existing mission read-only until its saved identity and draft have loaded",
+    "status": "passed"
+  },
+  {
+    "title": "offers a safe retry after a saved mission fails to load without exposing a blank form",
+    "status": "passed"
+  }
+]

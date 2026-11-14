@@ -1,0 +1,54 @@
+# Candidate search regions and reference sets (owner: Ayan). Architecture 36 section 6 / 40 section 4.
+config_version: "1.0"
+
+search_region_sets:
+  # The 3x3 practice grid. Geometry: EPSG:32612, 60 m cells, 64x64-cell windows (3,840 m), row 0 is north.
+  practice-earth-grid-v1:
+    description: Synthetic 3x3 practice grid (SYNTHETIC PRACTICE DATA, not terrain of this location)
+    kind: FIXED_GRID
+    body: EARTH
+    crs_epsg: 32612
+    sw_easting_m: 494240.0
+    north_northing_m: 3900000.0
+    cell_size_m: 60.0
+    window_cells: 64
+    rows: 3
+    cols: 3
+    id_pattern: "grid-r{row}c{col}"
+    coarse_windows_max: 30
+    windows:
+      - {window_id: grid-r0c0, row: 0, col: 0, negative_control: false}
+      - {window_id: grid-r0c1, row: 0, col: 1, negative_control: false}
+      - {window_id: grid-r0c2, row: 0, col: 2, negative_control: true}
+      - {window_id: grid-r1c0, row: 1, col: 0, negative_control: false}
+      - {window_id: grid-r1c1, row: 1, col: 1, negative_control: false}
+      - {window_id: grid-r1c2, row: 1, col: 2, negative_control: false}
+      - {window_id: grid-r2c0, row: 2, col: 0, negative_control: false}
+      - {window_id: grid-r2c1, row: 2, col: 1, negative_control: false}
+      - {window_id: grid-r2c2, row: 2, col: 2, negative_control: false}
+  # Recipe for LOCAL_DATASET sources: windows generated across the dataset's valid bbox,
+  # north-west first, row-major, no overlap, id grid-r<row>c<col>.
+  local-dataset-grid-v1:
+    description: Deterministic non-overlapping window grid across a local dataset bbox
+    kind: GENERATED_GRID
+    body: EARTH
+    cell_size_m: 60.0
+    window_cells: 64
+    order: NW_ROW_MAJOR
+    id_pattern: "grid-r{row}c{col}"
+    coarse_windows_max: 30
+    negative_control_window_ids: []
+
+reference_sets:
+  practice-reference-set-v1:
+    version: "1.0.0"
+    description: Synthetic reference list for the practice grid; contains no real site
+    entries:
+      - entry_id: ref-practice-r2c2
+        window_id: grid-r2c2
+        relation: KNOWN_ANALOG
+        synthetic: true
+        mission_question: Synthetic known-analog control for screening and novelty labelling
+        citation: SYNTHETIC PRACTICE reference entry defined by architecture 40 section 4
+        citation_url: null
+        georeference_quality: SYNTHETIC

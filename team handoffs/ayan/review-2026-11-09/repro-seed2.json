@@ -1,0 +1,1923 @@
+{
+  "results": [
+    {
+      "artifacts": [
+        {
+          "key": "profile-json",
+          "sha256": "e22cdbe75c12c8f3ff52fbad35cf298c37428febcaae8f7d65d1ce4dedc1afc6",
+          "size": 3690
+        },
+        {
+          "key": "target-grid",
+          "sha256": "9287c729e00109681da0da49df88ccd4e41a63066306f83f2c112d3598791d9e",
+          "size": 417854
+        }
+      ],
+      "evidence_parameters": [
+        "753553c36d04089f9d187b63c35135f337e386b550d5e0c274ad2098fa3a8bc1",
+        "e52237ed2f9b1833938eb047470cb70be207045e400818fca91ce33266170aa4",
+        "443665e3da917fe40593c997cb76ddddfa99f88c3afe6a09a63e95bc1416e9f4"
+      ],
+      "operation": "CHARACTERIZE_TARGET",
+      "params": "e52237ed2f9b1833938eb047470cb70be207045e400818fca91ce33266170aa4",
+      "payload": {
+        "comparison_support_m": 480.0,
+        "metrics": [
+          {
+            "method_id": "analysis-grid-npz-v1",
+            "metric_id": "valid_fraction",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 480.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 1.0,
+            "value": 1.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "surface_slope_deg:p05",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 480.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "deg",
+            "valid_fraction": 1.0,
+            "value": 2.999988761810478
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "surface_slope_deg:p50",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 480.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "deg",
+            "valid_fraction": 1.0,
+            "value": 6.99999226283933
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "surface_slope_deg:p95",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 480.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "deg",
+            "valid_fraction": 1.0,
+            "value": 22.00000295395485
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "surface_slope_deg:mean",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 480.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "deg",
+            "valid_fraction": 1.0,
+            "value": 7.895634433050057
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "surface_slope_deg:max",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 480.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "deg",
+            "valid_fraction": 1.0,
+            "value": 22.00000295395485
+          },
+          {
+            "method_id": "roughness-detrended-rms-v1",
+            "metric_id": "detrended_rms_height_m@1440",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 1440.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 1.0,
+            "value": 1.1134624363686971
+          },
+          {
+            "method_id": "relief-robust-q05-q95-v1",
+            "metric_id": "robust_relief_m@1440",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 1440.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 1.0,
+            "value": 135.26214299436475
+          },
+          {
+            "method_id": "roughness-detrended-rms-v1",
+            "metric_id": "detrended_rms_height_m@2400",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 2400.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 1.0,
+            "value": 4.513813531395193
+          },
+          {
+            "method_id": "relief-robust-q05-q95-v1",
+            "metric_id": "robust_relief_m@2400",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 2400.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 1.0,
+            "value": 262.9274393717448
+          },
+          {
+            "method_id": "roughness-detrended-rms-v1",
+            "metric_id": "detrended_rms_height_m@4320",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 4320.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 1.0,
+            "value": 16.59026991895566
+          },
+          {
+            "method_id": "relief-robust-q05-q95-v1",
+            "metric_id": "robust_relief_m@4320",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 4320.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 1.0,
+            "value": 494.8904124292834
+          }
+        ],
+        "operation": "CHARACTERIZE_TARGET",
+        "profile_evidence": {
+          "evidence_id": null,
+          "local_key": "profile"
+        },
+        "slope_histogram": {
+          "area_fraction": [
+            0.0,
+            0.41935483870967744,
+            0.3064516129032258,
+            0.0,
+            0.1935483870967742,
+            0.0,
+            0.08064516129032258,
+            0.0,
+            0.0
+          ],
+          "edges": [
+            0.0,
+            2.0,
+            5.0,
+            8.0,
+            12.0,
+            15.0,
+            18.0,
+            25.0,
+            35.0,
+            90.0
+          ],
+          "metric_id": "surface_slope_deg",
+          "support_scale_m": 480.0,
+          "unit": "deg",
+          "valid_area_m2": 3542630400.0
+        },
+        "unavailable_dimensions": [
+          {
+            "dimension": "SCIENCE",
+            "message": "No target mineral dataset is available in this build.",
+            "reason_code": "NO_COVERAGE"
+          },
+          {
+            "dimension": "THERMAL",
+            "message": "No thermal dataset is bound to this target.",
+            "reason_code": "NO_COVERAGE"
+          }
+        ]
+      },
+      "status": "SUCCEEDED"
+    },
+    {
+      "artifacts": [
+        {
+          "key": "screening-json",
+          "sha256": "aad34c53bc01f6dc8b4b60d86b68338e9bf9e2ffc70e7d4edc97a537a55682e3",
+          "size": 5862
+        }
+      ],
+      "evidence_parameters": [
+        "47a3f4127733f0792c033c118632f4d6dba547d4a72ae45f8779dd5e9d1b15a3",
+        "093ee152a526f5f74faf69efbcb8c8ddcc3ae77d36b01c3d13ed7f0d7ffcee3c",
+        "5c1aea751f83485eda101931347455297c22b3c87f9e793666d9c31933f20816",
+        "2c2cb94616644d02e4ca785ede961564c261d22d7424a72b0749643994a1353c",
+        "a233dfab88cd642147343b1dfed7ad555b5be36f88541fe306a1a2b24d2d0515",
+        "1713f8acdf28acf0a7d9d21a04e8978226f86b565e90bc4e56df4cd5eba9686e",
+        "587faefcd7e6e8b52457b39bec174ae508f8c14fc4bf282724f69fd9fdb106c6",
+        "915a84aaab5fa141da97fb0fe722522aac6cccdbbf1da97d2212f2a3ee5feccb",
+        "3d4eeb58298bb940b86be916e0faf1482e83efc34c2ff41735dfa3f0de5abe3c"
+      ],
+      "operation": "SCREEN_CANDIDATES",
+      "params": "3d4eeb58298bb940b86be916e0faf1482e83efc34c2ff41735dfa3f0de5abe3c",
+      "payload": {
+        "limitations": [
+          "Bounded search over the declared window grid; no global-optimality claim.",
+          "reference_set=practice-reference-set-v1 (membership is not a claim of historical novelty).",
+          "Feature scores are mission deficits and a distribution distance, not similarity percentages."
+        ],
+        "operation": "SCREEN_CANDIDATES",
+        "screened_count": 9,
+        "search_extent": {
+          "bbox": [
+            -111.06330992048233,
+            35.1391835700133,
+            -110.93669007951769,
+            35.24307771200421
+          ],
+          "body": "EARTH",
+          "crs_wkt": null,
+          "latitude_type": "GEODETIC",
+          "longitude_convention": "NEG180_180",
+          "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+        },
+        "shortlist_window_ids": [
+          "grid-r0c0",
+          "grid-r0c1",
+          "grid-r2c2",
+          "grid-r1c0",
+          "grid-r2c0",
+          "grid-r0c2"
+        ],
+        "stop_reason": "GRID_EXHAUSTED",
+        "windows": [
+          {
+            "aoi": {
+              "bbox": [
+                -111.06330992048233,
+                35.20843549081172,
+                -111.02109434901557,
+                35.2430758721817
+              ],
+              "body": "EARTH",
+              "crs_wkt": null,
+              "latitude_type": "GEODETIC",
+              "longitude_convention": "NEG180_180",
+              "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+            },
+            "evidence": {
+              "evidence_id": null,
+              "local_key": "window-grid-r0c0"
+            },
+            "excluded": false,
+            "exclusion_reason": null,
+            "feature_scores": {
+              "deficit:R-SLOPE-AVAILABILITY": 0.0,
+              "slope_w1_deg": 4.454178885630498
+            },
+            "is_negative_control": false,
+            "name": "Practice grid-r0c0",
+            "novelty_status": "NOT_IN_REFERENCE_LIST",
+            "origin": "DISCOVERED",
+            "rank": 1,
+            "window_id": "grid-r0c0"
+          },
+          {
+            "aoi": {
+              "bbox": [
+                -111.02110331192716,
+                35.208450190631844,
+                -110.97889668807284,
+                35.24307771200421
+              ],
+              "body": "EARTH",
+              "crs_wkt": null,
+              "latitude_type": "GEODETIC",
+              "longitude_convention": "NEG180_180",
+              "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+            },
+            "evidence": {
+              "evidence_id": null,
+              "local_key": "window-grid-r0c1"
+            },
+            "excluded": false,
+            "exclusion_reason": null,
+            "feature_scores": {
+              "deficit:R-SLOPE-AVAILABILITY": 0.0,
+              "slope_w1_deg": 5.267025089605735
+            },
+            "is_negative_control": false,
+            "name": "Practice grid-r0c1",
+            "novelty_status": "NOT_IN_REFERENCE_LIST",
+            "origin": "DISCOVERED",
+            "rank": 2,
+            "window_id": "grid-r0c1"
+          },
+          {
+            "aoi": {
+              "bbox": [
+                -110.97890565098442,
+                35.20843549081172,
+                -110.93669007951769,
+                35.2430758721817
+              ],
+              "body": "EARTH",
+              "crs_wkt": null,
+              "latitude_type": "GEODETIC",
+              "longitude_convention": "NEG180_180",
+              "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+            },
+            "evidence": {
+              "evidence_id": null,
+              "local_key": "window-grid-r0c2"
+            },
+            "excluded": false,
+            "exclusion_reason": null,
+            "feature_scores": {
+              "deficit:R-SLOPE-AVAILABILITY": 0.05,
+              "slope_w1_deg": 6.806451612903225
+            },
+            "is_negative_control": true,
+            "name": "Practice grid-r0c2",
+            "novelty_status": "NOT_IN_REFERENCE_LIST",
+            "origin": "SYNTHETIC_CONTROL",
+            "rank": 7,
+            "window_id": "grid-r0c2"
+          },
+          {
+            "aoi": {
+              "bbox": [
+                -111.06328303177354,
+                35.17380962958548,
+                -111.02108540137722,
+                35.208450190631844
+              ],
+              "body": "EARTH",
+              "crs_wkt": null,
+              "latitude_type": "GEODETIC",
+              "longitude_convention": "NEG180_180",
+              "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+            },
+            "evidence": {
+              "evidence_id": null,
+              "local_key": "window-grid-r1c0"
+            },
+            "excluded": false,
+            "exclusion_reason": null,
+            "feature_scores": {
+              "deficit:R-SLOPE-AVAILABILITY": 0.021018145161290327,
+              "slope_w1_deg": 4.931451612903225
+            },
+            "is_negative_control": false,
+            "name": "Practice grid-r1c0",
+            "novelty_status": "NOT_IN_REFERENCE_LIST",
+            "origin": "DISCOVERED",
+            "rank": 4,
+            "window_id": "grid-r1c0"
+          },
+          {
+            "aoi": {
+              "bbox": [
+                -111.02109434901558,
+                35.17382431066771,
+                -110.97890565098442,
+                35.20845202811017
+              ],
+              "body": "EARTH",
+              "crs_wkt": null,
+              "latitude_type": "GEODETIC",
+              "longitude_convention": "NEG180_180",
+              "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+            },
+            "evidence": null,
+            "excluded": true,
+            "exclusion_reason": "WATER_ONLY",
+            "feature_scores": {
+              "deficit:R-SLOPE-AVAILABILITY": null,
+              "slope_w1_deg": null
+            },
+            "is_negative_control": false,
+            "name": "Practice grid-r1c1",
+            "novelty_status": "NOT_IN_REFERENCE_LIST",
+            "origin": "DISCOVERED",
+            "rank": null,
+            "window_id": "grid-r1c1"
+          },
+          {
+            "aoi": {
+              "bbox": [
+                -110.97891459862281,
+                35.17380962958548,
+                -110.93671696822646,
+                35.208450190631844
+              ],
+              "body": "EARTH",
+              "crs_wkt": null,
+              "latitude_type": "GEODETIC",
+              "longitude_convention": "NEG180_180",
+              "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+            },
+            "evidence": null,
+            "excluded": true,
+            "exclusion_reason": "INSUFFICIENT_VALID_DATA",
+            "feature_scores": {
+              "deficit:R-SLOPE-AVAILABILITY": null,
+              "slope_w1_deg": null
+            },
+            "is_negative_control": false,
+            "name": "Practice grid-r1c2",
+            "novelty_status": "NOT_IN_REFERENCE_LIST",
+            "origin": "DISCOVERED",
+            "rank": null,
+            "window_id": "grid-r1c2"
+          },
+          {
+            "aoi": {
+              "bbox": [
+                -111.06325618888428,
+                35.1391835700133,
+                -111.02107646898614,
+                35.17382431066771
+              ],
+              "body": "EARTH",
+              "crs_wkt": null,
+              "latitude_type": "GEODETIC",
+              "longitude_convention": "NEG180_180",
+              "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+            },
+            "evidence": {
+              "evidence_id": null,
+              "local_key": "window-grid-r2c0"
+            },
+            "excluded": false,
+            "exclusion_reason": null,
+            "feature_scores": {
+              "deficit:R-SLOPE-AVAILABILITY": 0.024798387096774198,
+              "slope_w1_deg": 6.806451612903225
+            },
+            "is_negative_control": false,
+            "name": "Practice grid-r2c0",
+            "novelty_status": "NOT_IN_REFERENCE_LIST",
+            "origin": "DISCOVERED",
+            "rank": 5,
+            "window_id": "grid-r2c0"
+          },
+          {
+            "aoi": {
+              "bbox": [
+                -111.0210854013772,
+                35.13919823237326,
+                -110.9789145986228,
+                35.1738261458038
+              ],
+              "body": "EARTH",
+              "crs_wkt": null,
+              "latitude_type": "GEODETIC",
+              "longitude_convention": "NEG180_180",
+              "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+            },
+            "evidence": {
+              "evidence_id": null,
+              "local_key": "window-grid-r2c1"
+            },
+            "excluded": false,
+            "exclusion_reason": "BELOW_SHORTLIST_CUTOFF",
+            "feature_scores": {
+              "deficit:R-SLOPE-AVAILABILITY": 0.042943548387096776,
+              "slope_w1_deg": 6.806451612903225
+            },
+            "is_negative_control": false,
+            "name": "Practice grid-r2c1",
+            "novelty_status": "NOT_IN_REFERENCE_LIST",
+            "origin": "DISCOVERED",
+            "rank": 6,
+            "window_id": "grid-r2c1"
+          },
+          {
+            "aoi": {
+              "bbox": [
+                -110.97892353101385,
+                35.1391835700133,
+                -110.9367438111157,
+                35.17382431066771
+              ],
+              "body": "EARTH",
+              "crs_wkt": null,
+              "latitude_type": "GEODETIC",
+              "longitude_convention": "NEG180_180",
+              "vertical_datum": "SYNTHETIC_REFERENCE_ONLY"
+            },
+            "evidence": {
+              "evidence_id": null,
+              "local_key": "window-grid-r2c2"
+            },
+            "excluded": false,
+            "exclusion_reason": null,
+            "feature_scores": {
+              "deficit:R-SLOPE-AVAILABILITY": 0.0,
+              "slope_w1_deg": 6.806451612903225
+            },
+            "is_negative_control": false,
+            "name": "Practice grid-r2c2",
+            "novelty_status": "KNOWN_ANALOG",
+            "origin": "KNOWN_CONTROL",
+            "rank": 3,
+            "window_id": "grid-r2c2"
+          }
+        ]
+      },
+      "status": "SUCCEEDED"
+    },
+    {
+      "artifacts": [
+        {
+          "key": "analysis-grid",
+          "sha256": "d19f48383bbc28512e1afac97bdf42675d9620e8f2d2d69b05e2cbf704b8d697",
+          "size": 113319
+        },
+        {
+          "key": "analysis-summary-json",
+          "sha256": "65ac2d799f31defa36d597b5e372fbd66fe42b9c7061e65f41c6626054d61fc0",
+          "size": 16777
+        }
+      ],
+      "evidence_parameters": [
+        "47a3f4127733f0792c033c118632f4d6dba547d4a72ae45f8779dd5e9d1b15a3",
+        "159224fe04e077fb2c3ca43a5c40aeb6ac548eb4a8369cc39fd9d2eb692815da",
+        "5d2216954dacde1b86d70dcf756a1a3e6e7f10640963253081cc8d2d6602336a"
+      ],
+      "operation": "ANALYZE_CANDIDATE",
+      "params": "159224fe04e077fb2c3ca43a5c40aeb6ac548eb4a8369cc39fd9d2eb692815da",
+      "payload": {
+        "analysis_evidence": {
+          "evidence_id": null,
+          "local_key": "analysis"
+        },
+        "analysis_grid_artifact_key": "analysis-grid",
+        "connected_zones": [
+          {
+            "area_m2": 14284800.0,
+            "band_area_m2": {
+              "0-12": 12243600.0,
+              "0-15": 13237200.0,
+              "0-18": 14284800.0,
+              "0-2": 11790000.0,
+              "0-25": 14284800.0,
+              "0-35": 14284800.0,
+              "0-5": 11790000.0,
+              "0-8": 12243600.0,
+              "0-90": 14284800.0,
+              "12-15": 993600.0,
+              "12-18": 2041200.0,
+              "12-25": 2041200.0,
+              "12-35": 2041200.0,
+              "12-90": 2041200.0,
+              "15-18": 1047600.0,
+              "15-25": 1047600.0,
+              "15-35": 1047600.0,
+              "15-90": 1047600.0,
+              "18-25": 0.0,
+              "18-35": 0.0,
+              "18-90": 0.0,
+              "2-12": 453600.0,
+              "2-15": 1447200.0,
+              "2-18": 2494800.0,
+              "2-25": 2494800.0,
+              "2-35": 2494800.0,
+              "2-5": 0.0,
+              "2-8": 453600.0,
+              "2-90": 2494800.0,
+              "25-35": 0.0,
+              "25-90": 0.0,
+              "35-90": 0.0,
+              "5-12": 453600.0,
+              "5-15": 1447200.0,
+              "5-18": 2494800.0,
+              "5-25": 2494800.0,
+              "5-35": 2494800.0,
+              "5-8": 453600.0,
+              "5-90": 2494800.0,
+              "8-12": 0.0,
+              "8-15": 993600.0,
+              "8-18": 2041200.0,
+              "8-25": 2041200.0,
+              "8-35": 2041200.0,
+              "8-90": 2041200.0
+            },
+            "bbox_lonlat": null,
+            "contains_start": true,
+            "zone_id": "zone-1"
+          }
+        ],
+        "coverage_fraction": 0.96875,
+        "limitations": [
+          "Terrain model at 60 m support; cannot resolve 0.20 m obstacles.",
+          "Derivatives computed over the whole source extent and cropped to the window; cells next to nodata or water are not valid.",
+          "Source citation: AnalogForge synthetic practice generator practice-earth-grid-v1 v1.0.0",
+          "Source license: SYNTHETIC PRACTICE DATA generated by AnalogForge; not NASA data; no third-party licence applies.",
+          "Source provenance: SYNTHETIC",
+          "Connected zones use the default safe-slope cap of 18 deg: ANALYZE_CANDIDATE carries no rover, so a rover with a lower declared cap needs its own route search to establish reachability."
+        ],
+        "metrics": [
+          {
+            "method_id": "analysis-grid-npz-v1",
+            "metric_id": "valid_fraction",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.96875
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:0-2",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.8253528225806451
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:0-5",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.8253528225806451
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:0-8",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.8571068548387096
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:0-12",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.8571068548387096
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:0-15",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.9266633064516129
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:0-18",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 1.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:0-25",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 1.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:0-35",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 1.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:0-90",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 1.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:2-5",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:2-8",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.031754032258064516
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:2-12",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.031754032258064516
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:2-15",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.10131048387096774
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:2-18",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.17464717741935484
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:2-25",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.17464717741935484
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:2-35",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.17464717741935484
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:2-90",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.17464717741935484
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:5-8",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.031754032258064516
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:5-12",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.031754032258064516
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:5-15",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.10131048387096774
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:5-18",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.17464717741935484
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:5-25",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.17464717741935484
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:5-35",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.17464717741935484
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:5-90",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.17464717741935484
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:8-12",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:8-15",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.06955645161290322
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:8-18",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.1428931451612903
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:8-25",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.1428931451612903
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:8-35",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.1428931451612903
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:8-90",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.1428931451612903
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:12-15",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.06955645161290322
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:12-18",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.1428931451612903
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:12-25",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.1428931451612903
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:12-35",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.1428931451612903
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:12-90",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.1428931451612903
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:15-18",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0733366935483871
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:15-25",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0733366935483871
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:15-35",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0733366935483871
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:15-90",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0733366935483871
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:18-25",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:18-35",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:18-90",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:25-35",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:25-90",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "slope_area_fraction:35-90",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "fraction",
+            "valid_fraction": 0.96875,
+            "value": 0.0
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "surface_slope_deg:p05",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "deg",
+            "valid_fraction": 0.96875,
+            "value": 0.002683680147234917
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "surface_slope_deg:p50",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "deg",
+            "valid_fraction": 0.96875,
+            "value": 0.01041856757074653
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "surface_slope_deg:p95",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "deg",
+            "valid_fraction": 0.96875,
+            "value": 15.003039597541086
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "surface_slope_deg:mean",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "deg",
+            "valid_fraction": 0.96875,
+            "value": 2.393543701351655
+          },
+          {
+            "method_id": "slope-lsq-plane-3x3-v1",
+            "metric_id": "surface_slope_deg:max",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "deg",
+            "valid_fraction": 0.96875,
+            "value": 15.019353077813665
+          },
+          {
+            "method_id": "roughness-detrended-rms-v1",
+            "metric_id": "detrended_rms_height_m@180",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 180.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 0.96875,
+            "value": 0.13704572351352276
+          },
+          {
+            "method_id": "relief-robust-q05-q95-v1",
+            "metric_id": "robust_relief_m@180",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 180.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 0.96875,
+            "value": 5.230616129896023
+          },
+          {
+            "method_id": "roughness-detrended-rms-v1",
+            "metric_id": "detrended_rms_height_m@300",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 300.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 0.96875,
+            "value": 0.5199298563331638
+          },
+          {
+            "method_id": "relief-robust-q05-q95-v1",
+            "metric_id": "robust_relief_m@300",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 300.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 0.96875,
+            "value": 10.76752629937066
+          },
+          {
+            "method_id": "roughness-detrended-rms-v1",
+            "metric_id": "detrended_rms_height_m@540",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 540.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 0.96875,
+            "value": 1.931566052113476
+          },
+          {
+            "method_id": "relief-robust-q05-q95-v1",
+            "metric_id": "robust_relief_m@540",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 540.0,
+            "uncertainty_note": "Nominal modeled value; uncertainty not quantified.",
+            "unit": "m",
+            "valid_fraction": 0.96875,
+            "value": 23.014956104512116
+          }
+        ],
+        "operation": "ANALYZE_CANDIDATE",
+        "slope_histogram": {
+          "area_fraction": [
+            0.8253528225806451,
+            0.0,
+            0.031754032258064516,
+            0.0,
+            0.06955645161290322,
+            0.0733366935483871,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "edges": [
+            0.0,
+            2.0,
+            5.0,
+            8.0,
+            12.0,
+            15.0,
+            18.0,
+            25.0,
+            35.0,
+            90.0
+          ],
+          "metric_id": "surface_slope_deg",
+          "support_scale_m": 60.0,
+          "unit": "deg",
+          "valid_area_m2": 14284800.0
+        }
+      },
+      "status": "SUCCEEDED"
+    },
+    {
+      "artifacts": [
+        {
+          "key": "constraints",
+          "sha256": "02fdf290d7dfadd103eb38feacc30ed8954e740e630fe81e862ee28d93f18724",
+          "size": 3621
+        }
+      ],
+      "evidence_parameters": [
+        "1234ee158a1b104434d407bf7f1614f227320c0b36b15668a7db26c00da26220"
+      ],
+      "operation": "DESIGN_BENCHMARK",
+      "params": "1234ee158a1b104434d407bf7f1614f227320c0b36b15668a7db26c00da26220",
+      "payload": {
+        "blockers": [],
+        "constraints": {
+          "artifact_kind": "RASTER_ROUTE_TEST",
+          "blocked_edge_ids": [],
+          "candidate_window_id": "grid-r0c0",
+          "energy": {
+            "battery_wh": 1800.0,
+            "gravity_mps2": 9.80665,
+            "min_reserve_pct": 20.0,
+            "model": {
+              "calibration_evidence_id": null,
+              "calibration_status": "ASSUMED",
+              "drive_efficiency": 0.65,
+              "idle_power_w": 35.0,
+              "model_id": "earth-simple-v1",
+              "rolling_coefficient": 0.06,
+              "roughness_multiplier": 1.0,
+              "science_task_wh": 10.0,
+              "uncertainty_fraction": 0.25
+            },
+            "nominal_speed_mps": 0.5,
+            "rover_mass_kg": 42.0
+          },
+          "exposures": [
+            {
+              "band_deg": [
+                12.0,
+                18.0
+              ],
+              "counting": "UNIQUE_UNDIRECTED_EDGE_DISTANCE",
+              "metric_id": "surface_slope_deg",
+              "minimum_distance_m": 100.0,
+              "requirement_id": "R-EXPOSURE",
+              "upper_inclusive": true
+            }
+          ],
+          "footprint_dilation_m": 0.0,
+          "graph": null,
+          "grid": {
+            "analysis_evidence_id": "132c1313-a6ce-59be-b976-cb8b0b08995d",
+            "analysis_grid_sha256": "d19f48383bbc28512e1afac97bdf42675d9620e8f2d2d69b05e2cbf704b8d697",
+            "cell_size_m": 60.0,
+            "crs_wkt": "PROJCRS[\"WGS 84 / UTM zone 12N\",BASEGEOGCRS[\"WGS 84\",DATUM[\"World Geodetic System 1984\",ELLIPSOID[\"WGS 84\",6378137,298.257223563,LENGTHUNIT[\"metre\",1]]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"degree\",0.0174532925199433]],ID[\"EPSG\",4326]],CONVERSION[\"UTM zone 12N\",METHOD[\"Transverse Mercator\",ID[\"EPSG\",9807]],PARAMETER[\"Latitude of natural origin\",0,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8801]],PARAMETER[\"Longitude of natural origin\",-111,ANGLEUNIT[\"degree\",0.0174532925199433],ID[\"EPSG\",8802]],PARAMETER[\"Scale factor at natural origin\",0.9996,SCALEUNIT[\"unity\",1],ID[\"EPSG\",8805]],PARAMETER[\"False easting\",500000,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8806]],PARAMETER[\"False northing\",0,LENGTHUNIT[\"metre\",1],ID[\"EPSG\",8807]]],CS[Cartesian,2],AXIS[\"easting\",east,ORDER[1],LENGTHUNIT[\"metre\",1]],AXIS[\"northing\",north,ORDER[2],LENGTHUNIT[\"metre\",1]],ID[\"EPSG\",32612]]",
+            "height": 64,
+            "width": 64
+          },
+          "limitations": [
+            "Waypoints placed by auto-waypoints-v1 on the largest safe component (3968 cells); sampling locations are designated, not evidence of material availability.",
+            "Terrain model at 60 m support; the route is a raster-feasibility result, not a proven physical corridor.",
+            "Rover footprint, soil traction and obstacle clearance are not resolved by this model.",
+            "max_distance_m defaults to design_defaults.max_route_m = 8000 m (rover declares none)."
+          ],
+          "max_distance_m": 8000.0,
+          "max_duration_s": null,
+          "max_undirected_edge_traversals": 2,
+          "mission_content_sha256": "449bc49227102c852dca841020979e856563ab3de233abf23cab667b4defb854",
+          "mission_revision_id": "d972e1ba-6bbb-504c-a3ab-ab9b18512b2a",
+          "mode": "synthetic",
+          "resource_provider": "PHYSICAL_EARTH_MODEL",
+          "return_required": true,
+          "rover_content_sha256": "994b7da8b884dbe3d3c99f5da3fd6549884d5b08734e3609a58883c5452d2f62",
+          "rover_revision_id": "3f1dcef2-f817-5542-b2f7-919a5ebc52c9",
+          "schema_version": "1.0",
+          "solver": {
+            "max_expansions": 200000,
+            "max_labels_per_node": 32,
+            "max_seconds": 30,
+            "seed": 0
+          },
+          "start": {
+            "lat": null,
+            "lon": null,
+            "node_id": "r32c32",
+            "x_m": 496190.0,
+            "y_m": 3898050.0
+          },
+          "strategy": "EXPOSURE_COVERAGE",
+          "surface_slope_cap_deg": 18.0,
+          "tasks": [
+            {
+              "dwell_s": 60.0,
+              "evidence_origin": "SYNTHETIC_FIXTURE",
+              "incremental_energy_wh": 10.0,
+              "kind": "SAMPLING",
+              "location": {
+                "lat": null,
+                "lon": null,
+                "node_id": "r19c46",
+                "x_m": 497030.0,
+                "y_m": 3898830.0
+              },
+              "required_capability": "geological_sampling",
+              "requirement_ids": [
+                "R-TASKS"
+              ],
+              "task_id": "W1",
+              "tolerance_m": 60.0
+            },
+            {
+              "dwell_s": 60.0,
+              "evidence_origin": "SYNTHETIC_FIXTURE",
+              "incremental_energy_wh": 10.0,
+              "kind": "SAMPLING",
+              "location": {
+                "lat": null,
+                "lon": null,
+                "node_id": "r26c46",
+                "x_m": 497030.0,
+                "y_m": 3898410.0
+              },
+              "required_capability": "geological_sampling",
+              "requirement_ids": [
+                "R-TASKS"
+              ],
+              "task_id": "W2",
+              "tolerance_m": 60.0
+            }
+          ],
+          "test_revision": 1,
+          "unknown_is_forbidden": true
+        },
+        "constraints_artifact_key": "constraints",
+        "constraints_sha256": "02fdf290d7dfadd103eb38feacc30ed8954e740e630fe81e862ee28d93f18724",
+        "operation": "DESIGN_BENCHMARK",
+        "required_exposures": [
+          {
+            "lower": 12.0,
+            "metric_id": "surface_slope_deg",
+            "minimum_distance_m": 100.0,
+            "requirement_id": "R-EXPOSURE",
+            "upper": 18.0
+          }
+        ],
+        "requirement_mapping": [
+          {
+            "constraint_ids": [],
+            "limitation": "Evaluated from candidate analysis evidence (COMPARE_REQUIREMENT); not a route test.",
+            "requirement_id": "R-SLOPE-AVAILABILITY",
+            "treatment": "UNKNOWN"
+          },
+          {
+            "constraint_ids": [],
+            "limitation": "Evaluated from candidate analysis evidence (COMPARE_REQUIREMENT); not a route test.",
+            "requirement_id": "R-TARGET-SLOPE-CONTEXT",
+            "treatment": "UNKNOWN"
+          },
+          {
+            "constraint_ids": [
+              "C-EXPOSURE-R-EXPOSURE"
+            ],
+            "limitation": null,
+            "requirement_id": "R-EXPOSURE",
+            "treatment": "VERIFIED_BY_TOOL"
+          },
+          {
+            "constraint_ids": [
+              "C-TASK-W1",
+              "C-TASK-W2"
+            ],
+            "limitation": null,
+            "requirement_id": "R-TASKS",
+            "treatment": "VERIFIED_BY_TOOL"
+          },
+          {
+            "constraint_ids": [
+              "C-ENERGY-RESERVE"
+            ],
+            "limitation": null,
+            "requirement_id": "R-RESERVE",
+            "treatment": "VERIFIED_BY_TOOL"
+          },
+          {
+            "constraint_ids": [],
+            "limitation": "Observable mineral_class_present cannot be verified by modeled route geometry.",
+            "requirement_id": "R-MINERAL",
+            "treatment": "UNKNOWN"
+          },
+          {
+            "constraint_ids": [],
+            "limitation": "Observable ground_clearance_m cannot be verified by modeled route geometry.",
+            "requirement_id": "R-CLEARANCE",
+            "treatment": "UNKNOWN"
+          },
+          {
+            "constraint_ids": [],
+            "limitation": "Physical condition that an Earth analog cannot reproduce; not tested by the route.",
+            "requirement_id": "R-GRAVITY",
+            "treatment": "GAP"
+          },
+          {
+            "constraint_ids": [],
+            "limitation": "Physical condition that an Earth analog cannot reproduce; not tested by the route.",
+            "requirement_id": "R-ATMOSPHERE",
+            "treatment": "GAP"
+          }
+        ],
+        "unverified_requirement_ids": [
+          "R-SLOPE-AVAILABILITY",
+          "R-TARGET-SLOPE-CONTEXT",
+          "R-MINERAL",
+          "R-CLEARANCE",
+          "R-GRAVITY",
+          "R-ATMOSPHERE"
+        ]
+      },
+      "status": "SUCCEEDED"
+    },
+    {
+      "artifacts": [
+        {
+          "key": "route",
+          "sha256": "ff9219307f57f2bdf5fbca386730dabc1f6e49090002652a13531f8dea79442d",
+          "size": 2310
+        }
+      ],
+      "evidence_parameters": [
+        "6b4d5d220f9f8d4935529b8fce670ab5a6358e4e14fb027e8e805a1500fca9be"
+      ],
+      "operation": "SEARCH_ROUTE",
+      "params": "6b4d5d220f9f8d4935529b8fce670ab5a6358e4e14fb027e8e805a1500fca9be",
+      "payload": {
+        "approximation_flags": [],
+        "counters": {
+          "expansions": 1626,
+          "labels_created": 3937,
+          "labels_pruned_dominated": 9774,
+          "labels_pruned_lossy": 0
+        },
+        "operation": "SEARCH_ROUTE",
+        "optimistic_exposure_bound_m": {
+          "R-EXPOSURE": 8000.0
+        },
+        "route": {
+          "constraints_sha256": "02fdf290d7dfadd103eb38feacc30ed8954e740e630fe81e862ee28d93f18724",
+          "display_geometry": {
+            "coordinates": [
+              [
+                -111.04186784526155,
+                35.22548714164165
+              ],
+              [
+                -111.04120878279498,
+                35.226028394050665
+              ],
+              [
+                -111.04054971157548,
+                35.22656964282902
+              ],
+              [
+                -111.03989036681529,
+                35.226569861893424
+              ],
+              [
+                -111.0392312824589,
+                35.22711110345398
+              ],
+              [
+                -111.03857193330806,
+                35.22711131534017
+              ],
+              [
+                -111.03791283581467,
+                35.22765254968236
+              ],
+              [
+                -111.03725372956762,
+                35.22819378039296
+              ],
+              [
+                -111.0365946145667,
+                35.228735007471755
+              ],
+              [
+                -111.03593549081164,
+                35.229276230918536
+              ],
+              [
+                -111.03527635830226,
+                35.22981745073308
+              ],
+              [
+                -111.03461721703827,
+                35.23035866691518
+              ],
+              [
+                -111.03395806701948,
+                35.23089987946462
+              ],
+              [
+                -111.03329890824564,
+                35.231441088381175
+              ],
+              [
+                -111.03263974071649,
+                35.23198229366466
+              ],
+              [
+                -111.03263952402018,
+                35.23144126797439
+              ],
+              [
+                -111.03263930732962,
+                35.23090024223568
+              ],
+              [
+                -111.03197971516867,
+                35.230359392442836
+              ],
+              [
+                -111.03197950286703,
+                35.2298183666037
+              ],
+              [
+                -111.03263865729264,
+                35.22927716472878
+              ],
+              [
+                -111.03329802400846,
+                35.22927698514988
+              ],
+              [
+                -111.0339571652967,
+                35.2287357760541
+              ],
+              [
+                -111.03461629783081,
+                35.22819456332572
+              ],
+              [
+                -111.0352756557745,
+                35.22819437297969
+              ],
+              [
+                -111.03593477517161,
+                35.22765315303136
+              ],
+              [
+                -111.03659388581508,
+                35.22711192945103
+              ],
+              [
+                -111.03725323498604,
+                35.22711172833869
+              ],
+              [
+                -111.03791233249284,
+                35.22657049753935
+              ],
+              [
+                -111.03857142124646,
+                35.22602926310856
+              ],
+              [
+                -111.03923076164412,
+                35.226029051230796
+              ],
+              [
+                -111.03988983726144,
+                35.22548780958193
+              ],
+              [
+                -111.04054917326869,
+                35.225487590526235
+              ],
+              [
+                -111.04120850926876,
+                35.225487367879495
+              ],
+              [
+                -111.04186784526155,
+                35.22548714164165
+              ]
+            ],
+            "type": "LineString"
+          },
+          "graph_revision": "graph-14afd748efb244aa",
+          "mode": "synthetic",
+          "node_sequence": [
+            "r32c32",
+            "r31c33",
+            "r30c34",
+            "r30c35",
+            "r29c36",
+            "r29c37",
+            "r28c38",
+            "r27c39",
+            "r26c40",
+            "r25c41",
+            "r24c42",
+            "r23c43",
+            "r22c44",
+            "r21c45",
+            "r20c46",
+            "r21c46",
+            "r22c46",
+            "r23c47",
+            "r24c47",
+            "r25c46",
+            "r25c45",
+            "r26c44",
+            "r27c43",
+            "r27c42",
+            "r28c41",
+            "r29c40",
+            "r29c39",
+            "r30c38",
+            "r31c37",
+            "r31c36",
+            "r32c35",
+            "r32c34",
+            "r32c33",
+            "r32c32"
+          ],
+          "route_key": "route",
+          "schema_version": "1.0",
+          "solver_claimed": {
+            "distance_m": 2501.9090885900996,
+            "energy_conservative_wh": 123.95346942746954,
+            "unique_exposure_m": {
+              "R-EXPOSURE": 144.8528137423857
+            }
+          },
+          "strategy": "EXPOSURE_COVERAGE",
+          "task_events": [
+            {
+              "arrival_distance_m": 1138.2337649086285,
+              "dwell_s": 60.0,
+              "node_id": "r20c46",
+              "task_id": "W1"
+            },
+            {
+              "arrival_distance_m": 1487.9393923933999,
+              "dwell_s": 60.0,
+              "node_id": "r25c46",
+              "task_id": "W2"
+            }
+          ]
+        },
+        "route_artifact_key": "route",
+        "route_sha256": "ff9219307f57f2bdf5fbca386730dabc1f6e49090002652a13531f8dea79442d",
+        "search_status": "FOUND",
+        "termination_reason": "solution popped first by the best-first order [objective=distance; bound_pruned=0]"
+      },
+      "status": "SUCCEEDED"
+    },
+    {
+      "artifacts": [
+        {
+          "key": "verification-json",
+          "sha256": "d029d723504188e0e978c34bed2da8b3105c06cb1a7347326d19b0be5e9a0423",
+          "size": 4698
+        },
+        {
+          "key": "telemetry",
+          "sha256": "71f48fc484400debd22f9d97c03db787fcaf78cbd9418d6c576c87398640dbb5",
+          "size": 12072
+        }
+      ],
+      "evidence_parameters": [
+        "b513bb950e7049b5a2545fd333d406473a24cb7fcb73df5c949e135f4e0da1d6",
+        "65d9271709cbf1c4474ec2c5705f9f8e67205ec80ee2f4d19b12858bb8feac72"
+      ],
+      "operation": "VERIFY_ROUTE",
+      "params": "b513bb950e7049b5a2545fd333d406473a24cb7fcb73df5c949e135f4e0da1d6",
+      "payload": {
+        "benchmark_rows": [
+          {
+            "constraint_id": "C-CONTINUITY",
+            "margin": 0.0,
+            "measured": 0.0,
+            "requirement_id": null,
+            "rule": "every step is an allowed adjacency",
+            "status": "PASS",
+            "threshold": 0.0,
+            "unit": "steps"
+          },
+          {
+            "constraint_id": "C-SLOPE-CAP",
+            "margin": 2.9949347024635173,
+            "measured": 15.005065297536483,
+            "requirement_id": null,
+            "rule": "max hazard surface slope <= 18 deg",
+            "status": "PASS",
+            "threshold": 18.0,
+            "unit": "deg"
+          },
+          {
+            "constraint_id": "C-TERRAIN-MASK",
+            "margin": 0.0,
+            "measured": 0.0,
+            "requirement_id": null,
+            "rule": "no unknown, water, forbidden or dilated cell is intersected",
+            "status": "PASS",
+            "threshold": 0.0,
+            "unit": "steps"
+          },
+          {
+            "constraint_id": "C-EDGE-TRAVERSALS",
+            "margin": 1.0,
+            "measured": 1.0,
+            "requirement_id": null,
+            "rule": "each undirected edge traversed <= 2 times",
+            "status": "PASS",
+            "threshold": 2.0,
+            "unit": "traversals"
+          },
+          {
+            "constraint_id": "C-RETURN",
+            "margin": 30.0,
+            "measured": 0.0,
+            "requirement_id": null,
+            "rule": "route returns to the start",
+            "status": "PASS",
+            "threshold": 30.0,
+            "unit": "m"
+          },
+          {
+            "constraint_id": "C-TASK-W1",
+            "margin": 0.0,
+            "measured": 1.0,
+            "requirement_id": null,
+            "rule": "task W1 reached and completed",
+            "status": "PASS",
+            "threshold": 1.0,
+            "unit": "tasks"
+          },
+          {
+            "constraint_id": "C-TASK-W2",
+            "margin": 0.0,
+            "measured": 1.0,
+            "requirement_id": null,
+            "rule": "task W2 reached and completed",
+            "status": "PASS",
+            "threshold": 1.0,
+            "unit": "tasks"
+          },
+          {
+            "constraint_id": "C-EXPOSURE-R-EXPOSURE",
+            "margin": 44.852813742385706,
+            "measured": 144.8528137423857,
+            "requirement_id": "R-EXPOSURE",
+            "rule": ">= 100 m unique in [12,18] deg",
+            "status": "PASS",
+            "threshold": 100.0,
+            "unit": "m"
+          },
+          {
+            "constraint_id": "C-MAX-DISTANCE",
+            "margin": 5498.0909114099,
+            "measured": 2501.9090885900996,
+            "requirement_id": null,
+            "rule": "route distance <= 8000 m",
+            "status": "PASS",
+            "threshold": 8000.0,
+            "unit": "m"
+          },
+          {
+            "constraint_id": "C-ENERGY-RESERVE",
+            "margin": 73.11369614291836,
+            "measured": 93.11369614291836,
+            "requirement_id": null,
+            "rule": "reserve >= 20% (conservative energy)",
+            "status": "PASS",
+            "threshold": 20.0,
+            "unit": "percent"
+          },
+          {
+            "constraint_id": "C-START",
+            "margin": 0.0,
+            "measured": 1.0,
+            "requirement_id": null,
+            "rule": "route starts at the declared start",
+            "status": "PASS",
+            "threshold": 1.0,
+            "unit": "starts"
+          }
+        ],
+        "failure_category": null,
+        "limitations": [
+          "Modeled terrain-test verification on the stated discrete graph and source support; not a dynamics simulation or hardware certification.",
+          "Energy model parameters are ASSUMED design defaults, not calibrated."
+        ],
+        "metrics": [
+          {
+            "method_id": "route-verifier-v1",
+            "metric_id": "route_distance_m",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "horizontal planimetric distance recomputed from node_sequence",
+            "unit": "m",
+            "valid_fraction": 1.0,
+            "value": 2501.9090885900996
+          },
+          {
+            "method_id": "route-verifier-v1",
+            "metric_id": "route_duration_s",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "surface length / nominal speed plus task dwell",
+            "unit": "s",
+            "valid_fraction": 1.0,
+            "value": 5129.837335600266
+          },
+          {
+            "method_id": "route-verifier-v1",
+            "metric_id": "max_surface_slope_deg",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "max cell slope over positive-length intersections",
+            "unit": "deg",
+            "valid_fraction": 1.0,
+            "value": 15.005065297536483
+          },
+          {
+            "method_id": "route-verifier-v1",
+            "metric_id": "tasks_completed",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "tasks reached within tolerance",
+            "unit": "count",
+            "valid_fraction": 1.0,
+            "value": 2.0
+          },
+          {
+            "method_id": "route-verifier-v1",
+            "metric_id": "unique_exposure_m:R-EXPOSURE",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "unique undirected edge subsegment length in band",
+            "unit": "m",
+            "valid_fraction": 1.0,
+            "value": 144.8528137423857
+          },
+          {
+            "method_id": "route-verifier-v1",
+            "metric_id": "traversed_exposure_m:R-EXPOSURE",
+            "quantity_kind": "DERIVED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "every traversal counted",
+            "unit": "m",
+            "valid_fraction": 1.0,
+            "value": 144.8528137423857
+          },
+          {
+            "method_id": "earth-simple-v1",
+            "metric_id": "energy_nominal_wh",
+            "quantity_kind": "ASSUMED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "ASSUMED energy model parameters; not calibrated",
+            "unit": "Wh",
+            "valid_fraction": 1.0,
+            "value": 99.16277554197568
+          },
+          {
+            "method_id": "earth-simple-v1",
+            "metric_id": "energy_conservative_wh",
+            "quantity_kind": "ASSUMED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "ASSUMED energy model parameters; not calibrated",
+            "unit": "Wh",
+            "valid_fraction": 1.0,
+            "value": 123.95346942746954
+          },
+          {
+            "method_id": "earth-simple-v1",
+            "metric_id": "reserve_pct",
+            "quantity_kind": "ASSUMED",
+            "support_scale_m": 60.0,
+            "uncertainty_note": "ASSUMED energy model parameters; not calibrated",
+            "unit": "percent",
+            "valid_fraction": 1.0,
+            "value": 93.11369614291836
+          }
+        ],
+        "operation": "VERIFY_ROUTE",
+        "outcome": "PASS",
+        "search_status": "FOUND",
+        "telemetry_artifact_key": "telemetry",
+        "verification_evidence": {
+          "evidence_id": null,
+          "local_key": "verification"
+        },
+        "verified_route_sha256": "ff9219307f57f2bdf5fbca386730dabc1f6e49090002652a13531f8dea79442d",
+        "violations": []
+      },
+      "status": "SUCCEEDED"
+    }
+  ],
+  "sha256": "5ffacda74b80ef1feb8c62be079d19d7777d6390b320ad6cd4be67cfe8632b0e"
+}

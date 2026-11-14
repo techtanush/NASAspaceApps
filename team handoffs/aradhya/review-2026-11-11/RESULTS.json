@@ -1,0 +1,531 @@
+{
+  "schema_version": "1.0",
+  "date": "2026-11-11T21:14:06.092197+00:00",
+  "source_commit": "f5e4a238013e091ab6c8fe248a77bb73176a6d68",
+  "scope": "Aradhya frontend and pure renderer; mock mode only",
+  "subagents_used": false,
+  "release_checks": [
+    {
+      "name": "install",
+      "command": [
+        "pnpm",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exit_code": 0,
+      "seconds": 3.035
+    },
+    {
+      "name": "client",
+      "command": [
+        "pnpm",
+        "run",
+        "generate:client"
+      ],
+      "exit_code": 0,
+      "seconds": 1.72
+    },
+    {
+      "name": "client-clean",
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "apps/web/src/generated/schema.d.ts"
+      ],
+      "exit_code": 0,
+      "seconds": 0.041
+    },
+    {
+      "name": "assurance-fresh",
+      "command": [
+        "node",
+        "scripts/ui/generate_assurance_validator.mjs",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.157
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "pnpm",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 0,
+      "seconds": 22.015
+    },
+    {
+      "name": "lint",
+      "command": [
+        "pnpm",
+        "run",
+        "lint"
+      ],
+      "exit_code": 0,
+      "seconds": 8.949
+    },
+    {
+      "name": "test",
+      "command": [
+        "pnpm",
+        "run",
+        "test"
+      ],
+      "exit_code": 0,
+      "seconds": 95.445
+    },
+    {
+      "name": "test:contracts",
+      "command": [
+        "pnpm",
+        "run",
+        "test:contracts"
+      ],
+      "exit_code": 0,
+      "seconds": 13.129
+    },
+    {
+      "name": "build",
+      "command": [
+        "pnpm",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "seconds": 18.699
+    },
+    {
+      "name": "python",
+      "command": [
+        ".venv/bin/pytest",
+        "tests/contracts/kit",
+        "tests/unit/passport_renderer",
+        "tests/contracts/ui",
+        "-q",
+        "--strict-markers",
+        "--junitxml=/Users/tanushchokshi/Downloads/TKS/NASA space apps/Aradhya/analogforge/out/review-baseline-2026-11-11/python-release.xml"
+      ],
+      "exit_code": 0,
+      "seconds": 23.855
+    },
+    {
+      "name": "ruff",
+      "command": [
+        ".venv/bin/ruff",
+        "check",
+        "src/analogforge/rendering/passport",
+        "tests/unit/passport_renderer",
+        "tests/contracts/ui",
+        "scripts/ui",
+        "scripts/build_mock_exports.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.141
+    },
+    {
+      "name": "mypy",
+      "command": [
+        ".venv/bin/mypy",
+        "--strict",
+        "src/analogforge/rendering/passport"
+      ],
+      "exit_code": 0,
+      "seconds": 0.399
+    },
+    {
+      "name": "tokens",
+      "command": [
+        ".venv/bin/python",
+        "scripts/ui/verify_tokens.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.048
+    },
+    {
+      "name": "forbidden",
+      "command": [
+        ".venv/bin/python",
+        "scripts/ui/forbidden_scan.py",
+        "--json",
+        "/Users/tanushchokshi/Downloads/TKS/NASA space apps/Aradhya/analogforge/out/review-baseline-2026-11-11/forbidden-release.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.306
+    },
+    {
+      "name": "exports",
+      "command": [
+        ".venv/bin/python",
+        "scripts/ui/verify_exports.py",
+        "--self-test"
+      ],
+      "exit_code": 0,
+      "seconds": 1.267
+    },
+    {
+      "name": "kit",
+      "command": [
+        ".venv/bin/python",
+        "../architecture files/contracts/kit/materialize.py",
+        "--verify"
+      ],
+      "exit_code": 0,
+      "seconds": 0.23
+    },
+    {
+      "name": "ownership",
+      "command": [
+        ".venv/bin/python",
+        "../team coordination/scripts/check_branch_ownership.py",
+        "--person",
+        "aradhya",
+        "--repo",
+        "..",
+        "--base",
+        "origin/main"
+      ],
+      "exit_code": 0,
+      "seconds": 0.35
+    }
+  ],
+  "unit_tests": {
+    "passed": 111,
+    "failed": 0,
+    "skipped": 0,
+    "new_regressions": 21
+  },
+  "python_tests": {
+    "tests": 131,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "browser_tests": {
+    "startTime": "2026-11-11T20:42:35.054Z",
+    "duration": 1818494.051,
+    "expected": 41,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "visual_audit": {
+    "status": "PASS",
+    "reports": 621,
+    "findings": 0,
+    "skipped_checks": 0,
+    "thresholds": {
+      "minText": 12,
+      "bodyText": 13,
+      "contrast": 4.5,
+      "largeContrast": 3,
+      "grid": 4,
+      "cls": 0.02,
+      "target": 24,
+      "touchTarget": 44,
+      "radius": 6,
+      "glyphIoU": 0.85,
+      "viewports": [
+        [
+          1920,
+          1080
+        ],
+        [
+          1440,
+          900
+        ],
+        [
+          1280,
+          800
+        ],
+        [
+          1024,
+          768
+        ],
+        [
+          768,
+          1024
+        ],
+        [
+          390,
+          844
+        ]
+      ]
+    }
+  },
+  "mutation_check": {
+    "status": "PASS",
+    "mutants": 36,
+    "killed": 36,
+    "baseline": {
+      "status": "PASS",
+      "checks": [
+        {
+          "kind": "unit",
+          "status": "PASS",
+          "exit_code": 0,
+          "output_file": "out/mutations/baseline-unit.log"
+        },
+        {
+          "kind": "browser",
+          "status": "PASS",
+          "exit_code": 0,
+          "output_file": "out/mutations/baseline-browser.log"
+        }
+      ]
+    },
+    "records": [
+      {
+        "id": "M1",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M2",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M3",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M4",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M5",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M6",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M7",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M8",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M9",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M10",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M11",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M12",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M13",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M14",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M15",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M16",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M17",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M18",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M19",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M20",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M21",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M22",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M23",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M24",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M25",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M26",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M27",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M28",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M29",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M30",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M31",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M32",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M33",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M34",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M35",
+        "status": "KILLED",
+        "killed": true
+      },
+      {
+        "id": "M36",
+        "status": "KILLED",
+        "killed": true
+      }
+    ]
+  },
+  "exports": {
+    "verified": 27,
+    "tamper_cases_rejected": 27
+  },
+  "tokens": {
+    "passed": 150,
+    "total": 150
+  },
+  "real_backend_validation": "BLOCKED_ENVIRONMENT: MRG-03 belongs to the merging agent",
+  "evidence_receipts": [
+    {
+      "path": "out/review-baseline-2026-11-11/checks-release.json",
+      "sha256": "2451b7b4e5fab02761278a79b37cf837f08f72e32f887f797ba9290581c2ebc2"
+    },
+    {
+      "path": "out/review-baseline-2026-11-11/test-release.log",
+      "sha256": "2770011d3198e8a1ae09be8e0ac433c00aec59a8aa7951292774068d9976da83"
+    },
+    {
+      "path": "out/review-baseline-2026-11-11/python-release.xml",
+      "sha256": "8794df0beb3545abb9f91199d51d4bb952555edf877eb563faf118b248752d74"
+    },
+    {
+      "path": "out/review-baseline-2026-11-11/mutations-release.json",
+      "sha256": "411dcf7b7df72b84a1da24d32305d1c5ca54739a965e96875fa035e8c10799a5"
+    },
+    {
+      "path": "out/e2e-results-visual-review-release-2026-11-11.json",
+      "sha256": "ae634511c0b774ea09d51940c57c73508a3c408e20dc43ab0f51492747e19d87"
+    },
+    {
+      "path": "out/visual/report.json",
+      "sha256": "552a896e53276a880de419aad4c46801ebdd4ece78ffdc064cad9c01b303c0bd"
+    },
+    {
+      "path": "out/hooks-visual-review-release-2026-11-11-0.json",
+      "sha256": "ebe6b04d104845bf9fd7b1c96debc8bdf7b5f1ae6483ede4945f27c6bd449989"
+    },
+    {
+      "path": "out/hooks-review-hook-proof-0.json",
+      "sha256": "8299138fd95449d5fd0c68bc8bd515cee7a002a412171332347a52cfa49f76ce"
+    },
+    {
+      "path": "out/e2e-results-review-hook-proof.json",
+      "sha256": "c8d1e08e074b48b3bef7b644c0c82063fa7a8d6517cf971da9632790c7d17c60"
+    },
+    {
+      "path": "out/review-baseline-2026-11-11/ownership-post-handoff.json",
+      "sha256": "bf94d334752f9273fdd7593ee583ab8bc693cafbf4913538a988317ba22fcace"
+    }
+  ],
+  "hook_visibility_proof": {
+    "expected": 81,
+    "observed": 81,
+    "missing": [],
+    "required_attributes_asserted": true,
+    "source_files": [
+      "out/hooks-visual-review-release-2026-11-11-0.json",
+      "out/hooks-review-hook-proof-0.json"
+    ],
+    "focused_rerun": {
+      "startTime": "2026-11-11T21:16:42.234Z",
+      "duration": 22961.166,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "note": "Two read-only capture calls were added to existing J01/J04 cases after the complete41-case pass. Application runtime is unchanged; the stricter two cases also pass."
+  }
+}

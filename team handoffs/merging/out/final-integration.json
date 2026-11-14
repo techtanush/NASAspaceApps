@@ -1,0 +1,101 @@
+{
+ "tested_source_sha": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+ "tested_source_note": "Application source is byte-identical from 1ea6470 onward; later commits change only evidence documents, one test file (earth-camera hermetic mock) and the platform mutant catalog. Results below name the exact commit each ran on.",
+ "branches_integrated_in_order": [
+  {
+   "branch": "integration/rc",
+   "sha": "5e08b801f84625bc930b2be43974766a7f6c08ca",
+   "role": "base (all three contributor merges plus MERGE-01..32)"
+  },
+  {
+   "branch": "fix/rc-backend-hardening",
+   "sha": "eab4847b493cf2cd2e9287a85b136560f299bd68"
+  },
+  {
+   "branch": "fix/rc-frontend-dependencies",
+   "sha": "8ccea1bda18cf04ba4a9b16f20dccf8e28a242b4"
+  },
+  {
+   "branch": "ui/premium-glass",
+   "sha": "d3456b672babb6d529c23768d322e984a29199db"
+  },
+  {
+   "branch": "merging-branch",
+   "sha": "2a8340d256f33296116f7b7211e0759be118d51b",
+   "role": "evidence and guide only"
+  }
+ ],
+ "results": [
+  {
+   "gate": "kit materialize --verify; isolated kit tests",
+   "command": "materialize.py --verify; pytest tests/contracts/kit",
+   "result": "PASS; 20 passed",
+   "commit": "02a67f6720a5d431ba79bf55ad66f5d746d3225a"
+  },
+  {
+   "gate": "validate_docs, ruff, mypy (237 files), three forbidden scans, wire_check final, purity merged, validate_team_setup, preflight(synthetic)",
+   "result": "all PASS, 0 findings",
+   "commit": "02a67f6720a5d431ba79bf55ad66f5d746d3225a"
+  },
+  {
+   "gate": "platform suite, real science and renderer",
+   "command": "AF_SCIENCE_IMPL=real AF_RENDERER_IMPL=real pytest tests/unit/platform tests/integration/platform tests/contracts/platform -p no:randomly",
+   "result": "366 passed, 0 failed, 0 skipped (1543 s)",
+   "commit": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+   "history": "Five full invocations were made. #1 was discarded: the driver exported the persistent rehearsal CONFIG_DIR (live slot bound), failing two tests that assert an unbound live scenario; the same two tests pass in a clean environment. #2 failed one transport test and #3 failed one journey-API case (WorkerHandler FAILED while other science/browser workloads ran). Neither reproduced: isolated transport run 3/3, two parallel stress runs of both files 9/9 each, and #4 passed 366/366 under the same concurrent browser load. See open_observations."
+  },
+  {
+   "gate": "science, property, replay, renderer and UI-contract suites",
+   "result": "1165 passed, 0 failed, 0 skipped",
+   "commit": "5ff7fda (no application change since)"
+  },
+  {
+   "gate": "frontend unit, contract, stream-audit, generated client no drift, typecheck, lint, production build",
+   "result": "134 passed; 3 passed; 8 passed; clean; clean; clean; built",
+   "commit": "02a67f6720a5d431ba79bf55ad66f5d746d3225a"
+  },
+  {
+   "gate": "preview browser suite excluding the visual audit",
+   "result": "40 passed",
+   "commit": "5ff7fda"
+  },
+  {
+   "gate": "full visual audit (UIX-13), glass contrast and geometry",
+   "result": "PASS: 501 reports, 0 findings, 0 skipped checks, 11 thresholds",
+   "commit": "5ff7fda"
+  },
+  {
+   "gate": "real-backend browser suite, journeys plus integration, fresh database/data root/config copy",
+   "command": "playwright test journeys integration --trace off; E2E_TARGET=real; E2E_API_URL=http://127.0.0.1:<api>/api/v1",
+   "result": "pass b: 17 passed (37.2 min); pass c: 17 passed (36.7 min); each covers J01-J13 incl. J08b/J09b plus MRG-03 and MRG-11",
+   "commit": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+   "excluded": "An earlier pass was stopped and excluded: E2E_API_URL lacked the /api/v1 suffix MRG-03 passes to wire_check. Its log is retained outside the release evidence."
+  },
+  {
+   "gate": "mutation checks",
+   "result": "UI 36/36 killed with baseline PASS; API/display 6/6; renderer 9/9; science 16/16; platform 20/20",
+   "commit": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+   "note": "The UI baseline initially failed (earth-camera test could not transform the MapLibre worker ?url import from a symlinked node_modules); fixed by mocking that module (02a67f6). Platform mutants M13 and M15 initially reported MUTATION_NOT_APPLIED because the targeted lines were replaced by MERGE-10 and MERGE-35; their snippets now target the current code and are killed by the same tests."
+  },
+  {
+   "gate": "secrets",
+   "result": "no key-shaped strings in tracked files; none of OPENAI_API_KEY/EARTHDATA_TOKEN/sk- patterns in apps/web/dist; no .env tracked",
+   "commit": "02a67f6720a5d431ba79bf55ad66f5d746d3225a"
+  },
+  {
+   "gate": "recovery and persistence",
+   "result": "test_process_recovery, test_recovery, J08/J08b passed inside the runs above"
+  },
+  {
+   "gate": "practice matrix, perturbations, mock NASA drop, one-product variants, guarded fake-provider rehearsal",
+   "result": "exercised by committed tests inside the platform and science runs above (storylines, parity, perturbations PERT-01..09, mock NASA drop, partial dataset runs, live slot and live rehearsal) and by J11/J12/J13",
+   "commit": "02a67f6720a5d431ba79bf55ad66f5d746d3225a",
+   "note": "Hand-driven HTTP rehearsal scripts from earlier candidates are not committed; their results (out/rehearsals.json at b06a692/f628943) remain historical and are not re-claimed for this commit."
+  }
+ ],
+ "open_observations": [
+  "Two of five full platform invocations each failed a single worker-driven test (transport journey; journey-API small-battery case) while other science and browser workloads ran. Both runs recorded a run in state FAILED (fail-closed: never a wrong PASS). The exception type of the first is unknown; the second logged AssertionError. Neither reproduced in isolation, under parallel stress, or in the next full run. Root cause is not established. An earlier candidate recorded one similar sanitized worker error that also did not reproduce."
+ ],
+ "single_reviewer": "One reviewer; no subagents were authorised, so three independent reviews are not claimed.",
+ "scope": "Local synthetic/generated-data software integrity; no NASA-source, external-model or physical validation claim."
+}

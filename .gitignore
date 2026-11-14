@@ -20,3 +20,6 @@ analogforge/playwright-report/
 analogforge/test-results/
 analogforge/.coverage
 analogforge/htmlcov/
+
+# Raw merge/rehearsal outputs stay local; publish only curated handoff summaries.
+/out/

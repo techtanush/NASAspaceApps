@@ -1,0 +1,104 @@
+[
+  {
+    "label": "base",
+    "algorithm_config_sha256": "6a8b8b21c4f40dc0fe9d2f7d8931caaaeb7706ca951e45aebd57136e564e863e",
+    "windows": [
+      {
+        "window": "grid-r0c0",
+        "excluded": false,
+        "reason": null
+      },
+      {
+        "window": "grid-r0c1",
+        "excluded": false,
+        "reason": null
+      },
+      {
+        "window": "grid-r0c2",
+        "excluded": false,
+        "reason": null
+      },
+      {
+        "window": "grid-r1c0",
+        "excluded": false,
+        "reason": null
+      },
+      {
+        "window": "grid-r1c1",
+        "excluded": true,
+        "reason": "WATER_ONLY"
+      },
+      {
+        "window": "grid-r1c2",
+        "excluded": true,
+        "reason": "INSUFFICIENT_VALID_DATA"
+      },
+      {
+        "window": "grid-r2c0",
+        "excluded": false,
+        "reason": null
+      },
+      {
+        "window": "grid-r2c1",
+        "excluded": false,
+        "reason": "BELOW_SHORTLIST_CUTOFF"
+      },
+      {
+        "window": "grid-r2c2",
+        "excluded": false,
+        "reason": null
+      }
+    ]
+  },
+  {
+    "label": "strict",
+    "algorithm_config_sha256": "3243992a8f1e8cf9a435674f0c1388a9a70f0eaec5ef2fc3073536cff60586b9",
+    "windows": [
+      {
+        "window": "grid-r0c0",
+        "excluded": true,
+        "reason": "INSUFFICIENT_VALID_DATA"
+      },
+      {
+        "window": "grid-r0c1",
+        "excluded": true,
+        "reason": "INSUFFICIENT_VALID_DATA"
+      },
+      {
+        "window": "grid-r0c2",
+        "excluded": true,
+        "reason": "INSUFFICIENT_VALID_DATA"
+      },
+      {
+        "window": "grid-r1c0",
+        "excluded": true,
+        "reason": "INSUFFICIENT_VALID_DATA"
+      },
+      {
+        "window": "grid-r1c1",
+        "excluded": true,
+        "reason": "WATER_ONLY"
+      },
+      {
+        "window": "grid-r1c2",
+        "excluded": true,
+        "reason": "INSUFFICIENT_VALID_DATA"
+      },
+      {
+        "window": "grid-r2c0",
+        "excluded": true,
+        "reason": "INSUFFICIENT_VALID_DATA"
+      },
+      {
+        "window": "grid-r2c1",
+        "excluded": true,
+        "reason": "INSUFFICIENT_VALID_DATA"
+      },
+      {
+        "window": "grid-r2c2",
+        "excluded": true,
+        "reason": "INSUFFICIENT_VALID_DATA"
+      }
+    ]
+  }
+]

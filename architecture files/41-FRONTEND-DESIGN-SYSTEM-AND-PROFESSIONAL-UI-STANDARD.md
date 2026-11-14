@@ -38,10 +38,10 @@ The following are defects, not style choices. Items marked **[scan]** are enforc
 | # | Banned | Why / use instead |
 | --- | --- | --- |
 | X-01 | Emoji anywhere in UI, copy, test ids visible text, alt text, commit of fixtures **[scan]** | Use `lucide-react` icons or the custom status glyphs (§9.2). |
-| X-02 | Gradients on surfaces, buttons, text, borders (`linear-gradient`, `radial-gradient`, `conic-gradient`) **[scan]** | Flat tokens only. Exception: scientific colour ramps in raster legends, marked `/* allowed: scientific-ramp */`. |
-| X-03 | Glassmorphism: `backdrop-filter`, translucent blurred panels **[scan]** | Opaque `surface-*` tokens. |
-| X-04 | Glow / neon: coloured `box-shadow` or `text-shadow` halos, "sci-fi" outlines **[scan]** | Borders and flat fills. One neutral overlay shadow allowed (§5.3). |
-| X-05 | Large radii / pills / blobs: `border-radius` > 6 px except `50%` on 8–12 px status dots **[scan]** | `--radius-1..3` (2/4/6 px). |
+| X-02 | Gradients on surfaces, buttons, text, borders (`linear-gradient`, `radial-gradient`, `conic-gradient`) **[scan]** | Flat tokens only. Exceptions: scientific colour ramps in raster legends, marked `/* allowed: scientific-ramp */`; and the single static ambient backdrop of the glass layer (§5.5), which is a radial gradient on one element. |
+| X-03 | Glassmorphism **outside the glass layer** (§5.5): `backdrop-filter` or translucent blurred surfaces on anything except the listed chrome and panel frames **[scan]** | Opaque `surface-*` tokens. Tables, charts, maps and every scientific value are always opaque. |
+| X-04 | Glow / neon: coloured `box-shadow` or `text-shadow` halos, "sci-fi" outlines **[scan]** | Borders and flat fills. Neutral dark elevation shadows below listed surfaces are allowed (§5.3, §5.5); coloured or zero-offset halos never are. |
+| X-05 | Large radii / pills / blobs: `border-radius` > 6 px except `50%` on 8–12 px status dots and listed glass surfaces and data frames up to 14 px (§5.5) **[scan]** | `--radius-1..3` (2/4/6 px) for controls, badges and links. |
 | X-06 | Hero banners, gradient splash headers, marketing sections, "Welcome to AnalogForge!" illustrations, stock imagery | S01 opens straight into the work (§10 S01). |
 | X-07 | Starfield / space-themed backgrounds, planet illustrations as decoration, particle effects | The planet only appears as **data** (maps, panels). |
 | X-08 | Centered card grids of "features", three-column icon-over-heading blurbs, testimonial strips | Tables, lists, panels. |
@@ -133,10 +133,36 @@ All spacing, sizes and offsets are multiples of **4 px**. Tokens: `--space-1..7 
 * **Responsive:** ≥ 1280 three-column; 1024–1279 context collapses to icon rail, evidence is an overlay drawer; 768–1023 single column with a 56 px top tab strip and bottom sheet drawers; < 768 stacked cards with sequential sections and a sticky 48 px action bar. At every size, **no horizontal page scroll** (tables scroll inside their own container with sticky first column).
 
 ### 5.3 Elevation and borders
-Hierarchy by **fill step + 1 px border**, not shadows: `canvas < surface-1 (panels) < surface-2 (table header, inputs) < surface-3 (hover/selected)`. The only shadow in the product is the overlay shadow on popovers/dialogs/drawers: `0 8px 24px rgba(0,0,0,0.45)` (dark) / `0 8px 24px rgba(17,26,36,0.18)` (light). Dividers are 1 px `border-subtle`; control boundaries are 1 px `border-strong` (contrast ≥ 3:1).
+Hierarchy by **fill step + 1 px border**, not shadows: `canvas < surface-1 (panels) < surface-2 (table header, inputs) < surface-3 (hover/selected)`. The only shadow in the product is the overlay shadow on popovers/dialogs/drawers: `0 8px 24px rgba(0,0,0,0.45)` (dark) / `0 8px 24px rgba(17,26,36,0.18)` (light). Dividers are 1 px `border-subtle`; control boundaries are 1 px `border-strong` (contrast ≥ 3:1). *Amended 2026-11-13:* listed surfaces additionally carry a soft neutral elevation shadow and a glass edge, as specified in §5.5.
 
 ### 5.4 Density
 Three densities via `density-toggle` (`Compact / Default / Comfortable`), stored as `af.density` (same allowed-marker rule): table rows 28 / 36 / 44 px, control heights 28 / 32 / 40 px (touch pointer coarse ⇒ always 44 px targets). Default is **Default**. Density changes spacing only, never font size below 12 px.
+
+### 5.5 Glass layer (amendment D-2026-11-13-GLASS, user-directed)
+
+The product owner directed a premium, layered visual language: frosted-glass chrome over a soft ambient backdrop. This section supersedes X-02, X-03, X-04 and X-05 **only** as stated here; nothing else in this standard is relaxed, and no audit threshold changes.
+
+**Where glass is allowed.** The single source of truth is `apps/web/design/glass-surfaces.json`:
+
+* **chrome**: application header, context navigation, status strip, operations bar, drawers, dialogs, popovers, menus, toasts;
+* **panels**: panel frames, run state card, metric cards, critic and attempt cards, banners, empty and error states, preset and map-layer controls;
+* **frames** (opaque, never blurred): table frames, captions and scroll regions, map regions;
+* **ambient**: exactly one `aria-hidden`, non-interactive, fixed element behind all content.
+
+**What stays solid.** Every scientific value is painted on an opaque surface: table bodies and headers, charts, map and planetary views, histograms, route plots, inputs and selects. Glass frames them; it never sits behind a number a reader must trust.
+
+**Visual rules.**
+
+1. All colour derives from existing tokens through `color-mix()`; `glass.css` contains no hex, `rgb()` or `hsl()` literal and no new palette value.
+2. The ambient backdrop is three or four static radial fields of `--accent` (blue), `--state-pending` (sky) and `--state-pass` (teal) at low strength. No violet or purple fields, no animation, no starfield or space imagery (X-07 stands), no particles.
+3. Backdrop blur ≤ 24 px with saturation ≤ 1.6. Chrome ≈ 66 % opaque, panel frames ≈ 72 to 78 %, overlays ≈ 80 to 86 % (dark) and higher in light. Panels are dense enough that text contrast is judged on the painted pixels (rule 6).
+4. Radii: listed surfaces and frames ≤ 14 px (panels 12, overlays 14); controls, badges and links remain ≤ 6 px.
+5. Shadows: dark, below the element, negative spread, from `--glass-ink` (`--canvas` in dark, `--text-primary` in light, both near-black). Inset highlights are 1 px hairlines. No coloured shadow, no zero-offset halo, no text shadow.
+6. **Text on glass is verified on painted pixels.** Computed colours cannot see blur or ambient light, so the audit renders a second frame with all glyphs transparent and measures every glass-backed text node against the real background samples (≥ 4.5:1, ≥ 3:1 for large text). This is stricter than the computed check used for flat surfaces.
+7. No geometry changes: glass adds paint only (background, border colour, shadow, radius), so layout-shift and spacing gates are unaffected. No colour transitions are added; controls keep `transition: none` so audits never measure mid-transition.
+8. **Fallbacks are mandatory** and enforced by the scanner: `@supports not (backdrop-filter …)` and `prefers-reduced-transparency: reduce` restore the opaque surfaces and hide the ambient layer; `forced-colors: active` uses system colours; print is flat and ink-free.
+
+**Enforcement.** `scripts/ui/forbidden_scan.py` exempts `glass.css` only from the decorative-effect and large-radius rules and validates it structurally against the contract (listed selectors only, blur and radius limits, radial gradients on the ambient element only, dark non-halo shadows, token-derived colours, required fallbacks); every other stylesheet is still scanned in full. Audit check C10 allows glass only on listed selectors within the contract limits and requires the ambient layer to be unique, hidden from assistive technology and non-interactive. `tests/contracts/ui/test_glass_contract.py` damages the stylesheet in 19 ways and removes each fallback, and requires the scanner to fail every time.
 
 ## 6. Colour
 
@@ -363,7 +389,7 @@ Machine checks (`scripts/ui/visual_audit.mjs`, gate UIX-13) and human/agent revi
 | --- | --- |
 | VIS-01 | `tokens.json` passes `verify_tokens.py` (150 checks); `tokens.css` regenerates byte-identically; light and dark both render all screens |
 | VIS-02 | Fonts: only Inter and IBM Plex Mono load; computed `font-family` of every visible text node resolves to one of them (or a mono fallback); zero requests to non-`localhost` origins; fonts present in `dist` |
-| VIS-03 | No hex colour literals in `src/**/*.{css,tsx,ts}` outside `tokens.css`, `maps/`, and test files; no `linear-gradient`, `backdrop-filter`, text/box shadow other than the one overlay shadow, `border-radius` > 6 px (except 50 % dots), no emoji codepoints, no `Lorem ipsum`/`TODO` visible text |
+| VIS-03 | No hex colour literals in `src/**/*.{css,tsx,ts}` outside `tokens.css`, `maps/`, and test files; no gradient, `backdrop-filter`, text shadow, box shadow or `border-radius` > 6 px (except 50 % dots) outside the glass layer; the glass layer (`glass.css`) satisfies the structural contract of §5.5; no emoji codepoints, no `Lorem ipsum`/`TODO` visible text |
 | VIS-04 | Every visible text node ≥ 12 px; body text ≥ 13 px; computed text/background contrast ≥ 4.5:1 (≥ 3:1 for large/non-text) on the rendered pixels' backgrounds (axe `color-contrast` + custom sampler for canvas/map overlays) |
 | VIS-05 | 4 px grid: for every card/panel/table cell/control, computed margin/padding/gap/width/height in `{0} ∪ 4k px` except an explicit allow-list (1 px borders, 2 px focus, 3 px state edge, hairlines) |
 | VIS-06 | No horizontal page overflow at 1920×1080, 1440×900, 1280×800, 1024×768, 768×1024, 390×844; no element overlapping another interactive element; no clipped text (`scrollWidth ≤ clientWidth` unless `overflow` is intentional + labelled) |
@@ -379,6 +405,8 @@ Machine checks (`scripts/ui/visual_audit.mjs`, gate UIX-13) and human/agent revi
 | VIS-16 | Reduced motion: with `prefers-reduced-motion`, computed `transition-duration` ≤ 1 ms for all, no autoplay |
 | VIS-17 | Text-spacing override stylesheet (WCAG 1.4.12) causes no clipped or overlapping content |
 | VIS-18 | The production build contains no `/__styleguide`, no `msw`, no mock banner, and no external URLs |
+| VIS-19 | Glass contract (§5.5): the scanner fails every one of the 19 damaged copies of `glass.css` and each removed fallback; `[data-allowed=ambient-canvas]` is unique, `aria-hidden` and non-interactive; C10 reports backdrop, gradient, shadow or radius outside the contract |
+| VIS-20 | Text on glass: every glass-backed text node meets 4.5:1 (3:1 large) against the glyph-free rendered background in both themes at all six viewports; reduced-transparency and forced-colors renderings show opaque surfaces |
 
 **Design review rubric (human or reviewer-subagent; each criterion scored 0–4, all ≥ 3 and mean ≥ 3.5; any 0–1 is a blocker):** (1) hierarchy — status is the loudest thing; (2) restraint — colour only for state; (3) typography — scale, alignment, numerals; (4) density & spacing rhythm; (5) tables — scannable, aligned, units; (6) states — empty/error/loading/disabled are designed; (7) copy — plain, precise, no hype; (8) consistency across screens; (9) map & chart integrity; (10) accessibility feel (focus, contrast, keyboard); (11) "would a crew member trust this?" credibility test; (12) absence of every X-xx slop item. Reviewers must cite screenshot filenames and concrete defects with element selectors, not general praise.
 

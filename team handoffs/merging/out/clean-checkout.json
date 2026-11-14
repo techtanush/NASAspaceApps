@@ -1,0 +1,29 @@
+{
+  "tested_commit_sha": "51d6d7733bc890ba1b65da8498814791e12f2eb7",
+  "bootstrap_exit_code": 0,
+  "fresh_clone": true,
+  "no_worktree_dependencies_or_data_copied": true,
+  "commands": [
+    {
+      "command": "make migrate",
+      "exit_code": 0
+    },
+    {
+      "command": "make seed-synthetic",
+      "exit_code": 0
+    },
+    {
+      "command": "make preflight",
+      "exit_code": 0
+    }
+  ],
+  "scope": "Fresh clone bootstrapped from committed51d6d77 without copying dependencies/data or prior environment. Subsequent committed corrections fast-forwarded; dependency locks and migration files remain unchanged. Full1434-case backend matrix ated903b6 in the independent clean checkout; fresh manual J01 atf628943 (unchanged backend/passport routes) and current real browser gates cover the laterfrontend-only revision.",
+  "final_backend_executed_sha": "ed903b62d7968c0dcc420a557662f0c688c1b7ad",
+  "final_frontend_executed_sha": "c263d2affedfcb17b9e9adb69765f832019650a7",
+  "evidence": [
+    "suites.json",
+    "source-equivalence.json",
+    "manual-journey.json",
+    "journeys-real.json"
+  ]
+}

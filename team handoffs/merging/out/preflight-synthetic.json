@@ -1,0 +1,151 @@
+{
+  "gates": [
+    {
+      "checked_at": "2026-11-12T23:29:15.954712+00:00",
+      "code": "RUNTIME_READY",
+      "dependency": "GDAL",
+      "explanation": "Scientific runtime and required GDAL drivers import",
+      "remediation": "Install a rasterio/GDAL build with the required drivers",
+      "severity": "PASS",
+      "stage": "RUNTIME"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:15.955200+00:00",
+      "code": "STORAGE_SPACE_LOW",
+      "dependency": "DATA_ROOT",
+      "explanation": "Writable atomic storage; free bytes=4309315584",
+      "remediation": "Provide at least 10 GiB free space",
+      "severity": "WARN",
+      "stage": "STORAGE"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:15.985257+00:00",
+      "code": "DATABASE_READY",
+      "dependency": "DATABASE_URL",
+      "explanation": "Database readiness checked",
+      "remediation": "Start PostgreSQL/PostGIS and run migrations",
+      "severity": "PASS",
+      "stage": "STORAGE"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:15.992975+00:00",
+      "code": "MIGRATION_CURRENT",
+      "dependency": "DATABASE_URL",
+      "explanation": "Current schema revision=0007; expected=0007",
+      "remediation": "Run analogforge migrate",
+      "severity": "PASS",
+      "stage": "STORAGE"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:15.992982+00:00",
+      "code": "DATABASE_ENCODING_UTF8",
+      "dependency": "DATABASE_URL",
+      "explanation": "Database server encoding=UTF8",
+      "remediation": "Create a UTF8 database from template0",
+      "severity": "PASS",
+      "stage": "STORAGE"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:15.992986+00:00",
+      "code": "IDENTITY_READY",
+      "dependency": "AUTH_MODE",
+      "explanation": "local binding validated by typed settings",
+      "remediation": "",
+      "severity": "PASS",
+      "stage": "IDENTITY"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:15.992988+00:00",
+      "code": "MODEL_NOT_REQUIRED",
+      "dependency": "OpenAI",
+      "explanation": "synthetic mode does not construct a model provider",
+      "remediation": "",
+      "severity": "PASS",
+      "stage": "MODEL"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:15.997074+00:00",
+      "code": "SCENARIO_READY",
+      "dependency": "synthetic-mars-mobility-v1",
+      "explanation": "Scenario status=AVAILABLE; allowed modes=['synthetic']",
+      "remediation": "Bind required datasets or choose an available mode",
+      "severity": "PASS",
+      "stage": "SCENARIO"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:16.001134+00:00",
+      "code": "CONFIG_READY",
+      "dependency": "datasets.yaml",
+      "explanation": "Configuration parsed with required keys",
+      "remediation": "Restore the required config keys",
+      "severity": "PASS",
+      "stage": "METADATA"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:16.007509+00:00",
+      "code": "CONFIG_READY",
+      "dependency": "algorithms.yaml",
+      "explanation": "Configuration parsed with required keys",
+      "remediation": "Restore the required config keys",
+      "severity": "PASS",
+      "stage": "METADATA"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:16.009740+00:00",
+      "code": "CONFIG_READY",
+      "dependency": "candidates.yaml",
+      "explanation": "Configuration parsed with required keys",
+      "remediation": "Restore the required config keys",
+      "severity": "PASS",
+      "stage": "METADATA"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:16.009748+00:00",
+      "code": "DOWNLOAD_OFFLINE",
+      "dependency": "source adapters",
+      "explanation": "No network download is required by this preflight",
+      "remediation": "",
+      "severity": "PASS",
+      "stage": "DOWNLOAD"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:16.681646+00:00",
+      "code": "SCIENCE_READY",
+      "dependency": "analogforge.science.facade",
+      "explanation": "All 15 science operations exposed; synthetic coverage probe succeeded",
+      "remediation": "Install the science facade and its runtime dependencies",
+      "severity": "PASS",
+      "stage": "SCIENCE"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:16.697747+00:00",
+      "code": "RENDERER_READY",
+      "dependency": "analogforge.rendering.passport",
+      "explanation": "Passport renderer entry point loaded",
+      "remediation": "Install the passport renderer",
+      "severity": "PASS",
+      "stage": "SCIENCE"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:16.698087+00:00",
+      "code": "LOCK_READY",
+      "dependency": "synthetic-policy-v1",
+      "explanation": "Policy hash and source files match",
+      "remediation": "",
+      "severity": "PASS",
+      "stage": "LOCK"
+    },
+    {
+      "checked_at": "2026-11-12T23:29:16.698094+00:00",
+      "code": "SYNTHETIC_FIXTURES_READY",
+      "dependency": "synthetic-policy-v1",
+      "explanation": "Scenario uses frozen synthetic fixture selectors",
+      "remediation": "",
+      "severity": "PASS",
+      "stage": "DATASETS"
+    }
+  ],
+  "mode": "synthetic",
+  "scenario_id": "synthetic-mars-mobility-v1",
+  "status": "PASS"
+}
