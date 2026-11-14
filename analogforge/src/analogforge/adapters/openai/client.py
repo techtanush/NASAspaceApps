@@ -20,4 +20,6 @@ class ResponsesClient:
 
     def create(self, **kwargs: Any) -> dict[str, Any]:
         response = self.client.responses.create(model=self.model, store=False, parallel_tool_calls=False, **kwargs)
-        return cast(dict[str, Any], response.model_dump(mode="json"))
+        # Tool calls are replayed as API input; use wire names such as "async",
+        # rather than SDK-only Python names such as "async_".
+        return cast(dict[str, Any], response.model_dump(mode="json", by_alias=True, exclude_none=True))

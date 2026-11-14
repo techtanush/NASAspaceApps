@@ -39,9 +39,9 @@ from analogforge.science.display.png import PNG_MEDIA_TYPE, encode_png_rgba
 from analogforge.science.errors import GeometryError, RasterError, ScienceError
 from analogforge.science.geometry import (
     AnalysisGridSpec,
-    assert_crs_matches_body,
     frame_from_crs_wkt,
     lonlat_to_xy,
+    planetary_display_crs_wkt,
     xy_to_lonlat,
 )
 from analogforge.science.provenance import write_scratch_artifact
@@ -259,8 +259,8 @@ def render_layer(layer: LayerRaster) -> RenderedLayer:
     if body == "EARTH":
         values, affine, crs_wkt, pixel_m = _earth(layer)
     else:
-        assert_crs_matches_body(body, layer.grid.crs_wkt)
-        values, affine, crs_wkt, pixel_m = _planar(layer)
+        crs_wkt = planetary_display_crs_wkt(body, layer.grid.crs_wkt)
+        values, affine, _, pixel_m = _planar(layer)
     classes = _classes(layer)
     rgba = _colorize(values, classes, layer.categorical)
     png = encode_png_rgba(rgba)

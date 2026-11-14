@@ -27,7 +27,8 @@ from analogforge.adapters.source_http.sniff import looks_like_html as sniff_html
 from analogforge.ports.datasets import CrsSpec, DatasetManifest
 from analogforge.ports.hashing import file_sha256
 from analogforge.ports.science_payloads import ValidationCheck
-from analogforge.science.geometry import body_geometry, normalize_longitude
+from analogforge.science.errors import GeometryError
+from analogforge.science.geometry import assert_crs_matches_body, body_geometry, normalize_longitude
 
 Status = Literal["PASS", "WARN", "FAIL"]
 FloatArray = NDArray[np.float64]
@@ -202,6 +203,24 @@ def earth_like(crs: CRS) -> bool:
     return a is not None and abs(a - 6378137.0) / 6378137.0 < BODY_RADIUS_TOLERANCE
 
 
+def _analysis_frame_problem(manifest: DatasetManifest, crs: CRS) -> CheckOutcome | None:
+    if manifest.role == "CONTEXT_ONLY":
+        return None
+    mean = body_geometry(manifest.body).mean_radius_m
+    a = semi_major_m(crs)
+    if a is None or abs(a - mean) / mean > BODY_RADIUS_TOLERANCE:
+        return None  # The separate body_consistent check owns a wrong body's figure.
+    try:
+        assert_crs_matches_body(manifest.body, crs.to_wkt())
+    except GeometryError as exc:
+        return _fail(
+            "crs_resolved",
+            "CRS is outside the supported analysis frame; explicit source-frame normalization is required "
+            f"before quantitative analysis: {exc}",
+        )
+    return None
+
+
 def check_crs_resolved(manifest: DatasetManifest, file_crs_wkt: str | None, raster_read: bool) -> CheckOutcome:
     try:
         declared = crs_from_spec(manifest.crs)
@@ -217,6 +236,9 @@ def check_crs_resolved(manifest: DatasetManifest, file_crs_wkt: str | None, rast
         )
     if not is_earth and declared.to_epsg(min_confidence=100) is not None:
         return _fail("crs_resolved", "an EPSG-coded CRS cannot describe planetary data")
+    problem = _analysis_frame_problem(manifest, declared)
+    if problem is not None:
+        return problem
     if not raster_read:
         return not_evaluated("crs_resolved", "raster could not be read, so the file CRS is unknown")
     if file_crs_wkt is None:
@@ -238,6 +260,9 @@ def check_crs_resolved(manifest: DatasetManifest, file_crs_wkt: str | None, rast
     de, fe = declared.to_epsg(min_confidence=100), file_crs.to_epsg(min_confidence=100)
     if is_earth and de is not None and fe is not None and de != fe:
         return _fail("crs_resolved", f"file CRS EPSG:{fe} differs from manifest EPSG:{de}")
+    problem = _analysis_frame_problem(manifest, file_crs)
+    if problem is not None:
+        return problem
     return _ok("crs_resolved", "manifest and file CRS parse and agree with the body")
 
 

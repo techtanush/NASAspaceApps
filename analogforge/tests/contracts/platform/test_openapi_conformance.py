@@ -127,8 +127,59 @@ def test_mission_draft_revision_acceptance_and_immutable_history(harness: Any) -
     assert_contract(historical, "get", "/mission-revisions/{id}")
     assert historical.json() == accepted.json()
     with store.transaction(principal.workspace_id) as unit:
-        assert unit.require("mission_revisions", revision.json()["id"])["accepted_at"] is None
+        original_revision = unit.require("mission_revisions", revision.json()["id"])
+        assert original_revision["accepted_at"] is None
         assert len(unit.list("mission_acceptances", {"mission_revision_id": revision.json()["id"]})) == 1
+        original_run = unit.create("runs", {
+            "mission_revision_id": revision.json()["id"], "rover_revision_id": None,
+            "mode": "synthetic", "state": "VALIDATING", "config_sha256": "0" * 64,
+        })
+    header = client.get(f"/api/v1/missions/{mission['id']}").json()
+    edited = post(client, f"/missions/{mission['id']}/drafts", {
+        "expected_revision": header["revision"],
+        "draft": {**body(), "objective": "A new objective after accepting the historical contract"},
+    })
+    assert edited.status_code == 201, edited.text
+    reloaded = client.get(f"/api/v1/missions/{mission['id']}").json()
+    assert reloaded["current_contract_id"] is None
+    assert reloaded["accepted_contract_id"] == accepted.json()["id"]
+    assert client.get(f"/api/v1/mission-revisions/{revision.json()['id']}").json() == accepted.json()
+    with store.transaction(principal.workspace_id) as unit:
+        assert unit.require("mission_revisions", revision.json()["id"]) == original_revision
+        assert unit.require("runs", original_run["id"]) == original_run
+        assert len(unit.list("mission_acceptances", {"mission_revision_id": revision.json()["id"]})) == 1
+
+
+def test_draft_edit_clears_unaccepted_proposal_and_rejects_acceptance_with_a_fresh_header(harness: Any) -> None:
+    client, store, principal = harness
+    draft = body()
+    mission = post(client, "/missions", draft).json()
+    fixture = json.loads((APP / "tests/fixtures/kit/missions/mission-mars-mobility.json").read_text())
+    proposed = post(client, f"/missions/{mission['id']}/revisions", {
+        "expected_revision": mission["revision"],
+        "contract": {**fixture, **draft},
+    })
+    assert proposed.status_code == 201, proposed.text
+    header = client.get(f"/api/v1/missions/{mission['id']}").json()
+    assert header["current_contract_id"] == proposed.json()["id"]
+    changed_draft = {**draft, "objective": "A materially different objective after the proposal"}
+    saved = post(client, f"/missions/{mission['id']}/drafts", {
+        "expected_revision": header["revision"], "draft": changed_draft,
+    })
+    assert saved.status_code == 201, saved.text
+    reloaded = client.get(f"/api/v1/missions/{mission['id']}").json()
+    old_acceptance = post(client, f"/missions/{mission['id']}/accept", {
+        "expected_revision": reloaded["revision"], "revision_id": proposed.json()["id"],
+    })
+    assert old_acceptance.status_code == 409, old_acceptance.text
+    assert old_acceptance.json()["error"]["code"] == "REVISION_CONFLICT"
+    assert reloaded["current_contract_id"] is None and reloaded["accepted_contract_id"] is None
+    assert client.get(f"/api/v1/mission-drafts/{reloaded['current_draft_id']}").json()["draft"]["objective"] == (
+        changed_draft["objective"]
+    )
+    assert client.get(f"/api/v1/mission-revisions/{proposed.json()['id']}").json() == proposed.json()
+    with store.transaction(principal.workspace_id) as unit:
+        assert unit.list("mission_acceptances") == []
 
 
 def test_rover_import_revision_and_original_remain_separate(harness: Any) -> None:

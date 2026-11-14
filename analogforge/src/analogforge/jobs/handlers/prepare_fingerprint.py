@@ -345,10 +345,16 @@ def handle(runtime: Any, job: dict[str, Any]) -> None:
     try:
         scenarios = runtime.scenarios()
         scenario_id = next(
-            key
-            for key, value in scenarios.items()
-            if value["body"] == source["target"]["body"] and "synthetic" in value["allowed_modes"]
+            (
+                key
+                for key, value in scenarios.items()
+                if value["body"] == source["target"]["body"]
+                and payload["mode"] in value["allowed_modes"] + value.get("requested_modes", [])
+            ),
+            None,
         )
+        if scenario_id is None:
+            raise PersistenceError("INPUT_INVALID", "No preparation scenario supports the target body and mode")
         proposed = runtime.engine.prepare(
             source, workspace_id, preparation_id=preparation_id, scenario_config_id=scenario_id, mode=payload["mode"]
         )

@@ -205,9 +205,9 @@ def project_payload(role: str, facts: dict[str, Any]) -> dict[str, Any]:
             "portfolio_revision_id": passport["portfolio_id"],
             "claim_annotations": [],
             "unresolved_issue_ids": [],
-            "not_verified_requirement_ids": [
+            "not_verified_requirement_ids": list(dict.fromkeys(
                 r["requirement_id"] for r in facts.get("qualifications", []) if r["status"] != "PASS"
-            ],
+            )),
             "export_artifact_ids": [],
             "ready_to_publish": True,
         }

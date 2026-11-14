@@ -10,6 +10,7 @@ import importlib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from uuid import UUID
 
 import numpy as np
 import yaml
@@ -26,7 +27,7 @@ from analogforge.science.datasets.ingest import (
     source_evidence_draft,
 )
 from analogforge.science.ops.base import OpBlocked, OpEnv
-from analogforge.science.raster.normalized import decode_source
+from analogforge.science.raster.normalized import MEDIA_TYPE, decode_source, encode_source
 from analogforge.science.raster.project import project_source
 from analogforge.science.raster.source import SourceRaster, read_gdal_raster
 
@@ -176,7 +177,30 @@ def resolve_source(
         algorithm_config_sha256=env.cfg.algorithm_config_sha256,
         seed=env.seed,
     )
+    parents = _validated_source_parents(env, draft, result, water)
+    if parents:
+        draft = draft.model_copy(update={"parent_evidence_ids": parents})
     return ResolvedSource(raster, dataset_id, manifest, result, draft, root)
+
+
+def _validated_source_parents(
+    env: OpEnv, draft: EvidenceDraft, result: IngestResult, water: np.ndarray | None,
+) -> list[UUID]:
+    """Bind only the exact registered normalization of the source just revalidated from local bytes."""
+    matches = [handle for handle in env.request.input_evidence if (
+        handle.kind == "SOURCE" and handle.body == draft.body and handle.mode == env.request.mode
+        and handle.algorithm_id == draft.algorithm_id and handle.algorithm_version == draft.algorithm_version
+        and handle.parameters_sha256 == draft.parameters_sha256 and handle.artifact_media_type == MEDIA_TYPE
+        and handle.artifact_sha256 is not None
+    )]
+    if not matches:
+        return []
+    assert result.raster is not None and result.manifest is not None
+    assert result.payload is not None and result.payload.bbox_lonlat is not None
+    normalized_sha = bytes_sha256(encode_source(
+        result.raster, result.manifest, dict(result.file_hashes), result.payload.bbox_lonlat, water,
+    ))
+    return sorted({handle.evidence_id for handle in matches if handle.artifact_sha256 == normalized_sha}, key=str)
 
 
 def _resolve_evidence(env: OpEnv, selector: SourceSelector, roles: tuple[str, ...]) -> ResolvedSource:

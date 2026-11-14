@@ -129,7 +129,7 @@ def validate_dataset(settings: Settings, dataset_id: str, write_checksums: bool 
     if write_checksums:
         (root / "manifest.yaml").write_text(yaml.safe_dump(manifest_data, sort_keys=False), encoding="utf-8")
         manifest = DatasetManifest.model_validate(manifest_data)
-    service = _entrypoint("analogforge.science.facade", "create_science_service")()
+    service = _entrypoint("analogforge.science.facade", "create_science_service")(config_dir=settings.config_dir)
     if ScienceOperation.INGEST_LOCAL_DATASET not in service.supported_operations():
         raise DatasetError("SCIENCE_OPERATION_MISSING", "Science facade lacks INGEST_LOCAL_DATASET")
     scratch = settings.data_root / "scratch" / f"validate-{uuid4()}"

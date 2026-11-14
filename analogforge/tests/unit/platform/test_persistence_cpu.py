@@ -1,5 +1,7 @@
 """CPU deadline and cancellation cannot leave a worker child alive."""
 
+from __future__ import annotations
+
 import json
 import multiprocessing
 import signal
@@ -8,12 +10,84 @@ import sys
 import time
 from pathlib import Path
 from typing import Any, NoReturn, cast
+from uuid import uuid4
 
 import pytest
 
 from analogforge.db.store import PersistenceError
 from analogforge.jobs.cpu import _stop_child, run_callable, run_science
-from analogforge.ports.science import ScienceCancelled, ScienceContext, ScienceRequest, ScienceService
+from analogforge.ports.science import (
+    ScienceCancelled,
+    ScienceComputationResult,
+    ScienceContext,
+    ScienceRequest,
+    ScienceService,
+)
+
+
+@pytest.mark.parametrize("deliver_result", [True, False])
+def test_science_result_arriving_between_poll_and_child_exit_is_read(
+    monkeypatch: pytest.MonkeyPatch, deliver_result: bool
+) -> None:
+    """Schedule the result after an empty poll, before the exit-state check."""
+    from analogforge.ports.science_payloads import ResolveCoveragePayload
+
+    result = ScienceComputationResult(
+        request_id=uuid4(),
+        operation="RESOLVE_COVERAGE",
+        mode="synthetic",
+        status="SUCCEEDED",
+        algorithm_id="test",
+        algorithm_version="1",
+        parameters_sha256="0" * 64,
+        input_sha256="0" * 64,
+        payload=ResolveCoveragePayload(selections=[]),
+    )
+    ready = False
+    received = False
+
+    class Pipe:
+        def poll(self, timeout: float = 0) -> bool:
+            return ready
+
+        def recv(self) -> tuple[str, Any]:
+            nonlocal received
+            assert ready
+            received = True
+            return "result", result.model_dump(mode="json")
+
+        def close(self) -> None:
+            pass
+
+    class Process:
+        def start(self) -> None:
+            pass
+
+        def is_alive(self) -> bool:
+            nonlocal ready
+            ready = deliver_result
+            return False
+
+        def join(self, timeout: float) -> None:
+            pass
+
+    class Context:
+        def Pipe(self, **_kwargs: Any) -> tuple[Pipe, Pipe]:
+            return Pipe(), Pipe()
+
+        def Process(self, **_kwargs: Any) -> Process:
+            return Process()
+
+    monkeypatch.setattr(multiprocessing, "get_context", lambda *_: Context())
+    if deliver_result:
+        actual = run_science(cast(ScienceService, None), cast(ScienceRequest, None), cast(ScienceContext, None))
+        assert received
+        assert actual == result
+    else:
+        with pytest.raises(PersistenceError, match="exited without a result") as error:
+            run_science(cast(ScienceService, None), cast(ScienceRequest, None), cast(ScienceContext, None))
+        assert error.value.code == "SYSTEM"
+        assert not received
 
 
 def _wait() -> str:

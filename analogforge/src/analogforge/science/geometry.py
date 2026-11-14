@@ -267,6 +267,32 @@ def _frame_distortion(body: Body, crs_wkt: str, unwrapped: BBox) -> float:
 _BODY_LABEL: Final = {"EARTH": "Earth", "MOON": "Moon", "MARS": "Mars"}
 
 
+def planetary_display_crs_wkt(body: Body, crs_wkt: str) -> str:
+    """Annotate a validated display CRS with its body, changing names only.
+
+    The source WKT remains authoritative for analysis. No epoch or vertical datum is inferred, and already
+    body-named CRSs are returned unchanged.
+    """
+    assert_crs_matches_body(body, crs_wkt)
+    label = _BODY_LABEL[body]
+    if body == "EARTH" or label.casefold() in crs_wkt.casefold():
+        return crs_wkt
+    definition = _crs_from_wkt(crs_wkt).to_json_dict()
+    definition["name"] = f"{label} planar display CRS"
+    base = definition.get("base_crs")
+    if isinstance(base, dict):
+        if base.get("name") == "unknown":
+            base["name"] = f"{label} geographic display frame"
+        datum = base.get("datum")
+        if isinstance(datum, dict):
+            if datum.get("name") == "unknown":
+                datum["name"] = f"{label} reference figure"
+            ellipsoid = datum.get("ellipsoid")
+            if isinstance(ellipsoid, dict) and ellipsoid.get("name") == "unknown":
+                ellipsoid["name"] = f"{label} reference figure"
+    return CRS.from_json_dict(definition).to_wkt()
+
+
 def _name_planetary_crs(crs: CRS, body: Body, kind: FrameKind) -> CRS:
     """Give a PROJ-string CRS honest names (body datum/ellipsoid) instead of ``unknown``."""
     label = _BODY_LABEL[body]
@@ -707,6 +733,7 @@ __all__ = [
     "grid_from_bounds",
     "lonlat_to_xy",
     "normalize_longitude",
+    "planetary_display_crs_wkt",
     "pixel_to_world_gdal",
     "projected_bounds_to_bbox",
     "projected_frame_for_aoi",

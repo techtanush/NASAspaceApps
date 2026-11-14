@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Link, MemoryRouter, Route, Routes } from 'react-router-dom';
 import seed from '../../mock/fixtures/seed.json';
@@ -9,6 +10,14 @@ import { MissionEditor } from './MissionEditor';
 vi.mock('../../api/client', () => ({ api: { get: vi.fn(), post: vi.fn() } }));
 vi.mock('../rovers/RoverEditor', () => ({ RoverEditor: () => <div>Rover editor boundary</div> }));
 vi.mock('../../maps/PlanetaryPanel', () => ({ PlanetaryPanel: () => <div>Region preview boundary</div> }));
+
+// The real preset select scrolls its focused option; jsdom has no layout API.
+const originalScrollIntoView = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'scrollIntoView');
+beforeAll(() => Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', { configurable: true, value: vi.fn() }));
+afterAll(() => {
+  if (originalScrollIntoView) Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', originalScrollIntoView);
+  else Reflect.deleteProperty(HTMLElement.prototype, 'scrollIntoView');
+});
 
 const target = seed.missionPresets.MARS.target;
 const draft = (name: string, objective = 'Original experiment objective') => ({ name, objective, target });
@@ -46,6 +55,105 @@ beforeEach(() => {
     if (path.endsWith('/drafts')) return stored(path.split('/')[2]!, (body as { draft: ReturnType<typeof draft> }).draft);
     throw new Error(`Unexpected test command: ${path}`);
   }) as typeof api.post);
+});
+
+it('starts custom targets with an unknown reference and saves an edited vertical datum in each draft', async () => {
+  mount('/missions/new');
+  const datum = screen.getByRole('textbox', { name: 'Vertical datum / reference' });
+  expect(datum).toHaveValue('Unknown');
+  fireEvent.change(datum, { target: { value: 'MOLA areoid' } });
+  fireEvent.change(screen.getByRole('textbox', { name: 'Mission name' }), { target: { value: 'Real Mars region' } });
+  fireEvent.change(screen.getByRole('textbox', { name: 'Experiment objective' }), { target: { value: 'Compare measured Mars terrain' } });
+  await waitFor(() => expect(api.post).toHaveBeenCalledWith('/missions', expect.objectContaining({
+    target: expect.objectContaining({ body: 'MARS', vertical_datum: 'MOLA areoid' }),
+  }), expect.anything()));
+  await waitFor(() => expect(screen.getByTestId('save-indicator')).toHaveAttribute('data-save-state', 'saved'));
+  fireEvent.change(datum, { target: { value: 'MOLA MEGDR areoid reference' } });
+  await waitFor(() => expect(api.post).toHaveBeenCalledWith('/missions/mission-a/drafts', expect.objectContaining({
+    draft: expect.objectContaining({ target: expect.objectContaining({ vertical_datum: 'MOLA MEGDR areoid reference' }) }),
+  }), expect.anything()));
+});
+
+it('keeps unfinished coordinates unsaved and preserves negative decimals typed one character at a time', async () => {
+  const user = userEvent.setup();
+  mount('/missions/mission-a/edit');
+  await waitFor(() => expect(screen.getByTestId('btn-build-fingerprint')).toBeEnabled());
+  const south = screen.getByRole('textbox', { name: 'South latitude (deg)' });
+  const north = screen.getByRole('textbox', { name: 'North latitude (deg)' });
+  await user.clear(south);
+  expect(south).toHaveValue('');
+  expect(screen.getByTestId('btn-build-fingerprint')).toBeDisabled();
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 600)); });
+  expect(api.post).not.toHaveBeenCalled();
+  await user.type(south, '-');
+  expect(south).toHaveValue('-');
+  expect(screen.getByRole('alert')).toHaveTextContent('Enter a complete numeric value');
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 600)); });
+  expect(api.post).not.toHaveBeenCalled();
+  await user.clear(south);
+  await user.type(south, '-4.95');
+  await user.clear(north);
+  await user.type(north, '-4.65');
+  expect(south).toHaveValue('-4.95');
+  expect(north).toHaveValue('-4.65');
+  await waitFor(() => expect(api.post).toHaveBeenCalledWith('/missions/mission-a/drafts', expect.objectContaining({
+    draft: expect.objectContaining({ target: expect.objectContaining({ bbox: [137, -4.95, 138, -4.65] }) }),
+  }), expect.anything()));
+  await waitFor(() => expect(screen.getByTestId('btn-build-fingerprint')).toBeEnabled());
+});
+
+it('loads finite exponential bounds and waits for a complete typed exponent before saving', async () => {
+  const user = userEvent.setup();
+  vi.mocked(api.get).mockImplementation((async (path: string) => path === '/mission-drafts/mission-a-draft'
+    ? stored('mission-a', { ...draft('Mission A'), target: { ...target, bbox: [1e-7, -5, 1, -4] } })
+    : defaultGet(path)) as typeof api.get);
+  mount('/missions/mission-a/edit');
+  await waitFor(() => expect(screen.getByTestId('btn-build-fingerprint')).toBeEnabled());
+  const west = screen.getByRole('textbox', { name: 'West longitude (deg)' });
+  expect(west).toHaveValue('1e-7');
+  await user.clear(west);
+  await user.type(west, '1e');
+  expect(west).toHaveValue('1e');
+  expect(screen.getByTestId('btn-build-fingerprint')).toBeDisabled();
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 600)); });
+  expect(api.post).not.toHaveBeenCalled();
+  await user.type(west, '-');
+  expect(west).toHaveValue('1e-');
+  expect(screen.getByRole('alert')).toHaveTextContent('Enter a complete numeric value');
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 600)); });
+  expect(api.post).not.toHaveBeenCalled();
+  await user.type(west, '6');
+  expect(west).toHaveValue('1e-6');
+  await waitFor(() => expect(api.post).toHaveBeenCalledWith('/missions/mission-a/drafts', expect.objectContaining({
+    draft: expect.objectContaining({ target: expect.objectContaining({ bbox: [1e-6, -5, 1, -4] }) }),
+  }), expect.anything()));
+  await waitFor(() => expect(screen.getByTestId('btn-build-fingerprint')).toBeEnabled());
+});
+
+it('resets custom body references to Unknown and restores the exact metadata of explicit synthetic presets', async () => {
+  mount('/missions/new');
+  fireEvent.change(screen.getByRole('textbox', { name: 'Vertical datum / reference' }), { target: { value: 'Custom Mars reference' } });
+  fireEvent.click(screen.getByRole('radio', { name: 'Moon' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Change body and clear region' }));
+  expect(screen.getByRole('textbox', { name: 'Vertical datum / reference' })).toHaveValue('Unknown');
+  expect(screen.getByRole('textbox', { name: 'South latitude (deg)' })).toHaveValue(String(seed.missionPresets.MOON.target.bbox[1]));
+  fireEvent.keyDown(screen.getByRole('combobox', { name: 'Target preset' }), { key: 'ArrowDown' });
+  fireEvent.click(await screen.findByRole('option', { name: 'Practice Moon target (synthetic)' }));
+  fireEvent.change(screen.getByRole('textbox', { name: 'Mission name' }), { target: { value: 'Practice metadata' } });
+  fireEvent.change(screen.getByRole('textbox', { name: 'Experiment objective' }), { target: { value: 'Check explicit preset references' } });
+  await waitFor(() => expect(api.post).toHaveBeenCalledWith('/missions', expect.objectContaining({
+    target: seed.missionPresets.MOON.target,
+  }), expect.anything()));
+  await waitFor(() => expect(screen.getByTestId('save-indicator')).toHaveAttribute('data-save-state', 'saved'));
+  fireEvent.click(screen.getByRole('radio', { name: 'Mars' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Change body and clear region' }));
+  expect(screen.getByRole('textbox', { name: 'Vertical datum / reference' })).toHaveValue('Unknown');
+  fireEvent.keyDown(screen.getByRole('combobox', { name: 'Target preset' }), { key: 'ArrowDown' });
+  fireEvent.click(await screen.findByRole('option', { name: 'Practice Mars target (synthetic)' }));
+  expect(screen.getByRole('textbox', { name: 'South latitude (deg)' })).toHaveValue(String(seed.missionPresets.MARS.target.bbox[1]));
+  await waitFor(() => expect(api.post).toHaveBeenCalledWith('/missions/mission-a/drafts', expect.objectContaining({
+    draft: expect.objectContaining({ target: seed.missionPresets.MARS.target }),
+  }), expect.anything()));
 });
 
 it('loads the new mission identity when route parameters change without unmounting the editor', async () => {

@@ -1,0 +1,52 @@
+{
+  "name": "Gale to Flagstaff — explicit operator criteria",
+  "objective": "Regional terrain-only rehearsal. Use the explicitly supplied requirement unchanged: slope-distribution Wasserstein-1 distance <= 5 degrees at exactly 500 m comparison support. Treat 5 degrees as an operator-chosen demonstration criterion, not a scientifically validated tolerance. Evaluate real MOLA target terrain and locked NASADEM Earth terrain only; report source resolution, data lineage, search bounds and limitations. No rover experiment, climate/mineral equivalence, global optimality, historical novelty, or physical validation is requested.",
+  "target": {
+    "bbox": [
+      137.25,
+      -4.95,
+      137.55,
+      -4.65
+    ],
+    "body": "MARS",
+    "crs_wkt": null,
+    "latitude_type": "PLANETOCENTRIC",
+    "vertical_datum": "MOLA areoid GMM-3 degree/order 50, IAU 2000; radius minus areoid",
+    "longitude_convention": "NEG180_180"
+  },
+  "requirements": [
+    {
+      "id": "req-1",
+      "unit": "deg",
+      "label": "Mandatory terrain common-support slope distribution threshold",
+      "lower": null,
+      "upper": 5.0,
+      "origin": "USER",
+      "weight": 1.0,
+      "operator": "LTE",
+      "dimension": "TERRAIN",
+      "mandatory": true,
+      "observable": "slope_distribution_w1_deg",
+      "parameters": {
+        "task_ids": [],
+        "slope_band_deg": [
+          0.0,
+          5.0
+        ],
+        "temporal_support": null,
+        "co_location_group": null,
+        "exposure_counting": null,
+        "comparison_rule_id": "slope-w1-common-support-v1"
+      },
+      "evidence_scope": "terrain_model",
+      "acceptance_note": "Explicit operator-supplied criterion for this local regional terrain rehearsal: compare the slope-distribution Wasserstein-1 distance at exactly 500 m support against 5 degrees. This choice is not a scientifically calibrated universal threshold, a rover validation criterion, or a measured source resolution.",
+      "maximum_support_scale_m": 500.0,
+      "minimum_support_scale_m": 500.0
+    }
+  ],
+  "assumptions": [
+    "The 5 degree Wasserstein-1 limit and 500 m comparison support are explicit operator criteria for a local regional demonstration; they are not evidence of physical or mission validation.",
+    "No rover, route, mineral, thermal or weather qualification is claimed.",
+    "An empty unreviewed known-analog reference list does not establish historical novelty."
+  ]
+}

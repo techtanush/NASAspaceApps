@@ -124,3 +124,34 @@ def test_unknown_region_set_and_reference_set_are_blocked(screened) -> None:  # 
     for bad in ({"search_region_set_id": "nope", "reference_set_id": catalog.REFERENCE_SET_PRACTICE}, {"search_region_set_id": catalog.SEARCH_REGION_PRACTICE, "reference_set_id": "nope"}):
         res, _ = flow.call(ScreenCandidatesInput(**base, **bad), datasets=["practice-earth-grid-v1"])
         assert res.status.value == "BLOCKED" and res.payload is None and res.issues
+
+
+@pytest.mark.parametrize("is_synthetic", [False, True], ids=["real-source-identity", "synthetic-source-identity"])
+def test_generated_grid_candidate_names_follow_source_provenance(tmp_path: Path, is_synthetic: bool) -> None:
+    from support.builders import run
+
+    from analogforge.ports.science_payloads import ScreenCandidatesInput, ScreenCandidatesPayload, SourceSelector
+
+    ctx = make_practice_context(tmp_path)
+    dataset = catalog.FIXTURE_EARTH_GRID
+    path = ctx.dataset_roots[dataset] / "manifest.yaml"
+    manifest = yaml.safe_load(path.read_text())
+    if not is_synthetic:
+        # Generated test bytes stand in for a validated NASADEM source; no NASA observations are used by this test.
+        # Keep the practice-like dataset/window IDs to prove that names depend on provenance, not ID substrings.
+        manifest.update(is_synthetic=False, provider="TEST_HARNESS_NASADEM", product_identity={
+            "product_id": "NASADEM_HGT", "version": "001",
+            "source_url": "https://e4ftl01.cr.usgs.gov/MEASURES/NASADEM_HGT.001/test.tif",
+        })
+        path.write_text(yaml.safe_dump(manifest))
+        ctx.mode = "live"
+    inputs = ScreenCandidatesInput(
+        search_region_set_id="local-dataset-grid-v1", source=SourceSelector(kind="LOCAL_DATASET", dataset_id=dataset),
+        target_metrics=[], target_histogram=None, requirements=load_mission("mission-mars-mobility").requirements,
+        max_detailed=6, reference_set_id=catalog.REFERENCE_SET_PRACTICE,
+    )
+    result, _ = run(create_science_service(), inputs, ctx, datasets=[dataset], check_registrar=False)
+    assert isinstance(result.payload, ScreenCandidatesPayload), result.issues
+    assert result.payload.shortlist_window_ids and result.payload.windows
+    prefix = catalog.PRACTICE_CANDIDATE_NAME_PREFIX if is_synthetic else "Terrain "
+    assert all(window.name == prefix + window.window_id for window in result.payload.windows)

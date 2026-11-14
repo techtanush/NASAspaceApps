@@ -1,10 +1,15 @@
 """Strict task-discriminated terminal payloads; numeric claims remain receipt-owned."""
 
-from typing import Literal
+from typing import Annotated, Literal
 from uuid import UUID
+
+from pydantic import Field
 
 from analogforge.ports.common import Confidence, FailureCategory, PortModel, QualificationStatus, VerificationOutcome
 from analogforge.ports.science_payloads import RouteStrategy
+
+# Scientific assurance owns opaque claim IDs (for example q:<uuid> and uncovered:<requirement>).
+ClaimId = Annotated[str, Field(min_length=1)]
 
 
 class DirectorPayload(PortModel):
@@ -162,7 +167,7 @@ class RequiredRepair(PortModel):
 
 class Objection(PortModel):
     finding_id: UUID
-    claim_id: UUID | None
+    claim_id: ClaimId | None
     requirement_id: str | None
     evidence_ids: list[UUID]
     rule_code: str
@@ -175,7 +180,7 @@ class Objection(PortModel):
 class CriticPayload(PortModel):
     review_revision_id: UUID
     objections: list[Objection]
-    accepted_claim_ids: list[UUID]
+    accepted_claim_ids: list[ClaimId]
     gate_recommendation: Literal["CLEAR", "CLEAR_WITH_LIMITATIONS", "REPAIR_REQUIRED", "NO_SUPPORTED_RECOMMENDATION"]
 
 
@@ -226,7 +231,7 @@ class VerificationPayload(PortModel):
 
 
 class ClaimAnnotation(PortModel):
-    claim_id: UUID
+    claim_id: ClaimId
     display_text: str
     evidence_ids: list[UUID]
     assumption_ids: list[UUID]

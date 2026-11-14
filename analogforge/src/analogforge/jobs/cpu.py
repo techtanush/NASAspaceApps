@@ -91,7 +91,9 @@ def run_science(
                 return ScienceComputationResult.model_validate(payload)
             if time.monotonic() >= deadline:
                 raise PersistenceError("TOOL_TIMEOUT", "Science CPU deadline exceeded")
-            if not process.is_alive():
+            # A child can send and exit between poll() and is_alive(). Its
+            # buffered result must be drained before treating exit as failure.
+            if not process.is_alive() and not parent.poll():
                 raise PersistenceError("SYSTEM", "Science subprocess exited without a result")
     finally:
         try:

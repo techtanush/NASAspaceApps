@@ -127,6 +127,47 @@ def test_earth_crs_rejected_for_planets() -> None:
         render_layer(layer(bad))
 
 
+@pytest.mark.parametrize("body,radius", [("MARS", 3396190), ("MOON", 1737400)])
+def test_unnamed_planetary_display_crs_is_named_without_changing_source_geometry(body, radius) -> None:
+    # The real MOLA derivative uses this canonical figure/projection with PROJ's unnamed identity fields.
+    source = CRS.from_proj4(f"+proj=eqc +lat_ts=0 +lon_0=180 +R={radius} +units=m +type=crs")
+    source_wkt = source.to_wkt()
+    source = CRS.from_wkt(source_wkt)
+    assert body.lower() not in source_wkt.lower()
+    grid = AnalysisGridSpec(body, source_wkt, -2500000.0, -300000.0, 500.0, 4, 4)
+    values = ramp(grid)
+    original = values.copy()
+    rendered = render_layer(layer(grid, values=values, support_scale_m=500, synthetic=False,
+                                  attribution=("Source citation/license",)))
+    draft = rendered.draft
+    assert body.lower() in draft.display_crs_wkt.lower()
+    display = CRS.from_wkt(draft.display_crs_wkt)
+    assert body.lower() in display.name.lower()
+    assert body.lower() in display.datum.name.lower()
+    assert display.ellipsoid.semi_major_metre == source.ellipsoid.semi_major_metre
+    assert display.ellipsoid.semi_minor_metre == source.ellipsoid.semi_minor_metre
+    assert display.prime_meridian == source.prime_meridian
+    assert display.coordinate_operation.to_json_dict() == source.coordinate_operation.to_json_dict()
+    assert display.coordinate_system.to_json_dict() == source.coordinate_system.to_json_dict()
+    assert grid.crs_wkt == source_wkt
+    assert np.array_equal(values, original)
+    upscale = draft.width_px // grid.width
+    assert draft.pixel_to_world == (-2500000.0, 500.0 / upscale, 0, -300000.0, 0, -500.0 / upscale)
+    source_inverse = Transformer.from_crs(source, source.geodetic_crs, always_xy=True)
+    display_inverse = Transformer.from_crs(display, display.geodetic_crs, always_xy=True)
+    for col, row in [(0, 0), (0.5, 0.5), (draft.width_px, draft.height_px)]:
+        x, y = apply_affine(draft.pixel_to_world, col, row)
+        np.testing.assert_allclose(display_inverse.transform(x, y), source_inverse.transform(x, y), rtol=0, atol=1e-12)
+
+
+@pytest.mark.parametrize("radius", [6378137, 3396000, 1737400])
+def test_planetary_display_naming_does_not_accept_a_wrong_numeric_figure(radius) -> None:
+    source = CRS.from_proj4(f"+proj=eqc +lat_ts=0 +lon_0=180 +R={radius} +units=m +type=crs")
+    grid = AnalysisGridSpec("MARS", source.to_wkt(), 0.0, 0.0, 500.0, 4, 4)
+    with pytest.raises(GeometryError):
+        render_layer(layer(grid))
+
+
 def test_nodata_is_transparent_not_zero_and_valid_is_opaque() -> None:
     g = planet_grid("MARS")
     v = ramp(g)

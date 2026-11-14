@@ -242,6 +242,9 @@ def test_validation_level_requires_the_correct_executed_receipt_kind_and_algorit
     assert audit(snapshot, [claim], receipts).publication == "BLOCKED"
     record = record.model_copy(update={"kind": "VERIFICATION", "algorithm_id": "verify-route"})
     snapshot = replace(snapshot, evidence={record.id: record})
+    # Correct evidence metadata alone is insufficient: its successful registered receipt must execute the verifier.
+    assert audit(snapshot, [claim], receipts).publication == "BLOCKED"
+    receipts = [receipts[0].model_copy(update={"tool_name": "verify_route"})]
     assert audit(snapshot, [claim], receipts).publication == "ALLOWED"
 
 

@@ -103,3 +103,11 @@ Repair (`c263d2a`, MERGE-31): consume opaque collection cursors, de-duplicate re
 Check the entity before altering an assertion or resetting the database. The original J12 created a Mars mission, then selected the first accepted item in `GET /missions`. On a persistent library that item can be an older Moon mission with five requirements. The app may correctly show AWAITING_DATASETS and disabled Start while the test's unrelated nine-row expectation fails.
 
 MERGE-32 (`5e08b80`) captures the exact 201 creation response, confirms that mission was accepted, and reopens its ID. All nine-row and unavailable-slot assertions remain. Preserve the failing DOM, verify the same older-Moon counterexample in real mode and the updated preview twice, then repeat the full affected real batch. No app behavior or scientific thresholds change.
+
+### Local fake Responses disconnects after model-context compaction
+
+Inspect the captured local server traceback when a fake Responses test ends in `TOOL_TIMEOUT`. In the 14 November live-validation run, `test_actual_provider_repair_candidate_and_strategy_drive_next_attempt` compared advertised wire aliases such as `~u6` with canonical UUIDs captured outside the callback. Its assertion closed the fake HTTP connection, so the bounded client correctly reported a transport failure. The real provider and completed NASA-data report were unaffected.
+
+The fake model callback must choose from the advertised request's ID namespace. The repaired test asserts two distinct permitted candidate IDs, checks that the repair-target list matches that wire catalog, and selects its second entry. After client decoding and publication, it checks the exact canonical candidate UUID and strategy in the run, saved attempt, role result and science request; the original failed attempt and frozen mission/rover hashes remain checked. Keep evidence authorization and canonical publication validators active.
+
+Run `tests/integration/platform/test_live_choices.py` and `test_live_rehearsal.py` through the isolated offline test profile, followed by the full merged gates. Preserve the original failure log. This repair changes only the test callback and its assertions; it does not change production behavior, scientific criteria or provider capacity.

@@ -26,6 +26,11 @@ from analogforge.ports.science_payloads import GateEvidence
 GATE_IDS = tuple(f"SC-{number:02}" for number in range(1, 16))
 PLATFORM_GATES = frozenset({"SC-01", "SC-12", "SC-14", "SC-15"})
 INTEGRITY_GATES = frozenset({"SC-01", "SC-02", "SC-09", "SC-14", "SC-15"})
+VALIDATION_EVIDENCE = {
+    "decoded_source": ({"SOURCE"}, {"ingest-local-dataset", "fetch-source", "decode-source"}, "fetch_dataset"),
+    "common_scale_comparison": ({"COMPARISON"}, {"compare-requirement"}, "compare_requirement"),
+    "independent_verification": ({"VERIFICATION"}, {"verify-route"}, "verify_route"),
+}
 
 
 def assurance_policy_digest(config_dir: Path | None = None) -> str:
@@ -87,7 +92,7 @@ class AuditSnapshot:
     critiques: tuple[CritiqueIssue, ...] = ()
     frozen_inputs_match: bool = True
     snapshot_is_current: bool = True
-    # Populated only by executed decoder/comparison/verifier receipts, never a role.
+    # Derived inside audit() from scoped successful registered receipts; caller-supplied maps have no authority.
     validation_receipts: Mapping[str, tuple[UUID, ...]] = field(default_factory=dict)
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
@@ -131,6 +136,42 @@ def restrict_rehearsal_claim(snapshot: AuditSnapshot, proposal: ClaimInput) -> C
                    limitations=tuple(dict.fromkeys((*proposal.limitations, "TEST HARNESS — not NASA data"))))
 
 
+def _registered_validation_receipts(
+    snapshot: AuditSnapshot, receipts: Sequence[ToolReceipt]
+) -> Mapping[str, tuple[UUID, ...]]:
+    confirmed: dict[str, set[UUID]] = {key: set() for key in VALIDATION_EVIDENCE}
+    for receipt in receipts:
+        if (receipt.status != "SUCCEEDED" or receipt.workspace_id != snapshot.workspace_id
+                or receipt.run_id != snapshot.run_id or receipt.mode != snapshot.mode):
+            continue
+        for evidence_id in receipt.evidence_ids:
+            record = snapshot.evidence.get(evidence_id)
+            if (record is None or record.workspace_id != snapshot.workspace_id or record.run_id != snapshot.run_id
+                    or record.mode != snapshot.mode):
+                continue
+            for key, (kinds, algorithms, tool_name) in VALIDATION_EVIDENCE.items():
+                if receipt.tool_name == tool_name and record.kind in kinds and record.algorithm_id in algorithms:
+                    confirmed[key].add(evidence_id)
+    return {key: tuple(sorted(values, key=str)) for key, values in confirmed.items()}
+
+
+def _claim_lineage(snapshot: AuditSnapshot, proposal: ClaimInput) -> set[UUID]:
+    """Only a claim's own registered evidence and ancestors can establish its validation level."""
+    pending = list(proposal.evidence_ids)
+    lineage: set[UUID] = set()
+    while pending:
+        evidence_id = pending.pop()
+        if evidence_id in lineage:
+            continue
+        record = snapshot.evidence.get(evidence_id)
+        if (record is None or record.workspace_id != snapshot.workspace_id or record.run_id != snapshot.run_id
+                or record.mode != snapshot.mode):
+            continue
+        lineage.add(evidence_id)
+        pending.extend(record.input_evidence_ids)
+    return lineage
+
+
 def _mode_and_level(snapshot: AuditSnapshot, proposal: ClaimInput) -> tuple[bool, str]:
     records = [
         snapshot.evidence[eid]
@@ -149,15 +190,11 @@ def _mode_and_level(snapshot: AuditSnapshot, proposal: ClaimInput) -> tuple[bool
     required = {"S2": "decoded_source", "S3": "common_scale_comparison", "S4": "independent_verification"}
     receipt_kind = required.get(proposal.validation_level)
     if receipt_kind is not None:
-        confirmed = snapshot.validation_receipts.get(receipt_kind, ())
+        lineage = _claim_lineage(snapshot, proposal)
+        confirmed = tuple(eid for eid in snapshot.validation_receipts.get(receipt_kind, ()) if eid in lineage)
         if not confirmed or not all(eid in snapshot.evidence for eid in confirmed):
             return False, f"No executed {receipt_kind} evidence supports {proposal.validation_level}."
-        expected = {
-            "decoded_source": ({"SOURCE"}, {"ingest-local-dataset", "fetch-source", "decode-source"}),
-            "common_scale_comparison": ({"COMPARISON"}, {"compare-requirement"}),
-            "independent_verification": ({"VERIFICATION"}, {"verify-route"}),
-        }
-        kinds, algorithms = expected[receipt_kind]
+        kinds, algorithms, _ = VALIDATION_EVIDENCE[receipt_kind]
         for evidence_id in confirmed:
             record = snapshot.evidence[evidence_id]
             if (
@@ -201,6 +238,7 @@ def audit(
         raise ScientificClaimRejected(["CLAIM_SET_EMPTY"])
     if len({c.claim_id for c in claims}) != len(claims):
         raise ScientificClaimRejected(["CLAIM_ID_DUPLICATE"])
+    snapshot = replace(snapshot, validation_receipts=_registered_validation_receipts(snapshot, receipts))
     successful = {
         eid
         for receipt in receipts
@@ -467,10 +505,6 @@ def audit_registered_claim(
         evidence=evidence,
         frozen_inputs_match=runtime.get("mission_content_sha256") == mission["content_sha256"]
         and runtime.get("rover_content_sha256") == (rover["content_sha256"] if rover else None),
-        validation_receipts={
-            key: tuple(UUID(value) for value in values)
-            for key, values in runtime.get("validation_receipts", {}).items()
-        },
     )
     claim = ClaimInput(
         claim_id=f"q:{record['id']}",

@@ -166,9 +166,11 @@ def test_actual_provider_repair_candidate_and_strategy_drive_next_attempt(runtim
         changed = deepcopy(submission)
         if task["role_key"] == "verification_replanning":
             choices = task["payload"]["allowed_choices"]
-            assert choices["repair_target_revision_ids"]["NEW_CANDIDATE"] == [c["id"] for c in candidates[1:]]
+            eligible = choices["candidate_revision_ids"]
+            assert len(eligible) == len(set(eligible)) == 2
+            assert choices["repair_target_revision_ids"]["NEW_CANDIDATE"] == eligible
             changed["payload"]["repair"].update(
-                kind="NEW_CANDIDATE", target_revision_ids=[candidates[2]["id"]], strategy="MINIMUM_FEASIBLE_ROUTE"
+                kind="NEW_CANDIDATE", target_revision_ids=[eligible[1]], strategy="MINIMUM_FEASIBLE_ROUTE"
             )
         return changed
 
@@ -198,4 +200,6 @@ def test_actual_provider_repair_candidate_and_strategy_drive_next_attempt(runtim
         assert tx.require("test_results", failed_result["id"])["outcome"] == "FAIL"
         decisions = tx.list("role_results", {"run_id": run["id"], "role": "verification_replanning"})
         assert decisions[0]["payload"]["payload"]["repair"]["kind"] == "NEW_CANDIDATE"
+        assert decisions[0]["payload"]["payload"]["repair"]["target_revision_ids"] == [candidates[2]["id"]]
+        assert decisions[0]["payload"]["payload"]["repair"]["strategy"] == "MINIMUM_FEASIBLE_ROUTE"
     assert str(computed[1].candidate.candidate_id) == candidates[2]["id"]
