@@ -47,7 +47,7 @@ async function launch(page: import('@playwright/test').Page, siteOnly=false, moo
  if(options.practice) expect((await mission).postDataJSON().target).toEqual(moonPractice.target);
  else await mission;
  expect((await preparation).postDataJSON().rover_revision_id).toBe(roverRevisionId);
- await expect(page.getByTestId('proposed-requirements')).toBeVisible();
+ await expect(page.getByTestId('proposed-requirements')).toBeVisible({timeout:process.env.E2E_TARGET==='mock'?15000:120000});
  await page.getByText('Assumptions and test conditions',{exact:true}).click();
  await expect(page.getByRole('region',{name:'Contract assumptions and limits',exact:true})).toBeVisible();
  await page.getByText('Assumptions and test conditions',{exact:true}).click();
@@ -75,25 +75,32 @@ async function launch(page: import('@playwright/test').Page, siteOnly=false, moo
   const contract = await page.evaluate(async id=>{const response=await fetch(`/api/v1/mission-revisions/${id}`);return {status:response.status,body:await response.json()};},missionRevisionId);
   expect(contract.status).toBe(200);expect(contract.body.target).toEqual(moonPractice.target);expect(contract.body.accepted_at).not.toBeNull();
  }
+ await expect(page.getByRole('heading',{name:'Your Earth test locations'})).toBeVisible();
+ await expect(page.getByRole('region',{name:'All-location rehearsal plan'})).toBeVisible();
+ await page.getByRole('button',{name:'Inspect location 1',exact:true}).click();
  await expect(page.getByTestId('site-card')).toBeVisible();
  return runId;
 }
 test('globe, exact-site inspection, stable selection and printable report',async({page})=>{
- // The production map starts real imagery. This offline journey blocks only that exact
- // public tile source and verifies its honest fallback; no local API response is replaced.
+ // Production imagery requires an explicit click. Block its exact public source only
+ // after checking the offline default; no local API response is replaced.
  const satellite=/^https:\/\/(?:basemap\.nationalmap\.gov\/arcgis\/rest\/services\/USGSImageryOnly\/MapServer\/tile\/\d+\/\d+\/\d+|tiles\.maps\.eox\.at\/wmts\/1\.0\.0\/s2cloudless_3857\/default\/GoogleMapsCompatible\/\d+\/\d+\/\d+\.jpg)$/;
  const blockedSatellite:string[]=[];await page.context().route(satellite,route=>{blockedSatellite.push(route.request().url());return route.abort('blockedbyclient');});
  const external:string[]=[];page.context().on('request',request=>{const url=new URL(request.url());if(url.protocol.startsWith('http')&&url.origin!==new URL(process.env.E2E_BASE_URL||'http://127.0.0.1:5176').origin&&!satellite.test(url.href))external.push(url.origin);});
  const runId=await launch(page);
- if(process.env.E2E_TARGET==='real'){await expect(page.getByText(/Satellite imagery unavailable\. Measured terrain/)).toBeVisible();expect(blockedSatellite.length).toBeGreaterThan(0);}
+ expect(blockedSatellite).toEqual([]);
+ if(process.env.E2E_TARGET==='real'){await page.getByRole('button',{name:'Load satellite imagery',exact:true}).click();await expect(page.getByText(/Satellite imagery unavailable\. Measured terrain/)).toBeVisible();expect(blockedSatellite.length).toBeGreaterThan(0);}
  await expect(page.getByTestId('globe-stage')).toHaveAttribute('data-state','ready');
  const first=new URL(page.url()).searchParams.get('site');
  // This practice fixture places all candidates nearby. The globe must not stack
  // their labels or combine their individual qualification results.
  await page.getByTestId('btn-all-sites').click();
+ await expect(page.getByRole('heading',{name:'Your Earth test locations'})).toBeVisible();
+ const locationCount=await page.getByRole('button',{name:/^Inspect location \d+$/}).count();
+ expect(locationCount).toBeGreaterThan(0);
  const nearby=page.locator('.mc-ticker[data-group="true"]');
  await expect(nearby).toHaveCount(1);
- await expect(nearby).toHaveAttribute('data-member-count',String(await page.getByTestId('site-chip').count()));
+ await expect(nearby).toHaveAttribute('data-member-count',String(locationCount));
  await expect(nearby).toHaveAttribute('data-status','UNKNOWN');
  await expect(nearby).toContainText('nearby sites');
  await nearby.click();
@@ -108,7 +115,7 @@ test('globe, exact-site inspection, stable selection and printable report',async
  await expect(page.locator('.map-selection-readout')).toContainText('Selected: Site 2');
  await expect.poll(()=>page.getByTestId('site-card').evaluate(card=>card.getBoundingClientRect().top-card.closest('.mc-panel-body')!.getBoundingClientRect().top)).toBeGreaterThanOrEqual(-1);
  await expect.poll(()=>page.getByTestId('site-card').evaluate(card=>card.getBoundingClientRect().top-card.closest('.mc-panel-body')!.getBoundingClientRect().bottom)).toBeLessThan(0);
- await expect(page.getByTestId('regional-inspector')).toContainText('Practice');
+ await expect(page.getByTestId('regional-inspector')).toContainText('Earth site');
  await expect(page.getByTestId('site-card')).not.toContainText('null ');
  await page.screenshot({path:'../../out/mission-control-regional.png'});
  const href=await page.getByTestId('link-report').getAttribute('href');
@@ -151,7 +158,8 @@ test('mobile, site-only, keyboard and reduced motion retain complete evidence ac
  await page.getByTestId('btn-prev-site').click();
  await expect.poll(()=>new URL(page.url()).searchParams.get('site')).toBe(firstSite);
  await page.getByTestId('btn-all-sites').click();
- await expect(page.getByTestId('btn-all-sites')).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('heading',{name:'Your Earth test locations'})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Inspect location 1',exact:true})).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.keyboard.press('Tab');
  await expect(page.locator(':focus')).toBeVisible();

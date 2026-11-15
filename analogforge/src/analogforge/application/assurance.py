@@ -74,6 +74,7 @@ class ClaimInput:
     nominal_model: bool = False
     current_row_matches: bool = True
     policy_is_pinned: bool = True
+    requirement_label: str | None = None
 
 
 @dataclass(frozen=True)
@@ -108,8 +109,10 @@ def _statement(proposal: ClaimInput, disposition: str) -> str:
 
 
 def _ordinary_statement(proposal: ClaimInput, disposition: str) -> str:
-    subject = proposal.requirement_id or proposal.claim_id
-    scope = proposal.scope
+    subject = proposal.requirement_label or (
+        'the accepted mission criterion' if proposal.requirement_id
+        else 'the modeled rover route' if proposal.claim_type == 'VERIFICATION' else 'this evidence claim')
+    scope = {'terrain_model': 'the modeled terrain comparison'}.get(proposal.scope, proposal.scope.replace('_', ' '))
     if disposition == "REJECTED":
         return f"No publishable conclusion for {subject}: claim integrity checks failed."
     if proposal.qualification_status == "GAP":
@@ -118,9 +121,11 @@ def _ordinary_statement(proposal: ClaimInput, disposition: str) -> str:
         return f"No supported decision for {subject}; evidence or search is incomplete ({scope})."
     if proposal.claim_type == "DISCOVERY":
         return f"Candidate identified within the declared search and reference-list scope ({scope})."
-    result = proposal.verification_status or proposal.qualification_status or "context recorded"
+    result = {'PASS': 'meets its accepted checks', 'FAIL': 'does not meet its accepted checks',
+              'PARTIAL': 'has partial supporting evidence'}.get(
+                  proposal.verification_status or proposal.qualification_status or '', 'has recorded context')
     prefix = "Under the accepted nominal model" if disposition == "LIMITED" else "Under the accepted assumptions"
-    return f"{prefix}, {subject} has outcome {result} within {scope}."
+    return f"{prefix}, {subject} {result} within {scope}."
 
 
 def _is_rehearsal(snapshot: AuditSnapshot) -> bool:

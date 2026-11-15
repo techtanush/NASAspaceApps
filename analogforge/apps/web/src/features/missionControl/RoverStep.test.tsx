@@ -7,6 +7,8 @@ import type { components } from '../../generated/schema';
 import rover from '../../../../../tests/fixtures/kit/rovers/ares-1.json';
 import { fetchRoverProfiles } from '../rovers/roverProfiles';
 import { RoverStep } from './RoverStep';
+import { api } from '../../api/client';
+import example from '../../../../../config/presets/rovers/ares-1.json';
 
 const update = vi.hoisted(() => vi.fn());
 vi.mock('../../app/WorkspaceContext', () => ({ useWorkspace: () => 'workspace' }));
@@ -14,6 +16,20 @@ vi.mock('../rovers/roverProfiles', () => ({ fetchRoverProfiles: vi.fn() }));
 vi.mock('../rovers/RoverEditor', () => ({ RoverEditor: () => null }));
 vi.mock('./state', () => ({ useMissionControl: () => ({ plan: { confirmed: true, lat: 0, lng: 0, body: 'MARS', objective: 'Traverse', noRover: false, roverRevisionId: null }, update, box: { ok: true, bbox: [0, 0, 1, 1] } }) }));
 vi.mock('./StageShell', () => ({ useScene: () => {}, Guide: ({ children }: { children: ReactNode }) => <p>{children}</p>, Panel: ({ children, footer }: { children: ReactNode; footer: ReactNode }) => <main>{children}{footer}</main> }));
+
+it('offers the documented example on a fresh workspace without silently creating a rover', async () => {
+  vi.mocked(fetchRoverProfiles).mockResolvedValue({items:[],next_cursor:null});
+  const save=vi.spyOn(api,'post').mockResolvedValue({...rover,id:'saved-example',name:example.name});
+  const cache = new QueryClient({defaultOptions:{queries:{retry:false}}});
+  render(<QueryClientProvider client={cache}><MemoryRouter><RoverStep/></MemoryRouter></QueryClientProvider>);
+  const button=await screen.findByRole('button',{name:'Use ARES-1 example rover'});
+  expect(save).not.toHaveBeenCalled();expect(screen.getByText(/documented illustrative specifications/)).toBeVisible();
+  fireEvent.click(button);
+  await screen.findByRole('button',{name:'Use ARES-1 example rover'});
+  expect(save).toHaveBeenCalledWith('/rovers',example,expect.any(Object));
+  expect(update).toHaveBeenCalledWith({roverRevisionId:'saved-example',roverName:'ARES-1',noRover:false});
+  save.mockRestore();
+});
 
 it('distinguishes independent same-name rovers and selects their exact latest revisions', async () => {
   const profile = (id: string, roverId: string, revision: number, name = 'ARES-1') => ({ ...rover, id, rover_id: roverId, workspace_id: 'workspace', revision, name, created_at: '2026-11-14T00:00:00Z' }) as components['schemas']['RoverProfile'];

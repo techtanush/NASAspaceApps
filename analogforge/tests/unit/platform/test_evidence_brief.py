@@ -68,7 +68,7 @@ def test_actual_pdf_retains_failure_exact_value_missing_work_and_scope(projectio
     # Both reader levels must precede the auditable appendix without turning missing work into success.
     assert (extracted.index("Executive summary") < extracted.index("Simplified overview")
             < extracted.index("Technical details\n"))
-    assert "0 PASS; 1 FAIL; 1 UNKNOWN; 0 GAP" in extracted
+    assert "0 met; 1 unmet; 0 partly met; 1 need evidence; 0 Earth limitations" in extracted
     assert "Technical terminology" in extracted and "Wasserstein-1" in extracted
     assert "How this location was found" in extracted and "Location test plan" in extracted
     assert "Start / finish: not established" in extracted and "hardware reliability" in extracted

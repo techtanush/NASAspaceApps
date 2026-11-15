@@ -2,7 +2,7 @@ import { useRunAssurance } from './useRunAssurance';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { Button, ErrorPanel, ModeBadge, Skeleton, PublicationBadge } from '../../components/ui';
 import { useRunData } from './useRunData';
-import { buildSites } from './tour';
+import { buildSites, siteName } from './tour';
 import { BenchmarkEvidence } from './BenchmarkEvidence';
 import { EnvironmentContext } from './EnvironmentContext';
 import { formatPlace } from './coordinates';
@@ -24,7 +24,7 @@ export function ReportPage() {
   const changePresentation = (next: boolean) => setSearch(current => { if (next) current.set('detail', 'technical'); else current.delete('detail'); return current; }, { replace: true });
   return <article className="mc-report" data-theme="light" data-testid="site-report">
     <nav className="mc-report-actions" aria-label="Report actions"><Link to={`/runs/${runId}/tour?site=${site.candidate.id}`}>Back to location</Link><EvidenceBriefDownload key={site.candidate.id} run={snapshot} candidateId={site.candidate.id}/><EvidenceBriefDownload key={`all-${site.candidate.id}`} run={snapshot} candidateId={site.candidate.id} allLocations/><Button variant="ghost" onClick={() => window.print()}>Print this page</Button></nav>
-    <header className="mc-report-heading"><p className="mc-eyebrow">AnalogForge · current evidence brief</p><h1 tabIndex={-1}>{site.candidate.name}</h1><p className="mc-report-mission">{contract.name}</p><p>{formatPlace(site.lat, site.lng)} · Location {site.index} · <ModeBadge mode={snapshot.mode}/></p></header>
+    <header className="mc-report-heading"><p className="mc-eyebrow">AnalogForge · current evidence brief</p><h1 tabIndex={-1}>{siteName(site)}</h1><p className="mc-report-mission">{contract.name}</p><p>{formatPlace(site.lat, site.lng)} · Location {site.index} · <ModeBadge mode={snapshot.mode}/></p></header>
     <RunTerminalNotice run={snapshot}/>
     {presentationAvailable && <ResultPresentation technical={technical} onChange={changePresentation}/>}
     <p className="mc-report-scope">Current evidence at run revision {snapshot.revision}. This brief is not an immutable published passport. It covers the terrain data and candidate windows screened by this investigation.</p>

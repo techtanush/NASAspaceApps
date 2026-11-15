@@ -12,7 +12,8 @@ type RoutePlan = {
   assumptions: string[];
 };
 export type FieldPlan = { run_id: string; run_revision: number; candidate_id: string; center: Position; bbox: number[];
-  route: RoutePlan | null; route_note: string; field_readiness: string; steps: string[]; screened_count: number | null; dataset_lock_id: string | null };
+  route: RoutePlan | null; route_note: string; field_readiness: string; steps: string[]; screened_count: number | null; dataset_lock_id: string | null;
+  tests?: {requirement_id:string;label:string;focus:string;method:string;record:string}[] };
 const place = ([lon, lat]: Position) => formatPlace(lat, lon);
 export function SiteFieldPlan({ runId, candidateId, revision }: { runId: string; candidateId: string; revision: number }) {
   const workspace = useWorkspace();
@@ -36,15 +37,16 @@ export function SiteFieldPlan({ runId, candidateId, revision }: { runId: string;
     <p>The accepted mission criteria were compared with registered terrain observations in {plan.screened_count == null ? 'the acquired candidate windows' : `${plan.screened_count} screened windows`}. The benchmarks below show exactly which conditions this site matches. This is a regional search.</p>
     <p className="mc-eyebrow">02 · Where to test</p><h2>Start, checkpoints and finish</h2>
     <p>{plan.route_note}</p><div className="mc-field-coordinates"><span>Assessed region centre</span><strong>{place(plan.center)}</strong><small>Reference coordinate · not an approved starting point</small></div>
-    <figure className="mc-field-route"><svg viewBox="0 0 500 300" role="img" aria-label={route ? 'Computed raster route within the assessed Earth region; not a surveyed field corridor' : 'Assessed Earth region and reference centre; no route computed'}>
+    {route && <figure className="mc-field-route"><svg viewBox="0 0 500 300" role="img" aria-label="Computed raster route within the assessed Earth region; not a surveyed field corridor">
       <rect x={(500 - width) / 2} y="24" width={width} height={height} fill="var(--surface-2)" stroke="var(--accent)"/>
       {route ? <><path d={route.coordinates.map((point, i) => `${i ? 'L' : 'M'} ${plot(point).join(' ')}`).join(' ')} fill="none" stroke="var(--accent)" strokeWidth="2"/>{route.checkpoints.map((item, i) => { const [x, y] = plot(item.position); return <g key={item.id}><circle cx={x} cy={y} r="4" fill="var(--text-primary)"/><text x={x + 7} y={y - 7}>{i + 1}</text></g>; })}</> : <circle cx={plot(plan.center)[0]} cy={plot(plan.center)[1]} r="4" fill="var(--accent)"/>}
-    </svg><figcaption>North up · WGS84 coordinate schematic. Outline: assessed region. {route ? `Line: stored ${route.support_scale_m ?? 'unknown'} m raster route.` : 'Dot: region centre.'} No field clearance is implied.</figcaption></figure>
+    </svg><figcaption>North up · WGS84 coordinate schematic. Outline: assessed region. Line: stored {route.support_scale_m ?? 'unknown'} m raster route. No field clearance is implied.</figcaption></figure>}
     {route ? <><dl className="mc-field-endpoints"><dt>Start</dt><dd>{place(route.start)}</dd><dt>Finish</dt><dd>{place(route.finish)}{route.start.every((v, i) => v === route.finish[i]) && ' · return loop'}</dd></dl>
       <ol className="mc-field-stops">{route.checkpoints.map(item => <li key={item.id}><strong>{item.id} · {place(item.position)}</strong><p>{item.activity.toLowerCase()} · {item.capability?.replaceAll('_', ' ') ?? 'capability unspecified'} · dwell {item.dwell_s} s · tolerance {item.tolerance_m} m</p><small>{item.requirement_ids.length ? `Criteria: ${item.requirement_ids.join(', ')}` : 'No accepted mission criterion assigned to this checkpoint.'}</small></li>)}</ol>
       <details><summary>Route design assumptions</summary>{route.assumptions.map((line, i) => <p key={i}>{line}</p>)}</details>
       <p><Link to={`/runs/${runId}/test-lab`}>Inspect modeled route checks and telemetry</Link></p></> : <p><strong>Start and finish are not established.</strong> Survey this site, select endpoints and compute an independently verified route before planning a drive.</p>}
     <details className="mc-field-sequence"><summary>Field procedure and observations to collect</summary><ol>{plan.steps.map(step => <li key={step}>{step}</li>)}</ol></details>
+    {plan.tests && <details className="mc-field-sequence"><summary>How to test each accepted requirement</summary>{plan.tests.map(test => <section key={test.requirement_id}><h3>{test.focus}</h3><p>{test.label}</p><p>{test.method}</p><p className="helper">Record: {test.record}</p></section>)}</details>}
     <p className="mc-field-readiness">{plan.field_readiness}</p>
     <p>Terrain matching checks site suitability. Hardware acceptance needs a separately specified rover test; Earth testing does not assure Mars or Moon mission success.</p>
     <p className="mc-eyebrow">03 · What to test and the benchmark to meet</p>

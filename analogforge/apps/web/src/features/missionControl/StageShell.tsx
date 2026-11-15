@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { MotionConfig, motion, useReducedMotion } from 'motion/react';
@@ -30,7 +30,7 @@ function Stage() {
   return <div className="mc" data-theme="dark" data-testid="mission-control" data-layout={scene.layout ?? 'center'}>
     <GlobeStage scene={scene} onPick={handlers.onPick} onMarkerSelect={handlers.onMarkerSelect} onSurfaceDetail={openSurfaceDetail}/>
     <header className="mc-header"><Link to="/" className="wordmark"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" fill="none"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>AnalogForge</Link>
-      <div className="mc-workspace-context" aria-label="Workspace context"><span>{session?.authMode==='local'?'Local workspace':'Workspace'}</span>{session&&<strong>{session.role.charAt(0)+session.role.slice(1).toLowerCase()}</strong>}</div><nav className="mc-header-links" aria-label="Other views"><Link to="/workbench">Evidence workbench</Link><Link to="/rovers">Rovers</Link><Link to="/about">About</Link></nav></header>
+      {session?.authMode !== 'local' && <div className="mc-workspace-context" aria-label="Workspace context"><span>Workspace</span>{session&&<strong>{session.role.charAt(0)+session.role.slice(1).toLowerCase()}</strong>}</div>}<nav className="mc-header-links" aria-label="Other views"><Link to="/workbench">Evidence workbench</Link><Link to="/rovers">Rovers</Link><Link to="/about">About</Link></nav></header>
     <div className="mc-content" data-regional={/view=(regional|target)/.test(location.search) ? 'true' : 'false'}><Outlet/></div>
     {step && <StepRail current={step}/>}
   </div>;
@@ -45,10 +45,20 @@ export function useScene(scene: GlobeScene, handlers: { onPick?: (lat: number, l
 export function Panel({ title, step, lead, children, footer, notice, testid }: { title: string; step?: string; lead?: ReactNode; children: ReactNode; footer?: ReactNode; notice?: ReactNode; testid?: string }) {
   const reducedMotion = useReducedMotion();
   const body = useRef<HTMLDivElement>(null); const hasNotice = Boolean(notice);
+  const [more, setMore] = useState(false);
+  useEffect(() => {
+    const element = body.current; if (!element) return;
+    const update = () => setMore(element.scrollHeight - element.scrollTop - element.clientHeight > 20);
+    update(); element.addEventListener('scroll', update, { passive: true });
+    const resize = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
+    resize?.observe(element); for (const child of element.children) resize?.observe(child);
+    return () => { element.removeEventListener('scroll', update); resize?.disconnect(); };
+  }, [children]);
   useEffect(() => { if (hasNotice) body.current?.scrollTo({ top: 0, behavior: 'instant' }); }, [hasNotice]);
   return <motion.section className="mc-panel panel" data-theme="light" data-testid={testid} aria-labelledby="mc-panel-title" initial={reducedMotion ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reducedMotion ? 0 : .22, ease: [.22, 1, .36, 1] }}>
     <header className="mc-panel-head">{step && <p className="mc-eyebrow">{step}</p>}<h1 id="mc-panel-title" tabIndex={-1}>{title}</h1>{lead && <p className="mc-lead">{lead}</p>}</header>
-    <div className="mc-panel-body" ref={body}>{notice && <div className="mc-panel-notice">{notice}</div>}{children}</div>
+    <div className="mc-panel-body" ref={body} tabIndex={0} aria-label="Scroll for more mission details">{notice && <div className="mc-panel-notice">{notice}</div>}{children}</div>
+    {more && <p className="mc-scroll-cue">More details below · scroll this panel ↓</p>}
     {footer && <footer className="mc-panel-foot">{footer}</footer>}
   </motion.section>;
 }

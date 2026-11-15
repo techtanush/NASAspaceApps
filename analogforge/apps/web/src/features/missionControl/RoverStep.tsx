@@ -12,6 +12,7 @@ import { parseRoverImport, type RoverValidationIssue } from '../rovers/validatio
 import { Guide, Panel, useScene } from './StageShell';
 import { useMissionControl } from './state';
 import { BoundOperatorContext } from '../operatorContext/BoundOperatorContext';
+import exampleRover from '../../../../../config/presets/rovers/ares-1.json';
 
 type Rover = components['schemas']['RoverProfile'];
 const SPECS: { key: keyof Rover; label: string; unit: string }[] = [
@@ -39,10 +40,19 @@ export function RoverStep() {
     catch (cause) { setError(cause); } finally { setSaving(false); }
   };
   const list = latestRevisions(rovers.data?.items ?? []); const chosen = plan.noRover || plan.roverRevisionId !== null;
+  const useExample = async () => {
+    setSaving(true); setError(null);
+    try {
+      const saved = await api.post<Rover>('/rovers', exampleRover, { recover: () => api.get('/rovers') });
+      await cache.invalidateQueries({ queryKey: ['workspace', workspace, 'mc-rovers'] });
+      update({ roverRevisionId: saved.id, roverName: saved.name, noRover: false });
+    } catch (cause) { setError(cause); } finally { setSaving(false); }
+  };
   const nameCounts = new Map<string, number>(); for (const rover of list) nameCounts.set(rover.name, (nameCounts.get(rover.name) ?? 0) + 1);
   return <Panel testid="rover-step" step="Step 3 of 4" title="Which rover?" lead="Choose the rover to test, add one, or qualify the site without a rover."
     footer={<><Button variant="ghost" onClick={() => navigate('/start/mission')}><ArrowLeft size={16} aria-hidden="true"/>Back</Button><Button variant="primary" data-testid="btn-rover-continue" disabled={!chosen || saving || contextPending} disabledReason="Choose a rover or the site-only option, and finish saving any supporting context." onClick={() => navigate('/start/review')}>Continue<ArrowRight size={16} aria-hidden="true"/></Button></>}>
     <Guide>The rover’s limits set the benchmark. Every result is tied to this exact rover revision.</Guide>
+    {!rovers.isPending && !rovers.error && list.length === 0 && <section className="mc-example-rover" aria-label="Start with an example rover"><h2>No saved rovers yet</h2><p>Build your own profile below, or try ARES-1 with its documented illustrative specifications. Its energy model is assumed, not calibrated; this is not your rover’s measured performance.</p><Button variant="secondary" disabled={saving} onClick={() => { void useExample(); }}>{saving ? 'Saving example rover…' : 'Use ARES-1 example rover'}</Button></section>}
     {rovers.isPending ? <Skeleton label="Retrieving saved rovers"/> : rovers.error ? <ErrorPanel error={rovers.error} onRetry={() => { void rovers.refetch(); }}/> :
       <ul className="mc-rovers" data-testid="rover-options">{list.map(rover => { const selected = plan.roverRevisionId === rover.id; return <li key={rover.id}><button type="button" className="mc-rover" data-testid="rover-option" data-rover={rover.name} data-rover-id={rover.rover_id} data-rover-revision-id={rover.id} aria-pressed={selected} onClick={() => update({ roverRevisionId: rover.id, roverName: rover.name, noRover: false })}>
         <span className="mc-rover-head"><strong>{rover.name}</strong><span className="revision-badge">rev {rover.revision}</span>{selected && <Check size={16} aria-hidden="true"/>}</span>
