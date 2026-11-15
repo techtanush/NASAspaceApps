@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "body": {
+      "type": "string",
+      "enum": [
+        "EARTH",
+        "MARS",
+        "MOON"
+      ]
+    },
+    "bbox": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "scenario_config_id": {
+      "type": "string"
+    },
+    "dataset_lock_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "state": {
+      "enum": [
+        "COVERED",
+        "PARTIAL",
+        "NONE",
+        "UNKNOWN"
+      ]
+    },
+    "basis": {
+      "enum": [
+        "VALIDATED_FOOTPRINT",
+        "VALID_MASK",
+        "UNAVAILABLE"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "datasets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string",
+            "enum": [
+              "EARTH",
+              "MARS",
+              "MOON"
+            ]
+          },
+          "bbox": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "validated": {
+            "const": true
+          },
+          "eligible_for_scenario": {
+            "type": "boolean"
+          },
+          "native_resolution_m": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "comparison_support_m": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "body",
+          "bbox",
+          "validated",
+          "eligible_for_scenario",
+          "native_resolution_m",
+          "comparison_support_m"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "body",
+    "bbox",
+    "scenario_config_id",
+    "dataset_lock_id",
+    "state",
+    "basis",
+    "reason",
+    "datasets"
+  ]
+}

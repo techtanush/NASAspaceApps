@@ -73,6 +73,11 @@ def _parser() -> argparse.ArgumentParser:
     bind.add_argument("--policy-id")
     export = sub.add_parser("export-openapi")
     export.add_argument("--out", type=Path, required=True)
+    export.add_argument("--include-visualization", action="store_true")
+    visualization = sub.add_parser("visualization")
+    visualization_sub = visualization.add_subparsers(dest="visualization_action", required=True)
+    prepare_coverage = visualization_sub.add_parser("prepare-coverage")
+    prepare_coverage.add_argument("--dataset-lock", required=True)
     sub.add_parser("science-check")
     sub.add_parser("assurance-selftest")
     return parser
@@ -299,11 +304,20 @@ def _run(args: argparse.Namespace, settings: Settings) -> dict[str, Any]:
         if args.scenario_action == "show":
             return {"id": args.scenario_id, **get_scenarios(settings)[args.scenario_id]}
         return _bind(settings, args)
+    if args.command == "visualization":
+        from analogforge.application.visualization_coverage import prepare_visualization_coverage
+
+        return prepare_visualization_coverage(settings, args.dataset_lock)
     if args.command == "export-openapi":
-        from analogforge.main import app
+        from analogforge.api.contracts import specification
 
         args.out.parent.mkdir(parents=True, exist_ok=True)
-        args.out.write_text(json.dumps(app.openapi(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        document = specification()
+        if args.include_visualization:
+            from analogforge.api.visualization_contracts import effective_specification
+
+            document = effective_specification()
+        args.out.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         return {"status": "PASS", "out": str(args.out)}
     if args.command == "science-check":
         from analogforge.application.preflight import _science_check

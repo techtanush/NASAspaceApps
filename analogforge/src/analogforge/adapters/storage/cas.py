@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import os
 import re
+import stat
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -116,6 +117,33 @@ class ContentAddressedStore:
             content = target.read_bytes()
         except FileNotFoundError as exc:
             raise PersistenceError("SOURCE_UNAVAILABLE", "Referenced artifact bytes are unavailable") from exc
+        if hashlib.sha256(content).hexdigest() != sha256:
+            raise PersistenceError("SOURCE_CHECKSUM_MISMATCH", "Stored artifact integrity check failed")
+        return content
+
+    def read_limited(self, sha256: str, max_bytes: int) -> bytes:
+        """Bound allocation before reading a display/JSON artifact, including a replaced or growing file."""
+        if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes <= 0:
+            raise ValueError("A positive integer artifact read budget is required")
+        limit = min(max_bytes, self.max_bytes)
+        target = self.path(sha256)
+        try:
+            descriptor = os.open(target, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) | os.O_NONBLOCK)
+            with os.fdopen(descriptor, "rb") as source:
+                metadata = os.fstat(source.fileno())
+                if not stat.S_ISREG(metadata.st_mode):
+                    raise PersistenceError("SOURCE_CONTENT_INVALID", "Artifact must be a regular file")
+                if metadata.st_size > limit:
+                    raise PersistenceError("RESOURCE_LIMIT", "Artifact exceeds display read budget")
+                content = source.read(limit + 1)
+                if len(content) > limit:
+                    raise PersistenceError("RESOURCE_LIMIT", "Artifact exceeds display read budget")
+                if len(content) != metadata.st_size:
+                    raise PersistenceError("SOURCE_CONTENT_INVALID", "Artifact changed while being read")
+        except FileNotFoundError as exc:
+            raise PersistenceError("SOURCE_UNAVAILABLE", "Referenced artifact bytes are unavailable") from exc
+        except OSError as exc:
+            raise PersistenceError("SOURCE_CONTENT_INVALID", "Artifact bytes cannot be read safely") from exc
         if hashlib.sha256(content).hexdigest() != sha256:
             raise PersistenceError("SOURCE_CHECKSUM_MISMATCH", "Stored artifact integrity check failed")
         return content

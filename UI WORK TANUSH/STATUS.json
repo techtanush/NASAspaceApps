@@ -1,25 +1,61 @@
 {
   "owner": "Tanush",
   "branch": "tanush/platform-agents-integration",
-  "status": "HANDOFF_READY_IMPLEMENTATION_INCOMPLETE",
-  "common_handoff_sha": null,
+  "status": "BACKEND_DELIVERY_READY_FRONTEND_INTEGRATION_PENDING",
+  "common_handoff_sha": "52f41e58091a735527ef819beb4bdfb7bb6d1ed9",
   "betterui_source": "fc5e084c8b4e9e895604ba4be85e78fe2864fe7c",
   "tasks": {
-    "T0": "NOT_STARTED_IN_THIS_ROUND",
-    "T1": "NOT_STARTED_IN_THIS_ROUND",
-    "T2": "NOT_STARTED_IN_THIS_ROUND",
-    "T3": "NOT_STARTED_IN_THIS_ROUND",
-    "T4": "NOT_STARTED_IN_THIS_ROUND",
-    "T5": "NOT_STARTED_IN_THIS_ROUND"
+    "T0": "PASS_ADDITIVE_CORE_UNCHANGED",
+    "T1": "DELIVERED_NATIVE_MARS_RESOLUTION_LIMIT_DISCLOSED",
+    "T2": "REGISTERED_EARTH_MARS_REGIONAL_DISPLAYS_VERIFIED",
+    "T3": "PASS_VALIDATED_FOOTPRINT_ONLY",
+    "T4": "PASS_EXACT_REGISTERED_COMPARISONS",
+    "T5": "PASS_BACKEND_SCOPE"
   },
-  "delivered_schema_version": "planning-v1",
-  "runtime_endpoints_added": [],
-  "tests_executed_by_contributor": [],
-  "limitations": [
-    "Claude partial implementation inherited; new UI not merge-ready",
-    "Optional proposed API features not implemented by handoff",
-    "Global texture zoom does not increase scientific resolution"
+  "delivered_schema_version": "1.0",
+  "runtime_endpoints_added": [
+    "/api/v1/visualization/capabilities",
+    "/api/v1/visualization/openapi.json",
+    "/api/v1/visualization/coverage",
+    "/api/v1/runs/{run_id}/visualization/target",
+    "/api/v1/runs/{run_id}/visualization/candidates/{candidate_id}",
+    "/api/v1/runs/{run_id}/visualization/candidates/{candidate_id}/benchmarks"
   ],
-  "next_action": "Read local README and shared contract, record common base, begin ordered tasks",
-  "common_handoff_ref": "refs/tags/ui-split-base-20261114"
+  "tests_executed_by_contributor": [
+    {
+      "suite": "platform_real_science_and_renderer",
+      "tests": 815,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 832.766
+    },
+    {
+      "suite": "science_property_integration_replay_renderer_ui_contracts",
+      "tests": 1190,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 162.61
+    },
+    {
+      "suite": "isolated_frozen_contract_kit",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.314
+    }
+  ],
+  "limitations": [
+    "Global Mars context is native 1440x720, not new high-resolution terrain",
+    "No new actual LIVE lunar regional source was added",
+    "Coverage basis is validated footprint, not per-cell mask or mission qualification",
+    "No physical field validation or rover verification is inferred from display checks",
+    "Aradhya frontend adapter/report/responsive/accessibility/browser tasks and final merged gates remain required"
+  ],
+  "next_action": "Aradhya consumes DELIVERY.md and the v1 catalog/capability/contracts; merge contributor branches from common base, then run complete merged UI/backend gates",
+  "common_handoff_ref": "refs/tags/ui-split-base-20261114",
+  "validation_report": "UI WORK TANUSH/VALIDATION.json",
+  "source_sha256": "6def29012dd0f30fb1081da2c8412ba801e15157ca74d826a50abaf9b6006da3"
 }

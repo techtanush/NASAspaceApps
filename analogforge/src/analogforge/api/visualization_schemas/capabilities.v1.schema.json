@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "enabled": {
+      "const": true
+    },
+    "coverage": {
+      "const": true
+    },
+    "regional_detail": {
+      "const": true
+    },
+    "benchmarks": {
+      "const": true
+    },
+    "imagery_catalog_path": {
+      "const": "globe/data/catalog.v1.json"
+    },
+    "imagery_purpose": {
+      "const": "VISUAL_CONTEXT_ONLY"
+    },
+    "openapi_path": {
+      "const": "/api/v1/visualization/openapi.json"
+    }
+  },
+  "required": [
+    "schema_version",
+    "enabled",
+    "coverage",
+    "regional_detail",
+    "benchmarks",
+    "imagery_catalog_path",
+    "imagery_purpose",
+    "openapi_path"
+  ]
+}
