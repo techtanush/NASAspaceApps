@@ -109,8 +109,3 @@
     --text-tertiary: #566475;
   }
 }
-
-@page {
-  background: #FFFFFF;
-  @bottom-center { color: #3B4857; }
-}

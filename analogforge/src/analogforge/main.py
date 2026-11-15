@@ -210,6 +210,9 @@ def create_app(
     from analogforge.api.routers.operator_context import router as operator_context_router
 
     application.include_router(operator_context_router)
+    from analogforge.api.routers.evidence_briefs import router as evidence_brief_router
+
+    application.include_router(evidence_brief_router)
     from analogforge.api.routers.auth import router as auth_router
 
     application.include_router(auth_router)

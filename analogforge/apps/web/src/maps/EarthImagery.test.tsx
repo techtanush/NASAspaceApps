@@ -2,7 +2,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { AddProtocolAction, Map as MapInstance } from 'maplibre-gl';
 import type { components } from '../generated/schema';
-import { EarthImagery, earthImageryBounds, earthImageryGroundSampling, EARTH_IMAGERY_SOURCE, EARTH_IMAGERY_WORLD_BOUNDS } from './EarthImagery';
+import { EarthImagery, earthImageryBounds, earthImageryGroundSampling, supportsUsgsDetail, EARTH_IMAGERY_SOURCE, EARTH_IMAGERY_WORLD_BOUNDS } from './EarthImagery';
 import seed from '../mock/fixtures/seed.json';
 const state = vi.hoisted(() => ({ protocols: new Map<string, AddProtocolAction>() }));
 vi.mock('maplibre-gl', () => ({ addProtocol: vi.fn((name, action) => state.protocols.set(name, action)), removeProtocol: vi.fn(name => state.protocols.delete(name)) }));
@@ -14,6 +14,32 @@ function fakeMap() {
     addLayer: vi.fn(value => layers.set(value.id, value)), getLayer: (id: string) => layers.get(id), removeLayer: vi.fn(id => layers.delete(id)) };
 }
 afterEach(() => { vi.unstubAllGlobals(); vi.clearAllMocks(); state.protocols.clear(); });
+
+it('loads finer US aerial tiles without moving the scientific footprint, and switches to global imagery explicitly', () => {
+  const map = fakeMap(), active = vi.fn(), original = JSON.stringify(aoi);
+  render(<EarthImagery autoLoad preferHighDetail map={map as unknown as MapInstance} aoi={aoi} onActiveChange={active}/>);
+  expect(map.addSource).toHaveBeenLastCalledWith(EARTH_IMAGERY_SOURCE, expect.objectContaining({ maxzoom: 16 }));
+  expect(map.setMaxZoom).toHaveBeenLastCalledWith(15);
+  expect(screen.getByText(/Historical aerial/)).toHaveTextContent('2.0 m/pixel');
+  fireEvent.click(screen.getByText('Imagery source and resolution'));
+  expect(screen.getByRole('link', { name: /USDA \/ USGS/ })).toBeVisible();
+  fireEvent.change(screen.getByLabelText('Imagery layer'), { target: { value: 'eox' } });
+  expect(map.addSource).toHaveBeenLastCalledWith(EARTH_IMAGERY_SOURCE, expect.objectContaining({ maxzoom: 13 }));
+  expect(map.setMaxZoom).toHaveBeenLastCalledWith(12); expect(state.protocols.size).toBe(1);
+  expect(JSON.stringify(aoi)).toBe(original);
+  fireEvent.click(screen.getByRole('button', { name: 'Measured terrain view' }));
+  expect(map.setMaxZoom).toHaveBeenLastCalledWith(22); expect(state.protocols.size).toBe(0);
+});
+
+it('uses global imagery outside conservative continental-US coverage without inventing aerial coverage', () => {
+  const elsewhere = { ...aoi, bbox: [12.0, 43.0, 12.1, 43.1] }, map = fakeMap();
+  expect(supportsUsgsDetail(elsewhere)).toBe(false);
+  expect(supportsUsgsDetail({ ...aoi, body: 'MARS' })).toBe(false);
+  render(<EarthImagery autoLoad preferHighDetail map={map as unknown as MapInstance} aoi={elsewhere} onActiveChange={vi.fn()}/>);
+  expect(map.addSource).toHaveBeenCalledWith(EARTH_IMAGERY_SOURCE, expect.objectContaining({ maxzoom: 13 }));
+  expect(screen.queryByLabelText('Imagery layer')).not.toBeInTheDocument();
+  expect(earthImageryGroundSampling(aoi, 'usgs')).toBeCloseTo(earthImageryGroundSampling(aoi)! / 8, 10);
+});
 
 it('retains an offline default, then installs georeferenced regional tiles only after opt-in and restores camera constraints', () => {
   const map = fakeMap(), active = vi.fn();
@@ -120,10 +146,10 @@ it('keeps the actual tile-budget reason when the map subsequently emits its gene
   const [protocol, load] = [...state.protocols.entries()][0]!;
   const error = map.on.mock.calls[0]![1] as (event: { sourceId: string }) => void;
   await act(async () => {
-    for (let i = 0; i < 65; i++) await load({ url: `${protocol}://tiles/13/${1555 + i}/3239` }, new AbortController()).catch(() => {});
+    for (let i = 0; i < 257; i++) await load({ url: `${protocol}://tiles/13/${1555 + i}/3239` }, new AbortController()).catch(() => {});
     error({ sourceId: EARTH_IMAGERY_SOURCE });
   });
-  expect(screen.getByRole('status')).toHaveTextContent('64-tile limit');
+  expect(screen.getByRole('status')).toHaveTextContent('256-tile limit');
   expect(active).toHaveBeenLastCalledWith(false); expect(state.protocols.size).toBe(0);
 });
 

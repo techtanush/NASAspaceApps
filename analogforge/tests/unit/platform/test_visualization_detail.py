@@ -415,3 +415,28 @@ def test_invalid_selected_product_marks_otherwise_complete_display_partial(proje
         else:
             op["artifact_hashes"]["display-png"] = "0" * 64
     assert site_detail(uow, blobs, run["id"], candidate["id"])["availability"] == "PARTIAL"
+
+
+def test_site_read_does_not_reload_unrelated_large_analysis_history(projection, monkeypatch):
+    uow, blobs, run, _, candidate = projection
+    add_display(projection, "ELEVATION")
+    add_display(projection, "SLOPE")
+    expected = site_detail(uow, blobs, run["id"], candidate["id"])
+    for _ in range(100):
+        uow.seed("scientific_operations", run_id=run["id"], mode=run["mode"],
+                 operation="ANALYZE_CANDIDATE", status="SUCCEEDED", request={"grid": "unrelated grid"})
+        uow.seed("tool_receipts", run_id=run["id"], mode=run["mode"], status="SUCCEEDED",
+                 tool_name="characterize_target", evidence_ids=[])
+    original = uow.list
+    display_reads = []
+
+    def bounded(kind, filters=None):
+        if kind == "scientific_operations":
+            # A renderer may validate its own operations, not transfer every grid in the run.
+            assert filters == {"run_id": run["id"], "operation": "BUILD_DISPLAY_LAYERS"}
+            display_reads.append(filters)
+        return original(kind, filters)
+
+    monkeypatch.setattr(uow, "list", bounded)
+    assert site_detail(uow, blobs, run["id"], candidate["id"]) == expected
+    assert len(display_reads) == 1

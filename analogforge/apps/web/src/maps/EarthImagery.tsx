@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { addProtocol, removeProtocol, type Map as MapInstance } from 'maplibre-gl';
 import type { components } from '../generated/schema';
-import { createEarthTileLoader, EARTH_IMAGERY_MAP_MAX_ZOOM, EARTH_IMAGERY_MAX_ZOOM } from '../api/earthImagery';
+import { createEarthTileLoader, earthImageryMaxZoom, type EarthImageryProvider } from '../api/earthImagery';
 
 type Aoi = components['schemas']['AreaOfInterest'];
 type Bounds = [number, number, number, number];
@@ -30,15 +30,25 @@ export function earthImageryBounds(aoi: Aoi): Bounds | null {
 }
 
 /** Approximate horizontal ground sampling of the finest public Mercator tile at the footprint centre. */
-export function earthImageryGroundSampling(aoi: Aoi): number | null {
+export function earthImageryGroundSampling(aoi: Aoi, provider: EarthImageryProvider = 'eox'): number | null {
   if (!earthImageryBounds(aoi)) return null;
   const latitude = (aoi.bbox[1]! + aoi.bbox[3]!) / 2;
-  return (2 * Math.PI * 6378137 * Math.cos(latitude * Math.PI / 180)) / (256 * 2 ** EARTH_IMAGERY_MAX_ZOOM);
+  return (2 * Math.PI * 6378137 * Math.cos(latitude * Math.PI / 180)) / (256 * 2 ** earthImageryMaxZoom(provider));
 }
 
+/** Provider coverage preference only; this never nominates or qualifies a research site. */
+export function supportsUsgsDetail(aoi: Aoi): boolean {
+  if (!earthImageryBounds(aoi)) return false;
+  const [w, s, e, n] = aoi.bbox;
+  return w! >= -125 && e! <= -66 && s! >= 25 && n! <= 49;
+}
 
-export function EarthImagery({ map, aoi, onActiveChange, autoLoad = false }: { map: MapInstance | null; aoi: Aoi; onActiveChange: (active: boolean) => void; autoLoad?: boolean }) {
+export function EarthImagery({ map, aoi, onActiveChange, autoLoad = false, preferHighDetail = false }: { map: MapInstance | null; aoi: Aoi; onActiveChange: (active: boolean) => void; autoLoad?: boolean; preferHighDetail?: boolean }) {
   const bounds = earthImageryBounds(aoi), key = bounds?.join(',') ?? '';
+  const usgsEligible = supportsUsgsDetail(aoi);
+  const [choice, setChoice] = useState<EarthImageryProvider>(preferHighDetail && usgsEligible ? 'usgs' : 'eox');
+  const provider = choice === 'usgs' && usgsEligible ? 'usgs' : 'eox';
+  const maxZoom = earthImageryMaxZoom(provider);
   // A production selected-site view may start imagery automatically. This initial choice never retries
   // a failed view or overrides the user's later Measured terrain choice; a new keyed site starts fresh.
   const [requested, setRequested] = useState(autoLoad && !!bounds);
@@ -48,11 +58,11 @@ export function EarthImagery({ map, aoi, onActiveChange, autoLoad = false }: { m
     // The selected footprint establishes eligibility, not a scientific coverage claim for the
     // globally available visual mosaic. Only visible tiles are requested within the session budget.
     const region = EARTH_IMAGERY_WORLD_BOUNDS;
-    const protocol = `af-eox-${++nextProtocol}`;
+    const protocol = `af-${provider}-${++nextProtocol}`;
     let disposed = false, removed = false, handledFailure = false;
     const loader = createEarthTileLoader(protocol, () => { if (!disposed) setStatus('ready'); }, limited => {
       if (!disposed) { handledFailure = true; setStatus(limited ? 'limited' : 'failed'); setRequested(false); }
-    });
+    }, globalThis.fetch, provider);
     const oldMaxZoom = map.getMaxZoom();
     const onError = (event: { sourceId?: string; error?: { message: string; name?: string } }) => {
       // Camera changes normally abort superseded raster requests. MapLibre identifies these by name.
@@ -75,29 +85,39 @@ export function EarthImagery({ map, aoi, onActiveChange, autoLoad = false }: { m
       map.on('error', onError);
       map.on('remove', onRemove);
       addProtocol(protocol, loader.load);
-      map.setMaxZoom(EARTH_IMAGERY_MAP_MAX_ZOOM);
+      map.setMaxZoom(maxZoom - 1);
       // Keep MapLibre's native Mercator camera extent. A 360-degree maxBounds constraint
       // triggers a camera matrix failure in the installed version; source bounds remain latitude-safe.
       map.addSource(EARTH_IMAGERY_SOURCE, { type: 'raster', tiles: [`${protocol}://tiles/{z}/{x}/{y}`], tileSize: 256,
-        minzoom: 0, maxzoom: EARTH_IMAGERY_MAX_ZOOM, bounds: region });
+        minzoom: 0, maxzoom: maxZoom, bounds: region });
       map.addLayer({ id: EARTH_IMAGERY_SOURCE, type: 'raster', source: EARTH_IMAGERY_SOURCE, paint: { 'raster-opacity': 1, 'raster-fade-duration': 0 } }, 'candidates');
       onActiveChange(true);
     } catch { setStatus('failed'); setRequested(false); }
     return cleanup;
-  }, [requested, map, key, onActiveChange]);
+  }, [requested, map, key, onActiveChange, provider, maxZoom]);
   return <section className="earth-imagery" aria-label="Optional satellite visual context">
     <div className="inline-fields"><button type="button" disabled={!map || !bounds} onClick={() => {
       if (requested) { setRequested(false); setStatus('offline'); }
       else { setStatus('loading'); setRequested(true); }
     }}>{requested ? 'Measured terrain view' : 'Load satellite imagery'}</button><span className="helper">{requested ? 'Satellite imagery view · prepared measurements temporarily hidden' : 'Measured terrain / offline extent view'}</span></div>
-    <p className="helper">Historical satellite · 2016/2017{bounds&&<> · finest tile near selected site ~{earthImageryGroundSampling(aoi)!.toFixed(1)} m/pixel</>} · visual context only.</p>
+    <p className="helper">{provider === 'usgs' ? 'Historical aerial · USDA / USGS · 2017–2021 regional mosaic' : 'Historical satellite · 2016/2017'}{bounds&&<> · finest tile near selected site ~{earthImageryGroundSampling(aoi, provider)!.toFixed(1)} m/pixel</>} · visual context only.</p>
     {!bounds && <p className="helper">Satellite imagery requires a local Earth footprint in WGS84 geographic coordinates, below 85° latitude.</p>}
     {status === 'loading' && <p role="status">Loading satellite tiles…</p>}
     {status === 'failed' && <p role="status">Satellite imagery unavailable. Measured terrain and the offline footprint view remain available. Select Load satellite imagery to retry.</p>}
-    {status === 'limited' && <p role="status">This view reached its 64-tile limit. Measured terrain and the offline footprint view have been restored. Select Load satellite imagery for another bounded view.</p>}
+    {status === 'limited' && <p role="status">This view reached its 256-tile limit. Measured terrain and the offline footprint view have been restored. Select Load satellite imagery for another bounded view.</p>}
     <details><summary>Imagery source and resolution</summary>
-    <p className="helper">Historical 2016/2017 mosaic · nominal 10 m Sentinel-2 input. Zoom stops at the delivered public tile limit, source zoom 13 / camera zoom 12.</p>
-    <p className="helper">Visual context only; it does not measure slope, surface safety or benchmark coverage. Loading uses the public EOX tile service for the visible map, with at most 64 tile requests per view. Zoom out for global context; measured coverage remains limited to the selected footprint. Tile sampling is not a guarantee of resolved surface detail.</p>
-    <p className="helper earth-imagery-credit"><a href={PROVIDER} target="_blank" rel="noreferrer">EOxCloudless</a> by <a href={PUBLISHER} target="_blank" rel="noreferrer">EOX IT Services GmbH</a> (Contains modified Copernicus Sentinel data 2016 &amp; 2017) · <a href={LICENSE} target="_blank" rel="noreferrer">CC BY 4.0</a></p></details>
+    {usgsEligible && <label>Imagery layer<select value={provider} onChange={event => {
+      setChoice(event.target.value as EarthImageryProvider);
+      if (requested) setStatus('loading');
+    }}><option value="usgs">USGS aerial · continental United States</option><option value="eox">EOX satellite · global context</option></select></label>}
+    {provider === 'usgs' ? <>
+      <p className="helper">USGS The National Map · mostly NAIP aerial imagery, 2017–2021 in the continental United States. Source dates and detail vary. The delivered zoom limit is source 16 / camera 15; nominal 1 m inputs do not guarantee 1 m resolved detail. Outside this region, choose the global EOX layer.</p>
+      <p className="helper earth-imagery-credit"><a href="https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer" target="_blank" rel="noreferrer">USDA / USGS The National Map: Orthoimagery</a> · service refreshed June 2024.</p>
+    </> : <>
+      <p className="helper">Historical 2016/2017 mosaic · nominal 10 m Sentinel-2 input. Zoom stops at the delivered public tile limit, source zoom 13 / camera zoom 12.</p>
+      <p className="helper earth-imagery-credit"><a href={PROVIDER} target="_blank" rel="noreferrer">EOxCloudless</a> by <a href={PUBLISHER} target="_blank" rel="noreferrer">EOX IT Services GmbH</a> (Contains modified Copernicus Sentinel data 2016 &amp; 2017) · <a href={LICENSE} target="_blank" rel="noreferrer">CC BY 4.0</a></p>
+    </>}
+    <p className="helper">Visual context only; it does not measure slope, surface safety or benchmark coverage. Loading uses the public {provider === 'usgs' ? 'USGS' : 'EOX'} tile service for the visible map, with at most 256 tile requests per view. Zoom out for global context; measured coverage remains limited to the selected footprint. Tile sampling is not a guarantee of resolved surface detail.</p>
+    </details>
   </section>;
 }

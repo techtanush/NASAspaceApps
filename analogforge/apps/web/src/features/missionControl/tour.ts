@@ -6,10 +6,15 @@ export type Status = S['QualificationStatus'];
 /** Presentation only: restates accepted contract fields and committed statuses. Nothing here computes a result. */
 const number = (value: number | null) => (value === null ? 'unspecified' : String(value));
 const quantity = (value: number | null, unit: string) => (unit && unit !== 'none' && unit !== '1' ? `${number(value)} ${unit}` : number(value));
-export function benchmarkText(requirement: Requirement): string {
+export function readableQuantity(value: number | null, unit: string, simplified = false): string {
+  if (simplified && unit === 'fraction') return value === null ? 'unspecified' : `${Number((value * 100).toPrecision(3))}%`;
+  return quantity(value, unit);
+}
+export function benchmarkText(requirement: Requirement, simplified = false): string {
   const { operator, unit } = requirement; const low = requirement.lower, high = requirement.upper;
-  const rule = operator === 'LTE' ? `at most ${quantity(high, unit)}` : operator === 'GTE' ? `at least ${quantity(low, unit)}`
-    : operator === 'BETWEEN' ? `between ${number(low)} and ${quantity(high, unit)}` : operator === 'EQUALS' ? `exactly ${quantity(low ?? high, unit)}`
+  const label = (value: number | null) => readableQuantity(value, unit, simplified);
+  const rule = operator === 'LTE' ? `at most ${label(high)}` : operator === 'GTE' ? `at least ${label(low)}`
+    : operator === 'BETWEEN' ? `between ${simplified && unit === 'fraction' ? label(low) : number(low)} and ${label(high)}` : operator === 'EQUALS' ? `exactly ${label(low ?? high)}`
     : operator === 'PRESENT' ? 'must be present' : 'cannot be reproduced naturally on Earth';
   const min = requirement.minimum_support_scale_m, max = requirement.maximum_support_scale_m;
   const support = min !== null && max !== null ? (min === max ? ` at ${min} m support` : ` at ${min}–${max} m support`) : '';

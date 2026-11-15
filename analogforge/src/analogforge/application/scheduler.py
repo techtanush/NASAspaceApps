@@ -136,6 +136,7 @@ class WorkflowEngine:
             key, getattr(self.settings, "openai_model", None), base_url=base_url,
             cooldown=self._model_cooldown, **fallback_options(self.settings),
             min_request_interval_seconds=getattr(self.settings, "openai_min_request_interval_seconds", 0),
+            primary_output_token_limit=getattr(self.settings, "openai_max_output_tokens", 4096),
         )
 
     def _scenario(self, identifier: str) -> dict[str, Any]:
@@ -788,6 +789,7 @@ class WorkflowEngine:
                 "mission_revision_id": mission["id"],
                 "contract_sha256": mission["content_sha256"],
                 "scope": "OPERATOR_CRITERIA_FOR_PINNED_REVISION",
+                "requirement_ids": [requirement["id"] for requirement in mission["requirements"]],
                 "scientific_validation": False,
             }
             evidences = tx.list("evidence", {"run_id": run_id})
@@ -797,6 +799,7 @@ class WorkflowEngine:
             }
             evidences = [e for e in evidences if e["id"] in established]
             targets = tx.list("target_profiles", {"run_id": run_id})
+            target_operations = tx.list("scientific_operations", {"run_id": run_id, "operation": "CHARACTERIZE_TARGET"})
             candidates = tx.list("candidates", {"run_id": run_id})
             from analogforge.application import operator_context as operator_sources
 
@@ -838,6 +841,10 @@ class WorkflowEngine:
             "run": run,
             "scenario": scenario,
             "evidence_ids": [e["id"] for e in evidences],
+            "evidence_records": evidences,
+            "target_measurement_spec_id": (
+                target_operations[-1]["request"]["inputs"]["measurement_spec_id"] if target_operations else None
+            ),
             "validation_receipt_id": receipt["id"],
             "target": targets[-1] if targets else None,
             "candidates": candidates,

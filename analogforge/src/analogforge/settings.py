@@ -51,9 +51,23 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr | None = None
     openai_model: str | None = None
     openai_min_request_interval_seconds: float = Field(default=0, ge=0, le=60, allow_inf_nan=False)
+    openai_max_output_tokens: int = Field(default=4096, ge=256, le=4096)
     groq_api_key: SecretStr | None = None
     groq_model: str | None = None
     groq_fallback_enabled: bool = False
+    # None preserves legacy Groq opt-in; [] explicitly disables every fallback.
+    model_fallback_order: list[str] | None = None
+    openrouter_api_key: SecretStr | None = None
+    openrouter_model: str | None = None
+    openrouter_upstream: str | None = None
+    anthropic_api_key: SecretStr | None = None
+    anthropic_model: str | None = None
+    sambanova_api_key: SecretStr | None = None
+    sambanova_model: str | None = None
+    nvidia_api_key: SecretStr | None = None
+    nvidia_model: str | None = None
+    gemini_api_key: SecretStr | None = None
+    gemini_model: str | None = None
     earthdata_token: SecretStr | None = None
     meteomatics_username: SecretStr | None = None
     meteomatics_password: SecretStr | None = None
@@ -92,7 +106,8 @@ class Settings(BaseSettings):
 
     @field_validator(
         "openai_api_key", "groq_api_key", "earthdata_token", "session_secret", "oidc_client_secret",
-        "postgres_password", "meteomatics_username", "meteomatics_password",
+        "postgres_password", "meteomatics_username", "meteomatics_password", "openrouter_api_key",
+        "anthropic_api_key", "sambanova_api_key", "nvidia_api_key", "gemini_api_key",
         mode="before",
     )
     @classmethod
@@ -100,7 +115,9 @@ class Settings(BaseSettings):
         return None if value == "" else value
 
     @field_validator(
-        "openai_model", "groq_model", "oidc_issuer_url", "oidc_client_id", "map_tile_url", "test_database_url",
+        "openai_model", "groq_model", "openrouter_model", "openrouter_upstream", "anthropic_model",
+        "sambanova_model", "nvidia_model", "gemini_model",
+        "oidc_issuer_url", "oidc_client_id", "map_tile_url", "test_database_url",
         mode="before",
     )
     @classmethod
@@ -109,8 +126,23 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _validate_process(self) -> Settings:
-        if self.groq_fallback_enabled and not (self.groq_api_key and self.groq_model):
+        if (
+            self.model_fallback_order is None and self.groq_fallback_enabled
+            and not (self.groq_api_key and self.groq_model)
+        ):
             raise ValueError("Groq fallback requires GROQ_API_KEY and explicit GROQ_MODEL")
+        if self.model_fallback_order is not None:
+            from analogforge.adapters.openai.fallback import SUPPORTED_PROVIDERS
+
+            if len(set(self.model_fallback_order)) != len(self.model_fallback_order):
+                raise ValueError("MODEL_FALLBACK_ORDER must contain distinct provider names")
+            for provider in self.model_fallback_order:
+                if provider not in SUPPORTED_PROVIDERS:
+                    raise ValueError("MODEL_FALLBACK_ORDER contains an unsupported text provider")
+                if not (getattr(self, provider + "_api_key") and getattr(self, provider + "_model")):
+                    raise ValueError("Each enabled fallback requires its own API_KEY and explicit MODEL")
+            if "openrouter" in self.model_fallback_order and not self.openrouter_upstream:
+                raise ValueError("OpenRouter requires OPENROUTER_UPSTREAM to pin one provider")
         if not self.database_url.startswith("postgresql+psycopg://"):
             raise ValueError("DATABASE_URL must use postgresql+psycopg")
         if self.auth_mode == "local" and self.api_host not in {"127.0.0.1", "::1", "localhost"}:
@@ -168,9 +200,22 @@ class Settings(BaseSettings):
             "oidc_client_secret",
             "openai_api_key",
             "openai_min_request_interval_seconds",
+            "openai_max_output_tokens",
             "groq_api_key",
             "groq_model",
             "groq_fallback_enabled",
+            "model_fallback_order",
+            "openrouter_api_key",
+            "openrouter_model",
+            "openrouter_upstream",
+            "anthropic_api_key",
+            "anthropic_model",
+            "sambanova_api_key",
+            "sambanova_model",
+            "nvidia_api_key",
+            "nvidia_model",
+            "gemini_api_key",
+            "gemini_model",
             "earthdata_token",
             "meteomatics_username",
             "meteomatics_password",
@@ -184,7 +229,15 @@ class Settings(BaseSettings):
         public = self.model_dump(mode="json", exclude=excluded)
         if self.openai_min_request_interval_seconds > 0:
             public["openai_min_request_interval_seconds"] = self.openai_min_request_interval_seconds
-        if self.groq_fallback_enabled:
+        if self.openai_max_output_tokens != 4096:
+            public["openai_max_output_tokens"] = self.openai_max_output_tokens
+        if self.model_fallback_order is not None:
+            public["model_fallback_chain"] = [
+                {"provider": provider, "model": getattr(self, provider + "_model"), "trigger": "http_429",
+                 **({"upstream": self.openrouter_upstream} if provider == "openrouter" else {})}
+                for provider in self.model_fallback_order
+            ]
+        elif self.groq_fallback_enabled:
             public["model_fallback"] = {"provider": "groq", "model": self.groq_model, "trigger": "openai_http_429"}
         return public
 

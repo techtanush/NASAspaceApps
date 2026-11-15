@@ -1,0 +1,24 @@
+/* Keep evidence operations available while giving the measured terrain room to breathe. */
+.run-state { border-radius: 6px; padding: 12px 16px; gap: 8px 20px; }
+.run-state .run-pinned-identity { border-top: 1px solid var(--border-subtle); padding-top: 8px; color: var(--text-secondary); }
+.run-state .run-pinned-identity > span:first-child { color: var(--text-primary); font-weight: 500; }
+.run-state .run-metadata { margin-left: auto; }
+.run-state .run-metadata > summary { border-color: var(--border-subtle); border-radius: 6px; }
+.run-state .run-metadata[open] { flex-basis: 100%; margin-left: 0; order: 5; }
+.run-state .run-metadata[open] > .header-cluster { padding: 8px 0 0; }
+.run-state .run-actions { flex-basis: auto; }
+.run-location-overview { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; flex: 0 0 auto; padding: 8px 12px; margin-right: 8px; border: 1px solid var(--border-strong); border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; color: var(--text-primary); background: var(--surface-2); }
+.run-location-overview:hover { border-color: var(--accent); }
+.run-location-overview:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (min-width: 768px) {
+ .run-lifecycle { min-width: 140px; }
+ .run-state .run-science { margin-right: auto; }
+ .run-state .run-pinned-identity { order: 4; }
+ .run-state .run-actions:empty { display: none; }
+}
+@media (max-width: 767px) {
+ .run-state { padding: 6px 8px; gap: 4px 8px; }
+ .run-state .run-metadata { margin-left: 0; }
+ .run-state .run-metadata[open] { order: initial; }
+ .run-location-overview { max-width: 96px; margin-right: 0; padding: 4px 8px; line-height: 16px; text-align: center; }
+}

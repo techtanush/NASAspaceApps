@@ -110,10 +110,20 @@ export async function startRun(page: Page, options: Parameters<typeof newMission
  await newMission(page, options);
  await expect(page.getByTestId('btn-start-run')).toBeEnabled();
  await page.getByTestId('btn-start-run').click();
+ await (await runWorkbenchLink(page)).click();
  await expect(page.getByTestId('run-state-banner')).toBeVisible();
  await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state', options.moon ? /COMPLETED|AWAITING_REVIEW/ : 'AWAITING_REVIEW', { timeout: isMock() ? 10000 : 180000 });
  await inspectHooks(page);
  return page.url().match(/\/runs\/([^/?]+)/)![1];
+}
+/** Legacy science journeys explicitly enter the secondary workbench from the main location view. */
+export async function runWorkbenchLink(page: Page) {
+ await expect(page).toHaveURL(/\/runs\/[^/?]+\/tour(?:\?|$)/);
+ await expect(page.locator('[data-testid=tour], [data-testid=run-progress]')).toBeVisible();
+ // The progress panel can become the completed tour between observation and click.
+ // Keep the locator live across that transition instead of pinning its old container.
+ return page.locator('[data-testid=run-progress], [data-testid=tour]')
+  .getByRole('link', {name:/^(?:Open evidence workbench|Evidence workbench)$/});
 }
 export async function tab(page: Page, name: string) {
  await page.locator(`[data-testid=run-nav-tab][data-tab="${name}"]`).click();

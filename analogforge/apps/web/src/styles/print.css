@@ -41,5 +41,6 @@
  .passport-sheet>*+*{margin-top:8px}
 }
 
-/* Page canvas/footer colours are generated from the light palette in tokens.css. */
+/* The unchanged token generator supplies the light palette for print, including page margins. */
+@page{background:var(--surface-1);@bottom-center{color:var(--text-secondary)}}
 @media print{html,body,#root{background:var(--surface-1)!important;color:var(--text-primary);color-scheme:light!important}.mc-report{background:var(--surface-1)!important;color:var(--text-primary)}.mc-report footer{color:var(--text-secondary)}}

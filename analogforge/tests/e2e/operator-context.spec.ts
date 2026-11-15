@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import type { ContextBinding, OperatorContext, OperatorDocument } from '../../apps/web/src/api/operatorContext';
 import type { components } from '../../apps/web/src/generated/schema';
@@ -33,7 +33,16 @@ async function upload(page: Page, editor: Locator, path: string, source: string)
   await editor.getByLabel('Upload a supporting document', { exact: true }).setInputFiles(path);
   const response = await stored;
   expect(response.status()).toBe(201); expect(response.headers()['cache-control']).toBe('no-store');
-  const document = await response.json() as OperatorDocument;
+  // Read back the exact identity exposed by the successful upload. Chromium may evict
+  // a consumed POST body from its inspector cache; the authorized GET is authoritative.
+  const original = editor.getByRole('link', { name: `Download original ${basename(path)}`, exact: true });
+  await expect(original).toBeVisible();
+  const href = await original.getAttribute('href');
+  expect(href).toMatch(/^\/api\/v1\/operator-documents\/[a-f0-9-]{36}\/content$/i);
+  const documentId = href!.split('/')[4];
+  const readback = await browserJSON<OperatorDocument>(page, `/operator-documents/${documentId}`);
+  expect(readback.status).toBe(200); expect(readback.cache).toBe('no-store');
+  const document = readback.body; expect(document.id).toBe(documentId);
   expect(document.id).toMatch(/^[a-f0-9-]{36}$/i);
   expect(document.original_sha256).toBe(createHash('sha256').update(source).digest('hex'));
   expect(document.extracted_text).toBe(source);

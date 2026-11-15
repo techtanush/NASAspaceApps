@@ -71,6 +71,9 @@ def test_actual_director_task_finishes_only_current_review_and_retains_blockers(
             task = _expand_wire_task(json.loads(kwargs["input"][0]["content"])["task"])
             assert task["task_kind"] == "advance_workflow"
             assert task["payload"]["contract_acceptance"]["scientific_validation"] is False
+            assert task["payload"]["contract_acceptance"]["requirement_ids"] == [
+                row["id"] for row in engine._load(run_id, workspace)[1]["requirements"]
+            ]
             calls.append(len(kwargs["input"]))
             if len(calls) == 1:
                 name, arguments = "get_run_snapshot", {"sections": ["state"]}

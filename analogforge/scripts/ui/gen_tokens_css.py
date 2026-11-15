@@ -34,10 +34,6 @@ def render(doc: dict) -> str:
     out.append(block(':root, [data-theme="dark"]', dark))
     out.append(block('[data-theme="light"]', light))
     out.append('@media print {\n' + block(':root', light).replace('\n', '\n  ').rstrip(' ') + '}\n')
-    # Chromium paints the page canvas separately from html/body. Emit explicit page colours from the
-    # verified light palette; theme variables alone do not cover printed page margins.
-    out.append('@page {\n  background: ' + light['surface-1'] + ';\n'
-               '  @bottom-center { color: ' + light['text-secondary'] + '; }\n}\n')
     return "\n".join(out)
 
 

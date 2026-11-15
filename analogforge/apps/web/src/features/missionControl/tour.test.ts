@@ -32,3 +32,13 @@ describe('reviewable benchmark criteria', () => {
     expect(benchmarkText({...criterion,operator:'LTE',lower:null,upper:5,unit:'deg',parameters:{...criterion.parameters,slope_band_deg:null}})).toBe('at most 5 deg at 500 m support');
   });
 });
+
+
+it('shows fractions as percentages only in the simplified reading view without changing the accepted criterion', () => {
+  const criterion = {operator:'GTE',lower:0.05,upper:null,unit:'fraction',minimum_support_scale_m:500,maximum_support_scale_m:500,parameters:{slope_band_deg:[12,18]}} as Requirement;
+  const original = JSON.stringify(criterion);
+  expect(benchmarkText(criterion, true)).toBe('at least 5% · slope band 12–18 deg at 500 m support');
+  expect(benchmarkText({...criterion,lower:0.1}, true)).toContain('at least 10%');
+  expect(benchmarkText(criterion)).toContain('at least 0.05 fraction');
+  expect(JSON.stringify(criterion)).toBe(original);
+});

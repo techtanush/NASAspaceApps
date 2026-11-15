@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
-import { api, fixture, isMock } from './workbench';
+import { api, fixture, isMock, runWorkbenchLink } from './workbench';
 import type { components } from '../../../apps/web/src/generated/schema';
 export type S = components['schemas'];
 export const runTimeout = () => isMock() ? 10000 : 180000;
@@ -115,6 +115,7 @@ export async function keyboardMission(page: Page) {
   await expect(page.getByTestId('requirement-row')).toHaveCount(9);
   await pressControl(page, page.getByTestId('btn-accept-contract'));
   await pressControl(page, page.getByTestId('btn-start-run'));
+  await pressControl(page, await runWorkbenchLink(page));
   await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state', 'AWAITING_REVIEW', { timeout: runTimeout() });
   await pressControl(page, page.locator('[data-testid=run-nav-tab][data-tab=analogs]'));
   await expect(page.getByTestId('candidate-row')).toHaveCount(6);

@@ -192,6 +192,21 @@ def prepare(target: Path) -> None:
         1,
     )
     config.write_text(configuration)
+    # Vitest also serves MapLibre's real ?url worker module from the shared dependency
+    # symlink. Permit only the isolated tree and dependency roots, not arbitrary files.
+    unit_config = web / "vitest.config.ts"
+    unit_configuration = unit_config.read_text()
+    unit_anchor = "defineConfig({"
+    if unit_configuration.count(unit_anchor) != 1:
+        raise ValueError("Isolated Vitest configuration anchor is missing or ambiguous")
+    unit_configuration = unit_configuration.replace(
+        unit_anchor,
+        unit_anchor + " server: { fs: {allow: " + json.dumps([
+            str(target), str((ROOT / "node_modules").resolve()), str((ROOT / "apps/web/node_modules").resolve()),
+        ]) + "} },",
+        1,
+    )
+    unit_config.write_text(unit_configuration)
     for filename in ["package.json", "pnpm-workspace.yaml", "pyproject.toml"]:
         shutil.copy2(ROOT / filename, target / filename)
     for source, destination in [

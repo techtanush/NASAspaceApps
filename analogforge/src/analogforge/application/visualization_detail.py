@@ -161,6 +161,7 @@ def _usable_layer(
     subject: dict[str, Any],
     aoi: dict[str, Any],
     receipts: list[dict[str, Any]],
+    display_operations: list[dict[str, Any]],
 ) -> DisplayLayerManifest:
     # Store adds created_at; it is not a property of the frozen manifest.
     layer = DisplayLayerManifest.model_validate({k: raw[k] for k in DisplayLayerManifest.model_fields if k in raw})
@@ -188,12 +189,14 @@ def _usable_layer(
             continue
         operations = [
             operation
-            for operation in uow.list("scientific_operations", {"run_id": run["run_id"]})
+            for operation in display_operations
             if operation.get("receipt_id") == receipt["id"]
             and operation.get("operation") == "BUILD_DISPLAY_LAYERS"
             and operation.get("status") in {"SUCCEEDED", "LIMITED"}
             and all(operation.get(k) == run.get(k) for k in ("workspace_id", "run_id", "mode"))
         ]
+        if not operations:
+            continue
         for identifier in receipt.get("evidence_ids", []):
             evidence = scoped_record(uow, "evidence", identifier, run)
             if evidence.get("algorithm_id") != "build-display-layers" or evidence.get("body") != layer.body:
@@ -263,6 +266,11 @@ def site_detail(uow: Any, blob_store: Any, run_id: str, candidate_id: str | None
     invalid = False
     if subject is not None:
         receipts = uow.list("tool_receipts", {"run_id": run_id})
+        # Analysis requests can contain large grids. Fetch only the immutable display
+        # operations once per read, rather than reloading every operation per receipt/layer.
+        display_operations = uow.list("scientific_operations", {
+            "run_id": run_id, "operation": "BUILD_DISPLAY_LAYERS",
+        })
         for raw in uow.list("display_layers", {"run_id": run_id}):
             if raw.get("candidate_id") != candidate_id:
                 continue
@@ -272,7 +280,7 @@ def site_detail(uow: Any, blob_store: Any, run_id: str, candidate_id: str | None
                 invalid = True
                 continue
             try:
-                valid.append(_usable_layer(uow, blob_store, raw, run, subject, aoi, receipts))
+                valid.append(_usable_layer(uow, blob_store, raw, run, subject, aoi, receipts, display_operations))
             except (
                 ValueError,
                 KeyError,

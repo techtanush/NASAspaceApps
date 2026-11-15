@@ -22,18 +22,19 @@ _COLUMNS = {
     "claim_gates": ["gates", "claim_id"],
 }
 WIRE_INSTRUCTIONS = (
-    "\nWire only: ~eN/~rN/~cN/~uN identify exact evidence/receipt/opaque-claim/other UUIDs; return exact aliases, "
-    "never invent them. Literal ~ is escaped ~0. Client restores IDs before unchanged validators. "
-    "Gate reason_ref/evidence_ref index audit reason_catalog/evidence_catalog from zero. "
-    "Gate gate_id/outcome cells index audit gate_value_catalogs for that column. "
-    "Column rows pair strictly with *_columns, retaining nulls/order/all fields. "
-    "authoritative_claims/claim_gates use authoritative_claim_columns/claim_gate_columns. "
-    "Omitted prepared_submission equals authoritative_submission. Tool outputs wrap value plus audit_paths: at those "
-    "paths, _task_audit_ref means the full task scientific_audit. "
-    "At task_paths, _task_value_ref points to that exact task value; at table_paths, _wire_table columns/rows "
-    "reconstruct every original record and field, preserving nulls/order. _tool_result_ref reuses the complete "
-    "earlier result with that call_id, not an evidence ID. These references omit no scientific fact. "
-    "Review every outcome/finding, including UNKNOWN/blockers."
+    "\nAliases: ~eN=evidence, ~rN=receipt, ~cN=claim, ~uN=UUID; ~0=literal ~. "
+    "Use supplied aliases; restore before validation. reason_ref/evidence_ref index "
+    "reason_catalog/evidence_catalog (zero-based); gate_id/outcome index gate_value_catalogs. "
+    "Rows pair with *_columns; retain fields/nulls/order. "
+    "Omitted prepared_submission=authoritative_submission. Value refs: audit_paths/"
+    "_task_audit_ref=scientific_audit; task_paths/_task_value_ref=exact task value; table_paths/"
+    "_wire_table=columns/rows. _tool_result_ref=full prior call_id result, not evidence. "
+    "Review all outcomes/findings/UNKNOWNs/blockers. In submit_role_result, "
+    'payload={"_task_payload_ref":"authoritative_submission.payload"} reuses that reviewed exact payload. '
+    "Choose disposition/summary/issues/evidence_ids/next_action; or explicit payload. "
+    "Summary: one short sentence, max 800 restored characters; cite IDs in evidence_ids. "
+    "Schema errors are not evidence gaps or new approvals."
+    " Read only missing facts."
 )
 
 
@@ -254,6 +255,30 @@ class WireCodec:
                     rewrite(item)
         rewrite(result)
         _prune_definitions(result)
+        return result
+
+    def submission_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
+        """Permit one exact task-bound payload reference; canonical validation remains mandatory."""
+        result = deepcopy(schema)
+        expected = self.task_document["payload"].get("authoritative_submission", {}).get("payload")
+        if isinstance(expected, dict):
+            result["properties"]["payload"] = {"anyOf": [result["properties"]["payload"], {
+                "type": "object", "additionalProperties": False,
+                "properties": {"_task_payload_ref": {"type": "string", "enum": ["authoritative_submission.payload"]}},
+                "required": ["_task_payload_ref"],
+            }]}
+        return self.schema(result)
+
+    def submission(self, value: Any) -> Any:
+        result = self.decode(value)
+        if isinstance(result, dict) and isinstance(result.get("payload"), dict):
+            payload = result["payload"]
+            if "_task_payload_ref" in payload:
+                expected = self.task_document["payload"].get("authoritative_submission", {}).get("payload")
+                if (payload != {"_task_payload_ref": "authoritative_submission.payload"}
+                        or not isinstance(expected, dict)):
+                    raise ValueError("Invalid task payload reference")
+                result["payload"] = deepcopy(expected)
         return result
 
     def result(self, canonical_result: Any, *, call_id: str | None = None) -> dict[str, Any]:

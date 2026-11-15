@@ -304,10 +304,22 @@ def _validation_details(
         return [{"field": _POLICY_FAILURE_FIELDS[error.detail_code], "code": error.detail_code,
                  "remediation": remediation}]
     if isinstance(error, ValidationError):
-        return [
-            {"field": ".".join(str(part) for part in item["loc"]), "code": item["type"]}
-            for item in error.errors(include_input=False, include_url=False)[:8]
-        ]
+        details = []
+        for item in error.errors(include_input=False, include_url=False)[:8]:
+            detail: dict[str, Any] = {"field": ".".join(str(part) for part in item["loc"]), "code": item["type"]}
+            # Only schema-owned numeric bounds; never exception input/message/context prose.
+            bounds = {key: value for key, value in item.get("ctx", {}).items()
+                      if key in {"max_length", "min_length"}
+                      and isinstance(value, int) and not isinstance(value, bool)}
+            if bounds:
+                detail["constraints"] = bounds
+            if item["loc"] == ("summary",) and item["type"] == "string_too_long":
+                detail["remediation"] = (
+                    "Use one short outcome sentence without identifiers; cite evidence_ids instead. "
+                    "The character limit applies after restoring wire aliases."
+                )
+            details.append(detail)
+        return details
     if isinstance(error, json.JSONDecodeError):
         return [{"field": "arguments", "code": "invalid_json"}]
     if str(error) in {"Unlisted next action", "Unlisted action"}:
@@ -349,7 +361,10 @@ class OpenAIProvider:
             }
         )
         tools = specialize_tool_schemas(task, tools)
-        tools = [{**tool, "parameters": codec.schema(tool["parameters"])} for tool in tools]
+        tools = [{**tool, "parameters": (
+            codec.submission_schema(tool["parameters"]) if tool["name"] == "submit_role_result"
+            else codec.schema(tool["parameters"])
+        )} for tool in tools]
         correction_used = False
         transport_attempts = 0
 
@@ -366,6 +381,9 @@ class OpenAIProvider:
 
         for _ in range(BUDGETS["model_requests_per_invocation"]):
             charge_request()
+            final_request = request_count == BUDGETS["model_requests_per_invocation"]
+            request_tools = ([tool for tool in tools if tool["name"] == "submit_role_result"]
+                             if final_request else tools)
             try:
                 create_budgeted = getattr(self.client, "create_budgeted", None)
                 create = (
@@ -373,7 +391,8 @@ class OpenAIProvider:
                     if callable(create_budgeted) else self.client.create
                 )
                 response = create(
-                    instructions=instructions, input=items, tools=tools, tool_choice="required", max_output_tokens=4096,
+                    instructions=instructions, input=items, tools=request_tools, tool_choice="required",
+                    max_output_tokens=4096,
                 )
                 transport_attempts = 0
             except (APIConnectionError, APITimeoutError) as exc:
@@ -429,10 +448,14 @@ class OpenAIProvider:
             # Continuation items remain private/in-memory; no reasoning is persisted or rendered.
             items.extend(output)
             call = calls[0]
+            if final_request and call["name"] != "submit_role_result":
+                raise _output_failure(task, "REQUEST_BUDGET_EXHAUSTED")
             proposal = None
             feedback = False
             try:
-                arguments = codec.decode(json.loads(call["arguments"]))
+                raw_arguments = json.loads(call["arguments"])
+                arguments = (codec.submission(raw_arguments) if call["name"] == "submit_role_result"
+                             else codec.decode(raw_arguments))
                 if call["name"] == "submit_role_result":
                     proposal = RoleSubmission.model_validate(arguments)
                     validate_submission(task, proposal)
@@ -445,6 +468,11 @@ class OpenAIProvider:
             except (json.JSONDecodeError, ValidationError, ValueError) as exc:
                 feedback = True
                 details = _validation_details(exc, task, proposal)
+                logging.getLogger(__name__).warning(
+                    "provider.arguments_rejected.%s", ",".join(detail["code"] for detail in details),
+                    extra={"invocation_id": str(task.invocation_id), "role": task.role_key,
+                           "validation_fields": [detail["field"] for detail in details]},
+                )
                 if isinstance(exc, PolicyViolation):
                     detail_code = details[0]["code"]
                     logging.getLogger(__name__).warning(

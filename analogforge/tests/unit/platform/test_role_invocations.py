@@ -60,6 +60,7 @@ def test_accepted_proposed_default_has_exact_pinned_acceptance_context(role_atte
             "acceptance_id": acceptance["id"], "accepted_at": acceptance["accepted_at"],
             "mission_revision_id": str(task.contract_revision_id), "contract_sha256": task.contract_hash,
             "scope": "OPERATOR_CRITERIA_FOR_PINNED_REVISION", "scientific_validation": False,
+            "requirement_ids": ["req-1"],
         }
         contract = registry.execute("inspect_contract", {"contract_revision_id": str(task.contract_revision_id)},
                                     context, call_id="inspect-accepted")

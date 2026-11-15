@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { components } from '../../generated/schema';
 import { RunTerminalNotice } from './RunTerminalNotice';
@@ -21,4 +21,15 @@ it('keeps a safe recorded terminal reason and recovery link visible alongside re
   state.error = null;
   rerender(<MemoryRouter><RunTerminalNotice run={{ ...run, state: 'COMPLETED' }}/></MemoryRouter>);
   expect(screen.queryByTestId('run-terminal-notice')).not.toBeInTheDocument();
+});
+it('explains a review pause without raw error codes in the primary message and retains the exact record', () => {
+  state.error = null; state.data.items = [];
+  render(<MemoryRouter><RunTerminalNotice run={{ ...run, state: 'BLOCKED', blocked_dependencies: ['USER_REVIEW_REQUIRED'] }}/></MemoryRouter>);
+  expect(screen.getByText('Review needed')).toBeVisible();
+  expect(screen.getByText(/An evidence review needs attention/)).toBeVisible();
+  const code = screen.getByText(/Recorded dependencies: USER_REVIEW_REQUIRED/);
+  expect(code).not.toBeVisible();
+  fireEvent.click(screen.getByText('Technical status'));
+  expect(code).toBeVisible();
+  expect(screen.getByRole('link', { name: 'Inspect evidence and recovery options' })).toHaveAttribute('href', '/runs/run/target');
 });

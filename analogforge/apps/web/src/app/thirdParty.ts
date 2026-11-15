@@ -147,4 +147,5 @@ export const thirdParty=[
   },
   {"name":"globe.gl","version":"2.46.2","licence":"MIT"},
   {"name":"three","version":"0.187.0","licence":"MIT"},
+  {"name":"motion","version":"14.14.0","licence":"MIT"},
 ] as const;

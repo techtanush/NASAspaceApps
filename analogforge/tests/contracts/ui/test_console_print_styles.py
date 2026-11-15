@@ -45,13 +45,19 @@ def test_print_page_canvas_and_footer_use_the_verified_light_palette():
     document = json.loads((ROOT / "apps/web/design/tokens.json").read_text())
     generated = generator.render(document)
     assert generated == (ROOT / "apps/web/src/styles/tokens.css").read_text()
+    assert (ROOT / "scripts/ui/gen_tokens_css.py").read_bytes() == (
+        ROOT.parent / "team guides/Aradhya/design/gen_tokens_css.py"
+    ).read_bytes()
+    owned_print = (ROOT / "apps/web/src/styles/print.css").read_text()
+    assert "@page{background:var(--surface-1);@bottom-center{color:var(--text-secondary)}}" in owned_print
     light = document["themes"]["light"]
     assert light["surface-1"] == "#FFFFFF"
-    assert f"@page {{\n  background: {light['surface-1']};" in generated
-    assert f"@bottom-center {{ color: {light['text-secondary']}; }}" in generated
-    # The page colours must be generated from the palette, rather than copied literals.
+    print_theme = generated.split("@media print", 1)[1]
+    assert f"--surface-1: {light['surface-1']};" in print_theme
+    assert f"--text-secondary: {light['text-secondary']};" in print_theme
+    # Owned page styles resolve the generated print palette, rather than copying colour literals.
     document["themes"]["light"]["surface-1"] = "#FEFEFE"
-    assert "@page {\n  background: #FEFEFE;" in generator.render(document)
+    assert "--surface-1: #FEFEFE;" in generator.render(document).split("@media print", 1)[1]
 
 
 @pytest.mark.parametrize(

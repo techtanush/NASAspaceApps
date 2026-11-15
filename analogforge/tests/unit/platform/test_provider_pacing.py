@@ -70,3 +70,21 @@ def test_fallback_routing_does_not_consume_primary_slots_or_skip_request_charges
 def test_invalid_pacing_rejected_before_any_request(value):
     with pytest.raises(ValueError, match="request pacing"):
         ResponsesClient("fake-key", "model", min_request_interval_seconds=value)  # noqa: S106
+
+
+def test_smaller_primary_response_budget_never_increases_requested_or_fallback_limits():
+    client, seen = configured(200)
+    client.primary_output_token_limit = 1024
+    client.create(input="bounded assessment", max_output_tokens=4096)
+    client.create(input="smaller assessment", max_output_tokens=512)
+    assert [row[1]["max_output_tokens"] for row in seen] == [1024, 512]
+    fallback, routed = configured()
+    fallback.primary_output_token_limit = 768
+    fallback.create(input="same scientific checks", max_output_tokens=4096)
+    assert [row[1]["max_output_tokens"] for row in routed] == [768, 1024]
+
+
+@pytest.mark.parametrize("value", [0, 255, 4097, True, 512.5])
+def test_invalid_primary_response_budget_rejected(value):
+    with pytest.raises(ValueError, match="Primary output token limit"):
+        ResponsesClient("fake-key", "model", primary_output_token_limit=value)  # noqa: S106

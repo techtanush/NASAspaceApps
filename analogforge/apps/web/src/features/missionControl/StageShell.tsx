@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
+import { MotionConfig, motion, useReducedMotion } from 'motion/react';
 import { GlobeStage, type GlobeScene } from '../../maps/GlobeStage';
 import { STEPS, useMissionControl, type StepId } from './state';
 import { useWorkspaceSession } from '../../app/WorkspaceContext';
@@ -34,7 +35,7 @@ function Stage() {
     {step && <StepRail current={step}/>}
   </div>;
 }
-export function StageShell() { return <Stage/>; }
+export function StageShell() { return <MotionConfig reducedMotion="user"><Stage/></MotionConfig>; }
 /** Each screen declares what the globe should show while it is mounted. */
 export function useScene(scene: GlobeScene, handlers: { onPick?: (lat: number, lng: number) => void; onMarkerSelect?: (id: string) => void } = {}) {
   const { setScene, setHandlers } = useMissionControl(); const key = JSON.stringify(scene);
@@ -42,12 +43,13 @@ export function useScene(scene: GlobeScene, handlers: { onPick?: (lat: number, l
   useEffect(() => { setHandlers(handlers); return () => setHandlers({}); }, [handlers.onPick, handlers.onMarkerSelect]);
 }
 export function Panel({ title, step, lead, children, footer, notice, testid }: { title: string; step?: string; lead?: ReactNode; children: ReactNode; footer?: ReactNode; notice?: ReactNode; testid?: string }) {
-  return <section className="mc-panel panel" data-testid={testid} aria-labelledby="mc-panel-title">
+  const reducedMotion = useReducedMotion();
+  return <motion.section className="mc-panel panel" data-theme="light" data-testid={testid} aria-labelledby="mc-panel-title" initial={reducedMotion ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reducedMotion ? 0 : .22, ease: [.22, 1, .36, 1] }}>
     <header className="mc-panel-head">{step && <p className="mc-eyebrow">{step}</p>}<h1 id="mc-panel-title" tabIndex={-1}>{title}</h1>{lead && <p className="mc-lead">{lead}</p>}</header>
     {notice && <div className="mc-panel-notice">{notice}</div>}
     <div className="mc-panel-body">{children}</div>
     {footer && <footer className="mc-panel-foot">{footer}</footer>}
-  </section>;
+  </motion.section>;
 }
 export function Guide({ children }: { children: ReactNode }) {
   return <aside className="mc-guide" aria-label="Guide" data-testid="guide"><span className="mc-guide-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor"/><path d="M1.5 9h15M9 1.5c2.6 2.4 2.6 12.6 0 15M9 1.5c-2.6 2.4-2.6 12.6 0 15" fill="none" stroke="currentColor"/></svg></span><p>{children}</p></aside>;

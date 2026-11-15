@@ -5,21 +5,28 @@ export const EARTH_IMAGERY_MAX_ZOOM = 13;
 // Verified public 2016 tiles stop adding detail at WMTS 13 near Flagstaff; 14 is interpolated.
 // Stop at camera 12 so the last usable tile is not enlarged as if it contained additional detail.
 export const EARTH_IMAGERY_MAP_MAX_ZOOM = EARTH_IMAGERY_MAX_ZOOM - 1;
-export const EARTH_IMAGERY_TILE_BUDGET = 64;
+export type EarthImageryProvider = 'eox' | 'usgs';
+// The National Map advertises 1:9,028 maximum scale. Level 16 was verified to return
+// a real JPEG near the research footprint; level 17 returns 404. Do not overscale it.
+export const USGS_IMAGERY_MAX_ZOOM = 16;
+export const earthImageryMaxZoom = (provider: EarthImageryProvider) => provider === 'usgs' ? USGS_IMAGERY_MAX_ZOOM : EARTH_IMAGERY_MAX_ZOOM;
+export const EARTH_IMAGERY_TILE_BUDGET = 256;
 const MAX_TILE_BYTES = 524288;
 const TILE_TIMEOUT_MS = 8000;
 const TILE_ROOT = 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/GoogleMapsCompatible';
 
-export function earthImageryTileUrl(z: number, x: number, y: number): string {
-  if (![z, x, y].every(Number.isInteger) || z < 0 || z > EARTH_IMAGERY_MAX_ZOOM
+export function earthImageryTileUrl(z: number, x: number, y: number, provider: EarthImageryProvider = 'eox'): string {
+  if (![z, x, y].every(Number.isInteger) || z < 0 || z > earthImageryMaxZoom(provider)
     || x < 0 || y < 0 || x >= 2 ** z || y >= 2 ** z) throw new Error('Invalid satellite tile');
   // WMTS is matrix/row/column, whereas the map supplies z/x/y.
-  return `${TILE_ROOT}/${z}/${y}/${x}.jpg`;
+  return provider === 'usgs'
+    ? `https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/${z}/${y}/${x}`
+    : `${TILE_ROOT}/${z}/${y}/${x}.jpg`;
 }
 
 /** No application API, credentials, automatic retry or unbounded response reaches this loader. */
 export function createEarthTileLoader(protocol: string, loaded: () => void, failed: (limited: boolean) => void,
-  fetchTile: typeof fetch = globalThis.fetch): { load: AddProtocolAction; close: () => void } {
+  fetchTile: typeof fetch = globalThis.fetch, provider: EarthImageryProvider = 'eox'): { load: AddProtocolAction; close: () => void } {
   const session = new AbortController();
   let requests = 0, active = 0;
   const waiting = new Set<() => void>();
@@ -42,7 +49,7 @@ export function createEarthTileLoader(protocol: string, loaded: () => void, fail
       const url = new URL(request.url);
       const match = /^\/(\d+)\/(\d+)\/(\d+)$/.exec(url.pathname);
       if (url.protocol !== `${protocol}:` || url.hostname !== 'tiles' || url.username || url.password || url.port || url.search || url.hash || !match) throw new Error('Invalid satellite tile');
-      const tile = earthImageryTileUrl(Number(match[1]), Number(match[2]), Number(match[3]));
+      const tile = earthImageryTileUrl(Number(match[1]), Number(match[2]), Number(match[3]), provider);
       if (requests >= EARTH_IMAGERY_TILE_BUDGET) { limited = true; throw new Error('Satellite tile budget reached'); }
       requests++;
       await acquire(signal); acquired = true;

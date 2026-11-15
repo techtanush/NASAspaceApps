@@ -9,7 +9,7 @@ import type { GlobeMarker } from '../../maps/GlobeStage';
 import { Guide, Panel, useScene } from './StageShell';
 import { useRunData } from './useRunData';
 import { buildCoverage, buildSites, STATUS_WORD, type Site } from './tour';
-import { narrateSite, PROGRESS_STEPS, PROVING_LABEL, sentenceCase } from './narrator';
+import { PROGRESS_STEPS, PROVING_LABEL, sentenceCase } from './narrator';
 import { RegionalInspector, TargetInspector } from './RegionalInspector';
 import { boxCentre, formatPlace } from './coordinates';
 import { BenchmarkEvidence } from './BenchmarkEvidence';
@@ -17,6 +17,9 @@ import { RunActivity } from './RunActivity';
 import { EnvironmentContext } from './EnvironmentContext';
 import { EarthNomination } from './EarthNomination';
 import { RunTerminalNotice } from './RunTerminalNotice';
+import { SiteTestPurpose } from './SiteTestPurpose';
+import { EvidenceBriefDownload } from './EvidenceBriefDownload';
+import { ResultPresentation } from './ResultPresentation';
 
 const ORIGIN: Record<string, string> = { KNOWN_CONTROL: 'Known control', DISCOVERED: 'Discovered', USER_SUPPLIED: 'Nominated', SYNTHETIC_CONTROL: 'Synthetic practice' };
 const TERMINAL = ['FAILED', 'BLOCKED', 'CANCELLED'];
@@ -42,10 +45,10 @@ export function TourView() {
   const [search, setSearch] = useSearchParams();
   const [selectionError, setSelectionError] = useState<unknown>(null);
   const selectedId = search.get('site') ?? search.get('candidate');
-  const setSelectedId = useCallback((id: string) => setSearch(current => { current.set('site', id); return current; }, { replace: true }),[setSearch]);
+  const setSelectedId = useCallback((id: string) => setSearch(current => { current.set('site', id); current.set('view', 'regional'); return current; }, { replace: true }),[setSearch]);
   const regional = search.get('view') === 'regional'; const targetDetail = search.get('view') === 'target';
   const setView = (view: string) => setSearch(current => { if (view) current.set('view', view); else current.delete('view'); return current; }); const [overview, setOverview] = useState(false);
-  useEffect(() => { if (sites.length > 0 && !selectedId) setSelectedId(sites[0]!.candidate.id); }, [sites, selectedId]);
+  useEffect(() => { if (sites.length > 0 && (!selectedId || !search.has('view'))) setSelectedId(selectedId ?? sites[0]!.candidate.id); }, [sites, selectedId, search, setSelectedId]);
   const selected = sites.find(site => site.candidate.id === selectedId) ?? null; const group = selected ? groups.find(items => items.includes(selected)) ?? [selected] : [];
   const siteCard = useRef<HTMLElement>(null); const previousSite = useRef<string | null>(null);
   useEffect(() => {
@@ -66,54 +69,57 @@ export function TourView() {
   if (run.error) return <Panel title="Investigation unavailable" testid="tour-error"><ErrorPanel error={run.error}/></Panel>;
   if (run.loading || !snapshot || !contract) return <Panel title="Opening the investigation" testid="tour-loading"><Skeleton label="Retrieving the investigation"/></Panel>;
   if (selectedId && !sites.some(site => site.candidate.id === selectedId)) return <Panel title="Site unavailable"><p>This candidate is not part of the current run.</p><Button onClick={() => setSearch({})}>Return to site list</Button></Panel>;
-  const badges = <span className="mc-badges"><ModeBadge mode={snapshot.mode}/><PublicationBadge publication={assurance.publication}/><ConnectionIndicator connection={run.connection === 'connecting' ? 'reconnecting' : run.connection}/></span>;
+  const badges = <span className="mc-run-status"><ModeBadge mode={snapshot.mode}/><span>{sentenceCase(snapshot.state)}</span><ConnectionIndicator connection={run.connection === 'connecting' ? 'reconnecting' : run.connection}/></span>;
   if (!touring) {
     const stopped = TERMINAL.includes(snapshot.state); const current = PROGRESS_STEPS.findIndex(step => (step.states as readonly string[]).includes(snapshot.state));
-    return <Panel testid="run-progress" step="Investigation" title={stopped ? `Investigation ${sentenceCase(snapshot.state).toLowerCase()}` : snapshot.state === 'COMPLETED' ? 'No Earth sites were found' : 'Working on your investigation'} lead={contract.name}
+    return <Panel testid="run-progress" step="Investigation" title={snapshot.state === 'BLOCKED' ? 'Investigation paused' : stopped ? `Investigation ${sentenceCase(snapshot.state).toLowerCase()}` : snapshot.state === 'COMPLETED' ? 'No Earth sites were found' : 'Working on your investigation'} lead={contract.name} notice={stopped ? <RunTerminalNotice run={snapshot}/> : undefined}
       footer={<><Link to={`/runs/${snapshot.run_id}/target`}>Open evidence workbench</Link>{!stopped && snapshot.state !== 'COMPLETED' && <Button variant="secondary" data-testid="btn-cancel-run" disabled={run.pending} onClick={() => { void run.action({ action_type: 'CANCEL', expected_revision: snapshot.revision, payload: {} }); }}>Cancel</Button>}</>}>
       {badges}
       <Guide>{stopped ? 'The run stopped before any Earth site was assessed. The reason is recorded in the evidence workbench.' : 'AnalogForge is measuring the target and screening Earth terrain. This view updates by itself.'}</Guide>
       <ol className="mc-progress" data-testid="progress-steps" data-state={snapshot.state}>{PROGRESS_STEPS.map((step, index) => { const state = stopped ? 'next' : current >= 0 && index < current ? 'done' : index === current ? 'current' : 'next'; return <li key={step.label} data-state={state}><span className="mc-progress-mark" aria-hidden="true">{state === 'done' ? <Check size={12} strokeWidth={2.5}/> : state === 'current' ? <Loader size={12} className="mc-spin"/> : null}</span>{step.label}</li>; })}</ol>
       <RunActivity run={snapshot}/>
-      {run.lastEvent && <p className="mc-event helper" role="status">{run.lastEvent.summary}</p>}
-      {snapshot.blocked_dependencies.length > 0 && <p className="mc-error" role="alert">Blocked on: {snapshot.blocked_dependencies.join(', ')}</p>}
+      {!stopped && run.lastEvent && <p className="mc-event helper" role="status">{run.lastEvent.summary}</p>}
     </Panel>;
   }
   const position = selected ? sites.indexOf(selected) : 0; const step = (delta: number) => { const next = sites[(position + delta + sites.length) % sites.length]; if (next) { setSelectedId(next.candidate.id); setOverview(false); } };
   const canProve = !!snapshot.rover_revision_id && (snapshot.pending_review?.allowed_actions.includes('PROVE_IT') ?? false);
   const prove = async (site: Site) => { if (snapshot.selected_candidate_id !== site.candidate.id) { const ok = await run.action({ action_type: 'SELECT_CANDIDATE', expected_revision: snapshot.revision, payload: { candidate_id: site.candidate.id } }); if (!ok) throw new Error('Selection was not confirmed'); const confirmed = await api.get<components['schemas']['RunSnapshot']>(`/runs/${snapshot.run_id}`); if (confirmed.selected_candidate_id !== site.candidate.id) throw new Error('Site selection is still pending. Wait for the investigation to update, then retry.'); } };
   const working = PROVING_LABEL[snapshot.state];
-  return <>{regional && selected && <RegionalInspector runId={snapshot.run_id} site={selected} run={snapshot}/ >}{targetDetail && <TargetInspector runId={snapshot.run_id} profileId={snapshot.target_profile_id} target={contract.target} run={snapshot}/>}<Panel testid="tour" step="Earth sites" title="Where to rehearse on Earth" lead={`${sites.length} candidate ${sites.length === 1 ? 'site' : 'sites'} for ${contract.name}.`} notice={TERMINAL.includes(snapshot.state) ? <RunTerminalNotice run={snapshot}/> : undefined}
+  const researching = !TERMINAL.includes(snapshot.state) && !['COMPLETED', 'AWAITING_REVIEW'].includes(snapshot.state);
+  const technical = !researching && search.get('detail') === 'technical';
+  const changePresentation = (next: boolean) => setSearch(current => { if (next) current.set('detail', 'technical'); else current.delete('detail'); return current; }, { replace: true });
+  return <>{regional && selected && <RegionalInspector runId={snapshot.run_id} site={selected} run={snapshot}/ >}{targetDetail && <TargetInspector runId={snapshot.run_id} profileId={snapshot.target_profile_id} target={contract.target} run={snapshot}/>}<Panel testid="tour" step={`Location ${position + 1} of ${sites.length}`} title={selected?.candidate.name ?? 'Earth locations'} lead={contract.name} notice={TERMINAL.includes(snapshot.state) ? <RunTerminalNotice run={snapshot}/> : undefined}
     footer={<><div className="mc-tour-nav" role="group" aria-label="Tour"><Button variant="secondary" aria-label="Previous site" data-testid="btn-prev-site" onClick={() => step(-1)}><ChevronLeft size={16} aria-hidden="true"/></Button><span className="mono" data-testid="tour-position">{position + 1} / {sites.length}</span><Button variant="secondary" aria-label="Next site" data-testid="btn-next-site" onClick={() => step(1)}><ChevronRight size={16} aria-hidden="true"/></Button></div>
-      <Button variant="ghost" aria-pressed={overview} data-testid="btn-all-sites" onClick={() => { setView(''); setOverview(value => !value); }}><Globe2 size={16} aria-hidden="true"/>{overview ? 'Back to site' : 'Whole Earth'}</Button></>}>
+      <Button variant="ghost" aria-pressed={overview} data-testid="btn-all-sites" onClick={() => { if (overview) { setView('regional'); setOverview(false); } else { setView('globe'); setOverview(true); } }}><Globe2 size={16} aria-hidden="true"/>{overview ? 'Back to site' : 'Whole Earth'}</Button></>}>
     {badges}
+    {!researching && <ResultPresentation technical={technical} onChange={changePresentation}/>}
     {assurance.error && <ErrorPanel error={assurance.error}/>}
-    <p className="helper">Search scope: areas covered by this investigation’s terrain data and screened candidate windows.</p>
-    <div className="mc-view-switch" role="group" aria-label="Evidence view"><Button variant="secondary" aria-pressed={!regional && !targetDetail} onClick={() => setView('')}>Globe</Button><Button variant="secondary" aria-label="Inspect location" aria-pressed={regional} onClick={() => setView('regional')}>Site detail</Button><Button variant="secondary" aria-label="Target evidence" aria-pressed={targetDetail} onClick={() => setView('target')}>Target</Button></div>
-    {selected && <Guide>{narrateSite(selected, sites.length)}</Guide>}
-    {working && <p className="mc-working-line" role="status"><Loader size={14} className="mc-spin" aria-hidden="true"/>{working}</p>}
-    <details className="mc-activity-disclosure"><summary>Investigation work log</summary><RunActivity run={snapshot}/></details>
+    <div className="mc-view-switch" role="group" aria-label="Evidence view"><Button variant="secondary" aria-pressed={!regional && !targetDetail} onClick={() => { setView('globe'); setOverview(false); }}>Globe</Button><Button variant="secondary" aria-label="Inspect location" aria-pressed={regional} onClick={() => { setView('regional'); setOverview(false); }}>Site detail</Button><Button variant="secondary" aria-label="Target evidence" aria-pressed={targetDetail} onClick={() => setView('target')}>Target</Button></div>
+    {researching && <div className="mc-research-status" role="status"><p className="mc-working-line"><Loader size={14} className="mc-spin" aria-hidden="true"/>{working ?? 'Research is still running'}</p><p>{run.lastEvent?.summary ?? 'Candidate locations are provisional while the remaining evidence is checked.'}</p></div>}
+    <details className="mc-activity-disclosure" open={researching || technical || undefined}><summary>Investigation work log</summary><RunActivity run={snapshot}/></details>
     {selected && <p className="sr-only" role="status" aria-live="polite" aria-atomic="true" data-testid="site-selection-announcement">Site {selected.index} of {sites.length}: {selected.candidate.name}. {STATUS_WORD[selected.status]}.</p>}
     {selected && <article ref={siteCard} className="mc-site-card" data-testid="site-card" data-status={selected.status} aria-label={`Site ${selected.index}`}>
-      <header><div><h2>{selected.candidate.name}</h2><p className="mono">{formatPlace(selected.lat, selected.lng)} · {ORIGIN[selected.candidate.origin] ?? selected.candidate.origin}</p></div><span className="mc-site-status" data-status={selected.status}>{STATUS_WORD[selected.status]}</span></header>
-      <details className="mc-benchmark-details"><summary>All {selected.rows.length} requirements and benchmarks</summary>
-      <BenchmarkEvidence run={snapshot} contract={contract} site={selected}/></details>
-      <EnvironmentContext run={snapshot} candidateId={selected.candidate.id}/>
-      {selected.candidate.limitations.length > 0 && <details className="mc-benchmark-details" key={`limits-${selected.candidate.id}`}><summary>Source and model limits ({selected.candidate.limitations.length})</summary><ul className="mc-limits">{selected.candidate.limitations.map(item => <li key={item}>{item}</li>)}</ul></details>}
-      {run.results.length > 0 && <><h3>Run-level rover test attempts</h3><p className="helper">These attempts belong to the run; they are not attributed to the currently viewed site.</p><ol className="mc-attempts" data-testid="attempts">{run.results.map((result, index) => <li key={result.id}><span className="mono">Attempt {index + 1}</span><ResultBadge outcome={result.outcome}/>{result.failure_category && <span className="helper">{sentenceCase(result.failure_category)} problem</span>}</li>)}</ol></>}
+      <header><p className="mono">{formatPlace(selected.lat, selected.lng)} · {ORIGIN[selected.candidate.origin] ?? selected.candidate.origin}</p><span className="mc-site-status" data-status={selected.status}>{STATUS_WORD[selected.status]}</span></header>
+      <SiteTestPurpose site={selected}/>
+      <section className="mc-site-benchmarks" aria-label="Benchmarks and measured results"><h2>Benchmarks and measured results</h2><BenchmarkEvidence run={snapshot} contract={contract} site={selected} technical={technical}/></section>
+      <details className="mc-benchmark-details" open={technical || undefined}><summary>Weather and operating context</summary><EnvironmentContext run={snapshot} candidateId={selected.candidate.id}/></details>
+      {selected.candidate.limitations.length > 0 && <details className="mc-benchmark-details" key={`limits-${selected.candidate.id}`} open={technical || undefined}><summary>Source and model limits ({selected.candidate.limitations.length})</summary><ul className="mc-limits">{selected.candidate.limitations.map(item => <li key={item}>{item}</li>)}</ul></details>}
+      {run.results.length > 0 && <details className="mc-benchmark-details" open={technical || undefined}><summary>Run-level rover test attempts ({run.results.length})</summary><p className="helper">These attempts belong to the run; they are not attributed to the currently viewed site.</p><ol className="mc-attempts" data-testid="attempts">{run.results.map((result, index) => <li key={result.id}><span className="mono">Attempt {index + 1}</span><ResultBadge outcome={result.outcome}/>{result.failure_category && <span className="helper">{sentenceCase(result.failure_category)} problem</span>}</li>)}</ol></details>}
       <div className="mc-site-actions">
+        <a className="button" data-variant="primary" data-testid="link-report" href={`/runs/${snapshot.run_id}/report?site=${selected.candidate.id}`} target="_blank" rel="noreferrer">Location report<ExternalLink size={14} aria-hidden="true"/></a>
         {snapshot.rover_revision_id ? <button type="button" className="button" data-variant="primary" data-testid="link-prove" disabled={run.pending} onClick={() => { setSelectionError(null); void prove(selected).then(() => { navigate(`/runs/${snapshot.run_id}/test-lab`); }).catch(setSelectionError); }}>Open rover test</button> : <p className="helper">No rover supplied: route benchmarks are not run.</p>}
-        <a className="button" data-variant="secondary" data-testid="link-report" href={`/runs/${snapshot.run_id}/report?site=${selected.candidate.id}`} target="_blank" rel="noreferrer">Open report<ExternalLink size={14} aria-hidden="true"/></a>
-        <Link className="button" data-variant="ghost" to={`/runs/${snapshot.run_id}/qualification`}>View evidence</Link>
+        <Link className="button" data-variant="ghost" to={`/runs/${snapshot.run_id}/qualification?candidate=${selected.candidate.id}`}>Evidence workbench</Link>
       </div>
+      <EvidenceBriefDownload key={selected.candidate.id} run={snapshot} candidateId={selected.candidate.id}/>
       {!canProve && snapshot.rover_revision_id && <p className="helper">The rover test opens in the evidence workbench.</p>}
       {(run.actionError ?? selectionError) != null && <ErrorPanel error={run.actionError ?? selectionError}/>}
     </article>}
     <details className="mc-coverage-strip" data-testid="coverage-strip" aria-label="Which site tests each requirement"><summary>Requirement coverage · {coverage.filter(row => row.state === 'COVERED').length} of {coverage.length} supported</summary><ul>{coverage.map(row => <li key={row.requirement.id} data-state={row.state}><span>{row.requirement.label}</span><strong>{row.state === 'COVERED' ? row.sites.map(site => `Site ${site.index}`).join(', ') : row.state === 'GAP' ? 'Not testable on Earth' : 'No site yet'}</strong></li>)}</ul></details>
-    <section className="mc-portfolio" aria-label="Benchmark-specific rehearsal portfolio"><p className="mc-eyebrow">One mission, several rehearsals</p><h2>Match each benchmark to the right site.</h2><p className="helper">Different sites can support different requirements. A computed portfolio records those assignments and remaining gaps. Requirements that must happen together cannot be combined across separate locations.</p><div className="mc-site-actions"><Button variant="secondary" disabled={run.pending||snapshot.state!=='AWAITING_REVIEW'} disabledReason="Portfolio assembly is available when the investigation awaits review." onClick={()=>{void run.action({action_type:'BUILD_PORTFOLIO',expected_revision:snapshot.revision,payload:{candidate_ids:snapshot.candidate_ids,max_sites:3}});}}>Build rehearsal portfolio</Button><Link to={`/runs/${snapshot.run_id}/portfolio`}>Inspect portfolio{snapshot.portfolio_ids.length>0?` (${snapshot.portfolio_ids.length})`:''}</Link></div></section>
-    <EarthNomination key={snapshot.run_id} run={snapshot} action={run.action} pending={run.pending} error={run.actionError}/>
+    <details className="mc-portfolio" aria-label="Benchmark-specific rehearsal portfolio"><summary>Plan a rehearsal across several locations</summary><p className="helper">Different sites can support different requirements. A computed portfolio records those assignments and remaining gaps. Requirements that must happen together cannot be combined across separate locations.</p><div className="mc-site-actions"><Button variant="secondary" disabled={run.pending||snapshot.state!=='AWAITING_REVIEW'} disabledReason="Portfolio assembly is available when the investigation awaits review." onClick={()=>{void run.action({action_type:'BUILD_PORTFOLIO',expected_revision:snapshot.revision,payload:{candidate_ids:snapshot.candidate_ids,max_sites:3}});}}>Build rehearsal portfolio</Button><Link to={`/runs/${snapshot.run_id}/portfolio`}>Inspect portfolio{snapshot.portfolio_ids.length>0?` (${snapshot.portfolio_ids.length})`:''}</Link></div></details>
+    <details className="mc-benchmark-details"><summary>Suggest another Earth location</summary><EarthNomination key={snapshot.run_id} run={snapshot} action={run.action} pending={run.pending} error={run.actionError}/></details>
     {group.length > 1 && selected && <details className="mc-nearby"><summary>{group.length} nearby footprints</summary><LocalMap group={group} selected={selected.candidate.id} onSelect={selectSite}/></details>}
     <ul className="mc-site-list" data-testid="site-list" aria-label="Sites">{sites.map(site => <li key={site.candidate.id}><button type="button" data-testid="site-chip" data-status={site.status} aria-pressed={site === selected} onClick={() => selectSite(site.candidate.id)}><span className="mc-ticker-index">{site.index}</span>{site.candidate.name}</button></li>)}</ul>
+    <details className="mc-benchmark-details" open={technical || undefined}><summary>Run details and provenance</summary><PublicationBadge publication={assurance.publication}/><p className="helper">Search scope: areas covered by this investigation’s terrain data and screened candidate windows.</p><p className="mono">Run {snapshot.run_id} · revision {snapshot.revision}</p><p className="mono">Dataset lock: {snapshot.dataset_lock_id}</p><Link to={`/runs/${snapshot.run_id}/target`}>Open evidence workbench</Link></details>
 
   </Panel></>;
 }

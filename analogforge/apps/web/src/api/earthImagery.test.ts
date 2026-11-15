@@ -13,6 +13,18 @@ it('maps z/x/y to the verified 2016 WMTS matrix/row/column and rejects unsupport
   }
 });
 
+it('uses the exact USGS host and row/column order through its verified level 16, rejecting overscale', async () => {
+  expect(earthImageryTileUrl(16, 12470, 25865, 'usgs')).toBe('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/16/25865/12470');
+  expect(() => earthImageryTileUrl(17, 24940, 51730, 'usgs')).toThrow();
+  expect(() => earthImageryTileUrl(16, 65536, 0, 'usgs')).toThrow();
+  const fetchTile = vi.fn<typeof fetch>().mockImplementation(async () => jpeg());
+  const failed = vi.fn(), loader = createEarthTileLoader('af-test', vi.fn(), failed, fetchTile, 'usgs');
+  await loader.load(request(16, 12470, 25865), new AbortController());
+  expect(fetchTile.mock.calls[0]).toEqual([earthImageryTileUrl(16, 12470, 25865, 'usgs'), expect.objectContaining({ credentials: 'omit', referrerPolicy: 'no-referrer', redirect: 'error' })]);
+  await expect(loader.load({ url: 'af-test://tiles/16/12470/25865?host=other' }, new AbortController())).rejects.toThrow('SATELLITE_IMAGERY_UNAVAILABLE');
+  expect(fetchTile).toHaveBeenCalledOnce(); loader.close();
+});
+
 it('does no work until explicitly invoked, then fetches only the fixed host without credentials or referrer', async () => {
   const fetchTile = vi.fn<typeof fetch>().mockImplementation(async () => jpeg());
   const loaded = vi.fn(), failed = vi.fn();
@@ -34,12 +46,12 @@ it.each(['other://tiles/13/1/1', 'af-test://foreign/13/1/1', 'af-test://user:pas
   expect(fetchTile).not.toHaveBeenCalled(); expect(failed).toHaveBeenCalledWith(false); loader.close();
 });
 
-it('stops at exactly 64 requests and reports the budget limit without retries', async () => {
+it('stops at exactly 256 requests and reports the budget limit without retries', async () => {
   const fetchTile = vi.fn<typeof fetch>().mockImplementation(async () => jpeg()); const failed = vi.fn();
   const loader = createEarthTileLoader('af-test', vi.fn(), failed, fetchTile);
   for (let i = 0; i < EARTH_IMAGERY_TILE_BUDGET; i++) await loader.load(request(13, 1555 + i), new AbortController());
   await expect(loader.load(request(), new AbortController())).rejects.toThrow();
-  expect(fetchTile).toHaveBeenCalledTimes(64); expect(failed.mock.calls).toEqual([[true]]); loader.close();
+  expect(fetchTile).toHaveBeenCalledTimes(256); expect(failed.mock.calls).toEqual([[true]]); loader.close();
 });
 
 it.each(['http', 'content-type', 'length', 'body-limit', 'invalid-jpeg'])('fails closed and sanitizes %s failures', async fault => {

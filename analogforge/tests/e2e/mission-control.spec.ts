@@ -64,8 +64,13 @@ async function launch(page: import('@playwright/test').Page, siteOnly=false, moo
  return runId;
 }
 test('globe, exact-site inspection, stable selection and printable report',async({page})=>{
- const external:string[]=[];page.on('request',request=>{const url=new URL(request.url());if(url.protocol.startsWith('http')&&url.origin!==new URL(process.env.E2E_BASE_URL||'http://127.0.0.1:5176').origin)external.push(url.origin);});
+ // The production map starts real imagery. This offline journey blocks only that exact
+ // public tile source and verifies its honest fallback; no local API response is replaced.
+ const satellite=/^https:\/\/(?:basemap\.nationalmap\.gov\/arcgis\/rest\/services\/USGSImageryOnly\/MapServer\/tile\/\d+\/\d+\/\d+|tiles\.maps\.eox\.at\/wmts\/1\.0\.0\/s2cloudless_3857\/default\/GoogleMapsCompatible\/\d+\/\d+\/\d+\.jpg)$/;
+ const blockedSatellite:string[]=[];await page.context().route(satellite,route=>{blockedSatellite.push(route.request().url());return route.abort('blockedbyclient');});
+ const external:string[]=[];page.context().on('request',request=>{const url=new URL(request.url());if(url.protocol.startsWith('http')&&url.origin!==new URL(process.env.E2E_BASE_URL||'http://127.0.0.1:5176').origin&&!satellite.test(url.href))external.push(url.origin);});
  await launch(page);
+ if(process.env.E2E_TARGET==='real'){await expect(page.getByText(/Satellite imagery unavailable\. Measured terrain/)).toBeVisible();expect(blockedSatellite.length).toBeGreaterThan(0);}
  await expect(page.getByTestId('globe-stage')).toHaveAttribute('data-state','ready');
  const first=new URL(page.url()).searchParams.get('site');
  await page.getByRole('button',{name:'Inspect location',exact:true}).click();
@@ -83,7 +88,17 @@ test('globe, exact-site inspection, stable selection and printable report',async
  const href=await page.getByTestId('link-report').getAttribute('href');
  await page.goto(href!);
  await expect(page.getByTestId('site-report')).toBeVisible();
- await expect(page.getByTestId('site-report')).toContainText('current evidence summary');
+ await expect(page.getByTestId('site-report')).toContainText('current evidence brief');
+ await expect(page.getByRole('heading',{name:'Benchmarks and measured results',exact:true})).toBeVisible();
+ if(process.env.E2E_TARGET==='real'){
+  const candidateId=new URL(page.url()).searchParams.get('site')!;
+  const runId=new URL(page.url()).pathname.split('/')[2]!;
+  const downloading=page.waitForEvent('download',{timeout:15000});
+  await page.getByRole('button',{name:'Download current evidence PDF',exact:true}).click();
+  const downloaded=await downloading;
+  expect(downloaded.suggestedFilename()).toBe(`analogforge-evidence-brief-${runId.slice(0,8)}-${candidateId.slice(0,8)}.pdf`);
+  expect(readFileSync((await downloaded.path())!).subarray(0,5).toString()).toBe('%PDF-');
+ }
  await page.emulateMedia({media:'print'});
  await expect(page.getByRole('navigation',{name:'Report actions'})).toBeHidden();
  await page.pdf({path:'../../out/mission-control-report.pdf',format:'A4'});
@@ -133,6 +148,6 @@ test('Moon setup blocks unsupported coverage and its explicit practice target re
  await page.getByRole('button',{name:'Target evidence',exact:true}).click();
  await expect(page.getByTestId('planetary-panel')).toHaveAttribute('data-body','MOON');
  await expect(page.getByTestId('site-card')).toContainText('No rover supplied');
- await page.getByText(/All .* requirements and benchmarks/).click();
+ await expect(page.getByRole('heading',{name:'Benchmarks and measured results',exact:true})).toBeVisible();
  await expect(page.getByTestId('site-card')).toContainText('GAP');
 });
