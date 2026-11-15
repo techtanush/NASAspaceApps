@@ -259,6 +259,36 @@ def test_raw_reasoning_secrets_unknown_payloads_and_cross_run_refs_are_not_expos
     assert page(store, store.workspace, store.run)["items"][-1]["summary"] == "Investigation update committed"
 
 
+@pytest.mark.parametrize("mismatch", ["run_id", "invocation_id", "role", "mode", "workspace_id"])
+def test_role_result_reference_cannot_cross_task_run_mode_or_workspace(mismatch):
+    store = ActivityStore()
+    invocation = store.record("invocations", role="requirements", task_kind="validate_accepted_contract")
+    evidence = store.record("evidence")
+    fields = {"invocation_id": invocation["id"], "role": "requirements", "mode": "live",
+              "evidence_ids": [evidence["id"]]}
+    fields[mismatch] = "earth_scout" if mismatch == "role" else "synthetic" if mismatch == "mode" else str(uuid4())
+    result = store.record("role_results", **fields)
+    store.event("agent.completed", role="requirements", invocation_id=invocation["id"],
+                role_result_id=result["id"], evidence_count=9999)
+    item = page(store, store.workspace, store.run)["items"][0]
+    assert item["role_result_id"] is None and item["evidence_count"] == 0
+    assert item["evidence_ids"] == [] and item["evidence_ids_truncated"] is False
+
+
+def test_role_result_evidence_count_uses_only_unique_authorized_records_and_ignores_claimed_count():
+    store = ActivityStore()
+    invocation = store.record("invocations", role="requirements", task_kind="validate_accepted_contract")
+    evidence = store.record("evidence")
+    foreign = store.record("evidence", run_id=str(uuid4()))
+    result = store.record("role_results", invocation_id=invocation["id"], role="requirements", mode="live",
+                          evidence_ids=[evidence["id"], evidence["id"], foreign["id"], str(uuid4())])
+    store.event("agent.completed", role="requirements", invocation_id=invocation["id"],
+                role_result_id=result["id"], evidence_count=9999)
+    item = page(store, store.workspace, store.run)["items"][0]
+    assert item["role_result_id"] == result["id"] and item["evidence_ids"] == [evidence["id"]]
+    assert item["evidence_count"] == 1 and item["evidence_ids_truncated"] is False
+
+
 @pytest.mark.parametrize("cursor", ["not base64!", "[", "=" * 600, "e30="])
 def test_invalid_cursors_are_rejected(cursor):
     with pytest.raises(ApiError):

@@ -185,6 +185,12 @@ class ActivityProjection:
         role = payload.get("role") or invocation.get("role")
         role = role if isinstance(role, str) else None
         role = role if role in catalog.ROLE_DISPLAY_NAMES or role == "scientific_worker" else None
+        role_result = self.scoped("role_results", payload.get("role_result_id")) or {}
+        if role_result and (
+            role_result.get("invocation_id") != invocation.get("id")
+            or role_result.get("role") != role or role_result.get("mode") != self.run["mode"]
+        ):
+            role_result = {}
         candidate = self.scoped("candidates", payload.get("candidate_id") or invocation.get("candidate_id")) or {}
         requirement_id = payload.get("requirement_id") or invocation.get("requirement_id")
         requirement_id = (
@@ -254,12 +260,12 @@ class ActivityProjection:
         if code is not None:
             summary = f"{summary.rstrip('. ')}. {FAILURE_SUMMARIES[code]}"
         # Only authorized references cross this read boundary. Raw payloads/summaries are intentionally never copied.
-        evidence = event.get("evidence_ids", [])
-        evidence_ids = (
-            [row["id"] for eid in evidence[:128] if (row := self.scoped("evidence", eid))]
+        evidence = role_result.get("evidence_ids", []) if role_result else event.get("evidence_ids", [])
+        evidence_ids = list(dict.fromkeys(
+            [row["id"] for eid in evidence if (row := self.scoped("evidence", eid))]
             if isinstance(evidence, list)
             else []
-        )
+        ))
         return {
             "id": f"{self.run['id']}:{event['seq']}",
             "run_id": self.run["id"],
@@ -277,7 +283,10 @@ class ActivityProjection:
             "requirement_id": safe_label(requirement_id, "accepted requirement") if requirement_id else None,
             "invocation_id": invocation.get("id"),
             "tool_receipt_id": receipt.get("id"),
-            "evidence_ids": evidence_ids,
+            "role_result_id": role_result.get("id"),
+            "evidence_count": len(evidence_ids),
+            "evidence_ids_truncated": len(evidence_ids) > 128,
+            "evidence_ids": evidence_ids[:128],
         }
 
 

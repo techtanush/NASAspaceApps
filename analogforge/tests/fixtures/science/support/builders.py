@@ -22,7 +22,7 @@ from analogforge.ports.science import (
     ScienceService,
     SourcePolicy,
 )
-from support.registrar_stub import Registered, register
+from .registrar_stub import Registered, register
 
 KIT = Path(__file__).resolve().parents[2] / "kit"
 WORKSPACE = uuid.UUID("00000000-0000-4000-8000-000000000001")

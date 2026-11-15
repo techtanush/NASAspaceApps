@@ -13,7 +13,9 @@ export function benchmarkText(requirement: Requirement): string {
     : operator === 'PRESENT' ? 'must be present' : 'cannot be reproduced naturally on Earth';
   const min = requirement.minimum_support_scale_m, max = requirement.maximum_support_scale_m;
   const support = min !== null && max !== null ? (min === max ? ` at ${min} m support` : ` at ${min}–${max} m support`) : '';
-  return `${rule}${support}`;
+  const band = requirement.parameters?.slope_band_deg;
+  const bandText = band?.length === 2 && band.every(Number.isFinite) ? ` · slope band ${band[0]}–${band[1]} deg` : '';
+  return `${rule}${bandText}${support}`;
 }
 export const ORIGIN_LABEL: Record<Requirement['origin'], string> = { USER: 'Supplied by you', TARGET_DERIVED: 'Derived from the target', PROPOSED_DEFAULT: 'Proposed default' };
 export const STATUS_WORD: Record<Status, string> = { PASS: 'Matches', PARTIAL: 'Partly matches', FAIL: 'Does not match', GAP: 'Cannot be tested on Earth', UNKNOWN: 'Not yet known' };

@@ -7,8 +7,8 @@ from dataclasses import fields
 from uuid import uuid4
 
 import pytest
-from support.builders import make_context, make_request, run
-from support.registrar_stub import register
+from tests.fixtures.science.support.builders import make_context, make_request, run
+from tests.fixtures.science.support.registrar_stub import register
 
 from analogforge.jobs import cpu
 from analogforge.jobs.context import WorkerScienceContext

@@ -1081,7 +1081,8 @@ class WorkflowEngine:
                     run_id,
                     "agent.proposal_rejected" if rejected_seed else "agent.completed",
                     {"role": role, "task_kind": task_kind, "invocation_id": invocation_id,
-                     "status": result["status"], "evidence_ids": result["evidence_ids"],
+                     "status": result["status"], "role_result_id": result["id"],
+                     "evidence_count": len(result["evidence_ids"]),
                      "summary": submission.summary},
                     run["mode"],
                 )

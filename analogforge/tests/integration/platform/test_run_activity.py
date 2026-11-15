@@ -1,5 +1,6 @@
 """Durable activity replay is bounded, workspace/run scoped, and independent of browser history."""
 
+import json
 from pathlib import Path
 from uuid import uuid4
 
@@ -8,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from analogforge.api.dependencies import Principal
 from analogforge.application.activity import page
-from analogforge.db.store import Store
+from analogforge.db.store import PersistenceError, Store
 from analogforge.main import create_app
 from analogforge.ports.domain_models import RunEvent
 from analogforge.ports.hashing import canonical_sha256
@@ -19,6 +20,50 @@ from tests.integration.platform.test_migrations import platform_store, seed_run
 from tests.integration.platform.test_runtime_journey import runtime
 
 __all__ = ["platform_store", "runtime"]
+
+
+@pytest.mark.db
+def test_actual_role_completion_keeps_large_evidence_in_result_and_commits_a_bounded_event(runtime) -> None:
+    engine, store, workspace, make = runtime
+    run = engine.advance(make("synthetic-graph-regression-v1")["id"], workspace)
+    run = engine.advance(run["id"], workspace)  # Validate and pin the accepted synthetic input hashes.
+    with store.transaction(workspace) as unit:
+        invocation = unit.create("invocations", {"run_id": run["id"], "mode": "synthetic",
+                                                "role": "scientific_worker", "status": "SUCCEEDED"})
+        evidence_ids = [unit.create("evidence", {"run_id": run["id"], "mode": "synthetic",
+                                                "kind": "ANALYSIS", "body": "EARTH"})["id"] for _ in range(206)]
+        unit.create("tool_receipts", {"run_id": run["id"], "mode": "synthetic", "status": "SUCCEEDED",
+                                      "invocation_id": invocation["id"], "tool_name": "analyze_earth_candidate",
+                                      "evidence_ids": evidence_ids})
+    # Execute the actual synthetic role and publication path, without science/provider calls.
+    engine._role("mission_director", "advance_workflow", run["id"], workspace)
+    with store.transaction(workspace) as unit:
+        results = unit.list("role_results", {"run_id": run["id"]})
+        actions = unit.list("agent_actions", {"run_id": run["id"]})
+        assert len(results) == len(actions) == 1
+        result = results[0]
+        assert set(result["evidence_ids"]) == set(result["payload"]["evidence_ids"]) == set(evidence_ids)
+        assert set(actions[0]["evidence_ids"]) == set(evidence_ids)
+        assert unit.require("invocations", result["invocation_id"])["status"] == "SUCCEEDED"
+    events = store.events(workspace, run["id"])
+    completed = events[-1]
+    assert completed["event_type"] == "agent.completed"
+    assert completed["payload"]["role_result_id"] == result["id"]
+    assert completed["payload"]["evidence_count"] == 206
+    assert completed["evidence_ids"] == [] and "evidence_ids" not in completed["payload"]
+    assert len(json.dumps(completed).encode()) < 16384
+    assert RunEvent.model_validate(completed)
+    # The existing byte guard still rejects the former duplicated event shape.
+    oversized = {**completed["payload"], "evidence_ids": evidence_ids}
+    with pytest.raises(PersistenceError) as caught:
+        with store.transaction(workspace) as unit:
+            unit.append_event(run["id"], "agent.completed", oversized, "synthetic")
+    assert caught.value.code == "RESOURCE_LIMIT"
+    assert store.events(workspace, run["id"]) == events
+    activity = page(store, workspace, run["id"])["items"][-1]
+    assert activity["role_result_id"] == result["id"] and activity["evidence_count"] == 206
+    assert len(activity["evidence_ids"]) == 128 and activity["evidence_ids_truncated"] is True
+    assert set(activity["evidence_ids"]) <= set(evidence_ids)
 
 
 @pytest.mark.db

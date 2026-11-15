@@ -22,6 +22,8 @@ Each item has stable `id = run_id:seq`, `run_id`, `seq`, `event_type`, `created_
 
 Summaries project actual committed events and authorized records. Workers commit start records before scientific/provider execution; completion or failure is a separate transition. A historical “Started” record does not mean the operation is still running: correlate terminal records by invocation and consult current run state. Reload/resync reads the durable history; SSE watermark changes trigger UI refresh. The UI displays at most the first 2,000 records with a limit notice; endpoint pagination remains available. No scripted scenario outcomes, estimated percentages, raw code, prompts or hidden reasoning are progress records.
 
+Role completion events carry `role_result_id` and `evidence_count` rather than repeating a growing global evidence list inside the 16 KiB event envelope. The full canonical role result retains every evidence reference. Activity items additionally return nullable `role_result_id`, `evidence_count`, and `evidence_ids_truncated`; `evidence_ids` displays at most 128 unique authorized references. Counts come from the scoped stored records, not an unverified count in event text. A shortened display is explicitly marked and does not remove evidence from the result.
+
 Source: [activity projection](../../analogforge/src/analogforge/application/activity.py), [router](../../analogforge/src/analogforge/api/routers/runs.py), [UI consumer](../../analogforge/apps/web/src/features/missionControl/RunActivity.tsx).
 
 ## Optional stored weather/context
