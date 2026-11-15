@@ -24,7 +24,7 @@ This addresses Claude’s review of main `d6ee539`. The review used the real API
 ## Evidence and validation
 
 - Full platform backend suite: **1,247 passed**, with existing dependency deprecation warnings. New procedural guidance and latest PDF changes also passed focused tests.
-- Final frontend full suite: **360 passed**. Production build, TypeScript and changed-area lint checks passed.
+- Integrated local frontend suite: **360 passed**. The separate main-based release branch passed its complete **331-test** frontend suite, **70 focused backend tests**, TypeScript and production build. The additional local account tests and account code are excluded from the release branch.
 - Real-backend browser journeys: desktop globe, grouped markers, exact-site changes, opt-in blocked imagery and PDF; mobile 390 px; keyboard/reduced motion and serious/critical accessibility scan; no-WebGL; Moon unsupported coverage and explicit Moon practice data. All passed after the camera and test synchronization corrections.
 - Native Comet run: `25fbdc53-69c7-4c79-8672-8ce5168cdfb2`. Selected an existing canonical ARES-1 profile, prepared and accepted requirements, opened the overview, inspected a location, and ran its rover model in the tour. Two attempts were recorded and the run published a **LIMITED** passport. The first location showed **5 met, 2 need more evidence, 2 cannot be tested on Earth**. No physical rover pass is claimed.
 - Native Comet satellite check: explicitly loaded the public USDA/USGS aerial layer and zoomed twice. Roads/terrain loaded at a 500 m scale bar. Source vintage and approximate local sampling remain displayed.
@@ -46,6 +46,8 @@ From `apps/web/`, use the supported Node installation in PATH and run `vitest ru
 - This fix pass did not execute a fresh live NASA-data/model-provider research run. Existing live data, weather and provider adapters are unchanged. Synthetic scientific measurements remain labeled synthetic even when real historical imagery is used as context.
 - A regional search is not a claim of global optimality. Missing lunar coverage remains an explicit coverage stop; the separate Moon practice journey uses its declared synthetic target.
 - Route endpoints appear only after matching, independently verified route evidence exists for that location. They are model-derived planning references, not a surveyed or cleared driving corridor. Earth tests cannot assure mission success in different gravity, atmosphere or other unreproduced conditions.
-- The separate account/landing work remains local until published independently; it is not required for these demo fixes.
+- The separate account/login work remains local until published independently; it is not required for these demo fixes.
+
+Clean-release verification also corrected the original landing animation so its headline stays below the header. The end-to-end regression checks that position and runs the rover model inside the tour through to passport claims.
 
 Screenshots and PDFs are ignored local receipts under `out/demo-review/` and `out/mission-control-*.png`; no account data, credentials or large generated files are included in Git.

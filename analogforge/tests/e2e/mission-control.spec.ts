@@ -10,6 +10,8 @@ test('slow optional fonts cannot hold the authenticated workspace blank',async({
  try {
   await page.goto('/',{waitUntil:'domcontentloaded'});
   await expect(page.getByTestId('btn-begin')).toBeVisible();
+  const headline=await page.getByTestId('welcome').locator('h1').boundingBox();
+  expect(headline!.y).toBeGreaterThanOrEqual(64);
   await page.getByTestId('btn-begin').click();
   await expect(page.getByRole('button',{name:'Moon',exact:true})).toBeVisible();
   await expect(page.getByRole('button',{name:'Mars',exact:true})).toBeVisible();
@@ -137,6 +139,22 @@ test('globe, exact-site inspection, stable selection and printable report',async
  await page.pdf({path:'../../out/mission-control-report.pdf',format:'A4'});
  expect(external).toEqual([]);
  await page.emulateMedia({media:'screen'});
+ if(process.env.E2E_TARGET==='real'){
+  await page.goto(`/runs/${runId}/tour?site=${first}&view=regional`);
+  const proving=page.waitForResponse(response=>response.request().method()==='POST'&&new URL(response.url()).pathname===`/api/v1/runs/${runId}/actions`&&response.request().postDataJSON().action_type==='PROVE_IT');
+  await page.getByRole('button',{name:'Run rover test here',exact:true}).click();
+  expect((await proving).status()).toBe(202);
+  await expect.poll(async()=>{
+   const response=await page.request.get(`/api/v1/runs/${runId}`);expect(response.status()).toBe(200);
+   const snapshot=await response.json();return snapshot.state;
+  },{timeout:300000,message:'The in-tour rover model must finish its independent verification and publish the fixture result'}).toBe('COMPLETED');
+  expect(new URL(page.url()).pathname).toBe(`/runs/${runId}/tour`);
+  expect(new URL(page.url()).searchParams.get('site')).toBe(first);
+  await expect(page.getByTestId('site-card')).toContainText('5 met');
+  await page.goto(`/runs/${runId}/passport`);
+  await expect(page.getByTestId('passport-claim').first()).toBeVisible();
+  expect((await page.getByTestId('passport-claim').allTextContents()).join(' ')).not.toMatch(/has outcome (?:PASS|FAIL)|within terrain_model|R-SLOPE-AVAILABILITY has/);
+ }
  await page.goto('/');
  await expect(page.getByTestId('recent-investigations').locator('a').first()).toHaveAttribute('href',`/runs/${runId}/tour`);
 });
