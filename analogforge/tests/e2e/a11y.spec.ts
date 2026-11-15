@@ -13,7 +13,7 @@ async function assertAccessible(page: Page, screen: string) {
 for (const width of [1440, 900, 390]) test(`UIX-07 S01–S12 accessible at ${width}`, async ({ page }) => {
   test.setTimeout(240000);
   await page.setViewportSize({ width, height: 900 });
-  await page.goto('/'); await expect(page.getByTestId('btn-new-mission')).toBeVisible(); await assertAccessible(page, 'S01');
+  await page.goto('/workbench'); await expect(page.getByTestId('btn-new-mission')).toBeVisible(); await assertAccessible(page, 'S01');
   await page.getByTestId('btn-new-mission').click(); await assertAccessible(page, 'S02');
   await page.goto('/rovers'); await expect(page.getByTestId('rover-form')).toBeVisible(); await assertAccessible(page, 'S03');
   await newMission(page); await assertAccessible(page, 'S04');

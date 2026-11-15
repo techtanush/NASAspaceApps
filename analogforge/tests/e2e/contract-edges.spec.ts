@@ -58,7 +58,7 @@ test('job success keeps run settings locked until the proposed contract arrives'
    return original(input,init);
   };
  });
- await page.goto(isMock()?'/?mockLatency=300':'/');
+ await page.goto(isMock()?'/workbench?mockLatency=300':'/workbench');
  const authoring=newMission(page);
  await page.waitForFunction(()=>(window as unknown as {__proposalGate:{requested:boolean}}).__proposalGate.requested);
  try{

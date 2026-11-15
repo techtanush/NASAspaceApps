@@ -70,7 +70,7 @@ export async function api<T = Record<string, unknown>>(page: Page, path: string,
 }
 export async function newMission(page: Page, options: { moon?: boolean; rover?: string | null; scenario?: string; mode?: string; preview?: string } = {}) {
  page.on('pageerror',error=>console.error('Browser error:',error.message));
- await page.goto(options.preview ? `/?mockScenario=${encodeURIComponent(options.preview)}` : '/');
+ await page.goto(options.preview ? `/workbench?mockScenario=${encodeURIComponent(options.preview)}` : '/workbench');
  await expect(page.getByTestId('app-shell')).toBeVisible();
  await expect(page.getByTestId('btn-new-mission')).toBeVisible();
  await inspectHooks(page);

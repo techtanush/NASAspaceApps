@@ -6,6 +6,7 @@ import { api } from '../../api/client';
 import { useWorkspace } from '../../app/WorkspaceContext';
 import type { components } from '../../generated/schema';
 import { Button, ErrorPanel, FileDrop, Skeleton } from '../../components/ui';
+import { RoverEditor } from '../rovers/RoverEditor';
 import { fetchRoverProfiles } from '../rovers/roverProfiles';
 import { parseRoverImport, type RoverValidationIssue } from '../rovers/validation';
 import { Guide, Panel, useScene } from './StageShell';
@@ -25,6 +26,7 @@ export function RoverStep() {
   const ready = plan.confirmed && plan.lat !== null && plan.lng !== null && box?.ok === true && plan.objective.trim() !== '';
   useScene({ body: plan.body, layout: 'panel', autoRotate: false, focus: ready ? { lat: plan.lat!, lng: plan.lng!, altitude: 1.7 } : null, pin: ready ? { lat: plan.lat!, lng: plan.lng! } : null, box: ready ? box.bbox : null });
   const rovers = useQuery({ queryKey: ['workspace', workspace, 'mc-rovers'], queryFn: ({ signal }) => fetchRoverProfiles(signal) });
+  const [editor, setEditor] = useState(false);
   const [issues, setIssues] = useState<RoverValidationIssue[]>([]); const [error, setError] = useState<unknown>(null); const [saving, setSaving] = useState(false);
   if (!ready) return <Navigate to="/start/mission" replace/>;
   const importFile = async (file?: File) => {
@@ -36,18 +38,20 @@ export function RoverStep() {
   };
   const list = latestRevisions(rovers.data?.items ?? []); const chosen = plan.noRover || plan.roverRevisionId !== null;
   return <Panel testid="rover-step" step="Step 3 of 4" title="Which rover?" lead="Choose the rover to test, add one, or qualify the site without a rover."
-    footer={<><Button variant="ghost" onClick={() => navigate('/start/mission')}><ArrowLeft size={16} aria-hidden="true"/>Back</Button><Button variant="primary" data-testid="btn-rover-continue" disabled={!chosen} disabledReason="Choose a rover or the site-only option." onClick={() => navigate('/start/review')}>Continue<ArrowRight size={16} aria-hidden="true"/></Button></>}>
+    footer={<><Button variant="ghost" onClick={() => navigate('/start/mission')}><ArrowLeft size={16} aria-hidden="true"/>Back</Button><Button variant="primary" data-testid="btn-rover-continue" disabled={!chosen || saving} disabledReason="Choose a rover or the site-only option." onClick={() => navigate('/start/review')}>Continue<ArrowRight size={16} aria-hidden="true"/></Button></>}>
     <Guide>The rover’s limits set the benchmark. Every result is tied to this exact rover revision.</Guide>
     {rovers.isPending ? <Skeleton label="Retrieving saved rovers"/> : rovers.error ? <ErrorPanel error={rovers.error} onRetry={() => { void rovers.refetch(); }}/> :
       <ul className="mc-rovers" data-testid="rover-options">{list.map(rover => { const selected = plan.roverRevisionId === rover.id; return <li key={rover.id}><button type="button" className="mc-rover" data-testid="rover-option" data-rover={rover.name} aria-pressed={selected} onClick={() => update({ roverRevisionId: rover.id, roverName: rover.name, noRover: false })}>
         <span className="mc-rover-head"><strong>{rover.name}</strong><span className="revision-badge">rev {rover.revision}</span>{selected && <Check size={16} aria-hidden="true"/>}</span>
-        <span className="mc-specs">{SPECS.map(spec => <span key={spec.key}><em>{spec.label}</em>{String(rover[spec.key])} {spec.unit}</span>)}</span>
+        <span className="mc-specs">{SPECS.map(spec => <span key={spec.key}><em>{spec.label}</em>{rover[spec.key] === null || rover[spec.key] === undefined ? 'Unknown' : `${String(rover[spec.key])} ${spec.unit}`}</span>)}</span>
         <span className="mc-energy" data-energy={rover.energy_model?.calibration_status ?? 'NONE'}>{rover.energy_model ? `Energy model: ${rover.energy_model.calibration_status === 'CALIBRATED' ? 'calibrated' : 'assumed, not calibrated'}` : 'No energy model: route results will be inconclusive'}</span>
       </button></li>; })}
         <li><button type="button" className="mc-rover" data-testid="rover-none" aria-pressed={plan.noRover} onClick={() => update({ noRover: true, roverRevisionId: null, roverName: null })}><span className="mc-rover-head"><strong>No rover: qualify the site only</strong>{plan.noRover && <Check size={16} aria-hidden="true"/>}</span><span className="mc-energy">Earth sites are matched to the target terrain. Route benchmarks are not run.</span></button></li></ul>}
     <div className="mc-field"><span className="mc-field-label">Add a rover from a JSON profile</span><FileDrop data-testid="mc-rover-import" aria-label="Rover JSON profile" disabled={saving} onChange={event => { void importFile(event.target.files?.[0]); }}/>
       {issues.length > 0 && <ul className="mc-issues" role="alert" data-testid="rover-import-issues">{issues.slice(0, 5).map(issue => <li key={`${issue.field}:${issue.message}`}><strong>{issue.field}</strong> {issue.message}</li>)}</ul>}
       {error !== null && <ErrorPanel error={error}/>}
-      <p className="helper">Need the full editor? Open the <a href="/rovers">rover library</a>.</p></div>
+      <Button variant="secondary" aria-expanded={editor} onClick={() => setEditor(value => !value)}>{editor ? 'Close rover editor' : 'Create or edit a rover'}</Button>
+      {editor && <div className="mc-inline-editor"><RoverEditor value={plan.roverRevisionId} onSavingChange={setSaving} onSelect={id => { if (!id) { update({noRover:true, roverRevisionId:null, roverName:null}); return; } void api.get<Rover>(`/rover-revisions/${id}`).then(rover => { update({roverRevisionId:rover.id,roverName:rover.name,noRover:false}); }).catch(setError); }}/></div>}
+      <p className="helper">The <a href="/rovers" target="_blank" rel="noreferrer">rover library opens in a separate tab</a>; your investigation stays here.</p></div>
   </Panel>;
 }

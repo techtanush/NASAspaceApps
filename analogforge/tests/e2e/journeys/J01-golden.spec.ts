@@ -67,6 +67,6 @@ test('J01 full Mars investigation, immutable fail/replan/pass and independently 
  await page.reload(); await expect(page.getByTestId('passport-view')).toHaveAttribute('data-draft','false'); await expect(page.getByTestId('attempt-row')).toHaveCount(3);
  await inspectHooks(page); const snapshot=await api<{state:string;passport_id:string;last_event_seq:number}>(page,`/runs/${runId}`); expect(snapshot.status).toBe(200); expect(snapshot.body.state).toBe('COMPLETED');
  if(!isMock()) { const results=await api<{items: {id:string;evidence_ids:string[]}[]}>(page,`/tests?run_id=${runId}`); expect(results.body.items.length).toBe(3); for(const result of results.body.items) expect(result.id).toBeTruthy(); }
- await page.goto('/');await expect(page.getByTestId('run-row').first()).toBeVisible();await inspectHooks(page);
+ await page.goto('/workbench');await expect(page.getByTestId('run-row').first()).toBeVisible();await inspectHooks(page);
  expect(errors).toEqual([]); expect(external).toEqual([]);
 });

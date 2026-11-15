@@ -412,3 +412,10 @@ Machine checks (`scripts/ui/visual_audit.mjs`, gate UIX-13) and human/agent revi
 
 ## 21. Anti-gaming
 The visual audit may not be satisfied by: disabling checks, allow-listing selectors wholesale, scoping tests to hand-picked elements, hiding content with `display:none` to dodge overflow, or lowering thresholds. `forbidden_scan.py` and the merging guide verify the audit script's thresholds equal this document's. The merging agent re-runs the audit itself on the merged build and performs its own hands-on design review (MRG-11).
+
+
+## Decision D-2026-11-14-MISSION-CONTROL
+
+The product owner requested the globe-led Mission Control flow and exact-location inspection. For `/`, `/start/*`, and `/runs/:id/tour` only, an interactive body globe, spatial camera transitions, contextual starfield and guided setup panel are permitted. The globe navigates actual selected footprints; it is visual context, never a measurement source. The existing engineering workbench stays at `/workbench` with all run deep links preserved. Regional evidence uses prepared immutable display layers and body-specific renderers, not magnified global textures.
+
+This exception is limited to the stage composition and user-directed navigation. No automatic looping globe motion, scanning effect, or decorative pulse is required. Reduced motion removes camera animation and pulses. Tokens, glass boundaries, legibility, keyboard/list alternatives, scientific statuses, source mode, assurance and validation gates remain binding. Report pages are light and print-first. No threshold, frozen scientific contract, or audit check is weakened.

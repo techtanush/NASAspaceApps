@@ -1,3 +1,4 @@
+import { loadGlobeCatalog } from '../api/globeCatalog';
 import { useEffect, useRef, useState } from 'react';
 import { GLOBE_ASSETS, GLOBE_INK, STARFIELD, type GlobeBody } from './globeAssets';
 
@@ -26,9 +27,9 @@ function pinElement(): HTMLElement {
   element.append(head, stem); return element;
 }
 function markerElement(datum: OverlayDatum, select: (id: string) => void): HTMLElement {
-  const marker = datum.marker!; const element = document.createElement('button'); element.type = 'button'; element.className = 'mc-ticker';
+  const marker = datum.marker!; const element = document.createElement('div'); element.className = 'mc-ticker';
   element.dataset.status = marker.status ?? 'UNKNOWN'; element.dataset.selected = String(Boolean(datum.selected)); element.dataset.markerId = marker.id;
-  element.tabIndex = -1; element.setAttribute('aria-hidden', 'true');
+  element.setAttribute('aria-hidden', 'true');
   const badge = document.createElement('span'); badge.className = 'mc-ticker-index'; badge.textContent = String(marker.index ?? '');
   const label = document.createElement('span'); label.className = 'mc-ticker-label'; label.textContent = marker.label;
   element.append(badge, label); element.style.pointerEvents = 'auto'; element.addEventListener('click', event => { event.stopPropagation(); select(marker.id); });
@@ -45,6 +46,8 @@ function boxPath(box: number[]): number[][] {
 
 /** The persistent 3-D stage. It only displays positions it is given; it derives no scientific quantity. */
 export function GlobeStage({ scene, onPick, onMarkerSelect }: { scene: GlobeScene; onPick?: (lat: number, lng: number) => void; onMarkerSelect?: (id: string) => void }) {
+  const [assets, setAssets] = useState(GLOBE_ASSETS);
+  useEffect(() => { const controller = new AbortController(); const urls:string[] = []; void loadGlobeCatalog(controller.signal, url => { if (controller.signal.aborted) URL.revokeObjectURL(url); else urls.push(url); }).then(value => { if (!controller.signal.aborted) setAssets(value); }).catch(() => {}); return () => { controller.abort(); urls.forEach(url => URL.revokeObjectURL(url)); }; }, []);
   const container = useRef<HTMLDivElement>(null); const globe = useRef<Instance | null>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'unavailable'>('loading');
   const pick = useRef(onPick); pick.current = onPick; const select = useRef(onMarkerSelect); select.current = onMarkerSelect;
@@ -63,7 +66,7 @@ export function GlobeStage({ scene, onPick, onMarkerSelect }: { scene: GlobeScen
         .pathsData([]).pathPoints((path: object) => path as number[][]).pathPointLat((point: number[]) => point[0]!).pathPointLng((point: number[]) => point[1]!)
         .pathPointAlt(0.006).pathColor(() => GLOBE_INK.accent).pathStroke(1.4).pathDashLength(1).pathDashGap(0).pathTransitionDuration(0)
         .onGlobeClick(({ lat, lng }: { lat: number; lng: number }) => pick.current?.(lat, lng));
-      const controls = instance.controls(); controls.enablePan = false; controls.minDistance = 130; controls.maxDistance = 520; controls.autoRotateSpeed = 0.35;
+      const controls = instance.controls(); controls.enablePan = false; controls.minDistance = 101; controls.maxDistance = 520; controls.autoRotateSpeed = 0.35;
       const resize = () => {
         const width = element.clientWidth, height = element.clientHeight; if (!width || !height) return;
         instance.width(width).height(height); applyOffset.current();
@@ -73,6 +76,8 @@ export function GlobeStage({ scene, onPick, onMarkerSelect }: { scene: GlobeScen
         const offset: [number, number] = layout.current === 'center' ? [0, 0] : mobile ? [0, -Math.round(height * 0.2)] : layout.current === 'panel' ? [-Math.round(Math.min(440, width * 0.34) / 2), 0] : [Math.round(width * 0.2), 0];
         instance.globeOffset(offset);
       };
+      const contextLost = (event: Event) => { event.preventDefault(); setState('unavailable'); };
+      instance.renderer().domElement.addEventListener('webglcontextlost', contextLost);
       resize(); observer = new ResizeObserver(resize); observer.observe(element);
       globe.current = instance; setState('ready');
     }).catch(() => { if (!cancelled) setState('unavailable'); });
@@ -80,14 +85,14 @@ export function GlobeStage({ scene, onPick, onMarkerSelect }: { scene: GlobeScen
   }, []);
   const ready = state === 'ready';
   useEffect(() => {
-    const instance = globe.current; if (!ready || !instance) return; const asset = GLOBE_ASSETS[scene.body];
+    const instance = globe.current; if (!ready || !instance) return; const asset = assets[scene.body];
     instance.globeImageUrl(asset.surface).bumpImageUrl(asset.relief ?? '').showAtmosphere(asset.atmosphere !== null);
     if (asset.atmosphere) instance.atmosphereColor(asset.atmosphere.color).atmosphereAltitude(asset.atmosphere.altitude);
-  }, [ready, scene.body]);
+  }, [ready, scene.body, assets]);
   useEffect(() => { if (ready) applyOffset.current(); }, [ready, scene.layout]);
   useEffect(() => {
     const instance = globe.current; if (!ready || !instance) return;
-    const controls = instance.controls(); controls.autoRotate = Boolean(scene.autoRotate) && !reducedMotion();
+    const controls = instance.controls(); controls.autoRotate = false;
   }, [ready, scene.autoRotate]);
   const focusKey = scene.focus ? `${scene.focus.lat}:${scene.focus.lng}:${scene.focus.altitude ?? ''}` : '';
   useEffect(() => {
@@ -102,11 +107,11 @@ export function GlobeStage({ scene, onPick, onMarkerSelect }: { scene: GlobeScen
     instance.htmlElementsData(data);
     const selected = (scene.markers ?? []).find(marker => marker.id === scene.selectedMarker);
     const rings = reducedMotion() ? [] : scene.pin ? [scene.pin] : selected ? [{ lat: selected.lat, lng: selected.lng }] : [];
-    instance.ringsData(rings);
+    instance.ringsData(scene.pin && !reducedMotion() ? rings : []);
   }, [ready, markersKey]);
   const boxKey = scene.box ? scene.box.join(',') : '';
   useEffect(() => { const instance = globe.current; if (!ready || !instance) return; instance.pathsData(scene.box ? [boxPath(scene.box)] : []); }, [ready, boxKey]);
-  const asset = GLOBE_ASSETS[scene.body];
+  const asset = assets[scene.body];
   return <div className="mc-globe" data-testid="globe-stage" data-body={scene.body} data-state={state} data-scanning={scene.scanning ? 'true' : 'false'}>
     <div ref={container} className="mc-globe-canvas" role="img" aria-label={`Interactive globe of ${asset.label}. Every action is also available from the panel.`}/>
     {state === 'unavailable' && <div className="mc-globe-fallback" data-testid="globe-fallback"><p>The 3-D globe is not available in this browser.</p><p className="helper">Use the coordinate fields and site list; every step works without it.</p></div>}
