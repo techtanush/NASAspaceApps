@@ -66,8 +66,6 @@ from analogforge.ports.science_payloads import (
     DesignBenchmarkInput,
     DiagnoseResultInput,
     IngestLocalDatasetInput,
-    OptimizePortfolioInput,
-    QualificationRowInput,
     ResolveCoverageInput,
     ScreenCandidatesInput,
     SearchRouteInput,
@@ -1101,6 +1099,29 @@ class WorkflowEngine:
             return submission
 
     def _qualify(
+        self,
+        run_id: str,
+        workspace_id: str,
+        candidates: list[dict[str, Any]],
+        mission: dict[str, Any],
+        rover: dict[str, Any] | None,
+        *,
+        verification_by_candidate: dict[str, VerificationSummary] | None = None,
+        job_id: str | None = None,
+        lease_token: str | None = None,
+    ) -> None:
+        from analogforge.jobs.cpu import science_session
+
+        for candidate in candidates:
+            # Reuse imports within one candidate; every computation still has its own
+            # request, scratch directory, deadline, cancellation and fenced registrar.
+            with science_session():
+                self._qualify_candidate(
+                    run_id, workspace_id, [candidate], mission, rover,
+                    verification_by_candidate=verification_by_candidate, job_id=job_id, lease_token=lease_token,
+                )
+
+    def _qualify_candidate(
         self,
         run_id: str,
         workspace_id: str,
@@ -2446,21 +2467,11 @@ class WorkflowEngine:
                 tx.replace("runs", run_id, fresh, fresh["revision"])
 
             self._compute(
-                OptimizePortfolioInput(
-                    requirements=mission["requirements"],
-                    candidates=[discovery.reference(c) for c in candidates],
-                    qualification_rows=[
-                        QualificationRowInput(
-                            candidate_window_id=next(
-                                c["window_id"] for c in candidates if c["id"] == q["candidate_id"]
-                            ),
-                            requirement_id=q["requirement_id"],
-                            status=q["status"],
-                            evaluation_stage=q.get("evaluation_stage", "FINAL"),
-                            critic_blocking_open=q["critic_status"] == "CHALLENGED",
-                        )
-                        for q in rows
-                    ],
+                portfolios.optimizer_inputs(
+                    run=run, mission=mission, rover=rover, candidates=candidates, qualifications=rows,
+                    tests=self._rows(workspace_id, "tests", run_id),
+                    results=self._rows(workspace_id, "test_results", run_id),
+                    evidence=self._rows(workspace_id, "evidence", run_id),
                     max_sites=int(pending["payload"].get("max_sites", 3)),
                 ),
                 run_id,

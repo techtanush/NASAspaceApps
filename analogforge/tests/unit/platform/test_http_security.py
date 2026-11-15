@@ -345,7 +345,11 @@ def test_oidc_cookie_workspace_tamper_viewer_and_expiry(journey_store: Store, tm
     )
     app = create_app(settings=settings, store=journey_store)
     identity = IdentityService(journey_store, allowed_origins=("https://workbench.example",))
-    token, principal = identity.create_session(str(uuid4()), workspace, "VIEWER")
+    user = str(uuid4())
+    with journey_store.transaction(workspace) as unit:
+        unit.create("users", {"id": user, "issuer": "https://issuer.example", "subject": user})
+        unit.create("workspace_memberships", {"user_id": user, "role": "VIEWER"})
+    token, principal = identity.create_session(user, workspace, "VIEWER")
     with TestClient(app, base_url="https://workbench.example") as client:
         cookie = f"af_session={token}; af_workspace={workspace}"
         assert client.get("/api/v1/missions", headers={"Cookie": cookie}).status_code == 200

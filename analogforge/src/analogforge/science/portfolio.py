@@ -4,7 +4,7 @@ Pure function over the kit input model.  Rules implemented here:
 
 * Coverage is binary and conservative.  A row covers a requirement at a window only when it is ``PASS``, has no open
   blocking critic issue and, for route-dependent observables (``catalog.ROUTE_DEPENDENT_OBSERVABLES``), is ``FINAL``
-  (and the window's verification, when supplied, is ``PASS``).  UNKNOWN / FAIL / GAP / PARTIAL rows never cover.
+  and the window's verification is ``PASS``. UNKNOWN / FAIL / GAP / PARTIAL rows never cover.
 * Requirements sharing ``parameters.co_location_group`` form one *coupled* item: covered by a window only when every
   member row there is ``PASS`` + ``FINAL`` with no blocking critic issue **and** ``verification_by_window_id[window]``
   is ``PASS``.  Rows of different windows never combine.  Each member weight is counted once.
@@ -143,9 +143,9 @@ def optimize_portfolio(
         if _route_dependent(req):
             if row_ok(window, req, need_final=True) is None:
                 return 0
-            if verification is not None and verification.outcome != "PASS":
+            if verification is None or verification.outcome != "PASS":
                 return 0
-            return 3 if verification is not None else 2
+            return 3
         row = row_ok(window, req, need_final=False)
         if row is None:
             return 0
@@ -221,8 +221,12 @@ def optimize_portfolio(
             w
             for w in selected
             if (r := rows.get((w, req.id))) is not None
-            and r.status in ("PARTIAL", "PASS")
+            and r.status == "PARTIAL"
             and not r.critic_blocking_open
+            and (not _route_dependent(req) and not item.coupled or (
+                r.evaluation_stage == "FINAL"
+                and (v := inputs.verification_by_window_id.get(w)) is not None and v.outcome == "PASS"
+            ))
         ]
         # NONE / GAP assert that every evaluated candidate says so: a window with no row for this requirement is
         # unevaluated (unknown), never a failure, so one missing row keeps the requirement UNKNOWN.

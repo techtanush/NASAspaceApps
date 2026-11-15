@@ -17,6 +17,7 @@ export async function loadSession():Promise<Session> {
  let data:unknown;
  try{data=await response.json();}catch{throw sessionError('SESSION_INVALID','The server returned an invalid session response.',502);}
  const body=record(data),workspace=record(body?.workspace);
+ if(body?.authenticated===false)throw sessionError('AUTH_REQUIRED','Sign in to access this workspace.',401);
  const workspaceId=body?.workspace_id??workspace?.id;
  const role=body?.role??workspace?.role;
  if(!body||typeof workspaceId!=='string'||!UUID.test(workspaceId)||!['OWNER','EDITOR','VIEWER'].includes(String(role)))throw sessionError('SESSION_INVALID','The session does not identify a valid authorized workspace and role.',502);
