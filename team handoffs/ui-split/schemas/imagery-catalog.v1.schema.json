@@ -34,6 +34,7 @@
             ],
             "pattern": "^globe/deliveries/[A-Za-z0-9_./-]+$",
             "not": {
+              "type": "string",
               "pattern": "(^|/)\\.\\.(/|$)"
             }
           },
