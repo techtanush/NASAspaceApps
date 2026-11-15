@@ -26,6 +26,13 @@ function boot(body:'MARS'|'MOON'='MARS',roverName:string|null='ARES-1',scenario=
 }
 beforeEach(()=>{let identifier=4096;vi.spyOn(crypto,'randomUUID').mockImplementation(()=>`00000000-0000-4000-8000-${(++identifier).toString(16).padStart(12,'0')}`);resetDatabase();});
 afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();vi.restoreAllMocks();});
+it('recent runs are bounded, newest first and retain negative terminal outcomes',()=>{
+ const first=boot();const second=boot();first.snapshot.state='COMPLETED';second.snapshot.state='FAILED';
+ const response=dispatch('GET','/workspace/recent-runs?limit=1',null);
+ expect(response.status).toBe(200);expect(response.body).toEqual({items:[second.snapshot],next_cursor:null});
+ expect(dispatch('GET','/workspace/recent-runs?limit=0',null).status).toBe(422);
+ expect(dispatch('GET','/workspace/recent-runs?limit=21',null).status).toBe(422);
+});
 it('all43: real MSW GET events streams ordered replay and larger Last-Event-ID cursor with terminal close',async()=>{
  const run=boot();run.snapshot.state='COMPLETED';const server=setupServer(...handlers);server.listen({onUnhandledRequest:'error'});
  try{

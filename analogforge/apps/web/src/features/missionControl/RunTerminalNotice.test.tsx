@@ -37,11 +37,20 @@ it('explains a review pause without raw error codes in the primary message and r
 it('shows the admitted concern from the paused role despite its earlier workflow stage, without changing results', () => {
   state.error=null;
   state.data.items=[{run_id:'run',state:'QUALIFYING',status:'BLOCKED',event_type:'agent.completed',role_result_id:'review',review_concerns:[{message:'The accepted requirement needs a source-date check.',message_truncated:false,severity:'BLOCKING',requirement_label:'Terrain support'}]}, {run_id:'foreign',state:'BLOCKED',status:'BLOCKED',event_type:'agent.completed',role_result_id:'foreign-review',review_concerns:[{message:'Foreign concern',message_truncated:false,severity:'BLOCKING',requirement_label:null}]}];
-  const {rerender}=render(<MemoryRouter><RunTerminalNotice run={{...run,state:'BLOCKED'}}/></MemoryRouter>);
+  const {rerender}=render(<MemoryRouter><RunTerminalNotice run={{...run,state:'BLOCKED',blocked_dependencies:['USER_REVIEW_REQUIRED']}}/></MemoryRouter>);
   expect(screen.getByRole('region',{name:'Recorded reviewer concerns'})).toHaveTextContent('The accepted requirement needs a source-date check.');
   expect(screen.queryByText('Foreign concern')).not.toBeInTheDocument();
   expect(screen.getByText(/measured benchmark results remain unchanged/)).toBeVisible();
-  state.error=new Error('Forbidden');rerender(<MemoryRouter><RunTerminalNotice run={{...run,state:'BLOCKED'}}/></MemoryRouter>);
+  state.error=new Error('Forbidden');rerender(<MemoryRouter><RunTerminalNotice run={{...run,state:'BLOCKED',blocked_dependencies:['USER_REVIEW_REQUIRED']}}/></MemoryRouter>);
   expect(screen.queryByRole('region',{name:'Recorded reviewer concerns'})).not.toBeInTheDocument();
   state.error=null;
+});
+
+it('explains an exhausted budget without presenting an earlier resolved review as its current cause', () => {
+  state.error=null;
+  state.data.items=[{run_id:'run',state:'DESIGNING_TEST',status:'BLOCKED',event_type:'agent.completed',role_result_id:'old-review',review_concerns:[{message:'Historical proposal concern',message_truncated:false,severity:'BLOCKING',requirement_label:null}]}];
+  render(<MemoryRouter><RunTerminalNotice run={{...run,state:'BLOCKED',blocked_dependencies:['BUDGET_EXHAUSTED']}}/></MemoryRouter>);
+  expect(screen.getByText(/reached its configured research budget/)).toBeVisible();
+  expect(screen.queryByRole('region',{name:'Recorded reviewer concerns'})).not.toBeInTheDocument();
+  expect(screen.getByText(/Recorded dependencies: BUDGET_EXHAUSTED/)).not.toBeVisible();
 });

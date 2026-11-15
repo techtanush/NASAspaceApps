@@ -44,9 +44,22 @@ def test_failed_run_pdf_is_scoped_real_and_readonly(runtime, tmp_path):
         assert client.get(path + "?candidate_id=other").status_code == 422
         other_run = make(no_rover=True)
         assert client.get(path.replace(run["run_id"], other_run["run_id"])).status_code == 404
+        plan_path = path.replace("evidence-brief.pdf", "test-plan")
+        plan = client.get(plan_path)
+        assert plan.status_code == 200 and plan.json()["candidate_id"] == candidate_id
+        assert plan.json()["route"] is None and "no-store" in plan.headers["cache-control"]
+        assert client.get(plan_path + "?other=1").status_code == 422
+        combined = client.get(f"/api/v1/runs/{run['run_id']}/test-brief.pdf")
+        assert combined.status_code == 200, combined.text
+        assert combined.content.startswith(b"%PDF-")
+        reader = PdfReader(io.BytesIO(combined.content))
+        assert reader.outline and all(identifier in "\n".join(p.extract_text() for p in reader.pages)
+                                      for identifier in run["candidate_ids"])
     assert _counts(store, ws, run["run_id"]) == before
     foreign = str(uuid4())
     store.ensure_workspace(foreign)
     with _client(engine, store, foreign) as client:
         denied = client.get(path)
         assert denied.status_code == 404 and run["mission_revision_id"] not in denied.text
+        assert client.get(path.replace("evidence-brief.pdf", "test-plan")).status_code == 404
+        assert client.get(f"/api/v1/runs/{run['run_id']}/test-brief.pdf").status_code == 404

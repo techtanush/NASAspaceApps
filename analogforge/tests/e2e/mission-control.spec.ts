@@ -48,6 +48,9 @@ async function launch(page: import('@playwright/test').Page, siteOnly=false, moo
  else await mission;
  expect((await preparation).postDataJSON().rover_revision_id).toBe(roverRevisionId);
  await expect(page.getByTestId('proposed-requirements')).toBeVisible();
+ await page.getByText('Assumptions and test conditions',{exact:true}).click();
+ await expect(page.getByRole('region',{name:'Contract assumptions and limits',exact:true})).toBeVisible();
+ await page.getByText('Assumptions and test conditions',{exact:true}).click();
  const creation = page.waitForResponse(response => response.request().method()==='POST' && new URL(response.url()).pathname==='/api/v1/runs');
  await page.getByTestId('btn-accept-start').click();
  const created = await creation;
@@ -81,7 +84,7 @@ test('globe, exact-site inspection, stable selection and printable report',async
  const satellite=/^https:\/\/(?:basemap\.nationalmap\.gov\/arcgis\/rest\/services\/USGSImageryOnly\/MapServer\/tile\/\d+\/\d+\/\d+|tiles\.maps\.eox\.at\/wmts\/1\.0\.0\/s2cloudless_3857\/default\/GoogleMapsCompatible\/\d+\/\d+\/\d+\.jpg)$/;
  const blockedSatellite:string[]=[];await page.context().route(satellite,route=>{blockedSatellite.push(route.request().url());return route.abort('blockedbyclient');});
  const external:string[]=[];page.context().on('request',request=>{const url=new URL(request.url());if(url.protocol.startsWith('http')&&url.origin!==new URL(process.env.E2E_BASE_URL||'http://127.0.0.1:5176').origin&&!satellite.test(url.href))external.push(url.origin);});
- await launch(page);
+ const runId=await launch(page);
  if(process.env.E2E_TARGET==='real'){await expect(page.getByText(/Satellite imagery unavailable\. Measured terrain/)).toBeVisible();expect(blockedSatellite.length).toBeGreaterThan(0);}
  await expect(page.getByTestId('globe-stage')).toHaveAttribute('data-state','ready');
  const first=new URL(page.url()).searchParams.get('site');
@@ -126,6 +129,9 @@ test('globe, exact-site inspection, stable selection and printable report',async
  await expect(page.getByRole('navigation',{name:'Report actions'})).toBeHidden();
  await page.pdf({path:'../../out/mission-control-report.pdf',format:'A4'});
  expect(external).toEqual([]);
+ await page.emulateMedia({media:'screen'});
+ await page.goto('/');
+ await expect(page.getByTestId('recent-investigations').locator('a').first()).toHaveAttribute('href',`/runs/${runId}/tour`);
 });
 test('mobile, site-only, keyboard and reduced motion retain complete evidence access',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.emulateMedia({reducedMotion:'reduce'});

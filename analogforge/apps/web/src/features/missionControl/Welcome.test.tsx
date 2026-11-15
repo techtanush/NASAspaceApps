@@ -11,7 +11,7 @@ vi.mock('./StageShell', () => ({ useScene: () => {} }));
 
 beforeEach(() => {
   state.responses.clear(); state.reads.length = 0;
-  state.responses.set('/runs?limit=4', { items: [{ id: '12345678-run', mission_revision_id: 'mission-revision', workspace_id: 'workspace', state: 'AWAITING_REVIEW', mode: 'live' }] });
+  state.responses.set('/workspace/recent-runs?limit=4', { items: [{ id: '12345678-run', mission_revision_id: 'mission-revision', workspace_id: 'workspace', state: 'AWAITING_REVIEW', mode: 'live' }] });
 });
 
 it('resumes by the pinned mission name while retaining the exact run destination', () => {
@@ -19,6 +19,8 @@ it('resumes by the pinned mission name while retaining the exact run destination
   render(<MemoryRouter><Welcome/></MemoryRouter>);
   expect(screen.getByRole('link', { name: /Gale regional terrain rehearsal/ })).toHaveAttribute('href', '/runs/12345678-run/tour');
   expect(state.reads).toContainEqual(['workspace', '/mission-revisions/mission-revision']);
+  expect(state.reads).toContainEqual(['workspace', '/workspace/recent-runs?limit=4']);
+  expect(state.reads).not.toContainEqual(['workspace', '/runs?limit=4']);
 });
 
 it.each([

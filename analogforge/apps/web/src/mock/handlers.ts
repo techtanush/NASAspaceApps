@@ -161,6 +161,21 @@ export function dispatch(method:string,path:string,body:unknown,headers=new Head
  if(entity==='mission-revisions')return db.contracts[objectId!]?json(db.contracts[objectId!]):error('NOT_FOUND','Contract not found',404);
  if(entity==='rovers'||entity==='rover-revisions'){if(!objectId)return list(Object.values(db.rovers),url);const rover=db.rovers[objectId]||Object.values(db.rovers).find(r=>r.rover_id===objectId);return rover?json(rover):error('NOT_FOUND','Rover not found',404);}
  if(entity==='jobs')return db.jobs[objectId!]?json(db.jobs[objectId!]):error('NOT_FOUND','Job not found',404);
+ if(entity==='workspace'&&objectId==='recent-runs'){
+  const limit=Number(url.searchParams.get('limit')??4);
+  if(!Number.isInteger(limit)||limit<1||limit>20)return error('INPUT_INVALID','Recent list limit must be between 1 and 20',422);
+  const rows=Object.values(db.runs).map(run=>run.snapshot).filter(run=>run.workspace_id===workspaceId).sort((a,b)=>b.created_at.localeCompare(a.created_at)||b.id.localeCompare(a.id));
+  return json({items:rows.slice(0,limit),next_cursor:null},200,{'Cache-Control':'no-store'});
+ }
+ if(entity==='runs'&&action==='candidates'&&parts[4]==='test-plan'){
+  const selectedRun=db.runs[objectId!];const candidate=selectedRun?.candidates.find(item=>item.id===parts[3]);
+  if(!selectedRun||!candidate)return error('NOT_FOUND','Location not found',404);
+  const [west,south,east,north]=candidate.aoi.bbox;
+  return json({run_id:selectedRun.snapshot.run_id,run_revision:selectedRun.snapshot.revision,candidate_id:candidate.id,
+   center:[(west+east)/2,(south+north)/2],bbox:candidate.aoi.bbox,route:null,
+   route_note:'Synthetic practice view: no geographic field route has been computed.',
+   field_readiness:'Synthetic practice does not establish field readiness.',steps:[],screened_count:selectedRun.candidates.length,dataset_lock_id:selectedRun.snapshot.dataset_lock_id});
+ }
  if(entity==='runs')return objectId?(db.runs[objectId]?json(db.runs[objectId]!.snapshot):error('NOT_FOUND','Run not found',404)):list(Object.values(db.runs).map(r=>r.snapshot),url);
  const scopedRunId=url.searchParams.get('run_id');
  const run=scopedRunId?db.runs[scopedRunId]:objectId?Object.values(db.runs).find(r=>r.snapshot.run_id===objectId||r.target.id===objectId||r.candidates.some(c=>c.id===objectId)||r.qualifications.some(q=>q.id===objectId)||r.tests.some(t=>t.id===objectId)||r.results.some(t=>t.id===objectId)||r.evidence.some(e=>e.id===objectId)||r.snapshot.passport_id===objectId||r.portfolios.some(p=>p.id===objectId)||r.snapshot.pending_review?.review_id===objectId||r.reviews?.some(review=>review.review_id===objectId)||r.receipts.some(t=>t.id===objectId)||Object.hasOwn(r.artifacts,objectId)):undefined;

@@ -48,8 +48,8 @@ function MissionDraftEditor(){
  },[draft,saveState,header,saveCompletion,validCoordinates]);
  const selectedScenario=scenarios.data?.find(item=>item.id===scenario);const available=selectedScenario?.allowed_modes.length!==0;const validBox=validCoordinates&&draft.target.bbox.length===4&&draft.target.bbox.every(Number.isFinite)&&draft.target.bbox[0]!<draft.target.bbox[2]!&&draft.target.bbox[1]!<draft.target.bbox[3]!;
  useEffect(()=>{
-  if(!contract?.id||!contextAvailable)return;const controller=new AbortController();
-  void getPinnedOperatorContext('mission-revisions',contract.id,undefined,{signal:controller.signal}).then(snapshot=>{if(!controller.signal.aborted)setPinnedContext(snapshot);}).catch(cause=>{if(!controller.signal.aborted)setError(cause);});
+  if(!contract?.id||!contextAvailable)return;const controller=new AbortController();const captured=version.current;
+  void getPinnedOperatorContext('mission-revisions',contract.id,undefined,{signal:controller.signal}).then(snapshot=>{if(!controller.signal.aborted&&captured===version.current){setPinnedContext(snapshot);if(snapshot.rover_context)setRover(snapshot.rover_context.rover_revision_id);}}).catch(cause=>{if(!controller.signal.aborted)setError(cause);});
   return()=>controller.abort();
  },[contract?.id,contextAvailable,workspace]);
  useEffect(()=>{if(!validBox)setCoordinatesOpen(true);},[validBox]);

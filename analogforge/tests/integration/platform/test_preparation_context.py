@@ -13,7 +13,7 @@ import pytest
 import sqlalchemy as sa
 from pydantic import SecretStr
 
-from analogforge.application import missions
+from analogforge.application import missions, rovers
 from analogforge.application.seed import seed_synthetic
 from analogforge.db.store import Store
 from analogforge.jobs.handlers.prepare_fingerprint import (
@@ -54,20 +54,43 @@ def preparation(journey_store: Store, tmp_path: Path) -> dict[str, Any]:
     return {"runtime": runtime, "workspace": workspace, "header": header, "record": record, "draft": draft}
 
 
-def dispatch(preparation: dict[str, Any]) -> dict[str, Any]:
+def dispatch(preparation: dict[str, Any], rover_revision_id: str | None = None) -> dict[str, Any]:
     runtime = preparation["runtime"]
     with runtime.store.transaction(preparation["workspace"]) as unit:
         payload = {
             "mission_id": preparation["header"]["id"],
             "expected_revision": preparation["header"]["revision"],
             "mode": preparation["record"]["mode"],
-            "rover_revision_id": None,
+            "rover_revision_id": rover_revision_id,
         }
         job = unit.enqueue("PREPARE_FINGERPRINT", payload, preparation_id=preparation["record"]["id"])
     leased = runtime.store.claim_job(workspace_id=preparation["workspace"])
     assert leased and leased["id"] == job["id"]
     handle(runtime, leased)
     return dict(leased)
+
+
+@pytest.mark.db
+def test_preparation_worker_forwards_the_selected_profile_not_only_its_identifier(preparation, monkeypatch):
+    runtime, workspace = preparation["runtime"], preparation["workspace"]
+    content = json.loads((FIXTURES / "rovers/ares-1.json").read_text())
+    with runtime.store.transaction(workspace) as unit:
+        rover = rovers.create(unit, workspace, content)
+    real_prepare = runtime.engine.prepare
+    seen = []
+
+    def capture(*args, **kwargs):
+        assert kwargs["rover_profile"] == rover
+        seen.append(kwargs["rover_profile"]["id"])
+        return real_prepare(*args, **kwargs)
+
+    monkeypatch.setattr(runtime.engine, "prepare", capture)
+    dispatch(preparation, rover["id"])
+    assert seen == [rover["id"]]
+    with runtime.store.transaction(workspace) as unit:
+        record = unit.require("preparations", preparation["record"]["id"])
+        invocation = unit.list("agent_invocations", {"preparation_id": record["id"]})[0]
+        assert record["status"] == "SUCCEEDED" and invocation["task"]["rover_revision_id"] == rover["id"]
 
 
 @pytest.mark.db

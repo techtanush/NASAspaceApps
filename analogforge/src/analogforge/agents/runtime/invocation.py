@@ -80,6 +80,16 @@ def validate_authoritative_payload(task: AgentTask, submission: RoleSubmission) 
             raise PolicyViolation("CONTRACT_CHANGE_REQUIRES_REVIEW")
     if task.role_key == "rover_systems":
         rover = task.payload.get("authoritative_rover", {})
+        validation = task.payload.get("rover_validation_context", {})
+        report = validation.get("report", {})
+        matching = next((receipt for receipt in task.payload.get("receipt_summaries", [])
+                         if receipt["id"] == payload["validation_receipt_id"]), None)
+        if (payload["validation_receipt_id"] != validation.get("receipt_id")
+                or report.get("profile_revision_id") != str(task.rover_revision_id)
+                or report.get("profile_content_sha256") != task.rover_hash or report.get("valid") is not True
+                or not matching or matching.get("tool_name") != "validate_rover_profile"
+                or matching.get("status") != "SUCCEEDED"):
+            raise PolicyViolation("ROVER_VALIDATION_RECEIPT_REQUIRED")
         for limit in payload["hard_limit_summary"]:
             if limit["field_path"] not in rover or limit["value"] != rover[limit["field_path"]]:
                 raise PolicyViolation("ROVER_LIMIT_SUMMARY_CHANGED")

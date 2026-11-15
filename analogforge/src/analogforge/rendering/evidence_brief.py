@@ -13,6 +13,7 @@ from typing import Any
 from xml.sax.saxutils import escape
 
 import reportlab  # type: ignore[import-untyped]
+from pypdf import PdfReader, PdfWriter
 from reportlab.graphics.shapes import Circle, Drawing, Line, Rect, String  # type: ignore[import-untyped]
 from reportlab.lib import colors  # type: ignore[import-untyped]
 from reportlab.lib.pagesizes import A4  # type: ignore[import-untyped]
@@ -75,7 +76,26 @@ def accepted_rule(requirement: dict[str, Any]) -> str:
     return f"{requirement['operator']} {unit}".strip()
 
 
-def render(document: dict[str, Any]) -> bytes:
+# ReportLab ships no type declarations.
+class BriefDoc(SimpleDocTemplate):  # type: ignore[misc]
+    """PDF sidebar bookmarks are the document's navigable section tabs."""
+
+    def afterFlowable(self, flowable: Any) -> None:  # noqa: N802 - ReportLab hook
+        if isinstance(flowable, Paragraph) and flowable.style.name in {"title", "section"}:
+            key = f"section-{self.seq.nextf('outline')}"
+            self.canv.bookmarkPage(key)
+            self.canv.addOutlineEntry(flowable.getPlainText(), key,
+                                     level=0 if flowable.style.name == "title" else 1, closed=False)
+
+
+def position(point: list[float]) -> str:
+    lon, lat = point
+    return f"{abs(lat):.6f} deg {'N' if lat >= 0 else 'S'}, {abs(lon):.6f} deg {'E' if lon >= 0 else 'W'}"
+
+
+def render(document: dict[str, Any], *, concise: bool = False) -> bytes:
+    if "locations" in document:
+        return render_packet(document)
     font_root = Path(reportlab.__file__).parent / "fonts"
     pdfmetrics.registerFont(TTFont("BriefSans", str(font_root / "Vera.ttf")))
     pdfmetrics.registerFont(TTFont("BriefSansBold", str(font_root / "VeraBd.ttf")))
@@ -138,6 +158,42 @@ def render(document: dict[str, Any]) -> bytes:
         graphic.add(String(18, 61, f"Measured {format(value, '.6g')} {text(measurement['unit'])}",
                            fontName="BriefSansBold", fontSize=8, fillColor=INK))
         graphic.add(String(18, 0, "Point: registered measurement. Dashed markers: accepted bounds.",
+                           fontName="BriefSans", fontSize=7, fillColor=MUTED))
+        return graphic
+
+    def site_plot(plan: dict[str, Any]) -> Any:
+        """North-up coordinate schematic, not imagery or an invented field corridor."""
+        west, south, east, north = plan["bbox"]
+        cosine = math.cos(math.radians((south + north) / 2))
+        scale = min((WIDTH - 64) / ((east - west) * cosine), 170 / (north - south))
+        width, height = (east - west) * cosine * scale, (north - south) * scale
+        x0, y0 = (WIDTH - width) / 2, 28
+
+        def xy(point: list[float]) -> tuple[float, float]:
+            return x0 + (point[0] - west) * cosine * scale, y0 + (point[1] - south) * scale
+
+        graphic = Drawing(WIDTH, height + 70)
+        graphic.add(Rect(x0, y0, width, height, fillColor=PALE, strokeColor=ACCENT))
+        route = plan.get("route")
+        if route:
+            points = route["coordinates"]
+            for start, finish in zip(points, points[1:], strict=False):
+                a, b = xy(start), xy(finish)
+                graphic.add(Line(*a, *b, strokeColor=ACCENT, strokeWidth=2))
+            markers = [("Start / finish" if route["start"] == route["finish"] else "Start", route["start"])]
+            if route["start"] != route["finish"]:
+                markers.append(("Finish", route["finish"]))
+            markers.extend((str(i + 1), item["position"]) for i, item in enumerate(route["checkpoints"]))
+            for label, point in markers:
+                x, y = xy(point)
+                graphic.add(Circle(x, y, 3, fillColor=INK, strokeColor=colors.white))
+                graphic.add(String(x + 6, y + 7, label, fontName="BriefSansBold", fontSize=7, fillColor=INK))
+        else:
+            x, y = xy(plan["center"])
+            graphic.add(Circle(x, y, 3, fillColor=ACCENT, strokeColor=ACCENT))
+        graphic.add(String(4, height + 47, "N up | WGS84 coordinate schematic | outline = assessed region",
+                           fontName="BriefSans", fontSize=7, fillColor=MUTED))
+        graphic.add(String(4, 7, "Line = computed raster route, when available. No field clearance is implied.",
                            fontName="BriefSans", fontSize=7, fillColor=MUTED))
         return graphic
 
@@ -372,6 +428,80 @@ def render(document: dict[str, Any]) -> bytes:
                     "Use Technical details for exact values, accepted parameters, methods and source records. "
                     "The same evidence and limitations apply throughout."),
                   p("AnalogForge is not a NASA product; no NASA endorsement is implied.", "small"),
+                  PageBreak(), p("How this location was found", "title"),
+                  p("01 / From mission to Earth evidence", "section"),
+                  p("The accepted mission defines the conditions to match. Registered planetary and Earth "
+                    "terrain observations are compared at compatible spatial support; the saved comparisons "
+                    "below determine which criteria this location meets. No new search is performed for this PDF."),
+                  table([["Target region", aoi_text(mission["target"])],
+                         ["Discovery method", candidate.get("discovery_method") or "Not recorded"],
+                         ["Dataset lock", run.get("dataset_lock_id")],
+                         ["Windows screened", (document.get("search_scope") or {}).get("screened_count", "Unknown")],
+                         ["Earth analysis support", str((document["candidate_analysis"].get("slope_histogram")
+                          or {}).get("support_scale_m", "Unknown")) + " m"],
+                         ["Target analysis support", str((document["target_analysis"].get("slope_histogram")
+                          or {}).get("support_scale_m", "Unknown")) + " m"]], [140, WIDTH - 140]),
+                  p("A criterion's exact measurement, units and accepted limit appear in Simplified overview. "
+                    "This is a regional comparison, not a global optimum. A terrain comparison is not a "
+                    "physical test of wheels, suspension, instruments or sampling equipment."),
+                  p("02 / Final Earth location", "section"),
+                  p(position(document["test_plan"]["center"]), "label"),
+                  p("Region centre only - not a landing point, access point or approved route start."),
+                  p("Coordinate digits are display precision, not survey accuracy; terrain support remains as stated.",
+                    "small"),
+                  table([["Assessed region", aoi_text(candidate["aoi"])],
+                         ["Site identity", candidate["id"]]], [140, WIDTH - 140]),
+                  PageBreak(), p("Location test plan", "title"),
+                  p(candidate.get("name") or "Earth location", "section"),
+                  p(document["test_plan"]["route_note"]), site_plot(document["test_plan"])])
+    plan = document["test_plan"]
+    route = plan.get("route")
+    if route:
+        front.extend([table([["Start", position(route["start"])], ["Finish", position(route["finish"])],
+                            ["Model outcome", route["outcome"] + " - raster feasibility only"],
+                            ["Route analysis cells", f"{route['support_scale_m']} m"]], [140, WIDTH - 140]),
+                      p("Follow the numbered checkpoints in order only after the route is surveyed and approved. "
+                        "A return to the same coordinate is a loop. Checkpoint coordinates do not establish material "
+                        "presence or wheel-scale traversability."),
+                      p("Checkpoints and activities", "label")])
+        checkpoint_rows = [["Stop / coordinates", "Activity / capability", "Recorded design"]]
+        for i, item in enumerate(route["checkpoints"]):
+            checkpoint_rows.append([f"{i + 1}. {item['id']}\n{position(item['position'])}",
+                f"{item['activity']}\n{item.get('capability') or 'No specific hardware capability recorded'}",
+                f"Dwell {item['dwell_s']} s; tolerance {item['tolerance_m']} m\n"
+                f"Origin {item['origin']}; requirements {', '.join(item['requirement_ids']) or 'None assigned'}"])
+        if len(checkpoint_rows) > 1:
+            front.append(table(checkpoint_rows, [WIDTH * .38, WIDTH * .27, WIDTH * .35], header=True))
+        front.append(p("Recorded route assumptions - these are not additional accepted mission criteria", "label"))
+        front.extend(p(item, "small") for item in route["assumptions"])
+    else:
+        front.append(p("Start / finish: not established. Select field endpoints after survey, then compute and "
+                       "independently verify a route for this site. No neighbouring site's path is substituted."))
+    front.extend([p("What to test and which benchmark applies", "section"),
+                  p("Each row below retains the mission's own criterion. A subsystem-level physical acceptance "
+                    "test must be separately specified when only regional terrain criteria were accepted.")])
+    for row in requirements:
+        req = row["requirement"]
+        front.append(KeepTogether([p(f"{req['label']} ({req['id']})", "label"),
+            table([["Test focus", f"{req.get('dimension', 'Unspecified')} / {req.get('observable', 'Unspecified')}"],
+                   ["Benchmark to meet", accepted_rule(req)],
+                   ["Current evidence", row["status"] + " - " + row["explanation"]],
+                   ["Field task", "Measure the named observable with calibrated instruments at the accepted support. "
+                    "For a terrain-only criterion, this checks site suitability; a drive cannot substitute for "
+                    "the terrain comparison or establish hardware reliability."]], [140, WIDTH - 140])]))
+    if route:
+        front.append(p("Modeled route checks - separate from mission terrain criteria", "section"))
+        checks = [["Recorded rule", "Measurement / margin", "Model status"]]
+        for item in route["benchmark_rows"]:
+            checks.append([item["rule"], f"{text(item.get('measured'))} {text(item.get('unit'))}\n"
+                           f"Margin {text(item.get('margin'))}", item["status"]])
+        front.append(table(checks, [WIDTH * .48, WIDTH * .35, WIDTH * .17], header=True))
+    front.append(p("Field sequence and evidence to collect", "section"))
+    front.extend(p(f"{index + 1}. {step}") for index, step in enumerate(plan["steps"]))
+    front.extend([p(plan["field_readiness"], "label"),
+                  p("Success here supports only the accepted, measured capability. Mars/Moon gravity, atmosphere, "
+                    "temperature, dust and radiation need separate transfer analysis and validation. "
+                    "No probability of mission success is estimated."),
                   PageBreak(), p("Simplified overview", "title"),
                   p("The mission", "section"), p(mission.get("objective")),
                   p("What to test at this location", "section")])
@@ -394,9 +524,9 @@ def render(document: dict[str, Any]) -> bytes:
                     else f"{len(document['attempts'])} committed rover result(s) are recorded in Technical details."),
                   PageBreak()])
     story[:2] = [p("Technical details", "title")]
-    story = front + story
+    story = front[:-1] if concise else front + story
     output = io.BytesIO()
-    doc = SimpleDocTemplate(output, pagesize=A4, rightMargin=44, leftMargin=44, topMargin=55, bottomMargin=48,
+    doc = BriefDoc(output, pagesize=A4, rightMargin=44, leftMargin=44, topMargin=55, bottomMargin=48,
                             title="AnalogForge - Current evidence brief", author="AnalogForge", pageCompression=1)
 
     def page(canvas: Any, _doc: Any) -> None:
@@ -419,6 +549,53 @@ def render(document: dict[str, Any]) -> bytes:
     if len(result) > 8 * 1024 * 1024:
         raise ValueError("PDF byte bound exceeded")
     return result
+
+
+def render_packet(document: dict[str, Any]) -> bytes:
+    """One concise, bookmarked dossier; full audit appendices stay in the per-site downloads."""
+    locations = document["locations"]
+    if not 1 <= len(locations) <= 8:
+        raise ValueError("Location count exceeds packet bound")
+    parts = [render(location, concise=True) for location in locations]
+    output = io.BytesIO()
+    style = ParagraphStyle("index", fontName="BriefSans", fontSize=10, leading=15, textColor=INK)
+    title = ParagraphStyle("index-title", parent=style, fontName="BriefSansBold", fontSize=25, leading=32)
+
+    def p(value: Any) -> Any:
+        return Paragraph(escape(text(value)).replace("\n", "<br/>"), style)
+
+    story = [Paragraph("Mission field test brief", title), p(locations[0]["mission"].get("name")),
+             p("All investigated Earth locations. Use the PDF bookmarks to open a site's methods, coordinates, "
+               "test plan and benchmark graphs. These are planning references, not approved driving instructions."),
+             p("Location directory - WGS84 reference centres")]
+    for index, location in enumerate(locations):
+        statuses = [row["status"] for row in location["benchmarks"]["requirements"]]
+        story.extend([p(f"{index + 1}. {location['candidate'].get('name') or 'Earth location'}"),
+                      p(position(location["test_plan"]["center"])),
+                      p(f"{statuses.count('PASS')} criterion matches; {statuses.count('FAIL')} unmet; "
+                        f"{statuses.count('UNKNOWN')} unknown. " + location["test_plan"]["route_note"])])
+    story.extend([p("The directory includes unsuccessful candidates so a failed benchmark remains visible. "
+                    "Full evidence receipts, registered raster images and technical terminology are available "
+                    "in each location's current evidence PDF."),
+                  p(f"Run {document['run']['run_id']} / revision {document['run']['revision']}"),
+                  p("Combined snapshot SHA-256: " + document["snapshot_sha256"]),
+                  p("AnalogForge - no NASA endorsement. Earth testing reduces uncertainty; it does not assure "
+                    "Mars or Moon mission success.")])
+    SimpleDocTemplate(output, pagesize=A4, leftMargin=44, rightMargin=44,
+                      topMargin=55, bottomMargin=48, title="AnalogForge - Mission field test brief").build(story)
+    writer = PdfWriter()
+    writer.append(PdfReader(io.BytesIO(output.getvalue())), outline_item="Location directory")
+    for index, (location, content) in enumerate(zip(locations, parts, strict=True)):
+        writer.append(PdfReader(io.BytesIO(content)),
+                      outline_item=f"{index + 1}. {location['candidate'].get('name') or 'Earth location'}")
+    # The dossier combines up to eight separately bounded site sections. Keep a
+    # distinct total bound; one site's 40-page appendix limit is not a packet limit.
+    if len(writer.pages) > 120:
+        raise ValueError("Combined PDF page bound exceeded")
+    writer.add_metadata({"/Title": "AnalogForge - Mission field test brief", "/Author": "AnalogForge"})
+    result = io.BytesIO()
+    writer.write(result)
+    return result.getvalue()
 
 
 def main() -> None:

@@ -10,12 +10,15 @@ vi.mock('./useRunAssurance', () => ({ useRunAssurance: () => ({ publication: 'UN
 vi.mock('./useRunData', () => ({ useRunData: () => ({ snapshot: { run_id: seed.runId, workspace_id: seed.workspaceId, mode: 'synthetic', state: 'FAILED', revision: 12, candidate_ids: seed.candidates.map(candidate => candidate.id) }, contract: { ...seed.missionPresets.MARS, name: 'Accepted mission' }, candidates: seed.candidates, qualifications: [], loading: false }) }));
 vi.mock('./BenchmarkEvidence', () => ({ BenchmarkEvidence: () => <p>Candidate-scoped benchmark boundary</p> }));
 vi.mock('./EnvironmentContext', () => ({ EnvironmentContext: () => <p>Stored environment boundary</p> }));
+vi.mock('./SiteFieldPlan', () => ({ SiteFieldPlan: () => <p>Candidate-scoped field plan boundary</p> }));
 vi.mock('./RunTerminalNotice', () => ({ RunTerminalNotice: () => <p role="status">Recorded terminal reason</p> }));
 function mount(site: string) { render(<MemoryRouter initialEntries={[`/runs/${seed.runId}/report?site=${site}`]}><Routes><Route path="/runs/:runId/report" element={<ReportPage/>}/></Routes></MemoryRouter>); }
 it('offers a current-evidence PDF for the exact location while retaining terminal truth and publication limits', async () => {
   vi.mocked(api.raw).mockRejectedValue(new Error('PDF unavailable')); mount(seed.candidates[1]!.id);
   expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(seed.candidates[1]!.name);
   expect(screen.getByText('Recorded terminal reason')).toBeVisible();
+  expect(screen.getByText('Candidate-scoped field plan boundary')).toBeVisible();
+  expect(screen.getByRole('button', { name: 'Download all-location test brief' })).toBeVisible();
   expect(screen.getByText(/This brief is not an immutable published passport/)).toBeVisible();
   fireEvent.click(screen.getByRole('button', { name: 'Download current evidence PDF' }));
   await waitFor(() => expect(api.raw).toHaveBeenCalledWith(`/runs/${seed.runId}/candidates/${seed.candidates[1]!.id}/evidence-brief.pdf`, expect.anything()));

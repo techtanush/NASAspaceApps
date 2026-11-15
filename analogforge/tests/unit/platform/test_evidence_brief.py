@@ -70,11 +70,33 @@ def test_actual_pdf_retains_failure_exact_value_missing_work_and_scope(projectio
             < extracted.index("Technical details\n"))
     assert "0 PASS; 1 FAIL; 1 UNKNOWN; 0 GAP" in extracted
     assert "Technical terminology" in extracted and "Wasserstein-1" in extracted
+    assert "How this location was found" in extracted and "Location test plan" in extracted
+    assert "Start / finish: not established" in extracted and "hardware reliability" in extracted
+    assert reader.outline  # navigable sections, with no scripts or external links
     assert all(len(page.extract_text()) > 150 for page in reader.pages)
     assert re.search(r"30(?:\.0)?\s+m\s+support", extracted)
     assert "No committed route verification result" in extracted
     assert 1 <= len(reader.pages) <= 40 and uow.rows == before
     assert reader.trailer["/Root"].get("/OpenAction") is None
+
+
+def test_combined_brief_has_each_site_its_coordinates_and_bookmarks(projection):
+    uow, _blobs, run, _mission, candidate = projection
+    snapshot(projection)
+    second = uow.seed("candidates", **{**deepcopy(candidate), "id": str(uuid4()), "name": "Second distinct place",
+                                       "aoi": {**candidate["aoi"], "bbox": [-110, 34, -109, 35]}})
+    run["candidate_ids"].append(second["id"])
+    packet = brief.build_packet(uow, projection[1], run["id"])
+    before = deepcopy(uow.rows)
+    reader = PdfReader(io.BytesIO(brief.render_pdf(packet)))
+    extracted = "\n".join(page.extract_text() for page in reader.pages)
+    assert "Mission field test brief" in extracted and "Location directory" in extracted
+    assert candidate["id"] in extracted and second["id"] in extracted
+    assert "109.500000 deg W" in extracted and "111.500000 deg W" in extracted
+    assert len(reader.outline) >= 3 and len(reader.pages) <= 40 and uow.rows == before
+    for location in packet["locations"]:
+        assert location["snapshot_sha256"] == canonical_sha256({
+            key: value for key, value in location.items() if key != "snapshot_sha256"})
 
 
 def test_registered_analysis_histogram_requires_exact_operation_and_ancestry(projection):

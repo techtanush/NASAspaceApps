@@ -69,6 +69,27 @@ def test_unknown_parent_cycles_cannot_add_foreign_or_unregistered_sources():
     assert target_evidence_context(facts)["source_evidence_ids"] == ["parent", "source"]
 
 
+@pytest.mark.parametrize("geometry", [True, False])
+def test_rover_presence_and_proposal_provenance_cannot_relabel_registered_target_facts(geometry):
+    facts = coordinate_facts()
+    facts["mission"].update(id="accepted-contract", accepted_at="2026-11-15T00:00:00Z")
+    for row in facts["mission"]["requirements"]:
+        row.update(origin="PROPOSED_DEFAULT", acceptance_note="Proposed threshold requires explicit user review")
+    if not geometry:
+        facts["registered_receipts"][0]["tool_name"] = "inspect_contract"
+    facts.update(validation_receipt_id="contract-only", target_coordinate_context=target_coordinate_context(facts))
+    without_rover = project_payload("planetary_target", facts)
+    facts["rover"] = {"max_slope_deg": 18, "ground_clearance_m": 0.2, "energy_model": None}
+    before = deepcopy(facts)
+    with_rover = project_payload("planetary_target", facts)
+    assert with_rover == without_rover and facts == before
+    assert with_rover["comparison_ready"] is geometry
+    assert [row["availability"] for row in with_rover["dimension_evidence"]] == [
+        "AVAILABLE", "NO_COVERAGE", "UNRESOLVED",
+    ]
+    assert with_rover["source_evidence_ids"] == ["parent", "source"]
+
+
 def coordinate_facts():
     facts = target_facts()
     scope = {"workspace_id": "workspace", "run_id": "run", "mode": "live"}

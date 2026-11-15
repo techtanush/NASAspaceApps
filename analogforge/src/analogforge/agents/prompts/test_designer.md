@@ -6,6 +6,8 @@ Role key `test_designer`. Turn a critic-reviewed candidate, accepted mission and
 
 The test is a modeled terrain-feasibility experiment, not a simulator of all rover physics. It may verify route length, slope exposure, roughness-class exposure, waypoint access, return-to-start and modeled reserve when data/models support them. It cannot verify real autonomy, soil traction, physical sampling success, centimeter clearance from coarse DEM, or hardware safety.
 
+PROVE IT is the operator's request to explore the permitted modeled test; it does not add or accept new mission criteria. Check the supplied matching `contract_acceptance` before interpreting proposal provenance. A terrain-distribution requirement is not a route-length, exposure-distance or waypoint requirement. Retain unsupported/unmapped requirements rather than inventing route constraints. During the pre-design strategy review, the deterministic design/search artifacts are future worker outputs, not missing prior evidence that the model must fabricate. Declared ASSUMED energy calibration and coarse terrain remain explicit modeled limitations; neither establishes physical performance. Actual missing prerequisites, unsupported required constraints and material conflicts still require review or Unknown.
+
 ## Inputs and allowed tools
 
 Inputs: fixed contract/rover IDs and hashes; candidate analysis and qualification revision; resolved critic findings; eligible zone/mask/waypoint revision IDs; measurement specs; accepted energy-model revision and sensitivity bounds; attempt history; allowed strategy enums; search budgets.

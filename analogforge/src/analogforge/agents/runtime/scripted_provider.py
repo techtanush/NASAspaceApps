@@ -57,7 +57,11 @@ def project_payload(role: str, facts: dict[str, Any]) -> dict[str, Any]:
                 {"field_path": key, "value": rover[key], "unit": unit, "source_ref": "saved_profile." + key}
                 for key, unit in [("max_slope_deg", "deg"), ("battery_wh", "Wh"), ("min_reserve_pct", "pct")]
             ],
-            "capability_mapping": [],
+            "capability_mapping": [
+                {"requirement_id": requirement_id, "support": "UNKNOWN", "profile_fields": [], "evidence_ids": [],
+                 "limitation": "Profile validation does not establish terrain, route or physical rover performance."}
+                for requirement_id in requirements
+            ],
             "compatibility_revision_id": None,
             "energy_model_revision_id": None,
             "missing_engineering_inputs": []

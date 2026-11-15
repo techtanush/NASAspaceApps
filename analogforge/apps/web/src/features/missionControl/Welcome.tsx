@@ -24,7 +24,7 @@ const sentence = (state: string) => state.toLowerCase().replaceAll('_', ' ').rep
 export function Welcome() {
   const { reset } = useMissionControl();
   useScene({ body: 'EARTH', autoRotate: true, layout: 'hero', focus: { lat: 18, lng: -40, altitude: 2.3 } });
-  const workspace = useWorkspace(); const runs = useApi<Runs>(workspace, '/runs?limit=4');
+  const workspace = useWorkspace(); const runs = useApi<Runs>(workspace, '/workspace/recent-runs?limit=4');
   const recent = runs.data?.items ?? [];
   return <section className="mc-hero" data-testid="welcome" aria-labelledby="welcome-title">
     <div className="mc-hero-kicker"><span className="mc-orbit-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="10"/><ellipse cx="24" cy="24" rx="23" ry="8" transform="rotate(-35 24 24)"/><path d="M24 4v7M24 37v7M4 24h7M37 24h7"/></svg></span><p className="mc-eyebrow">Planetary mission. Earth rehearsal.</p></div>
