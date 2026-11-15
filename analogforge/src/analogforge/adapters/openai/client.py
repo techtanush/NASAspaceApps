@@ -26,7 +26,24 @@ class RateLimitCooldown:
     def __init__(self, clock: Callable[[], float] = time.monotonic) -> None:
         self.clock = clock
         self.until = 0.0
+        self.next_request_at = 0.0
         self.lock = threading.Lock()
+
+    def wait_for_slot(self, interval: float, sleep: Callable[[float], None]) -> None:
+        """Reserve a process-shared request slot without retaining conversation data.
+
+        Pacing is optional, local, and separate from provider retry/correction budgets.
+        A failed attempt still consumes its reserved slot. No lock is held during sleep.
+        """
+        if interval == 0:
+            return
+        with self.lock:
+            now = self.clock()
+            reserved = max(now, self.next_request_at)
+            self.next_request_at = reserved + interval
+        delay = max(0.0, reserved - now)
+        if delay:
+            sleep(delay)
 
     def active(self) -> bool:
         with self.lock:
@@ -74,11 +91,16 @@ class ResponsesClient:
         self, api_key: str | None, model: str | None, *, base_url: str | None = None, timeout: float = 30,
         groq_api_key: str | None = None, groq_model: str | None = None, groq_fallback_enabled: bool = False,
         cooldown: RateLimitCooldown | None = None,
+        min_request_interval_seconds: float = 0, sleep: Callable[[float], None] = time.sleep,
     ) -> None:
         if not api_key:
             raise ProviderError("PROVIDER_AUTH_FAILED", "OPENAI_API_KEY is required")
         if not model:
             raise ProviderError("PROVIDER_AUTH_FAILED", "OPENAI_MODEL is required")
+        if not math.isfinite(min_request_interval_seconds) or not 0 <= min_request_interval_seconds <= 60:
+            raise ValueError("Provider request pacing must be between 0 and 60 seconds")
+        self.min_request_interval_seconds = min_request_interval_seconds
+        self.sleep = sleep
         self.model = model
         self.primary_model = model
         self.client = OpenAI(api_key=api_key, base_url=base_url, timeout=timeout, max_retries=0)
@@ -150,6 +172,8 @@ class ResponsesClient:
     def _request(self, **kwargs: Any) -> dict[str, Any]:
         sdk = self.client if self.provider == "openai" else self.groq
         assert sdk is not None
+        if self.provider == "openai":
+            self.cooldown.wait_for_slot(self.min_request_interval_seconds, self.sleep)
         if self.provider == "groq":
             # Leave headroom for the complete input/tool schemas on the fallback
             # provider's smaller request budget. Incomplete proposals still fail closed.

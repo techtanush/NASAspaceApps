@@ -135,6 +135,7 @@ class WorkflowEngine:
         return ResponsesClient(
             key, getattr(self.settings, "openai_model", None), base_url=base_url,
             cooldown=self._model_cooldown, **fallback_options(self.settings),
+            min_request_interval_seconds=getattr(self.settings, "openai_min_request_interval_seconds", 0),
         )
 
     def _scenario(self, identifier: str) -> dict[str, Any]:
@@ -220,6 +221,7 @@ class WorkflowEngine:
         mode: str = "synthetic",
         model_request_charge: Callable[[], None] | None = None,
         provider_attempts: list[dict[str, Any]] | None = None,
+        operator_context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         scenario_id = (
             scenario_config_id
@@ -296,6 +298,7 @@ class WorkflowEngine:
                         ),
                         "mode": mode,
                         "draft": mission,
+                        **({"untrusted_operator_context": operator_context} if operator_context else {}),
                         "algorithm_config_version": algorithms["config_version"],
                         "algorithm_config_sha256": canonical_sha256(algorithms),
                         "observable_policy_catalog": policy_catalog,
@@ -325,6 +328,10 @@ class WorkflowEngine:
                     }
                 },
             )
+            if operator_context:
+                from analogforge.application.operator_context import INSTRUCTIONS
+
+                request["instructions"] = INSTRUCTIONS
             try:
                 response = create(**request)
             finally:
@@ -791,6 +798,9 @@ class WorkflowEngine:
             evidences = [e for e in evidences if e["id"] in established]
             targets = tx.list("target_profiles", {"run_id": run_id})
             candidates = tx.list("candidates", {"run_id": run_id})
+            from analogforge.application import operator_context as operator_sources
+
+            context_snapshot = operator_sources.pinned(tx, "RUN", run_id)
             receipt = ToolReceipt.model_validate(
                 {
                     **envelope(workspace_id, run_id, run["mode"]),
@@ -891,6 +901,10 @@ class WorkflowEngine:
                 "receipt_summaries": [
                     {k: r[k] for k in ("id", "tool_name", "status", "evidence_ids")} for r in receipts
                 ],
+                **({"untrusted_operator_context_ref": {
+                    "snapshot_sha256": context_snapshot["snapshot_sha256"], "read_tool": "get_run_snapshot",
+                    "trust": "UNTRUSTED_CONTEXT", "scientific_authority": "NONE",
+                }} if context_snapshot["snapshot_sha256"] else {}),
             },
         )
         seeded_defect = False
@@ -940,7 +954,11 @@ class WorkflowEngine:
         )
         registry = ToolRegistry(
             {
-                "get_run_snapshot": lambda args: {"run_revision": run["revision"], "snapshot": run},
+                "get_run_snapshot": lambda args: {
+                    "run_revision": run["revision"], "snapshot": run,
+                    **({"operator_context": operator_sources.model_payload(context_snapshot)}
+                       if context_snapshot["snapshot_sha256"] else {}),
+                },
                 "inspect_contract": lambda args: {
                     "accepted": True,
                     "acceptance": acceptance,

@@ -375,7 +375,7 @@ class Store:
                     return False
                 revision = connection.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one()
                 artifacts = connection.execute(sa.text("SELECT to_regclass('artifact_blobs')")).scalar_one()
-                return bool(revision == "0007" and artifacts is not None)
+                return bool(revision == "0008" and artifacts is not None)
         except SQLAlchemyError:
             return False
 

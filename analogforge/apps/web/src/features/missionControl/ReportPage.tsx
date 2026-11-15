@@ -19,6 +19,7 @@ export function ReportPage() {
     <nav className="mc-report-actions" aria-label="Report actions"><Link to={`/runs/${runId}/tour?site=${site.candidate.id}`}>Back to site</Link><Button onClick={() => window.print()}>Print / save PDF</Button><Link to={`/runs/${runId}/passport`}>Published passport and exports</Link></nav>
     <header><p className="mc-eyebrow">AnalogForge · current evidence summary</p><h1 tabIndex={-1}>{contract.name}</h1><p>{site.candidate.name} · {formatPlace(site.lat, site.lng)}</p><ModeBadge mode={snapshot.mode}/><PublicationBadge publication={assurance.publication}/></header>
     <RunTerminalNotice run={snapshot}/>
+    <p>Search scope: areas covered by this investigation’s terrain data and screened candidate windows.</p>
     <p className="mc-detail-notice">Presentation of current run data. This browser summary is not an immutable published passport. Assurance is shown only from a matching publication audit.</p>
     <dl className="mc-report-meta"><dt>Target</dt><dd>{contract.target.body} · {contract.target.bbox.join(', ')}</dd><dt>Rover revision</dt><dd>{snapshot.rover_revision_id ?? 'No rover — site qualification only'}</dd><dt>Run</dt><dd>{snapshot.run_id} · revision {snapshot.revision} · {snapshot.state}</dd><dt>Mission revision</dt><dd>{snapshot.mission_revision_id}</dd></dl>
     <h2>Why this site matches or falls short</h2><BenchmarkEvidence run={snapshot} contract={contract} site={site} report/>

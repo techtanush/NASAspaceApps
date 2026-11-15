@@ -9,7 +9,7 @@ export default defineConfig({
  testDir: '../../tests/e2e', timeout: mock ? 90000 : 900000 /* real backend: frozen step limits (prep 60 s + run 180 s + PROVE IT 240 s, guide 05 s3) exceed 90 s */, expect: { timeout: 15000 }, fullyParallel: false, workers: 1,
  // Merge-owned gates assert real persisted jobs and science artifacts. They are
  // a separate required real-backend suite; mock journeys still execute in full.
- testIgnore: mock ? ['**/integration/**'] : [],
+ testIgnore: mock ? ['**/integration/**', '**/operator-context.spec.ts'] : [],
  reporter: [['list'], ['json', { outputFile: `../../out/e2e-results-${process.env.E2E_RUN_NAME || 'default'}.json` }]],
  use: { actionTimeout: 15000, navigationTimeout: 30000, baseURL, viewport: { width: 1440, height: 900 }, acceptDownloads: true, trace: /^(visual|M\d)/.test(process.env.E2E_RUN_NAME||'') ? 'off' : 'retain-on-failure', screenshot: 'only-on-failure', launchOptions: { executablePath: executable, args: ['--no-sandbox', '--enable-unsafe-swiftshader'] } },
  webServer: mock ? { command: 'pnpm run dev:mock', url: baseURL, reuseExistingServer: !process.env.CI, timeout: 30000 } : undefined,

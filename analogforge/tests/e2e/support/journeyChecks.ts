@@ -91,6 +91,8 @@ export async function keyboardMission(page: Page) {
   await page.keyboard.type('Keyboard mobility investigation');
   await tabTo(page, page.getByTestId('input-objective'));
   await page.keyboard.type('Test geological sampling mobility with 100 m unique exposure on 12–18 degree slopes and return with reserve.');
+  await tabTo(page, page.getByText('Exact coordinates and data reference', {exact:true}));
+  await page.keyboard.press('Space');
   await tabTo(page, page.getByTestId('select-target-preset'));
   await page.keyboard.press('Space');
   await page.keyboard.press('ArrowDown');

@@ -8,7 +8,7 @@ async function launch(page: import('@playwright/test').Page, siteOnly=false, moo
  await page.getByTestId('btn-begin').click();
  if(moon){await page.getByRole('button',{name:'Moon',exact:true}).click();await page.getByRole('button',{name:'Mare Tranquillitatis Apollo 11 landing region'}).click();}
  else await page.getByRole('button',{name:'Gale Crater Curiosity landing region'}).click();
- if(options.practice) await page.getByTestId('btn-use-practice-target').click();
+ if(options.practice){await page.getByText('Practice datasets (synthetic)',{exact:true}).click();await page.getByTestId('btn-use-practice-target').click();}
  await page.getByTestId('btn-confirm-place').click();
  await page.getByRole('button',{name:'Slope traverse',exact:true}).click();
  await page.getByTestId('btn-mission-continue').click();

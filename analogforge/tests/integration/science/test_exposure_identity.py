@@ -7,8 +7,6 @@ from dataclasses import fields
 from uuid import uuid4
 
 import pytest
-from tests.fixtures.science.support.builders import make_context, make_request, run
-from tests.fixtures.science.support.registrar_stub import register
 
 from analogforge.jobs import cpu
 from analogforge.jobs.context import WorkerScienceContext
@@ -23,6 +21,8 @@ from analogforge.ports.hashing import (
 from analogforge.ports.science import LocalScienceContext, ScienceRequest
 from analogforge.ports.science_payloads import CompareRequirementInput, VerificationSummary, VerifyRouteInput
 from analogforge.science.facade import create_science_service
+from tests.fixtures.science.support.builders import make_context, make_request, run
+from tests.fixtures.science.support.registrar_stub import register
 from tests.unit.science.test_routing_support import candidate, graph_design, make_route, mission
 
 

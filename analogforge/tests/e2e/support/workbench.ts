@@ -82,6 +82,7 @@ export async function newMission(page: Page, options: { moon?: boolean; rover?: 
  const dialog = page.getByRole('dialog');
  if (await dialog.isVisible()) await dialog.getByRole('button', { name: /confirm|change body/i }).click();
  await page.getByTestId('input-objective').fill(options.moon ? 'Evaluate lunar polar thermal and terrain analogs.' : 'Test geological sampling mobility with 100 m unique exposure on 12–18 degree slopes and return with reserve.');
+ await page.getByText('Exact coordinates and data reference', {exact:true}).click();
  await choose(page, 'select-target-preset', options.moon ? 'Moon' : 'Mars');
  await expect(page.locator('[data-testid=save-indicator][data-save-state=saved]')).toBeVisible();
  if (options.rover === null) await page.getByTestId('btn-continue-no-rover').click();
@@ -97,6 +98,7 @@ export async function newMission(page: Page, options: { moon?: boolean; rover?: 
  // Job completion precedes retrieval of the accepted-contract proposal.
  await expect(page.getByTestId('btn-accept-contract')).toBeEnabled();
  await inspectHooks(page);
+ await page.getByText('Advanced data settings', {exact:true}).click();
  await choose(page, 'select-scenario', options.scenario || (options.moon ? 'synthetic-moon-gap-v1' : 'synthetic-mars-mobility-v1'));
  await choose(page, 'select-mode', options.mode || 'synthetic');
  await expect(page.getByTestId('btn-accept-contract')).toBeEnabled();

@@ -12,6 +12,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 # Explicit user-selected EOX 2016 visual context, never a generic external-URL exemption.
 IMAGERY_URLS = {
+    "apps/web/src/api/planetaryImagery.ts": {
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile",
+        "https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm",
+        "https://trek.nasa.gov/tiles/apidoc/trekAPI.html?body=mars",
+        "https://trek.nasa.gov/tiles/apidoc/trekAPI.html?body=moon",
+    },
     "apps/web/src/api/earthImagery.ts": {
         "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/GoogleMapsCompatible",
     },

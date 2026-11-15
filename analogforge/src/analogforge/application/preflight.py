@@ -274,6 +274,7 @@ def run_preflight(
                     settings.openai_api_key.get_secret_value(),
                     settings.openai_model,
                     base_url=settings.fake_openai_url if settings.test_hooks else None,
+                    min_request_interval_seconds=getattr(settings, "openai_min_request_interval_seconds", 0),
                     **client_module.fallback_options(settings),
                 )
                 probe.probe(client)

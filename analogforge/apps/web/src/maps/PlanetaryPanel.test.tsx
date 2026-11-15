@@ -5,6 +5,7 @@ import { api } from '../api/client';
 import fixtures from '../mock/fixtures/display-assets.json';
 import seed from '../mock/fixtures/seed.json';
 import { PlanetaryPanel } from './PlanetaryPanel';
+vi.mock('./PlanetaryBasemap', () => ({ PlanetaryBasemap: () => <div>Orbital imagery</div> }));
 
 type S = components['schemas'];
 const aoi = seed.missionPresets.MARS.target as S['AreaOfInterest'];
@@ -18,6 +19,7 @@ afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 it('moves a visible crosshair to arbitrary display points and gives keyboard and pointer inspection identical coordinates', () => {
   render(<PlanetaryPanel aoi={aoi} layers={[layer]}/>);
+  fireEvent.click(screen.getByRole('button', { name: 'Measured terrain' }));
   const inspector = screen.getByRole('group', { name: /MARS bounding box/ });
   fireEvent.focus(inspector);
   fireEvent.keyDown(inspector, { key: 'ArrowRight' });
@@ -41,6 +43,7 @@ it('moves a visible crosshair to arbitrary display points and gives keyboard and
 
 it('keeps geometry-only inspection honest, clamps the crosshair, and resets it when the target changes', () => {
   const { rerender } = render(<PlanetaryPanel aoi={aoi}/>);
+  fireEvent.click(screen.getByText('Coordinates and region tools'));
   const inspector = screen.getByRole('group', { name: /MARS bounding box/ });
   for (let index = 0; index < 50; index++) fireEvent.keyDown(inspector, { key: 'ArrowLeft', shiftKey: true });
   for (let index = 0; index < 40; index++) fireEvent.keyDown(inspector, { key: 'ArrowUp', shiftKey: true });

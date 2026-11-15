@@ -30,6 +30,7 @@ test('MRG-03 real persisted attempts, frozen inputs, assurance, artifacts and ex
     expect(sha(await response.body())).toBe(layer.image_artifact_sha256);
   }
   await tab(page, 'target');
+  await page.getByRole('button', { name: 'Measured terrain', exact: true }).click();
   await expect(page.locator('[data-testid=planetary-panel] svg image')).toHaveCount(1);
   await expect(page.getByText('The prepared image could not load. Numeric evidence remains available.')).toHaveCount(0);
   await tab(page, 'analogs');

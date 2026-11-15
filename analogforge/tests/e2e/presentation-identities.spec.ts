@@ -10,6 +10,7 @@ test('authoring groups stay bounded and pinned contract identity remains inspect
  }
  const editor=page.getByRole('textbox',{name:'Energy model JSON'});await expect(editor).toHaveCSS('font-family',/mono/i);await expect(editor).toHaveCSS('white-space','pre-wrap');await expect(editor).toHaveValue(/^\{\n {2}"model_id"/);
  await page.setViewportSize({width:1440,height:900});await page.getByTestId('btn-start-run').click();await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state','AWAITING_REVIEW');
+ await page.getByRole('button',{name:'Measured terrain',exact:true}).click();
  await expect(page.locator('[data-planetary-ground-scale]')).toBeVisible();expect(Number(await page.locator('[data-planetary-ground-scale]').getAttribute('data-distance-m'))).toBeGreaterThan(0);await expect(page.getByLabel('Ground-distance scale',{exact:true})).toContainText('Approximate reference-sphere scale');
  await page.locator('[data-testid=planetary-panel] svg').focus();await page.keyboard.press('Enter');await expect(page.locator('[data-testid=planetary-panel] .coordinate-readout')).toContainText('display CRS coordinates (native units)');
  const runId=page.url().match(/\/runs\/([^/?]+)/)![1];const run=await api<{mission_revision_id:string}>(page,`/runs/${runId}`);const contract=await api<{content_sha256:string}>(page,`/mission-revisions/${run.body.mission_revision_id}`);

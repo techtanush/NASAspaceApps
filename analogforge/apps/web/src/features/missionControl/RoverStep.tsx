@@ -11,6 +11,7 @@ import { fetchRoverProfiles } from '../rovers/roverProfiles';
 import { parseRoverImport, type RoverValidationIssue } from '../rovers/validation';
 import { Guide, Panel, useScene } from './StageShell';
 import { useMissionControl } from './state';
+import { BoundOperatorContext } from '../operatorContext/BoundOperatorContext';
 
 type Rover = components['schemas']['RoverProfile'];
 const SPECS: { key: keyof Rover; label: string; unit: string }[] = [
@@ -27,6 +28,7 @@ export function RoverStep() {
   useScene({ body: plan.body, layout: 'panel', autoRotate: false, focus: ready ? { lat: plan.lat!, lng: plan.lng!, altitude: 1.7 } : null, pin: ready ? { lat: plan.lat!, lng: plan.lng! } : null, box: ready ? box.bbox : null });
   const rovers = useQuery({ queryKey: ['workspace', workspace, 'mc-rovers'], queryFn: ({ signal }) => fetchRoverProfiles(signal) });
   const [editor, setEditor] = useState(false);
+  const [contextPending, setContextPending] = useState(false);
   const [issues, setIssues] = useState<RoverValidationIssue[]>([]); const [error, setError] = useState<unknown>(null); const [saving, setSaving] = useState(false);
   if (!ready) return <Navigate to="/start/mission" replace/>;
   const importFile = async (file?: File) => {
@@ -39,7 +41,7 @@ export function RoverStep() {
   const list = latestRevisions(rovers.data?.items ?? []); const chosen = plan.noRover || plan.roverRevisionId !== null;
   const nameCounts = new Map<string, number>(); for (const rover of list) nameCounts.set(rover.name, (nameCounts.get(rover.name) ?? 0) + 1);
   return <Panel testid="rover-step" step="Step 3 of 4" title="Which rover?" lead="Choose the rover to test, add one, or qualify the site without a rover."
-    footer={<><Button variant="ghost" onClick={() => navigate('/start/mission')}><ArrowLeft size={16} aria-hidden="true"/>Back</Button><Button variant="primary" data-testid="btn-rover-continue" disabled={!chosen || saving} disabledReason="Choose a rover or the site-only option." onClick={() => navigate('/start/review')}>Continue<ArrowRight size={16} aria-hidden="true"/></Button></>}>
+    footer={<><Button variant="ghost" onClick={() => navigate('/start/mission')}><ArrowLeft size={16} aria-hidden="true"/>Back</Button><Button variant="primary" data-testid="btn-rover-continue" disabled={!chosen || saving || contextPending} disabledReason="Choose a rover or the site-only option, and finish saving any supporting context." onClick={() => navigate('/start/review')}>Continue<ArrowRight size={16} aria-hidden="true"/></Button></>}>
     <Guide>The rover’s limits set the benchmark. Every result is tied to this exact rover revision.</Guide>
     {rovers.isPending ? <Skeleton label="Retrieving saved rovers"/> : rovers.error ? <ErrorPanel error={rovers.error} onRetry={() => { void rovers.refetch(); }}/> :
       <ul className="mc-rovers" data-testid="rover-options">{list.map(rover => { const selected = plan.roverRevisionId === rover.id; return <li key={rover.id}><button type="button" className="mc-rover" data-testid="rover-option" data-rover={rover.name} data-rover-id={rover.rover_id} data-rover-revision-id={rover.id} aria-pressed={selected} onClick={() => update({ roverRevisionId: rover.id, roverName: rover.name, noRover: false })}>
@@ -53,7 +55,8 @@ export function RoverStep() {
       {issues.length > 0 && <ul className="mc-issues" role="alert" data-testid="rover-import-issues">{issues.slice(0, 5).map(issue => <li key={`${issue.field}:${issue.message}`}><strong>{issue.field}</strong> {issue.message}</li>)}</ul>}
       {error !== null && <ErrorPanel error={error}/>}
       <Button variant="secondary" aria-expanded={editor} onClick={() => setEditor(value => !value)}>{editor ? 'Close rover editor' : 'Create or edit a rover'}</Button>
-      {editor && <div className="mc-inline-editor"><RoverEditor value={plan.roverRevisionId} onSavingChange={setSaving} onSelect={id => { if (!id) { update({noRover:true, roverRevisionId:null, roverName:null}); return; } void api.get<Rover>(`/rover-revisions/${id}`).then(rover => { update({roverRevisionId:rover.id,roverName:rover.name,noRover:false}); }).catch(setError); }}/></div>}
+      {editor && <div className="mc-inline-editor"><RoverEditor showContext={false} value={plan.roverRevisionId} onSavingChange={setSaving} onSelect={id => { if (!id) { update({noRover:true, roverRevisionId:null, roverName:null}); return; } void api.get<Rover>(`/rover-revisions/${id}`).then(rover => { update({roverRevisionId:rover.id,roverName:rover.name,noRover:false}); }).catch(setError); }}/></div>}
       <p className="helper">The <a href="/rovers" target="_blank" rel="noreferrer">rover library opens in a separate tab</a>; your investigation stays here.</p></div>
+    {!plan.noRover && plan.roverRevisionId && <BoundOperatorContext key={plan.roverRevisionId} kind="ROVER" id={plan.roverRevisionId} targetId={plan.roverRevisionId} disabled={saving} onPendingChange={setContextPending} onContextChange={roverContext => { if (!plan.roverContextChecked || (plan.roverContext?.id ?? null) !== (roverContext?.id ?? null)) update({ roverContext, roverContextChecked: true }); }}/>}
   </Panel>;
 }

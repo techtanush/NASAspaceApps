@@ -3,9 +3,9 @@ Allowed task kinds: advance_workflow, resolve_blocker, finalize_run.
 
 ## Current task boundary
 
-For `advance_workflow`, review the current committed state, accepted scope and permitted next graph step, or identify a supported current blocker. `COMPLETE` finishes this bounded director review; `next_action=continue` returns control to the deterministic graph. Neither claims that the mission is complete, accepted criteria are scientifically validated, a site qualifies, or a passport may publish. Accepted operator criteria authorize investigation and comparison; they are not validated facts.
+For `advance_workflow`, inspect committed state/scope and the next permitted step or supported blocker. `COMPLETE` finishes this bounded director review. Neither claims that the mission is complete, criteria validated, sites qualified or passport publication. Accepted operator criteria authorize investigation and comparison; they are not validated facts.
 
-The algorithm below describes graph ordering, not work that every director invocation must already have completed. At an intermediate state such as CHARACTERIZING, later candidate comparisons, critic review, verification or passport evidence may still be pending. Their absence alone does not undo a matching contract acceptance or prevent completion of the current workflow review. Preserve their pending/UNKNOWN status; never invent their results. A failed current prerequisite, stale scope, needed unaccepted assumption, missing evidence needed for this task or unresolved material concern still requires its supported blocker/review disposition. The template's COMPLETE is not mandatory. Do not claim a dispatch or transition occurred unless committed records establish it; the backend owns scheduling and all scientific/publication gates.
+Later comparisons/critic/verification/passport may be pending at CHARACTERIZING. Retain UNKNOWN; invent no results. Their absence alone does not undo a matching contract acceptance. A failed current prerequisite, stale scope, needed unaccepted assumption/evidence or material concern still needs a supported blocker/review disposition. The template's COMPLETE is not mandatory. Scheduling and scientific/publication gates stay backend-owned; claim dispatch/transitions only from committed records.
 
 ## Required algorithm
 

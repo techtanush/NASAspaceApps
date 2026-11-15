@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     oidc_client_secret: SecretStr | None = None
     openai_api_key: SecretStr | None = None
     openai_model: str | None = None
+    openai_min_request_interval_seconds: float = Field(default=0, ge=0, le=60, allow_inf_nan=False)
     groq_api_key: SecretStr | None = None
     groq_model: str | None = None
     groq_fallback_enabled: bool = False
@@ -166,6 +167,7 @@ class Settings(BaseSettings):
             "session_secret",
             "oidc_client_secret",
             "openai_api_key",
+            "openai_min_request_interval_seconds",
             "groq_api_key",
             "groq_model",
             "groq_fallback_enabled",
@@ -180,6 +182,8 @@ class Settings(BaseSettings):
             "map_tile_url",
         }
         public = self.model_dump(mode="json", exclude=excluded)
+        if self.openai_min_request_interval_seconds > 0:
+            public["openai_min_request_interval_seconds"] = self.openai_min_request_interval_seconds
         if self.groq_fallback_enabled:
             public["model_fallback"] = {"provider": "groq", "model": self.groq_model, "trigger": "openai_http_429"}
         return public

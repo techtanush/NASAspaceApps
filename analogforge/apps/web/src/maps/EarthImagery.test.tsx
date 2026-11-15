@@ -2,7 +2,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { AddProtocolAction, Map as MapInstance } from 'maplibre-gl';
 import type { components } from '../generated/schema';
-import { EarthImagery, earthImageryBounds, earthImageryGroundSampling, EARTH_IMAGERY_SOURCE } from './EarthImagery';
+import { EarthImagery, earthImageryBounds, earthImageryGroundSampling, EARTH_IMAGERY_SOURCE, EARTH_IMAGERY_WORLD_BOUNDS } from './EarthImagery';
 import seed from '../mock/fixtures/seed.json';
 const state = vi.hoisted(() => ({ protocols: new Map<string, AddProtocolAction>() }));
 vi.mock('maplibre-gl', () => ({ addProtocol: vi.fn((name, action) => state.protocols.set(name, action)), removeProtocol: vi.fn(name => state.protocols.delete(name)) }));
@@ -20,14 +20,16 @@ it('retains an offline default, then installs georeferenced regional tiles only 
   render(<EarthImagery map={map as unknown as MapInstance} aoi={aoi} onActiveChange={active}/>);
   expect(state.protocols.size).toBe(0); expect(map.addSource).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole('button', { name: 'Load satellite imagery' }));
-  expect(map.addSource).toHaveBeenCalledWith(EARTH_IMAGERY_SOURCE, expect.objectContaining({ type: 'raster', tileSize: 256, minzoom: 0, maxzoom: 13, bounds: [-111.1, 34.9, -110.87, 35.13] }));
+  expect(map.addSource).toHaveBeenCalledWith(EARTH_IMAGERY_SOURCE, expect.objectContaining({ type: 'raster', tileSize: 256, minzoom: 0, maxzoom: 13, bounds: [-180, -85, 180, 85] }));
   expect(map.setMaxZoom).toHaveBeenCalledWith(12); expect(active).toHaveBeenLastCalledWith(true);
+  expect(screen.getByText(/Historical satellite/)).toHaveTextContent('15.7 m/pixel');
+  expect(screen.getByRole('link', { name: 'CC BY 4.0', hidden: true })).not.toBeVisible();
+  fireEvent.click(screen.getByText('Imagery source and resolution'));
   expect(screen.getByText(/Historical 2016\/2017 mosaic/)).toHaveTextContent('nominal 10 m Sentinel-2 input');
-  expect(screen.getByText(/Historical 2016\/2017 mosaic/)).toHaveTextContent('15.7 m/pixel');
   expect(screen.getByRole('link', { name: 'CC BY 4.0' })).toBeVisible();
   fireEvent.click(screen.getByRole('button', { name: 'Measured terrain view' }));
   expect(state.protocols.size).toBe(0); expect(map.removeSource).toHaveBeenCalledWith(EARTH_IMAGERY_SOURCE);
-  expect(map.setMaxZoom).toHaveBeenLastCalledWith(22); expect(map.setMaxBounds).toHaveBeenLastCalledWith(null); expect(active).toHaveBeenLastCalledWith(false);
+  expect(map.setMaxZoom).toHaveBeenLastCalledWith(22); expect(map.setMaxBounds).not.toHaveBeenCalled(); expect(active).toHaveBeenLastCalledWith(false);
 });
 
 it('does not offer loading without WebGL or supported geographic coordinates', () => {
@@ -37,6 +39,28 @@ it('does not offer loading without WebGL or supported geographic coordinates', (
     { ...aoi, bbox: [-120, 30, -110, 40] }, { ...aoi, bbox: [-111, 85, -110, 86] }, { ...aoi, bbox: [NaN, 35, -110, 36] }]) {
     expect(earthImageryBounds(bad as typeof aoi)).toBeNull();
   }
+});
+
+it('accepts the canonical null-CRS Earth AOI emitted by the science screen without rewriting candidate metadata', () => {
+  const canonical = { ...aoi, crs_wkt: null }, original = JSON.stringify(canonical);
+  const map = fakeMap(), active = vi.fn();
+  expect(earthImageryBounds(canonical)).toEqual(earthImageryBounds(aoi));
+  expect(earthImageryGroundSampling(canonical)).toEqual(earthImageryGroundSampling(aoi));
+  render(<EarthImagery map={map as unknown as MapInstance} aoi={canonical} onActiveChange={active}/>);
+  expect(screen.getByRole('button', { name: 'Load satellite imagery' })).toBeEnabled();
+  fireEvent.click(screen.getByRole('button', { name: 'Load satellite imagery' }));
+  expect(map.addSource).toHaveBeenCalledWith(EARTH_IMAGERY_SOURCE, expect.objectContaining({ bounds: EARTH_IMAGERY_WORLD_BOUNDS }));
+  expect(active).toHaveBeenLastCalledWith(true); expect(JSON.stringify(canonical)).toBe(original);
+});
+
+it.each([
+  { crs_wkt: undefined }, { crs_wkt: '' }, { crs_wkt: 'UNKNOWN' }, { crs_wkt: 'EPSG:3857' },
+  { crs_wkt: 'EPSG:32612' }, { body: 'MARS' }, { latitude_type: 'PLANETOCENTRIC' },
+  { latitude_type: 'PLANETOGRAPHIC' }, { latitude_type: undefined }, { longitude_convention: 'ZERO_360' },
+  { longitude_convention: undefined }, { bbox: [440000, 3900000, 441000, 3901000] },
+])('does not infer a geographic frame for missing, projected or mixed axis metadata: %s', patch => {
+  const unsupported = { ...aoi, crs_wkt: null, ...patch } as unknown as typeof aoi;
+  expect(earthImageryBounds(unsupported)).toBeNull(); expect(earthImageryGroundSampling(unsupported)).toBeNull();
 });
 
 it('labels delivered Mercator sampling by latitude instead of claiming nominal sensor resolution for every tile', () => {
@@ -101,4 +125,88 @@ it('keeps the actual tile-budget reason when the map subsequently emits its gene
   });
   expect(screen.getByRole('status')).toHaveTextContent('64-tile limit');
   expect(active).toHaveBeenLastCalledWith(false); expect(state.protocols.size).toBe(0);
+});
+
+
+it('starts an authorized selected-site view once its map is ready, and honors the later measured-view choice', () => {
+  const map = fakeMap(), active = vi.fn();
+  const view = render(<EarthImagery autoLoad map={null} aoi={aoi} onActiveChange={active}/>);
+  expect(state.protocols.size).toBe(0);
+  view.rerender(<EarthImagery autoLoad map={map as unknown as MapInstance} aoi={aoi} onActiveChange={active}/>);
+  expect(state.protocols.size).toBe(1); expect(active).toHaveBeenLastCalledWith(true);
+  fireEvent.click(screen.getByRole('button', { name: 'Measured terrain view' }));
+  view.rerender(<EarthImagery autoLoad map={map as unknown as MapInstance} aoi={{ ...aoi }} onActiveChange={active}/>);
+  expect(state.protocols.size).toBe(0); expect(map.addSource).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('button', { name: 'Load satellite imagery' })).toBeVisible();
+});
+
+it('does not automatically retry a failed site but starts a fresh bounded view for a newly selected site', () => {
+  const map = fakeMap(), active = vi.fn();
+  const view = render(<EarthImagery key="one" autoLoad map={map as unknown as MapInstance} aoi={aoi} onActiveChange={active}/>);
+  const fail = map.on.mock.calls.find(call => call[0] === 'error')![1] as (event: { sourceId: string }) => void;
+  act(() => fail({ sourceId: EARTH_IMAGERY_SOURCE }));
+  view.rerender(<EarthImagery key="one" autoLoad map={map as unknown as MapInstance} aoi={{ ...aoi }} onActiveChange={active}/>);
+  expect(state.protocols.size).toBe(0); expect(map.addSource).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('status')).toHaveTextContent('Satellite imagery unavailable');
+  view.rerender(<EarthImagery key="two" autoLoad map={map as unknown as MapInstance} aoi={{ ...aoi, bbox: [-112, 35, -111.99, 35.01] }} onActiveChange={active}/>);
+  expect(state.protocols.size).toBe(1); expect(map.addSource).toHaveBeenCalledTimes(2);
+  expect(map.removeSource).toHaveBeenCalledWith(EARTH_IMAGERY_SOURCE);
+});
+
+it('does not auto-load unsupported planetary or projected footprints', () => {
+  const map = fakeMap();
+  render(<EarthImagery autoLoad map={map as unknown as MapInstance} aoi={{ ...aoi, crs_wkt: 'EPSG:3857' }} onActiveChange={vi.fn()}/>);
+  expect(state.protocols.size).toBe(0); expect(map.addSource).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: 'Load satellite imagery' })).toBeDisabled();
+  expect(screen.queryByText('Loading satellite tiles…')).not.toBeInTheDocument();
+});
+
+
+it('allows country and distant world views without expanding the immutable selected scientific footprint', async () => {
+  const fetchTile = vi.fn().mockImplementation(async () => new Response(new Uint8Array([255, 216, 255, 217]), { headers: { 'Content-Type': 'image/jpeg' } }));
+  vi.stubGlobal('fetch', fetchTile);
+  const map = fakeMap(), active = vi.fn(), original = JSON.stringify(aoi);
+  render(<EarthImagery autoLoad map={map as unknown as MapInstance} aoi={aoi} onActiveChange={active}/>);
+  expect(map.setMaxBounds).not.toHaveBeenCalled();
+  expect(map.addSource).toHaveBeenCalledWith(EARTH_IMAGERY_SOURCE, expect.objectContaining({ bounds: [-180, -85, 180, 85], maxzoom: 13 }));
+  const [protocol, load] = [...state.protocols.entries()][0]!;
+  await act(async () => {
+    // Country-scale tile near western Europe and a distant high-detail tile in Japan are both
+    // valid visual requests even though the selected scientific footprint remains in Arizona.
+    await load({ url: `${protocol}://tiles/4/8/5` }, new AbortController());
+    await load({ url: `${protocol}://tiles/13/7276/3228` }, new AbortController());
+  });
+  expect(fetchTile).toHaveBeenCalledTimes(2);
+  expect(fetchTile.mock.calls[0]![0]).toContain('/4/5/8.jpg');
+  expect(fetchTile.mock.calls[1]![0]).toContain('/13/3228/7276.jpg');
+  expect(JSON.stringify(aoi)).toBe(original);
+  expect(screen.getByText(/Loading uses the public EOX tile service/)).toHaveTextContent('measured coverage remains limited to the selected footprint');
+  fireEvent.click(screen.getByRole('button', { name: 'Measured terrain view' }));
+  expect(map.setMaxBounds).not.toHaveBeenCalled(); expect(map.setMaxZoom).toHaveBeenLastCalledWith(22);
+});
+
+
+it('keeps satellite view through a canceled camera tile and then loads the next visible tile', async () => {
+  const fetchTile = vi.fn().mockImplementationOnce((_url: RequestInfo | URL, options?: RequestInit) => new Promise<Response>((_resolve, reject) => {
+    options?.signal?.addEventListener('abort', () => reject(new DOMException('Superseded tile', 'AbortError')), { once: true });
+  })).mockResolvedValue(new Response(new Uint8Array([255, 216, 255, 217]), { headers: { 'Content-Type': 'image/jpeg' } }));
+  vi.stubGlobal('fetch', fetchTile);
+  const map = fakeMap(), active = vi.fn();
+  render(<EarthImagery autoLoad map={map as unknown as MapInstance} aoi={aoi} onActiveChange={active}/>);
+  const [protocol, load] = [...state.protocols.entries()][0]!;
+  const onError = map.on.mock.calls.find(call => call[0] === 'error')![1] as (event: { sourceId: string; error: Error }) => void;
+  const caller = new AbortController();
+  await act(async () => {
+    const canceled = load({ url: `${protocol}://tiles/13/1555/3239` }, caller);
+    await Promise.resolve(); expect(fetchTile).toHaveBeenCalledTimes(1);
+    caller.abort(); await expect(canceled).rejects.toMatchObject({ name: 'AbortError' });
+    onError({ sourceId: EARTH_IMAGERY_SOURCE, error: new DOMException('Superseded tile', 'AbortError') });
+  });
+  expect(active).toHaveBeenLastCalledWith(true); expect(state.protocols.size).toBe(1);
+  expect(screen.getByRole('button', { name: 'Measured terrain view' })).toBeVisible();
+  expect(screen.queryByText(/Satellite imagery unavailable/)).not.toBeInTheDocument();
+  await act(async () => { await load({ url: `${protocol}://tiles/12/777/1619` }, new AbortController()); });
+  expect(fetchTile).toHaveBeenCalledTimes(2); expect(state.protocols.size).toBe(1);
+  expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  expect(active).toHaveBeenLastCalledWith(true);
 });

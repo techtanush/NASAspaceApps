@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { GlobeStage, type GlobeScene } from '../../maps/GlobeStage';
 import { STEPS, useMissionControl, type StepId } from './state';
@@ -20,10 +20,14 @@ function StepRail({ current }: { current: StepId }) {
 }
 function Stage() {
   const { scene, handlers } = useMissionControl(); const location = useLocation(); const step = stepFor(location.pathname);
+  const navigate = useNavigate();
+  const openSurfaceDetail = !/view=(regional|target)/.test(location.search) && ((scene.body === 'EARTH' && scene.selectedMarker && step === 'tour') || (scene.body !== 'EARTH' && scene.box && step === 'place'))
+    ? () => { const query = new URLSearchParams(location.search); if (scene.body === 'EARTH') query.set('site',scene.selectedMarker!); query.set('view',scene.body === 'EARTH'?'regional':'target'); navigate(`${location.pathname}?${query}`,{replace:true}); }
+    : undefined;
   const session=useWorkspaceSession();
   useEffect(() => { document.documentElement.dataset.stage = 'true'; return () => { delete document.documentElement.dataset.stage; }; }, []);
   return <div className="mc" data-theme="dark" data-testid="mission-control" data-layout={scene.layout ?? 'center'}>
-    <GlobeStage scene={scene} onPick={handlers.onPick} onMarkerSelect={handlers.onMarkerSelect}/>
+    <GlobeStage scene={scene} onPick={handlers.onPick} onMarkerSelect={handlers.onMarkerSelect} onSurfaceDetail={openSurfaceDetail}/>
     <header className="mc-header"><Link to="/" className="wordmark"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" fill="none"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>AnalogForge</Link>
       <div className="mc-workspace-context" aria-label="Workspace context"><span>{session?.authMode==='local'?'Local workspace':'Workspace'}</span>{session&&<strong>{session.role.charAt(0)+session.role.slice(1).toLowerCase()}</strong>}</div><nav className="mc-header-links" aria-label="Other views"><Link to="/workbench">Evidence workbench</Link><Link to="/rovers">Rovers</Link><Link to="/about">About</Link></nav></header>
     <div className="mc-content" data-regional={/view=(regional|target)/.test(location.search) ? 'true' : 'false'}><Outlet/></div>

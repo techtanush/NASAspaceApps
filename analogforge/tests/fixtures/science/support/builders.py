@@ -22,6 +22,7 @@ from analogforge.ports.science import (
     ScienceService,
     SourcePolicy,
 )
+
 from .registrar_stub import Registered, register
 
 KIT = Path(__file__).resolve().parents[2] / "kit"

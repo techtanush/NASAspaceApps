@@ -20,6 +20,7 @@ from analogforge.agents.runtime.invocation import _nested_references, validate_s
 from analogforge.agents.runtime.provider import ProviderError
 from analogforge.agents.runtime.provider_backoff import provider_backoff
 from analogforge.agents.runtime.tool_projection import (
+    OPERATOR_CONTEXT_INSTRUCTIONS,
     PROJECTION_INSTRUCTIONS,
     project_tool_result,
     specialize_tool_schemas,
@@ -328,6 +329,8 @@ class OpenAIProvider:
         codec = WireCodec(task, _task_receipt_ids(task))
         wire = codec.task(_wire_task(task))
         instructions += WIRE_INSTRUCTIONS + PROJECTION_INSTRUCTIONS
+        if task.payload.get("untrusted_operator_context_ref"):
+            instructions += OPERATOR_CONTEXT_INSTRUCTIONS
         items: list[dict[str, Any]] = [
             {"role": "user", "content": json.dumps({"task": wire}, separators=(",", ":"), ensure_ascii=False)}
         ]

@@ -61,7 +61,7 @@ export function TourView() {
   const touring = sites.length > 0; const target = contract ? boxCentre(contract.target.bbox) : null;
   const groupMarker = selected ? markers.find(marker => marker.id === selected.candidate.id) : undefined;
   useScene(touring
-    ? { body: 'EARTH', layout: 'panel', autoRotate: false, markers, selectedMarker: selected?.candidate.id ?? null, box: selected ? selected.candidate.aoi.bbox : null, focus: overview || !selected ? { lat: 20, lng: groupMarker?.lng ?? 0, altitude: 2.3 } : { lat: selected.lat, lng: selected.lng, altitude: 0.35 } }
+    ? { body: 'EARTH', layout: 'panel', autoRotate: false, markers, selectedMarker: selected?.candidate.id ?? null, box: selected ? selected.candidate.aoi.bbox : null, focus: overview || !selected ? { lat: 20, lng: groupMarker?.lng ?? 0, altitude: 2.3 } : { lat: selected.lat, lng: selected.lng, altitude: 0.95 } }
     : { body: contract?.target.body ?? 'MARS', layout: 'panel', autoRotate: false, scanning: true, focus: target ? { ...target, altitude: 1.7 } : null, pin: target, box: contract ? contract.target.bbox : null }, { onMarkerSelect });
   if (run.error) return <Panel title="Investigation unavailable" testid="tour-error"><ErrorPanel error={run.error}/></Panel>;
   if (run.loading || !snapshot || !contract) return <Panel title="Opening the investigation" testid="tour-loading"><Skeleton label="Retrieving the investigation"/></Panel>;
@@ -88,6 +88,7 @@ export function TourView() {
       <Button variant="ghost" aria-pressed={overview} data-testid="btn-all-sites" onClick={() => { setView(''); setOverview(value => !value); }}><Globe2 size={16} aria-hidden="true"/>{overview ? 'Back to site' : 'Whole Earth'}</Button></>}>
     {badges}
     {assurance.error && <ErrorPanel error={assurance.error}/>}
+    <p className="helper">Search scope: areas covered by this investigation’s terrain data and screened candidate windows.</p>
     <div className="mc-view-switch" role="group" aria-label="Evidence view"><Button variant="secondary" aria-pressed={!regional && !targetDetail} onClick={() => setView('')}>Globe</Button><Button variant="secondary" aria-label="Inspect location" aria-pressed={regional} onClick={() => setView('regional')}>Site detail</Button><Button variant="secondary" aria-label="Target evidence" aria-pressed={targetDetail} onClick={() => setView('target')}>Target</Button></div>
     {selected && <Guide>{narrateSite(selected, sites.length)}</Guide>}
     {working && <p className="mc-working-line" role="status"><Loader size={14} className="mc-spin" aria-hidden="true"/>{working}</p>}

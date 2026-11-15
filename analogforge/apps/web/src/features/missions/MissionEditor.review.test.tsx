@@ -9,6 +9,7 @@ import { MissionEditor } from './MissionEditor';
 
 vi.mock('../../api/client', () => ({ api: { get: vi.fn(), post: vi.fn() } }));
 vi.mock('../rovers/RoverEditor', () => ({ RoverEditor: () => <div>Rover editor boundary</div> }));
+vi.mock('../operatorContext/BoundOperatorContext', () => ({ BoundOperatorContext: () => null }));
 vi.mock('../../maps/PlanetaryPanel', () => ({ PlanetaryPanel: () => <div>Region preview boundary</div> }));
 
 // The real preset select scrolls its focused option; jsdom has no layout API.
@@ -55,6 +56,19 @@ beforeEach(() => {
     if (path.endsWith('/drafts')) return stored(path.split('/')[2]!, (body as { draft: ReturnType<typeof draft> }).draft);
     throw new Error(`Unexpected test command: ${path}`);
   }) as typeof api.post);
+});
+
+it('keeps body and goals visible while exact coordinates and engineering source settings start collapsed', async () => {
+  mount('/missions/new');
+  const coordinates=screen.getByText('Exact coordinates and data reference').closest('details')!;
+  const data=screen.getByText('Advanced data settings').closest('details')!;
+  expect(coordinates.open).toBe(false);expect(data.open).toBe(false);
+  expect(screen.getByRole('link',{name:'Open the guided mission setup'})).toHaveAttribute('href','/start/place');
+  expect(screen.getByRole('textbox',{name:'Mission name'})).toBeVisible();expect(screen.getByText('Target body')).toBeVisible();
+  fireEvent.click(screen.getByText('Exact coordinates and data reference'));
+  await waitFor(()=>expect(coordinates.open).toBe(true));
+  fireEvent.change(screen.getAllByTestId('input-bbox')[0]!,{target:{value:'-'}});
+  expect(coordinates.open).toBe(true);expect(screen.getByRole('alert')).toHaveTextContent('complete numeric');
 });
 
 it('starts custom targets with an unknown reference and saves an edited vertical datum in each draft', async () => {

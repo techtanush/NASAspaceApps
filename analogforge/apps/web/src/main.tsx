@@ -16,6 +16,7 @@ import './styles/print.css';
 import './styles/polish.css';
 import './styles/glass.css';
 import './styles/mission-control.css';
+import './styles/operator-context.css';
 async function boot() {
   if (import.meta.env.VITE_API_MOCK === '1') {
     const { startMock } = await import('./mock/server');

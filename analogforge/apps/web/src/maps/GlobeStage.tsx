@@ -45,12 +45,13 @@ function boxPath(box: number[]): number[][] {
 }
 
 /** The persistent 3-D stage. It only displays positions it is given; it derives no scientific quantity. */
-export function GlobeStage({ scene, onPick, onMarkerSelect }: { scene: GlobeScene; onPick?: (lat: number, lng: number) => void; onMarkerSelect?: (id: string) => void }) {
+export function GlobeStage({ scene, onPick, onMarkerSelect, onSurfaceDetail }: { scene: GlobeScene; onPick?: (lat: number, lng: number) => void; onMarkerSelect?: (id: string) => void; onSurfaceDetail?: () => void }) {
   const [assets, setAssets] = useState(GLOBE_ASSETS);
   useEffect(() => { const controller = new AbortController(); const urls:string[] = []; void loadGlobeCatalog(controller.signal, url => { if (controller.signal.aborted) URL.revokeObjectURL(url); else urls.push(url); }).then(value => { if (!controller.signal.aborted) setAssets(value); }).catch(() => {}); return () => { controller.abort(); urls.forEach(url => URL.revokeObjectURL(url)); }; }, []);
   const container = useRef<HTMLDivElement>(null); const globe = useRef<Instance | null>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'unavailable'>('loading');
   const pick = useRef(onPick); pick.current = onPick; const select = useRef(onMarkerSelect); select.current = onMarkerSelect;
+  const detail = useRef(onSurfaceDetail); detail.current = onSurfaceDetail;
   const layout = useRef(scene.layout ?? 'center'); layout.current = scene.layout ?? 'center';
   const applyOffset = useRef(() => {});
   useEffect(() => {
@@ -66,7 +67,11 @@ export function GlobeStage({ scene, onPick, onMarkerSelect }: { scene: GlobeScen
         .pathsData([]).pathPoints((path: object) => path as number[][]).pathPointLat((point: number[]) => point[0]!).pathPointLng((point: number[]) => point[1]!)
         .pathPointAlt(0.006).pathColor(() => GLOBE_INK.accent).pathStroke(1.4).pathDashLength(1).pathDashGap(0).pathTransitionDuration(0)
         .onGlobeClick(({ lat, lng }: { lat: number; lng: number }) => pick.current?.(lat, lng));
-      const controls = instance.controls(); controls.enablePan = false; controls.minDistance = 101; controls.maxDistance = 520; controls.autoRotateSpeed = 0.35;
+      const controls = instance.controls(); controls.enablePan = false; controls.minDistance = 165; controls.maxDistance = 520; controls.autoRotateSpeed = 0.35;
+      // The overview texture has fixed resolution. Hand a deliberate close zoom to the
+      // selected site's tiled map rather than magnifying it down to surface pixels.
+      const openDetail = () => { if (instance.pointOfView().altitude <= 0.72) detail.current?.(); };
+      controls.addEventListener('end', openDetail);
       const resize = () => {
         const width = element.clientWidth, height = element.clientHeight; if (!width || !height) return;
         instance.width(width).height(height); applyOffset.current();
