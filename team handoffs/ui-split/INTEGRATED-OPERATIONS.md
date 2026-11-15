@@ -26,7 +26,7 @@ Source: [activity projection](../../analogforge/src/analogforge/application/acti
 
 ## Optional stored weather/context
 
-Enable `ANALOGFORGE_ENVIRONMENT_CONTEXT=true` with server-side `METEOMATICS_USERNAME` and `METEOMATICS_PASSWORD`; default is false. Meteomatics uses those Basic-auth credentials, not a separate API-key field. `EARTHDATA_TOKEN` is a separate acquisition credential, not a weather login. Visualization routes separately require `ANALOGFORGE_VISUALIZATION=1`.
+Empty optional integration variables are listed in [optional-integrations.env](../../analogforge/config/examples/optional-integrations.env); the frozen kit `.env.example` remains byte-identical. Enable `ANALOGFORGE_ENVIRONMENT_CONTEXT=true` with server-side `METEOMATICS_USERNAME` and `METEOMATICS_PASSWORD`; default is false. Meteomatics uses those Basic-auth credentials, not a separate API-key field. `EARTHDATA_TOKEN` is a separate acquisition credential, not a weather login. Visualization routes separately require `ANALOGFORGE_VISUALIZATION=1`.
 
 A leased LIVE worker captures context once after detailed Earth candidate analysis. Synthetic/replay/test-harness work never performs this acquisition. Limits are six candidate AOI midpoints, eight HTTP calls and 30 seconds shared across acquisition/verification/publication. Interrupted attempts remain unavailable rather than silently querying again.
 
