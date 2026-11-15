@@ -6,6 +6,7 @@ import base64
 import io
 import json
 import math
+import re
 import resource
 import sys
 from pathlib import Path
@@ -30,9 +31,48 @@ from reportlab.platypus import (  # type: ignore[import-untyped]
     TableStyle,
 )
 
+from analogforge.application.field_guidance import field_guidance
+
 INK, MUTED, ACCENT = colors.HexColor("#17283A"), colors.HexColor("#48586A"), colors.HexColor("#126B78")
 PALE, RULE = colors.HexColor("#EDF4F6"), colors.HexColor("#D7E0E7")
 WIDTH = A4[0] - 88
+
+CRITERIA = {
+    'slope_band_area_fraction': 'Area in the accepted slope band',
+    'slope_distribution_w1_deg': 'Target-to-Earth slope distribution difference',
+    'unique_slope_exposure_m': 'Unique route distance on the required slopes',
+    'completed_task_count': 'Completion of assigned science tasks',
+    'final_battery_reserve_pct': 'Battery reserve at the required finish',
+    'surface_temperature_min_k': 'Minimum surface temperature',
+    'mineral_class_present': 'Mineral context', 'ground_clearance_m': 'Rover ground clearance',
+    'planetary_gravity': 'Planetary gravity', 'planetary_atmosphere': 'Planetary atmosphere',
+}
+
+
+def criterion_name(requirement: dict[str, Any]) -> str:
+    label = CRITERIA.get(str(requirement.get('observable') or ''), str(requirement['label']))
+    if requirement.get('mandatory') is False and '(optional)' not in label.lower():
+        label += ' (optional)'
+    return label
+
+
+def readable_state(state: str) -> str:
+    return {'AWAITING_REVIEW': 'Evidence ready - choose the next test',
+            'BUILDING_PASSPORT': 'Preparing the final report'}.get(state, state.replace('_', ' ').capitalize())
+
+
+def readable_status(status: str) -> str:
+    return {'PASS': 'Met', 'FAIL': 'Unmet', 'PARTIAL': 'Partly met', 'UNKNOWN': 'Needs evidence',
+            'GAP': 'Earth limitation', 'INCONCLUSIVE': 'Inconclusive'}.get(
+                status, status.replace('_', ' ').capitalize())
+
+
+def readable_site(candidate: dict[str, Any]) -> str:
+    name = candidate.get('name') or 'Earth location'
+    if re.fullmatch(r'(?:Practice|Terrain) grid-r\d+c\d+', name, re.IGNORECASE):
+        west, south, east, north = candidate['aoi']['bbox']
+        return 'Earth site - ' + position([(west + east) / 2, (south + north) / 2])
+    return name
 
 
 def text(value: Any) -> str:
@@ -62,18 +102,23 @@ def accepted_rule(requirement: dict[str, Any]) -> str:
     unit = requirement.get("unit", "")
     lower, upper = requirement.get("lower"), requirement.get("upper")
     if requirement["operator"] == "LTE":
-        return f"At most {simple_quantity(upper, unit)}"
-    if requirement["operator"] == "GTE":
-        return f"At least {simple_quantity(lower, unit)}"
-    if requirement["operator"] == "BETWEEN":
-        return f"Between {simple_quantity(lower, unit)} and {simple_quantity(upper, unit)}"
-    if requirement["operator"] == "EQUALS":
-        return f"Equal to {simple_quantity(lower if lower is not None else upper, unit)}"
-    if requirement["operator"] == "PRESENT":
-        return "The accepted feature must be present"
-    if requirement["operator"] == "NOT_NATURALLY_REPRODUCIBLE":
-        return "This planetary condition cannot be naturally reproduced on Earth"
-    return f"{requirement['operator']} {unit}".strip()
+        rule = f"At most {simple_quantity(upper, unit)}"
+    elif requirement["operator"] == "GTE":
+        rule = f"At least {simple_quantity(lower, unit)}"
+    elif requirement["operator"] == "BETWEEN":
+        rule = f"Between {simple_quantity(lower, unit)} and {simple_quantity(upper, unit)}"
+    elif requirement["operator"] == "EQUALS":
+        rule = f"Equal to {simple_quantity(lower if lower is not None else upper, unit)}"
+    elif requirement["operator"] == "PRESENT":
+        rule = "The accepted feature must be present"
+    elif requirement["operator"] == "NOT_NATURALLY_REPRODUCIBLE":
+        rule = "This planetary condition cannot be naturally reproduced on Earth"
+    else:
+        rule = f"{requirement['operator']} {unit}".strip()
+    band = (requirement.get("parameters") or {}).get("slope_band_deg")
+    if isinstance(band, list) and len(band) == 2:
+        rule += f"; slope band {band[0]} to {band[1]} deg"
+    return rule
 
 
 # ReportLab ships no type declarations.
@@ -123,8 +168,8 @@ def render(document: dict[str, Any], *, concise: bool = False) -> bytes:
                        repeatRows=1 if header else 0, hAlign="LEFT", splitInRow=1)
         commands: list[Any] = [
             ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 8),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 6),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 6), ("LINEBELOW", (0, 0), (-1, -1), .5, RULE),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 8), ("TOPPADDING", (0, 0), (-1, -1), 3),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 3), ("LINEBELOW", (0, 0), (-1, -1), .5, RULE),
         ]
         if header:
             commands.extend([("BACKGROUND", (0, 0), (-1, 0), PALE),
@@ -132,7 +177,7 @@ def render(document: dict[str, Any], *, concise: bool = False) -> bytes:
         result.setStyle(TableStyle(commands))
         return result
 
-    def numeric_plot(row: dict[str, Any]) -> Any:
+    def numeric_plot(row: dict[str, Any], width: float = WIDTH) -> Any:
         measurement, requirement = row["measurement"], row["requirement"]
         value = measurement["value"]
         values = [float(value)] + [float(requirement[k]) for k in ("lower", "upper")
@@ -144,10 +189,10 @@ def render(document: dict[str, Any], *, concise: bool = False) -> bytes:
         low, high = low - span * .08, high + span * .08
 
         def x(number: float) -> float:
-            return float(18 + (number - low) / (high - low) * (WIDTH - 38))
+            return float(18 + (number - low) / (high - low) * (width - 38))
 
-        graphic = Drawing(WIDTH, 76)
-        graphic.add(Line(18, 34, WIDTH - 20, 34, strokeColor=RULE, strokeWidth=2))
+        graphic = Drawing(width, 76)
+        graphic.add(Line(18, 34, width - 20, 34, strokeColor=RULE, strokeWidth=2))
         for key in ("lower", "upper"):
             bound = requirement.get(key)
             if bound is not None:
@@ -158,7 +203,7 @@ def render(document: dict[str, Any], *, concise: bool = False) -> bytes:
         graphic.add(String(18, 61, f"Measured {format(value, '.6g')} {text(measurement['unit'])}",
                            fontName="BriefSansBold", fontSize=8, fillColor=INK))
         graphic.add(String(18, 0, "Point: registered measurement. Dashed markers: accepted bounds.",
-                           fontName="BriefSans", fontSize=7, fillColor=MUTED))
+                           fontName="BriefSans", fontSize=6, fillColor=MUTED))
         return graphic
 
     def site_plot(plan: dict[str, Any]) -> Any:
@@ -261,9 +306,7 @@ def render(document: dict[str, Any], *, concise: bool = False) -> bytes:
                         f"Co-location group: {text(req.get('parameters', {}).get('co_location_group'))}.", "small"),
                       p("Acceptance note: " + req["acceptance_note"], "small"),
                       p("Accepted parameters: " + json.dumps(req.get("parameters", {}), ensure_ascii=False), "small")])
-        if measured["value"] is not None:
-            story.append(numeric_plot(row))
-        else:
+        if measured["value"] is None:
             story.append(p("No numeric plot: " + measured["reason"], "small"))
         story.append(p(f"Evidence support: {text(measured.get('support_scale_m'))} m. "
                        f"Critic: {text(row.get('critic_status'))}. "
@@ -276,7 +319,7 @@ def render(document: dict[str, Any], *, concise: bool = False) -> bytes:
                        f"{', '.join(row['test_result_ids']) or 'None'}", "small"))
         criterion = story[criterion_start:]
         del story[criterion_start:]
-        story.append(KeepTogether(criterion))
+        story.extend(criterion)
     story.append(p("Registered terrain observations", "section"))
     for key, label in (("target_analysis", "Planetary target"), ("candidate_analysis", "Earth location")):
         analysis = document[key]
@@ -334,7 +377,7 @@ def render(document: dict[str, Any], *, concise: bool = False) -> bytes:
         story.append(p(f"{asset['subject']} - {asset['kind']} ({asset['unit']}); "
                        f"{asset['support_scale_m']} m analysis support", "label"))
         image = Image(io.BytesIO(base64.b64decode(asset["png"], validate=True)))
-        image._restrictSize(WIDTH, 260)
+        image._restrictSize(WIDTH, 140)
         story.append(image)
         story.append(p("Display pixels add no analysis resolution. Registered legend:", "small"))
         legend_rows = [["Display interval", "Lower bound", "Upper bound"]]
@@ -385,146 +428,152 @@ def render(document: dict[str, Any], *, concise: bool = False) -> bytes:
                   "or scientific conclusion recomputed while creating this download. Later run revisions can "
                   "contain different evidence; this PDF identifies only the snapshot below.", "small"),
                   p("Private snapshot SHA-256: " + document["snapshot_sha256"], "small")])
-    # Plain-language presentation of the same pinned records precedes the complete technical evidence.
-    # Counting saved verdicts here introduces no new qualification, ranking, threshold or scientific score.
+    # One concise reading path, followed by the complete technical appendix.
+    # This is presentation of pinned evidence; it neither ranks sites nor changes verdicts.
     requirements = document["benchmarks"]["requirements"]
     statuses = {status: sum(row["status"] == status for row in requirements)
-                for status in ("PASS", "FAIL", "UNKNOWN", "GAP")}
-    front = [p("CURRENT EVIDENCE BRIEF", "small"),
-             p("Executive summary", "title"),
-             p(candidate.get("name") or "Earth location", "section"),
-             p(mission.get("name") or "Accepted mission", "label"),
-             p("This brief explains what this Earth location can be evaluated against, what the saved "
-               "measurements show, and what still needs work. It is a current evidence snapshot, "
-               "not an assured or published Analog Passport."),
-             table([["Research workflow", f"{run['state']} / {run['mode']}"],
-                    ["Mission criteria", f"{statuses['PASS']} PASS; {statuses['FAIL']} FAIL; "
-                     f"{statuses['UNKNOWN']} UNKNOWN; {statuses['GAP']} GAP"],
-                    ["Rover", document["rover"].get("name") if document["rover"]
-                     else "No rover supplied - site evidence checks only"],
-                    ["Planetary target", mission["target"]["body"]],
-                    ["Research scope", "The acquired regional terrain and screened candidate windows"]],
-                   [120, WIDTH - 120]),
-             p("What this means", "section")]
-    if document["run_reason"]:
-        front.append(p(document["run_reason"]["message"]))
-    elif run["state"] not in {"COMPLETED", "AWAITING_REVIEW"}:
-        front.append(p(f"The investigation is {run['state'].lower().replace('_', ' ')}. "
-                       "Its available evidence is retained; unfinished work remains Unknown."))
-    front.append(p("PASS means the saved measurement meets an accepted mission criterion; FAIL means it "
-                   "does not. These dataset comparisons are separate from the software research-workflow "
-                   "status above. They do not establish physical rover performance or publication assurance."))
-    for row in requirements:
-        req = row["requirement"]
-        measured = row["measurement"]
-        measured_text = (f" Measured {simple_quantity(measured['value'], measured['unit'])} "
-                         f"at {text(measured.get('support_scale_m'))} m support."
-                         if measured["value"] is not None else " Measurement not established.")
-        front.append(p(f"{row['status']} - {req['label']} "
-                       f"({'required' if req['mandatory'] else 'optional'}). {accepted_rule(req)}."
-                       + measured_text))
-    front.extend([p("How to use this brief", "section"),
-                  p("Use the next section to plan the location's tests and read the graphs. "
-                    "Use Technical details for exact values, accepted parameters, methods and source records. "
-                    "The same evidence and limitations apply throughout."),
-                  p("AnalogForge is not a NASA product; no NASA endorsement is implied.", "small"),
-                  PageBreak(), p("How this location was found", "title"),
-                  p("01 / From mission to Earth evidence", "section"),
-                  p("The accepted mission defines the conditions to match. Registered planetary and Earth "
-                    "terrain observations are compared at compatible spatial support; the saved comparisons "
-                    "below determine which criteria this location meets. No new search is performed for this PDF."),
-                  table([["Target region", aoi_text(mission["target"])],
-                         ["Discovery method", candidate.get("discovery_method") or "Not recorded"],
-                         ["Dataset lock", run.get("dataset_lock_id")],
-                         ["Windows screened", (document.get("search_scope") or {}).get("screened_count", "Unknown")],
-                         ["Earth analysis support", str((document["candidate_analysis"].get("slope_histogram")
-                          or {}).get("support_scale_m", "Unknown")) + " m"],
-                         ["Target analysis support", str((document["target_analysis"].get("slope_histogram")
-                          or {}).get("support_scale_m", "Unknown")) + " m"]], [140, WIDTH - 140]),
-                  p("A criterion's exact measurement, units and accepted limit appear in Simplified overview. "
-                    "This is a regional comparison, not a global optimum. A terrain comparison is not a "
-                    "physical test of wheels, suspension, instruments or sampling equipment."),
-                  p("02 / Final Earth location", "section"),
-                  p(position(document["test_plan"]["center"]), "label"),
-                  p("Region centre only - not a landing point, access point or approved route start."),
-                  p("Coordinate digits are display precision, not survey accuracy; terrain support remains as stated.",
-                    "small"),
-                  table([["Assessed region", aoi_text(candidate["aoi"])],
-                         ["Site identity", candidate["id"]]], [140, WIDTH - 140]),
-                  PageBreak(), p("Location test plan", "title"),
-                  p(candidate.get("name") or "Earth location", "section"),
-                  p(document["test_plan"]["route_note"]), site_plot(document["test_plan"])])
+                for status in ("PASS", "FAIL", "PARTIAL", "UNKNOWN", "GAP")}
+    label = readable_site(candidate)
     plan = document["test_plan"]
     route = plan.get("route")
+    state = readable_state(run["state"])
+    counts = (f"{statuses['PASS']} met; {statuses['FAIL']} unmet; {statuses['PARTIAL']} partly met; "
+              f"{statuses['UNKNOWN']} need evidence; {statuses['GAP']} Earth limitations")
+    front = [p("CURRENT EVIDENCE BRIEF", "small"), p("Executive summary", "title"),
+             p(label, "section"), p(mission.get("name") or "Accepted mission", "label"),
+             p("This is a current evidence snapshot, not an assured or published Analog Passport. "
+               "It identifies what to rehearse at this Earth location and which accepted criteria are supported."),
+             table([["Investigation", state + " / " + run["mode"]],
+                    ["Recorded criteria", counts],
+                    ["Earth reference centre", position(plan["center"])],
+                    ["Rover", document["rover"].get("name") if document["rover"]
+                     else "No rover supplied - site evidence only"],
+                    ["Planetary target", mission["target"]["body"]]], [125, WIDTH - 125]),
+             p("What the results mean", "section"),
+             p("Met means a saved measurement satisfies an accepted criterion. Unmet means it does not. "
+               "Missing measurements remain unknown; natural Earth limitations remain separate. A dataset match "
+               "does not establish hardware reliability or guarantee success on Mars or the Moon.")]
+    if document["run_reason"]:
+        front.append(p(document["run_reason"]["message"]))
+    front.append(p("Next step: " + ("Inspect the stored route and checkpoints below, then survey and approve the "
+                    "corridor before field execution." if route else
+                    "Run the selected location’s rover model to establish a route when available. Without a "
+                    "compatible recorded route, start and finish remain unestablished.")))
+    if concise:
+        front = [p("LOCATION / FIELD PLAN", "small"), p(label, "title"),
+                 p(position(plan["center"]), "label"), p(counts),
+                 p("Reference centre only. " + state + ". " + (document["rover"].get("name")
+                   if document["rover"] else "No rover supplied") + ". " + mission["target"]["body"], "small")]
+    if not concise:
+        front.append(PageBreak())
+    front.extend([p("Simplified overview", "section" if concise else "title"), p(mission.get("objective")),
+                  p("Accepted benchmarks at this location", "section")])
+    overview_rows = [["Test / accepted benchmark", "Recorded evidence", "Assessment"]]
+    for row in requirements:
+        req, measured = row["requirement"], row["measurement"]
+        value = (simple_quantity(measured["value"], measured["unit"]) if measured["value"] is not None
+                 else "Not established")
+        support = f" at {text(measured.get('support_scale_m'))} m support" if measured["value"] is not None else ""
+        overview_rows.append([f"{criterion_name(req)}\n{accepted_rule(req)}", value + support,
+                              readable_status(row["status"])])
+    front.append(table(overview_rows, [WIDTH * .49, WIDTH * .32, WIDTH * .19], header=True))
+    if not concise:
+        measured_rows = [row for row in requirements if row["measurement"]["value"] is not None]
+        for index in range(0, len(measured_rows), 2):
+            cells = [[p(criterion_name(row["requirement"]), "label"), numeric_plot(row, WIDTH / 2 - 14)]
+                     for row in measured_rows[index:index + 2]]
+            if len(cells) == 1:
+                cells.append([])
+            plots = Table([cells], colWidths=[WIDTH / 2, WIDTH / 2], hAlign="LEFT")
+            plots.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"),
+                                      ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                                      ("RIGHTPADDING", (0, 0), (-1, -1), 14)]))
+            front.append(plots)
+    if concise:
+        scope = document.get("search_scope") or {}
+        front.extend([p("How this location was found", "section"),
+                      p(f"Discovery: {candidate.get('discovery_method') or 'not recorded'}. "
+                        f"Screened windows: {scope.get('screened_count', 'Unknown')}. "
+                        "Accepted planetary and Earth terrain were compared at compatible support.", "small"),
+                      p(aoi_text(candidate["aoi"]), "small"), p("Site reference: " + candidate["id"], "small")])
+    else:
+        front.extend([p("How this location was found", "section"),
+                      p("Accepted planetary conditions were compared with registered Earth observations at compatible "
+                        "support. The rows above show the recorded results; this is a regional search, "
+                        "not a global optimum."),
+                      table([["Discovery", candidate.get("discovery_method") or "Not recorded"],
+                             ["Windows screened", (document.get("search_scope") or {}).get(
+                                 "screened_count", "Unknown")],
+                             ["Final Earth region", aoi_text(candidate["aoi"])],
+                             ["Site reference", candidate["id"]]], [125, WIDTH - 125]),
+                      p("Region centres and printed coordinates are references, not approved route starts. "
+                        "Display digits do not establish survey accuracy.", "small"),
+    ])
+    front.extend([p("Location test plan", "section" if concise else "title"), p(plan["route_note"])])
     if route:
-        front.extend([table([["Start", position(route["start"])], ["Finish", position(route["finish"])],
-                            ["Model outcome", route["outcome"] + " - raster feasibility only"],
-                            ["Route analysis cells", f"{route['support_scale_m']} m"]], [140, WIDTH - 140]),
-                      p("Follow the numbered checkpoints in order only after the route is surveyed and approved. "
-                        "A return to the same coordinate is a loop. Checkpoint coordinates do not establish material "
-                        "presence or wheel-scale traversability."),
-                      p("Checkpoints and activities", "label")])
+        front.extend([site_plot(plan),
+                      table([["Start", position(route["start"])], ["Finish", position(route["finish"])],
+                             ["Model outcome", readable_status(route["outcome"]) + " - raster feasibility only"],
+                             ["Route analysis support", f"{route['support_scale_m']} m"]], [125, WIDTH - 125])])
         checkpoint_rows = [["Stop / coordinates", "Activity / capability", "Recorded design"]]
         for i, item in enumerate(route["checkpoints"]):
             checkpoint_rows.append([f"{i + 1}. {item['id']}\n{position(item['position'])}",
-                f"{item['activity']}\n{item.get('capability') or 'No specific hardware capability recorded'}",
-                f"Dwell {item['dwell_s']} s; tolerance {item['tolerance_m']} m\n"
-                f"Origin {item['origin']}; requirements {', '.join(item['requirement_ids']) or 'None assigned'}"])
+                                   f"{text(item['activity']).replace('_', ' ').capitalize()}\n"
+                                   f"{item.get('capability') or 'No specific capability recorded'}",
+                                   f"Dwell {item['dwell_s']} s; tolerance {item['tolerance_m']} m\n"
+                                   f"Requirements: {', '.join(item['requirement_ids']) or 'None assigned'}"])
         if len(checkpoint_rows) > 1:
-            front.append(table(checkpoint_rows, [WIDTH * .38, WIDTH * .27, WIDTH * .35], header=True))
-        front.append(p("Recorded route assumptions - these are not additional accepted mission criteria", "label"))
-        front.extend(p(item, "small") for item in route["assumptions"])
+            front.append(table(checkpoint_rows, [WIDTH * .36, WIDTH * .32, WIDTH * .32], header=True))
+        if not concise:
+            front.append(p("Recorded route assumptions - not new accepted criteria", "label"))
+            front.extend(p(item, "small") for item in route["assumptions"])
     else:
-        front.append(p("Start / finish: not established. Select field endpoints after survey, then compute and "
-                       "independently verify a route for this site. No neighbouring site's path is substituted."))
-    front.extend([p("What to test and which benchmark applies", "section"),
-                  p("Each row below retains the mission's own criterion. A subsystem-level physical acceptance "
-                    "test must be separately specified when only regional terrain criteria were accepted.")])
+        front.append(table([["Start / finish: not established", "No compatible geographic route is recorded. "
+                            "The assessed region is not a driving corridor. Compute and verify a route, then "
+                            "survey and approve its endpoints before a field trial."]], [WIDTH * .34, WIDTH * .66]))
+    front.append(p("What to test and how to perform it", "section"))
     for row in requirements:
         req = row["requirement"]
-        front.append(KeepTogether([p(f"{req['label']} ({req['id']})", "label"),
-            table([["Test focus", f"{req.get('dimension', 'Unspecified')} / {req.get('observable', 'Unspecified')}"],
-                   ["Benchmark to meet", accepted_rule(req)],
-                   ["Current evidence", row["status"] + " - " + row["explanation"]],
-                   ["Field task", "Measure the named observable with calibrated instruments at the accepted support. "
-                    "For a terrain-only criterion, this checks site suitability; a drive cannot substitute for "
-                    "the terrain comparison or establish hardware reliability."]], [140, WIDTH - 140])]))
+        if req["operator"] == "NOT_NATURALLY_REPRODUCIBLE" or (concise and not req["mandatory"]):
+            continue
+        guide = field_guidance(req)
+        front.extend([p(criterion_name(req), "label"),
+                      p(guide["focus"] + ". " + guide["method"]),
+                      p("Benchmark: " + accepted_rule(req) + ". Current evidence: "
+                        + readable_status(row["status"]), "small")])
+        if not concise:
+            front.append(p("Record: " + guide["record"], "small"))
+    gaps = [criterion_name(row["requirement"]) for row in requirements
+            if row["requirement"]["operator"] == "NOT_NATURALLY_REPRODUCIBLE"]
+    if gaps:
+        front.append(p("Separate planetary validation: " + "; ".join(gaps) +
+                       ". These conditions cannot be passed by selecting a natural Earth location."))
     if route:
-        front.append(p("Modeled route checks - separate from mission terrain criteria", "section"))
-        checks = [["Recorded rule", "Measurement / margin", "Model status"]]
+        checks = [["Modeled route rule", "Recorded value / margin", "Assessment"]]
         for item in route["benchmark_rows"]:
             checks.append([item["rule"], f"{text(item.get('measured'))} {text(item.get('unit'))}\n"
-                           f"Margin {text(item.get('margin'))}", item["status"]])
-        front.append(table(checks, [WIDTH * .48, WIDTH * .35, WIDTH * .17], header=True))
-    front.append(p("Field sequence and evidence to collect", "section"))
-    front.extend(p(f"{index + 1}. {step}") for index, step in enumerate(plan["steps"]))
-    front.extend([p(plan["field_readiness"], "label"),
-                  p("Success here supports only the accepted, measured capability. Mars/Moon gravity, atmosphere, "
-                    "temperature, dust and radiation need separate transfer analysis and validation. "
-                    "No probability of mission success is estimated."),
-                  PageBreak(), p("Simplified overview", "title"),
-                  p("The mission", "section"), p(mission.get("objective")),
-                  p("What to test at this location", "section")])
-    for row in requirements:
-        req, measured = row["requirement"], row["measurement"]
-        block = [p(f"{req['label']} - {row['status']}", "label"), p(accepted_rule(req)),
-                 p(row["explanation"])]
-        if measured["value"] is not None:
-            block.extend([p(f"Measured {simple_quantity(measured['value'], measured['unit'])}; "
-                            f"compared at {text(measured.get('support_scale_m'))} m terrain support."),
-                          numeric_plot(row)])
-        else:
-            block.append(p("Not yet established: " + measured["reason"]))
-        front.append(KeepTogether(block))
-    front.extend([p("Limits to keep in mind", "section"),
-                  p("These are comparisons of the measured terrain covered by this investigation. "
-                    "They do not establish a globally best Earth location or reproduce every planetary "
-                    "condition. Graphs show registered measurements, not physical rover test results."),
-                  p("No committed rover verification at this location." if not document["attempts"]
-                    else f"{len(document['attempts'])} committed rover result(s) are recorded in Technical details."),
-                  PageBreak()])
-    story[:2] = [p("Technical details", "title")]
-    story = front[:-1] if concise else front + story
+                           f"Margin {text(item.get('margin'))}", readable_status(item["status"])])
+        if not concise:
+            story.extend([p("Independent route checks", "section"),
+                          table(checks, [WIDTH * .47, WIDTH * .34, WIDTH * .19], header=True)])
+        front.append(p("Independent route checks: " + "; ".join(
+            f"{readable_status(status)} {sum(item['status'] == status for item in route['benchmark_rows'])}"
+            for status in dict.fromkeys(item["status"] for item in route["benchmark_rows"]))
+            + ". Exact checks and margins remain in the individual technical appendix.", "small"))
+    front.append(p("Before field execution", "section"))
+    front.append(p("Confirm access and permits; survey hazards at rover scale; approve the route and recovery "
+                   "plan; retain calibrated telemetry and task observations. " + plan["field_readiness"]))
+    if not concise:
+        story.append(p("Field execution checklist", "section"))
+        story.extend(p(f"{index + 1}. {step}") for index, step in enumerate(plan["steps"]))
+    front.extend([p("Earth testing reduces uncertainty; it does not assure planetary mission success. "
+                    "Missing observations stay unknown. No simulation or new qualification occurs while rendering."),
+                  p("AnalogForge - independent project; no NASA endorsement.", "small")])
+    if concise:
+        story = front
+    else:
+        story[:2] = [p("Technical details", "title")]
+        story = front + [PageBreak()] + story
     output = io.BytesIO()
     doc = BriefDoc(output, pagesize=A4, rightMargin=44, leftMargin=44, topMargin=55, bottomMargin=48,
                             title="AnalogForge - Current evidence brief", author="AnalogForge", pageCompression=1)
@@ -558,36 +607,88 @@ def render_packet(document: dict[str, Any]) -> bytes:
         raise ValueError("Location count exceeds packet bound")
     parts = [render(location, concise=True) for location in locations]
     output = io.BytesIO()
-    style = ParagraphStyle("index", fontName="BriefSans", fontSize=10, leading=15, textColor=INK)
-    title = ParagraphStyle("index-title", parent=style, fontName="BriefSansBold", fontSize=25, leading=32)
+    style = ParagraphStyle("index", fontName="BriefSans", fontSize=9, leading=13, textColor=INK, spaceAfter=8)
+    title = ParagraphStyle("title", parent=style, fontName="BriefSansBold", fontSize=25, leading=31, spaceAfter=12)
+    section = ParagraphStyle("section", parent=style, fontName="BriefSansBold", fontSize=14, leading=19,
+                             textColor=ACCENT, spaceBefore=14, spaceAfter=9, keepWithNext=True)
+    small = ParagraphStyle("matrix", parent=style, fontSize=7.5, leading=10.5, spaceAfter=4)
 
-    def p(value: Any) -> Any:
-        return Paragraph(escape(text(value)).replace("\n", "<br/>"), style)
+    def p(value: Any, selected: Any = style) -> Any:
+        return Paragraph(escape(text(value)).replace("\n", "<br/>"), selected)
 
-    story = [Paragraph("Mission field test brief", title), p(locations[0]["mission"].get("name")),
-             p("All investigated Earth locations. Use the PDF bookmarks to open a site's methods, coordinates, "
-               "test plan and benchmark graphs. These are planning references, not approved driving instructions."),
-             p("Location directory - WGS84 reference centres")]
+    def matrix(rows: list[list[Any]], widths: list[float]) -> Any:
+        result = Table([[p(cell, small) for cell in row] for row in rows], colWidths=widths,
+                       repeatRows=1, hAlign="LEFT", splitInRow=1)
+        result.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), PALE), ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("LINEBELOW", (0, 0), (-1, 0), 1, ACCENT), ("LINEBELOW", (0, 1), (-1, -1), .5, RULE),
+            ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+            ("TOPPADDING", (0, 0), (-1, -1), 8), ("BOTTOMPADDING", (0, 0), (-1, -1), 8)]))
+        return result
+
+    story = [p("MISSION / EARTH REHEARSAL", small), p("Mission field test brief", title),
+             p(locations[0]["mission"].get("name"), section),
+             p("Executive summary: a separate location for each supported rehearsal. The directory below connects "
+               "coordinates, test purpose, recorded benchmarks, and the next action. These are planning references, "
+               "not approved driving instructions or a guarantee of planetary mission success."),
+             p("Location directory - WGS84 reference centres", section)]
+    rows = [["Location / reference centre", "What this site supports", "Saved criteria / next test"]]
     for index, location in enumerate(locations):
-        statuses = [row["status"] for row in location["benchmarks"]["requirements"]]
-        story.extend([p(f"{index + 1}. {location['candidate'].get('name') or 'Earth location'}"),
-                      p(position(location["test_plan"]["center"])),
-                      p(f"{statuses.count('PASS')} criterion matches; {statuses.count('FAIL')} unmet; "
-                        f"{statuses.count('UNKNOWN')} unknown. " + location["test_plan"]["route_note"])])
-    story.extend([p("The directory includes unsuccessful candidates so a failed benchmark remains visible. "
-                    "Full evidence receipts, registered raster images and technical terminology are available "
-                    "in each location's current evidence PDF."),
-                  p(f"Run {document['run']['run_id']} / revision {document['run']['revision']}"),
-                  p("Combined snapshot SHA-256: " + document["snapshot_sha256"]),
-                  p("AnalogForge - no NASA endorsement. Earth testing reduces uncertainty; it does not assure "
-                    "Mars or Moon mission success.")])
-    SimpleDocTemplate(output, pagesize=A4, leftMargin=44, rightMargin=44,
-                      topMargin=55, bottomMargin=48, title="AnalogForge - Mission field test brief").build(story)
+        requirements = location["benchmarks"]["requirements"]
+        statuses = [row["status"] for row in requirements]
+        supported = [criterion_name(row["requirement"]) + ": " + accepted_rule(row["requirement"])
+                     + (" (partial evidence)" if row["status"] == "PARTIAL" else "")
+                     for row in requirements if row["status"] in {"PASS", "PARTIAL"}]
+        next_step = ("Inspect recorded route and checkpoints; survey before a field trial."
+                     if location["test_plan"].get("route")
+                     else "Compute a compatible rover route; endpoints not established.")
+        rows.append([f"{index + 1}. {readable_site(location['candidate'])}\n"
+                     + position(location["test_plan"]["center"]),
+                     "\n".join(supported) or "No supported rehearsal established yet.",
+                     f"{statuses.count('PASS')} met; {statuses.count('FAIL')} unmet; "
+                     f"{statuses.count('PARTIAL')} partly met; {statuses.count('UNKNOWN')} need evidence; "
+                     f"{statuses.count('GAP')} Earth limitations.\n"
+                     + next_step])
+    story.append(matrix(rows, [WIDTH * .29, WIDTH * .41, WIDTH * .30]))
+    coverage = [["Mission benchmark", "Locations with a recorded match"]]
+    for row in locations[0]["benchmarks"]["requirements"]:
+        req = row["requirement"]
+        matches = [str(index + 1) for index, location in enumerate(locations)
+                   if any(item["requirement"]["id"] == req["id"] and item["status"] == "PASS"
+                          for item in location["benchmarks"]["requirements"])]
+        coverage.append([criterion_name(req) + "\n" + accepted_rule(req),
+                         ", ".join("Location " + index for index in matches) or
+                         ("Cannot be reproduced naturally on Earth" if req["operator"] == "NOT_NATURALLY_REPRODUCIBLE"
+                          else "No matching evidence yet")])
+    story.extend([p("Which location supports each benchmark", section),
+                  matrix(coverage, [WIDTH * .65, WIDTH * .35]),
+                  p("Use the PDF bookmarks for each site's exact region, route when available, and test instructions. "
+                    "Unsuccessful candidates remain included. Full registered raster images, source receipts and "
+                    "audit tables remain in the individual current-evidence PDFs.", small),
+                  p(f"Run {document['run']['run_id']} / revision {document['run']['revision']}", small),
+                  p("Combined snapshot SHA-256: " + document["snapshot_sha256"], small)])
+
+    def cover_page(canvas: Any, doc: Any) -> None:
+        canvas.saveState()
+        canvas.setFillColor(ACCENT)
+        canvas.setFont("BriefSansBold", 8)
+        canvas.drawString(44, A4[1] - 31, "ANALOGFORGE / MISSION FIELD BRIEF")
+        canvas.setStrokeColor(RULE)
+        canvas.line(44, A4[1] - 39, A4[0] - 44, A4[1] - 39)
+        canvas.setFillColor(MUTED)
+        canvas.setFont("BriefSans", 7)
+        canvas.drawString(44, 28, "Current evidence - no NASA endorsement")
+        canvas.drawRightString(A4[0] - 44, 28, f"Directory {doc.page}")
+        canvas.restoreState()
+
+    BriefDoc(output, pagesize=A4, leftMargin=44, rightMargin=44, topMargin=55, bottomMargin=48,
+             title="AnalogForge - Mission field test brief").build(
+                 story, onFirstPage=cover_page, onLaterPages=cover_page)
     writer = PdfWriter()
     writer.append(PdfReader(io.BytesIO(output.getvalue())), outline_item="Location directory")
     for index, (location, content) in enumerate(zip(locations, parts, strict=True)):
         writer.append(PdfReader(io.BytesIO(content)),
-                      outline_item=f"{index + 1}. {location['candidate'].get('name') or 'Earth location'}")
+                      outline_item=f"{index + 1}. {readable_site(location['candidate'])}")
     # The dossier combines up to eight separately bounded site sections. Keep a
     # distinct total bound; one site's 40-page appendix limit is not a packet limit.
     if len(writer.pages) > 120:

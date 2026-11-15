@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import seed from '../../mock/fixtures/seed.json';
-import { benchmarkText, buildSites, type Candidate, type Requirement, type Qualification } from './tour';
+import { benchmarkText, buildSites, siteName, siteStatusSummary, type Candidate, type Requirement, type Qualification } from './tour';
 
 describe('committed candidate presentation', () => {
   const candidates = seed.candidates as unknown as Candidate[];
@@ -41,4 +41,30 @@ it('shows fractions as percentages only in the simplified reading view without c
   expect(benchmarkText({...criterion,lower:0.1}, true)).toContain('at least 10%');
   expect(benchmarkText(criterion)).toContain('at least 0.05 fraction');
   expect(JSON.stringify(criterion)).toBe(original);
+});
+
+
+it('counts unknown route work separately from absent environmental data and natural gaps', () => {
+  const requirements = [
+    {id:'slope',mandatory:true,observable:'slope_band_area_fraction'},
+    {id:'route',mandatory:true,observable:'unique_slope_exposure_m'},
+    {id:'weather',mandatory:true,observable:'surface_temperature_min_k'},
+    {id:'gap',mandatory:true,observable:'planetary_gravity'},
+  ] as Requirement[];
+  const candidate = seed.candidates[0]! as unknown as Candidate;
+  const qualifications = [
+    {candidate_id:candidate.id,requirement_id:'slope',status:'PASS'},
+    {candidate_id:candidate.id,requirement_id:'gap',status:'GAP'},
+  ] as Qualification[];
+  const site = buildSites([candidate], requirements, qualifications)[0]!;
+  expect(siteStatusSummary(site)).toBe('1 met · 1 need the rover test · 1 need more evidence · 1 cannot be tested on Earth');
+  expect(site.status).toBe('UNKNOWN');
+});
+
+it('uses readable coordinates for generated grid names without rewriting custom or stored names', () => {
+  const candidate = {...seed.candidates[0]!,name:'Practice grid-r0c0'} as unknown as Candidate;
+  const site = buildSites([candidate], [], [])[0]!;
+  expect(siteName(site)).toMatch(/^Earth site · /);
+  expect(candidate.name).toBe('Practice grid-r0c0');
+  expect(siteName({...site,candidate:{...candidate,name:'Surveyed crater rim'}})).toBe('Surveyed crater rim');
 });

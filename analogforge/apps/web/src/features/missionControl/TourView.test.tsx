@@ -6,6 +6,7 @@ import type { components } from '../../generated/schema';
 import seed from '../../mock/fixtures/seed.json';
 import type { useRunData } from './useRunData';
 import { TourView } from './TourView';
+import { api } from '../../api/client';
 
 type S = components['schemas'];
 const state = vi.hoisted(() => ({ run: {} as ReturnType<typeof useRunData>, publication: 'UNPUBLISHED' }));
@@ -16,15 +17,49 @@ vi.mock('./RegionalInspector', () => ({ RegionalInspector: ({ site }: { site: { 
 vi.mock('./RunActivity', () => ({ RunActivity: () => <p>Persisted operation log</p> }));
 vi.mock('./RunTerminalNotice', () => ({ RunTerminalNotice: () => <p role="status">Recorded terminal reason</p> }));
 vi.mock('./BenchmarkEvidence', () => ({ BenchmarkEvidence: ({ site }: { site: { candidate: { id: string } } }) => <p>Benchmarks for {site.candidate.id}</p> }));
+vi.mock('./SiteFieldPlan', () => ({ SiteFieldPlan: () => <p>Scoped field plan</p> }));
 vi.mock('./EnvironmentContext', () => ({ EnvironmentContext: () => <p>Stored environment context</p> }));
 vi.mock('./EarthNomination', () => ({ EarthNomination: () => <p>Nomination boundary</p> }));
 vi.mock('./EvidenceBriefDownload', () => ({ EvidenceBriefDownload: () => <button>Download current evidence PDF</button> }));
 beforeEach(() => {
+  vi.restoreAllMocks();
   state.publication = 'UNPUBLISHED';
-  state.run = { snapshot: { run_id: seed.runId, mode: 'synthetic', state: 'QUALIFYING', candidate_ids: seed.candidates.slice(0, 2).map(candidate => candidate.id), blocked_dependencies: [], portfolio_ids: [] }, contract: { ...seed.missionPresets.MARS, id: 'mission', name: 'Terrain rehearsal' }, candidates: seed.candidates.slice(0, 2), qualifications: [], results: [], lastEvent: { summary: 'Comparing the next accepted slope requirement.' }, connection: 'connected', loading: false, pending: false, action: vi.fn() } as unknown as ReturnType<typeof useRunData>;
+  state.run = { snapshot: { run_id: seed.runId, mode: 'synthetic', state: 'AWAITING_REVIEW', candidate_ids: seed.candidates.slice(0, 2).map(candidate => candidate.id), blocked_dependencies: [], portfolio_ids: [] }, contract: { ...seed.missionPresets.MARS, id: 'mission', name: 'Terrain rehearsal' }, candidates: seed.candidates.slice(0, 2), qualifications: [], results: [], lastEvent: { summary: 'Comparing the next accepted slope requirement.' }, connection: 'connected', loading: false, pending: false, action: vi.fn() } as unknown as ReturnType<typeof useRunData>;
 });
 function tour() { return <MemoryRouter initialEntries={[`/runs/${seed.runId}/tour`]}><Routes><Route path="/runs/:runId/tour" element={<TourView/>}/></Routes></MemoryRouter>; }
-function mount() { return render(tour()); }
+function mount() { const view = render(tour()); fireEvent.click(screen.getByRole('button', {name:'Inspect location 1'})); return view; }
+it('starts on Earth with an individual location directory and a separate results dashboard', () => {
+  render(tour());
+  expect(screen.getByRole('heading', {name:'Your Earth test locations'})).toBeVisible();
+  expect(screen.getByRole('region', {name:'Earth location directory'})).toBeVisible();
+  fireEvent.click(screen.getByRole('button', {name:'Open results dashboard'}));
+  expect(screen.getByRole('heading', {name:'Your location test plan'})).toBeVisible();
+  expect(screen.getByRole('region', {name:'All-location rehearsal plan'})).toBeVisible();
+  fireEvent.click(screen.getByRole('button', {name:'Back to Earth'}));
+  expect(screen.getByRole('button', {name:'Inspect location 1'})).toBeVisible();
+  expect(screen.getByRole('button', {name:'Inspect location 2'})).toBeVisible();
+  expect(screen.queryByRole('region', {name:'Regional map'})).not.toBeInTheDocument();
+  expect(state.run.action).not.toHaveBeenCalled();
+});
+it('runs the selected rover test in the tour after confirming the exact current selection and revision', async () => {
+  state.run.snapshot = {...state.run.snapshot!, state:'AWAITING_REVIEW', workspace_id:'workspace', revision:7,
+    rover_revision_id:'rover', selected_candidate_id:null, pending_review:{allowed_actions:['SELECT_CANDIDATE','PROVE_IT']}} as S['RunSnapshot'];
+  vi.mocked(state.run.action).mockResolvedValue(true);
+  vi.spyOn(api, 'get').mockResolvedValue({...state.run.snapshot, revision:8, selected_candidate_id:seed.candidates[0]!.id});
+  mount(); fireEvent.click(screen.getByRole('button', {name:'Run rover test here'}));
+  await waitFor(() => expect(state.run.action).toHaveBeenLastCalledWith({action_type:'PROVE_IT',expected_revision:8,payload:{candidate_id:seed.candidates[0]!.id}}));
+  expect(screen.getByRole('region', {name:'Regional map'})).toBeVisible();
+});
+it('does not bypass the evidence review or prove a different site after a selection race', async () => {
+  state.run.snapshot = {...state.run.snapshot!, state:'AWAITING_REVIEW', workspace_id:'workspace', revision:7,
+    rover_revision_id:'rover', selected_candidate_id:null, pending_review:{allowed_actions:['SELECT_CANDIDATE','PROVE_IT']}} as S['RunSnapshot'];
+  vi.mocked(state.run.action).mockResolvedValue(true);
+  vi.spyOn(api, 'get').mockResolvedValue({...state.run.snapshot, revision:8, selected_candidate_id:'another-site'});
+  mount(); fireEvent.click(screen.getByRole('button', {name:'Run rover test here'}));
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('not ready for a rover test'));
+  expect(state.run.action).toHaveBeenCalledTimes(1);
+  expect(vi.mocked(state.run.action).mock.calls[0]![0].action_type).toBe('SELECT_CANDIDATE');
+});
 it('keeps limited publication visible beside workflow completion without opening technical details', async () => {
   state.publication = 'LIMITED';
   state.run.snapshot = { ...state.run.snapshot!, state: 'COMPLETED', passport_id: 'registered-passport' } as S['RunSnapshot'];
@@ -44,20 +79,19 @@ it('keeps the selected map mounted while newly pinned qualification records load
   expect(screen.queryByTestId('tour-loading')).toBeNull();
   expect(screen.getByText('Benchmarks for ' + seed.candidates[0]!.id)).toBeVisible();
 });
-it('opens each actual location map and keeps in-progress work visible while candidate evidence is incomplete', async () => {
-  mount();
-  await waitFor(() => expect(screen.getByRole('region', { name: 'Regional map' })).toHaveTextContent(seed.candidates[0]!.name));
-  expect(screen.getByText('Location 1 of 2')).toBeVisible();
-  expect(screen.getByText('Checking each requirement')).toBeVisible();
-  expect(screen.getByText(/Candidate locations are provisional/)).toBeVisible();
-  expect(screen.queryByText('Comparing the next accepted slope requirement.')).toBeNull();
-  expect(screen.getByText('Investigation work log').closest('details')).toHaveAttribute('open');
-  expect(screen.queryByRole('group', { name: 'Result presentation' })).toBeNull();
-  expect(screen.getByRole('heading', { name: 'Benchmarks and measured results' })).toBeVisible();
-  expect(screen.getByText('No benchmark has yet demonstrated a supported rehearsal here. Review the measured results and remaining unknowns below.')).toBeVisible();
-  fireEvent.click(screen.getByRole('button', { name: 'Next site' }));
-  await waitFor(() => expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(seed.candidates[1]!.name));
-  expect(screen.getByRole('region', { name: 'Regional map' })).toHaveTextContent(seed.candidates[1]!.name);
+it('keeps research on one progress screen until the saved results are ready, then opens Earth', async () => {
+  state.run.snapshot = {...state.run.snapshot!, state:'QUALIFYING'} as S['RunSnapshot'];
+  const view = render(tour());
+  expect(screen.getByTestId('run-progress')).toBeVisible();
+  expect(screen.queryByRole('button', {name:'Inspect location 1'})).toBeNull();
+  expect(screen.getByText('Persisted operation log')).toBeVisible();
+  state.run = {...state.run, snapshot:{...state.run.snapshot!, state:'AWAITING_REVIEW'} as S['RunSnapshot']};
+  view.rerender(tour());
+  expect(await screen.findByRole('heading', {name:'Your Earth test locations'})).toBeVisible();
+  fireEvent.click(screen.getByRole('button', {name:'Inspect location 1'}));
+  expect(screen.getByRole('region', {name:'Regional map'})).toHaveTextContent(seed.candidates[0]!.name);
+  fireEvent.click(screen.getByRole('button', {name:'Next site'}));
+  expect(screen.getByRole('region', {name:'Regional map'})).toHaveTextContent(seed.candidates[1]!.name);
   expect(screen.getByTestId('link-report')).toHaveAttribute('href', `/runs/${seed.runId}/report?site=${seed.candidates[1]!.id}`);
   expect(screen.getByTestId('site-selection-announcement')).toHaveTextContent(`Site 2 of 2: ${seed.candidates[1]!.name}`);
 });

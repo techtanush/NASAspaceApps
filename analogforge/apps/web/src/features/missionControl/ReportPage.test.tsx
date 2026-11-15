@@ -15,7 +15,7 @@ vi.mock('./RunTerminalNotice', () => ({ RunTerminalNotice: () => <p role="status
 function mount(site: string) { render(<MemoryRouter initialEntries={[`/runs/${seed.runId}/report?site=${site}`]}><Routes><Route path="/runs/:runId/report" element={<ReportPage/>}/></Routes></MemoryRouter>); }
 it('offers a current-evidence PDF for the exact location while retaining terminal truth and publication limits', async () => {
   vi.mocked(api.raw).mockRejectedValue(new Error('PDF unavailable')); mount(seed.candidates[1]!.id);
-  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(seed.candidates[1]!.name);
+  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Earth site · 35.015° N, 110.945° W');
   expect(screen.getByText('Recorded terminal reason')).toBeVisible();
   expect(screen.getByText('Candidate-scoped field plan boundary')).toBeVisible();
   expect(screen.getByRole('button', { name: 'Download all-location test brief' })).toBeVisible();

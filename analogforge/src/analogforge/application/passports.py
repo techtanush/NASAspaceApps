@@ -601,6 +601,7 @@ def publish_passport(
                 claim_id=claim_id,
                 claim_type="QUALIFICATION",
                 requirement_id=row.requirement_id,
+                requirement_label=requirement.label,
                 candidate_ids=(row.candidate_id,),
                 scope=requirement.evidence_scope,
                 evidence_ids=tuple(row.evidence_ids),

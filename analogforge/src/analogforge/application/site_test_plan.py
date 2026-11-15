@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from analogforge.application.field_guidance import field_guidance
 from analogforge.application.visualization_detail import registered_json, scoped_record
 from analogforge.db.store import PersistenceError
 from analogforge.ports.hashing import canonical_sha256
@@ -20,6 +21,8 @@ def field_plan(
         "bbox": candidate["aoi"]["bbox"], "route": None,
         "route_note": "Route not yet computed for this location. The region centre is a reference, not a start point.",
         "field_readiness": "Survey and operator approval required; no physical field trial has been recorded.",
+        "tests": [{"requirement_id": row["id"], "label": row["label"], **field_guidance(row)}
+                  for row in mission.get("requirements", [])],
         "steps": [
             "Confirm land access, permits, environmental restrictions and a site-specific operating safety plan.",
             "Survey the region at rover scale. Locate obstacles, loose ground, slope transitions and recovery access; "

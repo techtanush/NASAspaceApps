@@ -112,7 +112,7 @@ def test_supported_negative_is_allowed_and_does_not_become_success():
     assert report.publication == "ALLOWED"
     assert report.claims[0].disposition == "SUPPORTED"
     assert report.claims[0].qualification_status == "FAIL"
-    assert "outcome FAIL" in report.claims[0].permitted_statement
+    assert "does not meet its accepted checks" in report.claims[0].permitted_statement
     conclusions = compile_conclusions(report)
     assert conclusions["qualified_uses"] == []
     assert len(conclusions["unsupported_uses"]) == 1

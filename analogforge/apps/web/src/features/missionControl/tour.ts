@@ -27,6 +27,18 @@ export const STATUS_WORD: Record<Status, string> = { PASS: 'Matches', PARTIAL: '
 const SEVERITY: Status[] = ['FAIL', 'UNKNOWN', 'PARTIAL', 'GAP', 'PASS'];
 export interface SiteRow { requirement: Requirement; qualification: Qualification | null; status: Status }
 export interface Site { candidate: Candidate; index: number; lat: number; lng: number; rows: SiteRow[]; status: Status; covers: string[] }
+const ROUTE_OBSERVABLES = new Set(['unique_slope_exposure_m', 'completed_task_count', 'final_battery_reserve_pct']);
+export function siteName(site: Pick<Site, 'candidate' | 'lat' | 'lng'>): string {
+  return /^(?:Practice|Terrain) grid-r\d+c\d+$/i.test(site.candidate.name)
+    ? `Earth site · ${Math.abs(site.lat).toFixed(3)}° ${site.lat < 0 ? 'S' : 'N'}, ${Math.abs(site.lng).toFixed(3)}° ${site.lng < 0 ? 'W' : 'E'}`
+    : site.candidate.name;
+}
+/** Counts restate saved verdicts; an unknown data source is not mislabeled as a pending rover test. */
+export function siteStatusSummary(site: Site): string {
+  const count = (status: Status) => site.rows.filter(row => row.status === status).length;
+  const route = site.rows.filter(row => row.status === 'UNKNOWN' && ROUTE_OBSERVABLES.has(row.requirement.observable)).length;
+  return [count('PASS') && `${count('PASS')} met`, count('FAIL') && `${count('FAIL')} unmet`, count('PARTIAL') && `${count('PARTIAL')} partly met`, route && `${route} need the rover test`, count('UNKNOWN') - route && `${count('UNKNOWN') - route} need more evidence`, count('GAP') && `${count('GAP')} cannot be tested on Earth`].filter(Boolean).join(' · ') || 'No assessed benchmarks yet';
+}
 /** Overall site status is the most severe mandatory row; natural gaps do not by themselves fail a site. */
 export function buildSites(candidates: Candidate[], requirements: Requirement[], qualifications: Qualification[]): Site[] {
   const sites = candidates.filter(candidate => candidate.aoi.body === 'EARTH' && candidate.aoi.bbox.length === 4 && candidate.aoi.bbox.every(Number.isFinite) && candidate.aoi.bbox[0]! < candidate.aoi.bbox[2]! && candidate.aoi.bbox[1]! < candidate.aoi.bbox[3]!).map(candidate => {

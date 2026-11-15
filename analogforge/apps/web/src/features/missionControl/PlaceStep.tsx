@@ -37,8 +37,8 @@ export function PlaceStep() {
     <div className="mc-field"><span className="mc-field-label">Known sites</span>
       <ul className="mc-sites" data-testid="named-sites">{sites.map(site => <li key={site.id}><button type="button" className="mc-site" data-testid="named-site" data-site={site.id} aria-pressed={plan.siteId === site.id} onClick={() => place(site.lat, site.lng, site.id)}><strong>{site.name}</strong><span>{site.note}</span></button></li>)}</ul></div>
     <div className="mc-coords">
-      <FormField label="Latitude (°)" hint="Planetocentric, north positive" error={latError}><Input data-testid="input-latitude" inputMode="decimal" value={plan.latText} placeholder="-4.8" onChange={event => typed(event.target.value, plan.lngText)}/></FormField>
-      <FormField label="Longitude (°)" hint="East positive; 0–360 also accepted" error={lngError}><Input data-testid="input-longitude" inputMode="decimal" value={plan.lngText} placeholder="137.4" onChange={event => typed(plan.latText, event.target.value)}/></FormField>
+      <FormField label="Latitude (°)" hint="Planetocentric, north positive" error={latError}><Input data-testid="input-latitude" inputMode="decimal" value={plan.latText} placeholder="Enter latitude" onChange={event => typed(event.target.value, plan.lngText)}/></FormField>
+      <FormField label="Longitude (°)" hint="East positive; 0–360 also accepted" error={lngError}><Input data-testid="input-longitude" inputMode="decimal" value={plan.lngText} placeholder="Enter longitude" onChange={event => typed(plan.latText, event.target.value)}/></FormField>
     </div>
     {hasPoint && <p className="mc-readout mono" data-testid="coordinate-readout">{formatPlace(plan.lat!, plan.lng!)} · {longitude360(plan.lng!)}{plan.exactTarget && <><br/><ExactTargetBounds target={plan.exactTarget}/></>}</p>}
     <div className="mc-field"><span className="mc-field-label">Area to analyse</span>

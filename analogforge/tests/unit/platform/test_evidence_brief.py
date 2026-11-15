@@ -68,10 +68,11 @@ def test_actual_pdf_retains_failure_exact_value_missing_work_and_scope(projectio
     # Both reader levels must precede the auditable appendix without turning missing work into success.
     assert (extracted.index("Executive summary") < extracted.index("Simplified overview")
             < extracted.index("Technical details\n"))
-    assert "0 PASS; 1 FAIL; 1 UNKNOWN; 0 GAP" in extracted
+    assert "0 met; 1 unmet; 0 partly met; 1 need evidence; 0 Earth limitations" in extracted
     assert "Technical terminology" in extracted and "Wasserstein-1" in extracted
     assert "How this location was found" in extracted and "Location test plan" in extracted
     assert "Start / finish: not established" in extracted and "hardware reliability" in extracted
+    assert "N up | WGS84 coordinate schematic" not in extracted
     assert reader.outline  # navigable sections, with no scripts or external links
     assert all(len(page.extract_text()) > 150 for page in reader.pages)
     assert re.search(r"30(?:\.0)?\s+m\s+support", extracted)
@@ -235,3 +236,26 @@ def test_unavailable_macos_memory_monitor_reaps_child_and_releases_slot(projecti
     assert unavailable.value.code == "RESOURCE_LIMIT" and child.killed
     assert brief._render_slot.acquire(blocking=False)
     brief._render_slot.release()
+
+
+def test_combined_directory_does_not_present_partial_support_as_a_full_match(projection):
+    add_comparison(projection, "PARTIAL", .1)
+    snapshot(projection)
+    packet = brief.build_packet(projection[0], projection[1], projection[2]["id"])
+    reader = PdfReader(io.BytesIO(brief.render_pdf(packet)))
+    directory = " ".join(reader.pages[0].extract_text().split())
+    assert "1 partly met" in directory and "(partial evidence)" in directory
+    assert "0 met" in directory
+
+
+def test_simple_pdf_retains_custom_slope_band_and_marks_optional_once(projection):
+    requirement = projection[3]["requirements"][0]
+    requirement["mandatory"] = False
+    requirement["label"] = "Slope band rehearsal (optional)"
+    requirement["parameters"]["slope_band_deg"] = [7, 11]
+    document = snapshot(projection)
+    reader = PdfReader(io.BytesIO(brief.render_pdf(document)))
+    simple = " ".join(" ".join(page.extract_text() for page in reader.pages[:3]).split())
+    assert re.search(r"slope band 7(?:\.0)? to 11(?:\.0)? deg", simple), re.findall(
+        r"slope band.{0,80}", simple)
+    assert "(optional)" in simple and "(optional) (optional)" not in simple
