@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { resolve } from 'node:path';
-async function launch(page: import('@playwright/test').Page, siteOnly=false, moon=false) {
+import { startRun } from './support/workbench';
+async function launch(page: import('@playwright/test').Page, siteOnly=false, moon=false, unsupported=false) {
  await page.goto('/');
  await page.getByTestId('btn-begin').click();
  if(moon){await page.getByRole('button',{name:'Moon',exact:true}).click();await page.getByRole('button',{name:'Mare Tranquillitatis Apollo 11 landing region'}).click();}
@@ -30,10 +31,25 @@ async function launch(page: import('@playwright/test').Page, siteOnly=false, moo
  await page.getByTestId('btn-prepare').click();
  expect((await preparation).postDataJSON().rover_revision_id).toBe(roverRevisionId);
  await expect(page.getByTestId('proposed-requirements')).toBeVisible();
- const creation = page.waitForRequest(request => request.method()==='POST' && new URL(request.url()).pathname==='/api/v1/runs');
+ const creation = page.waitForResponse(response => response.request().method()==='POST' && new URL(response.url()).pathname==='/api/v1/runs');
  await page.getByTestId('btn-accept-start').click();
- expect((await creation).postDataJSON().rover_revision_id).toBe(roverRevisionId);
+ const created = await creation;
+ expect(created.status()).toBe(202);
+ expect(created.request().postDataJSON().rover_revision_id).toBe(roverRevisionId);
+ const {run_id:runId} = await created.json() as {run_id:string};
+ let runState = '';
+ let blockedDependencies: string[] = [];
+ await expect.poll(async()=>{
+  const response = await page.evaluate(async id=>{const response=await fetch(`/api/v1/runs/${id}`);return {status:response.status,body:await response.json() as {state:string;blocked_dependencies:string[]}};},runId);
+  expect(response.status).toBe(200);
+  runState = response.body.state;
+  blockedDependencies = response.body.blocked_dependencies;
+  return ['AWAITING_REVIEW','COMPLETED','BLOCKED','FAILED','CANCELLED'].includes(runState);
+ },{timeout:process.env.E2E_TARGET==='mock'?10000:180000,message:`Run ${runId} must reach its backend review or terminal boundary`}).toBe(true);
+ if(unsupported){expect(runState).toBe('BLOCKED');expect(blockedDependencies).toContain('NO_COVERAGE');return runId;}
+ expect(runState,`Run ${runId} must have reviewable results`).toMatch(/^(AWAITING_REVIEW|COMPLETED)$/);
  await expect(page.getByTestId('site-card')).toBeVisible();
+ return runId;
 }
 test('globe, exact-site inspection, stable selection and printable report',async({page})=>{
  const external:string[]=[];page.on('request',request=>{const url=new URL(request.url());if(url.protocol.startsWith('http')&&url.origin!==new URL(process.env.E2E_BASE_URL||'http://127.0.0.1:5176').origin)external.push(url.origin);});
@@ -77,8 +93,15 @@ test('no-WebGL users retain setup and individual candidate access',async({page})
  await expect(page.getByTestId('tour-position')).toHaveText('2 / 6');
 });
 
-test('Moon setup retains its body-specific target and natural gaps',async({page})=>{
- await launch(page,true,true);
+test('Moon setup blocks unsupported coverage and the documented practice target retains natural gaps',async({page})=>{
+ if(process.env.E2E_TARGET!=='mock'){
+  await launch(page,true,true,true);
+  await expect(page.getByRole('heading',{name:'Investigation blocked'})).toBeVisible();
+  await expect(page.getByRole('alert')).toContainText('NO_COVERAGE');
+ }
+ const runId = await startRun(page,{moon:true,rover:null});
+ await page.goto(`/runs/${runId}/tour`);
+ await expect(page.getByTestId('site-card')).toBeVisible();
  await page.getByRole('button',{name:'Target evidence',exact:true}).click();
  await expect(page.getByTestId('planetary-panel')).toHaveAttribute('data-body','MOON');
  await expect(page.getByTestId('site-card')).toContainText('No rover supplied');

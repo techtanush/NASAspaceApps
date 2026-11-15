@@ -55,6 +55,12 @@ Artifacts are ignored local outputs under the baseline application's `out/` and
   production build pass. Existing bundle-size warning remains advisory.
 - Complete old real-backend browser gate: **17/17 passed**, 30.7 minutes, original
   readiness limits. `out/e2e-results-baseline-repaired-real.json` records the run.
+- Four new real-backend Mission Control journeys: **4/4 passed**, 2.5 minutes;
+  receipt `out/e2e-results-baseline-repaired-mc-moon-boundary-real.json`. Tests
+  import a rover and bind its exact server revision, wait for analysis using the
+  existing 180-second backend boundary, and keep 15-second UI assertions. Moon
+  checks prove unsupported Apollo geometry blocks with NO_COVERAGE, then exercise
+  the documented workbench practice preset and its natural GAP in the tour.
 - Platform mutation gate: **20/20 killed**, no setup failures or survivors.
 - Ruff, strict mypy (244 source files), generated-client equality, stream audits,
   frozen wiring and all three forbidden-pattern scans pass.
