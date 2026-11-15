@@ -95,6 +95,8 @@ The following are defects, not style choices. Items marked **[scan]** are enforc
 
 **Dependency policy for UI libraries.** Allowed: React 19, React Router, TanStack Query/Table/Virtual, MapLibre, d3 primitives (`d3-scale`, `d3-shape`, `d3-axis`, `d3-array`, `d3-format`, `d3-time-format`), `lucide-react`, Radix primitives (`@radix-ui/react-dialog|popover|tooltip|tabs|select|toggle-group|dropdown-menu|visually-hidden`), `@fontsource/inter`, `@fontsource/ibm-plex-mono`, `clsx`. **Banned:** component kits that impose a look (MUI, Ant Design, Chakra, Mantine, Bootstrap, Tailwind-UI templates, shadcn *copied wholesale with its default styling*), animation libraries (`framer-motion`, `gsap`, `lottie`), chart kits with animated defaults (Chart.js, ECharts, Recharts default theme), CSS-in-JS runtime. Styling is **plain CSS modules or one global stylesheet using the token variables** (no utility-class framework needed). Every dependency is pinned, licensed (recorded), and imported locally (no CDN).
 
+**User-directed amendment, 14–15 November 2026:** the operator explicitly requested Motion (motion.dev) for the redesigned Mission Control. Pinned `motion@14.14.0` is permitted only for short stage entrances and user-directed view transitions, with reduced-motion support. This supersedes the blanket animation-library ban for that package and scope; GSAP, Lottie and unapproved animation dependencies remain banned. The glass/scientific-surface rules, exact data, stable geometry and quiet-motion requirements still apply. See [implementation decision](../team%20handoffs/aradhya/DECISIONS.md).
+
 ## 4. Theme model
 
 * **Dark ("Mission Console Dark") is the default.** `:root, [data-theme="dark"]`.

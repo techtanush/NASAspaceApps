@@ -7,15 +7,20 @@ function sessionError(code:string,message:string,status:number,retryable=false):
 }
 function record(value:unknown):Record<string,unknown>|undefined {return value!==null&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:undefined;}
 export async function loadSession():Promise<Session> {
+ const controller=new AbortController();
+ const deadline=setTimeout(()=>controller.abort(),15000);
+ try{return await authenticatedSession(controller.signal);}finally{clearTimeout(deadline);}
+}
+async function authenticatedSession(signal:AbortSignal):Promise<Session> {
  // Clear the previous session's token before any failed refresh or workspace switch.
  setSessionCsrf(undefined);
  let response:Response;
- try{response=await fetch('/auth/session',{method:'GET',credentials:'same-origin',headers:{Accept:'application/json'},cache:'no-store'});}
+ try{response=await fetch('/auth/session',{method:'GET',credentials:'same-origin',headers:{Accept:'application/json'},cache:'no-store',signal});}
  catch{throw sessionError('SESSION_UNAVAILABLE','Unable to load the authenticated session. Retry the connection.',0,true);}
  if(response.status===401)throw sessionError('AUTH_REQUIRED','Sign in to access this workspace.',401);
  if(!response.ok)throw sessionError('SESSION_UNAVAILABLE','The authenticated session service is unavailable.',response.status,response.status>=500);
  let data:unknown;
- try{data=await response.json();}catch{throw sessionError('SESSION_INVALID','The server returned an invalid session response.',502);}
+ try{data=await response.json();}catch{if(signal.aborted)throw sessionError('SESSION_UNAVAILABLE','The session check timed out. Retry the connection.',0,true);throw sessionError('SESSION_INVALID','The server returned an invalid session response.',502);}
  const body=record(data),workspace=record(body?.workspace);
  if(body?.authenticated===false)throw sessionError('AUTH_REQUIRED','Sign in to access this workspace.',401);
  const workspaceId=body?.workspace_id??workspace?.id;

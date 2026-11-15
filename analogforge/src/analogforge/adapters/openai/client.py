@@ -111,6 +111,8 @@ class ResponsesClient:
         cooldown: RateLimitCooldown | None = None,
         min_request_interval_seconds: float = 0, sleep: Callable[[float], None] = time.sleep,
         primary_output_token_limit: int = 4096,
+        primary_reasoning_effort: str | None = None,
+        nvidia_output_token_limit: int = 1024,
         fallbacks: tuple[FallbackConfig, ...] | None = None,
     ) -> None:
         if not api_key:
@@ -124,6 +126,15 @@ class ResponsesClient:
                 or not 256 <= primary_output_token_limit <= 4096):
             raise ValueError("Primary output token limit must be between 256 and 4096")
         self.primary_output_token_limit = primary_output_token_limit
+        if primary_reasoning_effort is not None and primary_reasoning_effort not in {
+            "none", "low", "medium", "high", "xhigh"
+        }:
+            raise ValueError("Invalid primary reasoning effort")
+        self.primary_reasoning_effort = primary_reasoning_effort
+        if (isinstance(nvidia_output_token_limit, bool) or not isinstance(nvidia_output_token_limit, int)
+                or not 256 <= nvidia_output_token_limit <= 4096):
+            raise ValueError("NVIDIA output token limit must be between 256 and 4096")
+        self.nvidia_output_token_limit = nvidia_output_token_limit
         self.sleep = sleep
         self.model = model
         self.primary_model = model
@@ -152,6 +163,7 @@ class ResponsesClient:
             elif config.provider in {"sambanova", "nvidia", "gemini"}:
                 self.fallback_clients[config.provider] = JsonToolEnvelope(
                     config.provider, config.api_key.get_secret_value(), timeout=timeout,
+                    output_token_limit=nvidia_output_token_limit if config.provider == "nvidia" else 1024,
                 )
             else:
                 url = "https://api.groq.com/openai/v1" if config.provider == "groq" else "https://openrouter.ai/api/v1"
@@ -244,9 +256,10 @@ class ResponsesClient:
         if self.provider != "openai":
             # Leave headroom for the complete input/tool schemas on the fallback
             # provider's smaller request budget. Incomplete proposals still fail closed.
-            output_budget = kwargs.get("max_output_tokens", 1024)
+            provider_limit = self.nvidia_output_token_limit if self.provider == "nvidia" else 1024
+            output_budget = kwargs.get("max_output_tokens", provider_limit)
             if isinstance(output_budget, int):
-                kwargs = {**kwargs, "max_output_tokens": min(output_budget, 1024)}
+                kwargs = {**kwargs, "max_output_tokens": min(output_budget, provider_limit)}
             if self.provider == "groq" and self.model in {"openai/gpt-oss-20b", "openai/gpt-oss-120b"}:
                 # Groq counts reasoning against max_output_tokens. Its documented
                 # low effort leaves more of this bounded budget for complete tool arguments.
@@ -273,6 +286,8 @@ class ResponsesClient:
                                               + "\nReturn exactly one tool call per response.")
                 response = sdk.responses.create(model=self.model, store=False, **kwargs)
             else:
+                if self.provider == "openai" and self.primary_reasoning_effort is not None:
+                    kwargs = {**kwargs, "reasoning": {"effort": self.primary_reasoning_effort}}
                 response = sdk.responses.create(model=self.model, store=False, parallel_tool_calls=False, **kwargs)
         except APIStatusError as exc:
             attempt["http_status"] = exc.status_code

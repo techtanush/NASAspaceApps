@@ -78,8 +78,12 @@ def project_payload(role: str, facts: dict[str, Any]) -> dict[str, Any]:
             "target_profile_revision_id": target["id"] if target else None,
             "coverage_receipt_ids": facts.get("coverage_receipt_ids", []),
             **target_evidence_context(facts),
-            "geometry_validation_receipt_id": receipt,
-            "comparison_ready": target is not None,
+            "geometry_validation_receipt_id": facts.get("target_coordinate_context", {}).get(
+                "geometry_validation_receipt_id"
+            ),
+            "comparison_ready": bool(target and facts.get("target_coordinate_context", {}).get(
+                "geometry_validation_receipt_id"
+            )),
         }
     if role == "earth_scout":
         screening = facts.get("screening", {})

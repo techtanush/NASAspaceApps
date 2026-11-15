@@ -3,6 +3,18 @@ import AxeBuilder from '@axe-core/playwright';
 import { resolve } from 'node:path';
 import { readFileSync } from 'node:fs';
 const moonPractice = JSON.parse(readFileSync(resolve(import.meta.dirname,'../fixtures/kit/missions/mission-moon-gap.json'),'utf8'));
+test('slow optional fonts cannot hold the authenticated workspace blank',async({page})=>{
+ let release!:()=>void;
+ const held=new Promise<void>(resolve=>{release=resolve;});
+ await page.route(/\.woff2?(?:\?|$)/,async route=>{await held;await route.continue();});
+ try {
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  await expect(page.getByTestId('btn-begin')).toBeVisible();
+  await page.getByTestId('btn-begin').click();
+  await expect(page.getByRole('button',{name:'Moon',exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'Mars',exact:true})).toBeVisible();
+ } finally {release();await page.unrouteAll({behavior:'wait'});}
+});
 async function launch(page: import('@playwright/test').Page, siteOnly=false, moon=false, options:{unsupported?:boolean;practice?:boolean}={}) {
  await page.goto('/');
  await page.getByTestId('btn-begin').click();
@@ -141,8 +153,12 @@ test('no-WebGL users retain setup and individual candidate access',async({page})
 test('Moon setup blocks unsupported coverage and its explicit practice target retains natural gaps',async({page})=>{
  if(process.env.E2E_TARGET!=='mock'){
   await launch(page,true,true,{unsupported:true});
-  await expect(page.getByRole('heading',{name:'Investigation blocked'})).toBeVisible();
-  await expect(page.getByRole('alert')).toContainText('NO_COVERAGE');
+  await expect(page.getByRole('heading',{name:'Investigation paused'})).toBeVisible();
+  const notice=page.getByTestId('run-terminal-notice');
+  await expect(notice).toHaveAttribute('data-state','BLOCKED');
+  await expect(notice).toContainText('Source data does not cover the requested area.');
+  await notice.getByText('Technical status',{exact:true}).click();
+  await expect(notice).toContainText('NO_COVERAGE');
  }
  await launch(page,true,true,{practice:true});
  await page.getByRole('button',{name:'Target evidence',exact:true}).click();

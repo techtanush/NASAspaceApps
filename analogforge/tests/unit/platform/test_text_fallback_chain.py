@@ -25,10 +25,11 @@ from tests.unit.platform.test_groq_fallback import response
 PROVIDERS = ("groq", "openrouter", "anthropic", "sambanova", "nvidia", "gemini")
 
 
-def chain(order=PROVIDERS, *, handler=None, cooldown=None):
+def chain(order=PROVIDERS, *, handler=None, cooldown=None, nvidia_limit=1024):
     configs = tuple(FallbackConfig(name, name + "-model", SecretStr(name + "-marker"),
                                    "openai" if name == "openrouter" else None) for name in order)
-    client = ResponsesClient("primary-marker", "primary-model", fallbacks=configs, cooldown=cooldown)
+    client = ResponsesClient("primary-marker", "primary-model", fallbacks=configs, cooldown=cooldown,
+                             nvidia_output_token_limit=nvidia_limit)
     seen = []
 
     def handle(request):
@@ -79,6 +80,46 @@ def bounded_tools():
         "type": "object", "properties": {"value": {"type": "integer", "minimum": 1, "maximum": 3}},
         "required": ["value"], "additionalProperties": False,
     }}]
+
+
+def test_explicit_nvidia_allowance_preserves_primary_groq_and_per_request_caps():
+    def handler(provider, body):
+        return output(provider, body) if provider == "nvidia" else httpx.Response(429)
+
+    client, seen = chain(("groq", "nvidia"), handler=handler, nvidia_limit=2048)
+    client.primary_output_token_limit = 768
+    charges = []
+    result = client.create_budgeted(lambda: charges.append(True), input="bounded review", tools=bounded_tools(),
+                                    tool_choice="required", max_output_tokens=4096)
+    assert result["status"] == "completed" and charges == [True, True]
+    assert [row[1].get("max_output_tokens", row[1].get("max_tokens")) for row in seen] == [768, 1024, 2048]
+    client.create(input="smaller review", tools=bounded_tools(), tool_choice="required", max_output_tokens=512)
+    assert seen[-1][1]["max_tokens"] == 512
+
+
+def test_larger_nvidia_allowance_still_rejects_truncated_output_without_dispatch():
+    def handler(provider, body):
+        if provider == "openai":
+            return httpx.Response(429)
+        return httpx.Response(200, json={"choices": [{"finish_reason": "length", "message": {"content": "{"}}]})
+
+    client, seen = chain(("nvidia",), handler=handler, nvidia_limit=2048)
+    result = client.create(input="review", tools=bounded_tools(), tool_choice="required", max_output_tokens=4096)
+    assert result == {"status": "incomplete", "output": []}
+    assert seen[-1][1]["max_tokens"] == 2048
+
+
+@pytest.mark.parametrize("value", [0, 255, 4097, True, 512.5])
+def test_invalid_nvidia_allowance_rejected_before_transport(value):
+    with pytest.raises(ValueError, match="NVIDIA output token limit"):
+        ResponsesClient("fake-key", "model", nvidia_output_token_limit=value)
+
+
+def test_nondefault_nvidia_allowance_is_pinned_in_public_configuration():
+    base = Settings(_env_file=None)
+    assert "nvidia_max_output_tokens" not in base.public_config()
+    configured = base.model_copy(update={"nvidia_max_output_tokens": 2048})
+    assert configured.public_config()["nvidia_max_output_tokens"] == 2048
 
 
 def test_ordered_429_chain_charges_every_dispatch_and_pins_openrouter():
@@ -322,3 +363,31 @@ def test_provider_secrets_are_removed_from_diagnostics_including_native_headers(
     private.update({"x-api-key": "private-marker", "x-goog-api-key": "private-marker", "safe": "okay"})
     assert sanitize(private) == {"safe": "okay"}
     assert sanitize("nvapi-fake_token AIzaFakeGoogleToken sk-ant-fake") == "[REDACTED] [REDACTED] [REDACTED]"
+
+
+def test_explicit_primary_reasoning_stays_stateless_and_never_leaks_into_fallback_transport():
+    from tests.unit.platform.test_groq_fallback import configured
+
+    client, seen = configured(primary_status=200)
+    client.primary_reasoning_effort = "low"
+    client.create(input="bounded", max_output_tokens=32)
+    assert seen[0][1]["reasoning"] == {"effort": "low"} and seen[0][1]["store"] is False
+    client, seen = configured()
+    client.primary_reasoning_effort = "low"
+    charges = ["initial caller charge"]
+    client.create_budgeted(lambda: charges.append(True), input="bounded")
+    assert len(charges) == 2 and seen[0][1]["reasoning"] == {"effort": "low"}
+    assert "reasoning" not in seen[1][1] and seen[1][1]["store"] is False
+
+
+def test_reasoning_effort_is_explicit_validated_and_part_of_effective_configuration():
+    from analogforge.adapters.openai.client import ResponsesClient
+
+    baseline = Settings(_env_file=None).public_config()
+    assert "openai_reasoning_effort" not in baseline
+    selected = Settings(_env_file=None, openai_reasoning_effort="low")
+    assert selected.public_config() == {**baseline, "openai_reasoning_effort": "low"}
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None, openai_reasoning_effort="invented")
+    with pytest.raises(ValueError):
+        ResponsesClient("marker", "model", primary_reasoning_effort="invented")

@@ -45,6 +45,10 @@ def proposal_for(role, claim_id):
         }
         kind = "assemble_passport"
     raw = {**deepcopy(task.payload["prepared_submission"]), "role_key": role, "task_kind": kind, "payload": payload}
+    if role == "evidence_passport":
+        raw["issues"] = [{"code": "MISSING_EVIDENCE", "severity": "WARNING", "requirement_id": "req-1",
+                          "evidence_ids": [], "message": "Review the unresolved claim evidence before publication.",
+                          "recommended_action": "Inspect the registered claim lineage."}]
     task = task.model_copy(update={
         "role_key": role, "task_kind": kind,
         "payload": {"authoritative_submission": deepcopy(raw), "authoritative_claims": [{

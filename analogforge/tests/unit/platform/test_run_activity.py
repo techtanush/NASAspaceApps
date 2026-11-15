@@ -334,3 +334,51 @@ def test_optional_endpoint_authorizes_viewers_bounds_pages_and_never_caches(tmp_
         assert client.get(url, params={"cursor": "malformed"}).status_code == 422
         app.state.identity_provider = lambda _request: Principal(str(uuid4()), str(uuid4()), "VIEWER")
         assert client.get(url).status_code == 404
+
+
+def paused_review(store):
+    invocation = store.record("invocations", role="qualification", task_kind="qualify_candidate")
+    result = store.record("role_results", role="qualification", mode="live", status="BLOCKED",
+                          invocation_id=invocation["id"], payload={"summary": "PRIVATE_REASONING", "issues": [
+                              {"severity": "BLOCKING", "requirement_id": "ICE-SUPPORT",
+                               "message": "The source date needs review. token=private-secret https://private.invalid"}]})
+    store.event("agent.completed", invocation_id=invocation["id"], role_result_id=result["id"],
+                role="qualification", status="BLOCKED")
+    return result
+
+
+def test_paused_review_exposes_only_sanitized_bounded_concerns_from_the_admitted_record():
+    store = ActivityStore()
+    result = paused_review(store)
+    original = deepcopy(result)
+    item = page(store, store.workspace, store.run)["items"][0]
+    assert item["review_concerns"] == [{"message": "The source date needs review. [REDACTED] [link omitted]",
+        "message_truncated": False, "severity": "BLOCKING", "requirement_label": "ICE-SUPPORT"}]
+    assert "PRIVATE_REASONING" not in str(item) and "private-secret" not in str(item)
+    assert result == original
+    result["payload"]["issues"] = [{"severity": "WARNING", "requirement_id": "FOREIGN",
+                                     "message": "x" * 900} for _ in range(12)]
+    concerns = page(store, store.workspace, store.run)["items"][0]["review_concerns"]
+    assert len(concerns) == 8 and all(len(c["message"]) == 800 and c["message_truncated"] for c in concerns)
+    assert all(c["requirement_label"] is None for c in concerns)
+
+
+@pytest.mark.parametrize("field,value", [
+    ("run_id", str(uuid4())), ("workspace_id", str(uuid4())), ("invocation_id", str(uuid4())),
+    ("role", "scientific_critic"), ("mode", "synthetic"), ("status", "SUCCEEDED"),
+])
+def test_review_concerns_do_not_cross_record_identity_or_terminal_boundaries(field, value):
+    store = ActivityStore()
+    result = paused_review(store)
+    result[field] = value
+    assert page(store, store.workspace, store.run)["items"][0]["review_concerns"] == []
+
+
+def test_started_record_cannot_present_a_review_concern_and_malformed_issue_is_omitted():
+    store = ActivityStore()
+    result = paused_review(store)
+    store.events[0]["event_type"] = "agent.started"
+    assert page(store, store.workspace, store.run)["items"][0]["review_concerns"] == []
+    store.events[0]["event_type"] = "agent.completed"
+    result["payload"]["issues"] = [{"severity": {}}, {"severity": "BLOCKING", "message": []}]
+    assert page(store, store.workspace, store.run)["items"][0]["review_concerns"] == []

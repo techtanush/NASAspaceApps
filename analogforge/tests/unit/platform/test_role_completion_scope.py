@@ -23,6 +23,9 @@ def tool_value(output, task):
         source = task
         for key in reference["task_path"]:
             source = source[key]
+        if not reference["path"]:
+            value = deepcopy(source)
+            continue
         destination = value
         for key in reference["path"][:-1]:
             destination = destination[key]
@@ -55,10 +58,13 @@ def test_actual_director_task_finishes_only_current_review_and_retains_blockers(
     class Client:
         def create(self, **kwargs):
             instructions = kwargs["instructions"]
-            assert "`COMPLETE` finishes this bounded director review" in instructions
-            assert "Neither claims that the mission is complete" in instructions
+            assert "`COMPLETE` ends only this review" in instructions
+            assert "it does not qualify sites or approve publication" in instructions
             assert (
-                "Accepted operator criteria authorize investigation and comparison; they are not validated facts"
+                "Accepted operator criteria authorize comparison, not validated facts"
+            ) in instructions
+            assert (
+                "Future candidate, qualification, test and portfolio records are not due at CHARACTERIZING"
             ) in instructions
             assert "Their absence alone does not undo a matching contract acceptance" in instructions
             assert "A failed current prerequisite" in instructions

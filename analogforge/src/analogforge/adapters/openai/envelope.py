@@ -64,10 +64,14 @@ def gemini_steps(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 class JsonToolEnvelope:
-    def __init__(self, provider: str, api_key: str, *, timeout: float = 30) -> None:
+    def __init__(self, provider: str, api_key: str, *, timeout: float = 30, output_token_limit: int = 1024) -> None:
         if provider not in _URLS:
             raise ValueError("Unsupported JSON-schema transport provider")
         self.provider = provider
+        if (isinstance(output_token_limit, bool) or not isinstance(output_token_limit, int)
+                or not 256 <= output_token_limit <= (4096 if provider == "nvidia" else 1024)):
+            raise ValueError("Invalid provider output token limit")
+        self.output_token_limit = output_token_limit
         self._key = api_key
         self.http = httpx.Client(timeout=timeout, follow_redirects=False)
 
@@ -82,7 +86,7 @@ class JsonToolEnvelope:
             raise invalid_output()
         schema = wire_schema(original, self.provider)
         messages = chat_messages(kwargs["input"], kwargs.get("instructions", ""))
-        budget = min(kwargs.get("max_output_tokens", 1024), 1024)
+        budget = min(kwargs.get("max_output_tokens", self.output_token_limit), self.output_token_limit)
         headers = {"Authorization": "Bearer " + self._key}
         if self.provider == "gemini":
             headers = {"x-goog-api-key": self._key, "Api-Revision": "2026-05-20"}
@@ -96,7 +100,7 @@ class JsonToolEnvelope:
                         "name": "single_tool_call" if tools else format_["name"], "schema": schema, "strict": True,
                     }}}
             if self.provider == "nvidia":
-                body["reasoning_effort"] = "none"  # Documented model option; keep 1024 for the actual JSON output.
+                body["reasoning_effort"] = "none"  # Reserve the bounded allowance for actual JSON output.
         request = self.http.build_request("POST", _URLS[self.provider], json=body, headers=headers)
         try:
             response = self.http.send(request)

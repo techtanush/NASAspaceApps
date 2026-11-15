@@ -45,6 +45,7 @@ def real_contract_task():
         "hash": task.contract_hash,
         "requirements": mission["requirements"],
     }
+    task = task.model_copy(update={"payload": {**task.payload, "contract_context": deepcopy(contract)}})
     budget = {
         "limits": {"active_run_seconds": 900, "tool_calls_per_run": 160, "replans_total": 3},
         "counters": {"tool_calls_per_run": 2},
@@ -73,9 +74,13 @@ def test_contract_table_and_repeated_tool_reads_are_exact_and_keep_all_scientifi
     task, _context, _counts, contract, _snapshot = real_contract_task()
     original = deepcopy(contract)
     codec = WireCodec(task, _task_receipt_ids(task))
+    wire_task = codec.task(task.model_dump(mode="json"))
+    restored = _expand_wire_task(codec.decode(wire_task))
+    assert restored["payload"]["contract_context"] == original
+    assert task.payload["contract_context"] == original
     first = codec.result(contract, call_id="inspect-one")
     assert codec.expand_result(first) == original and contract == original
-    assert ["requirements"] in first["table_paths"]
+    assert first["value"] == {"_task_value_ref": ["payload", "contract_context"]}
     assert first["task_paths"]  # Acceptance is already supplied in the initial task, with identical values.
     assert len(json.dumps(first)) < len(json.dumps(contract)) * 0.8
     second = codec.result(contract, call_id="inspect-two")
@@ -253,3 +258,29 @@ def test_new_tool_returned_identifiers_remain_resolvable_after_reference_reuse()
     alias = wire["value"]["review_revision_id"]
     assert alias != identifier and codec.decode({"review_revision_id": alias}) == {"review_revision_id": identifier}
     assert codec.expand_result(codec.result(result, call_id="reuse-new-id")) == result
+
+
+@pytest.mark.parametrize("remaining", [1, 2, 3])
+def test_last_run_request_is_reserved_for_an_assessment_without_forcing_positive_disposition(remaining):
+    task, context, _registry, counts, _ = task_and_context()
+    task = task.model_copy(update={"budget": {**task.budget, "model_requests_per_run": remaining}})
+    registry = ToolRegistry({"get_run_snapshot": lambda _: {"run_revision": task.expected_run_revision,
+        "snapshot": {"id": str(task.run_id), "run_id": str(task.run_id), "workspace_id": str(task.workspace_id)}}})
+    calls = []
+
+    class Client:
+        def create(self, **kwargs):
+            calls.append(kwargs)
+            if len(calls) < remaining:
+                call = tool("get_run_snapshot", {"sections": []}, call_id=f"read-{len(calls)}")
+            else:
+                assert [item["name"] for item in kwargs["tools"]] == ["submit_role_result"]
+                proposal = deepcopy(task.payload["prepared_submission"])
+                proposal.update(disposition="BUDGET_EXHAUSTED", next_action=None,
+                                summary="Further evidence review needs additional budget.")
+                call = tool("submit_role_result", proposal, call_id="assessment")
+            return {"status": "completed", "output": [call]}
+
+    assessment = OpenAIProvider(Client()).run(task, registry, context)
+    assert assessment.disposition == "BUDGET_EXHAUSTED" and assessment.next_action is None
+    assert len(calls) == counts.count("model_requests_per_run") == remaining

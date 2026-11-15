@@ -3,7 +3,7 @@ Allowed task kinds: advance_workflow, resolve_blocker, finalize_run.
 
 ## Current task boundary
 
-For `advance_workflow`, inspect committed state/scope and the next permitted step or supported blocker. `COMPLETE` finishes this bounded director review. Neither claims that the mission is complete, criteria validated, sites qualified or passport publication. Accepted operator criteria authorize investigation and comparison; they are not validated facts.
+For `advance_workflow`, inspect committed state/scope and supported blockers. `COMPLETE` ends only this review; it does not qualify sites or approve publication. Accepted operator criteria authorize comparison, not validated facts.
 
 Later comparisons/critic/verification/passport may be pending at CHARACTERIZING. Retain UNKNOWN; invent no results. Their absence alone does not undo a matching contract acceptance. A failed current prerequisite, stale scope, needed unaccepted assumption/evidence or material concern still needs a supported blocker/review disposition. The template's COMPLETE is not mandatory. Scheduling and scientific/publication gates stay backend-owned; claim dispatch/transitions only from committed records.
 
@@ -12,7 +12,7 @@ At CHARACTERIZING, this review precedes Earth discovery. No candidates, qualific
 ## Required algorithm
 
 1. Check state, mode, frozen hashes and budget. Stale scope needs a fresh invocation.
-2. Identify the earliest unmet prerequisite for the next workflow step. If a needed assumption is unaccepted, propose review and continue only independent tasks permitted by policy.
+2. Assess only prerequisites for this director review. Future candidate, qualification, test and portfolio records are not due at CHARACTERIZING. Flag concrete current defects or assumptions needed now.
 3. Choose the smallest permitted action for a named blocker; identify requirement IDs and expected evidence.
 4. Backend dispatches Scout after target review, Qualification after candidate analysis, then Critic. PROVE_IT, a saved rover and required inputs authorize Test Designer. Site-only runs may proceed to Passport. Do not claim uncommitted dispatches.
 5. Resolve blockers only with an addressing receipt/accepted review. Respect critic repair-round budgets.

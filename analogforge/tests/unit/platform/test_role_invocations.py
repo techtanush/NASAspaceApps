@@ -47,6 +47,31 @@ def active_invocation(store):
     return next(row for row in store.list("invocations") if row["task_kind"] == "advance_workflow")
 
 
+def test_scout_receives_exact_registered_target_primitives_without_inventing_a_comparison(role_attempt, monkeypatch):
+    engine, store, workspace, run_id, _ = role_attempt
+    profile = {"id": str(uuid4()), "run_id": run_id, "workspace_id": workspace,
+               "metrics": [{"metric_id": "surface_slope_deg:mean", "value": 9.25,
+                            "uncertainty_note": "Not quantified", "support_scale_m": 500}],
+               "payload": {"slope_histogram": {"edges": [0, 5, 10], "area_fraction": [0.25, 0.75],
+                                               "support_scale_m": 500},
+                           "unavailable_dimensions": [{"dimension": "SCIENCE", "reason_code": "NO_COVERAGE"}]}}
+    store.create("target_profiles", deepcopy(profile))
+    store.require("runs", run_id)["target_profile_id"] = profile["id"]
+    captured = []
+
+    def review(_provider, task, *_):
+        supplied = task.payload["target_profile_context"]
+        assert supplied == profile
+        assert "slope_w1_deg" not in str(supplied)  # A pair comparison is not a planetary scalar.
+        supplied["metrics"][0]["value"] = -999
+        captured.append(task)
+        return task.payload["prepared_submission"]
+
+    monkeypatch.setattr(OpenAIProvider, "run", review)
+    engine._role("earth_scout", "screen_candidates", run_id, workspace)
+    assert len(captured) == 1 and store.require("target_profiles", profile["id"]) == profile
+
+
 def test_accepted_proposed_default_has_exact_pinned_acceptance_context(role_attempt, monkeypatch):
     engine, store, workspace, run_id, _ = role_attempt
     acceptance = store.list("mission_acceptances")[0]

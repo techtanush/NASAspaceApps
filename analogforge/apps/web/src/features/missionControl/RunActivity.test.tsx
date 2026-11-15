@@ -27,4 +27,15 @@ describe('recorded activity pagination and authorization',()=>{
    await expect(fetchRunActivity(runId,new AbortController().signal)).rejects.toThrow('reference counts');
   }
  });
+ it('accepts bounded admitted concerns and rejects malformed or nonterminal concern records',async()=>{
+  const get=vi.spyOn(api,'get');
+  const concern={message:'The source date needs review.',message_truncated:false,severity:'BLOCKING',requirement_label:null};
+  const row={...item(1),status:'BLOCKED',role_result_id:'review',review_concerns:[concern]};
+  get.mockResolvedValueOnce({items:[row],next_cursor:null,last_event_seq:1});
+  expect((await fetchRunActivity(runId,new AbortController().signal))?.items[0]).toEqual(row);
+  for(const invalid of [{...row,status:'RUNNING'},{...row,role_result_id:null},{...row,review_concerns:[{...concern,message:'x'.repeat(801)}]},{...row,review_concerns:Array(9).fill(concern)},{...row,review_concerns:[{...concern,severity:'PASS'}]}]){
+   get.mockResolvedValueOnce({items:[invalid],next_cursor:null,last_event_seq:1});
+   await expect(fetchRunActivity(runId,new AbortController().signal)).rejects.toThrow('review concerns');
+  }
+ });
 });

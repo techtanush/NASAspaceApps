@@ -53,7 +53,8 @@ def simple_quantity(value: Any, unit: str) -> str:
         return "Unknown"
     if unit == "fraction":
         return f"{format(value * 100, '.4g')}% ({format(value, '.6g')} fraction)"
-    return f"{text(value)} {unit}".strip()
+    readable = format(value, ".6g") if isinstance(value, (int, float)) and not isinstance(value, bool) else text(value)
+    return f"{readable} {unit}".strip()
 
 
 def accepted_rule(requirement: dict[str, Any]) -> str:

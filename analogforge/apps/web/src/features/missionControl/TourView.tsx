@@ -67,9 +67,11 @@ export function TourView() {
     ? { body: 'EARTH', layout: 'panel', autoRotate: false, markers, selectedMarker: selected?.candidate.id ?? null, box: selected ? selected.candidate.aoi.bbox : null, focus: overview || !selected ? { lat: 20, lng: groupMarker?.lng ?? 0, altitude: 2.3 } : { lat: selected.lat, lng: selected.lng, altitude: 0.95 } }
     : { body: contract?.target.body ?? 'MARS', layout: 'panel', autoRotate: false, scanning: true, focus: target ? { ...target, altitude: 1.7 } : null, pin: target, box: contract ? contract.target.bbox : null }, { onMarkerSelect });
   if (run.error) return <Panel title="Investigation unavailable" testid="tour-error"><ErrorPanel error={run.error}/></Panel>;
-  if (run.loading || !snapshot || !contract) return <Panel title="Opening the investigation" testid="tour-loading"><Skeleton label="Retrieving the investigation"/></Panel>;
+  // New qualification IDs can arrive while their scoped records are fetching.
+  // Keep the existing candidate map mounted so that live updates preserve its camera.
+  if ((run.loading && sites.length === 0) || !snapshot || !contract) return <Panel title="Opening the investigation" testid="tour-loading"><Skeleton label="Retrieving the investigation"/></Panel>;
   if (selectedId && !sites.some(site => site.candidate.id === selectedId)) return <Panel title="Site unavailable"><p>This candidate is not part of the current run.</p><Button onClick={() => setSearch({})}>Return to site list</Button></Panel>;
-  const badges = <span className="mc-run-status"><ModeBadge mode={snapshot.mode}/><span>{sentenceCase(snapshot.state)}</span><ConnectionIndicator connection={run.connection === 'connecting' ? 'reconnecting' : run.connection}/></span>;
+  const badges = <span className="mc-run-status"><ModeBadge mode={snapshot.mode}/><span>{sentenceCase(snapshot.state)}</span><ConnectionIndicator connection={run.connection === 'connecting' ? 'reconnecting' : run.connection}/>{snapshot.passport_id && <span aria-label="Run publication assurance"><PublicationBadge publication={assurance.publication}/></span>}</span>;
   if (!touring) {
     const stopped = TERMINAL.includes(snapshot.state); const current = PROGRESS_STEPS.findIndex(step => (step.states as readonly string[]).includes(snapshot.state));
     return <Panel testid="run-progress" step="Investigation" title={snapshot.state === 'BLOCKED' ? 'Investigation paused' : stopped ? `Investigation ${sentenceCase(snapshot.state).toLowerCase()}` : snapshot.state === 'COMPLETED' ? 'No Earth sites were found' : 'Working on your investigation'} lead={contract.name} notice={stopped ? <RunTerminalNotice run={snapshot}/> : undefined}
@@ -78,13 +80,12 @@ export function TourView() {
       <Guide>{stopped ? 'The run stopped before any Earth site was assessed. The reason is recorded in the evidence workbench.' : 'AnalogForge is measuring the target and screening Earth terrain. This view updates by itself.'}</Guide>
       <ol className="mc-progress" data-testid="progress-steps" data-state={snapshot.state}>{PROGRESS_STEPS.map((step, index) => { const state = stopped ? 'next' : current >= 0 && index < current ? 'done' : index === current ? 'current' : 'next'; return <li key={step.label} data-state={state}><span className="mc-progress-mark" aria-hidden="true">{state === 'done' ? <Check size={12} strokeWidth={2.5}/> : state === 'current' ? <Loader size={12} className="mc-spin"/> : null}</span>{step.label}</li>; })}</ol>
       <RunActivity run={snapshot}/>
-      {!stopped && run.lastEvent && <p className="mc-event helper" role="status">{run.lastEvent.summary}</p>}
     </Panel>;
   }
   const position = selected ? sites.indexOf(selected) : 0; const step = (delta: number) => { const next = sites[(position + delta + sites.length) % sites.length]; if (next) { setSelectedId(next.candidate.id); setOverview(false); } };
   const canProve = !!snapshot.rover_revision_id && (snapshot.pending_review?.allowed_actions.includes('PROVE_IT') ?? false);
   const prove = async (site: Site) => { if (snapshot.selected_candidate_id !== site.candidate.id) { const ok = await run.action({ action_type: 'SELECT_CANDIDATE', expected_revision: snapshot.revision, payload: { candidate_id: site.candidate.id } }); if (!ok) throw new Error('Selection was not confirmed'); const confirmed = await api.get<components['schemas']['RunSnapshot']>(`/runs/${snapshot.run_id}`); if (confirmed.selected_candidate_id !== site.candidate.id) throw new Error('Site selection is still pending. Wait for the investigation to update, then retry.'); } };
-  const working = PROVING_LABEL[snapshot.state];
+  const working = PROVING_LABEL[snapshot.state] ?? PROGRESS_STEPS.find(step => (step.states as readonly string[]).includes(snapshot.state))?.label;
   const researching = !TERMINAL.includes(snapshot.state) && !['COMPLETED', 'AWAITING_REVIEW'].includes(snapshot.state);
   const technical = !researching && search.get('detail') === 'technical';
   const changePresentation = (next: boolean) => setSearch(current => { if (next) current.set('detail', 'technical'); else current.delete('detail'); return current; }, { replace: true });
@@ -95,7 +96,7 @@ export function TourView() {
     {!researching && <ResultPresentation technical={technical} onChange={changePresentation}/>}
     {assurance.error && <ErrorPanel error={assurance.error}/>}
     <div className="mc-view-switch" role="group" aria-label="Evidence view"><Button variant="secondary" aria-pressed={!regional && !targetDetail} onClick={() => { setView('globe'); setOverview(false); }}>Globe</Button><Button variant="secondary" aria-label="Inspect location" aria-pressed={regional} onClick={() => { setView('regional'); setOverview(false); }}>Site detail</Button><Button variant="secondary" aria-label="Target evidence" aria-pressed={targetDetail} onClick={() => setView('target')}>Target</Button></div>
-    {researching && <div className="mc-research-status" role="status"><p className="mc-working-line"><Loader size={14} className="mc-spin" aria-hidden="true"/>{working ?? 'Research is still running'}</p><p>{run.lastEvent?.summary ?? 'Candidate locations are provisional while the remaining evidence is checked.'}</p></div>}
+    {researching && <div className="mc-research-status" role="status"><p className="mc-working-line"><Loader size={14} className="mc-spin" aria-hidden="true"/>{working ?? 'Research is still running'}</p><p>Candidate locations are provisional while the remaining evidence is checked. Follow the work log for each recorded operation.</p></div>}
     <details className="mc-activity-disclosure" open={researching || technical || undefined}><summary>Investigation work log</summary><RunActivity run={snapshot}/></details>
     {selected && <p className="sr-only" role="status" aria-live="polite" aria-atomic="true" data-testid="site-selection-announcement">Site {selected.index} of {sites.length}: {selected.candidate.name}. {STATUS_WORD[selected.status]}.</p>}
     {selected && <article ref={siteCard} className="mc-site-card" data-testid="site-card" data-status={selected.status} aria-label={`Site ${selected.index}`}>

@@ -10,7 +10,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-# Explicit user-selected EOX 2016 visual context, never a generic external-URL exemption.
+# Exact, user-selected official imagery endpoints; never a domain-wide URL exemption.
 IMAGERY_URLS = {
     "apps/web/src/api/planetaryImagery.ts": {
         "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile",
@@ -20,9 +20,11 @@ IMAGERY_URLS = {
     },
     "apps/web/src/api/earthImagery.ts": {
         "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/GoogleMapsCompatible",
+        "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile",
     },
     "apps/web/src/maps/EarthImagery.tsx": {
         "https://cloudless.eox.at", "https://eox.at", "https://creativecommons.org/licenses/by/4.0/",
+        "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer",
     },
 }
 

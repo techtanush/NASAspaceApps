@@ -8,9 +8,9 @@ import type { useRunData } from './useRunData';
 import { TourView } from './TourView';
 
 type S = components['schemas'];
-const state = vi.hoisted(() => ({ run: {} as ReturnType<typeof useRunData> }));
+const state = vi.hoisted(() => ({ run: {} as ReturnType<typeof useRunData>, publication: 'UNPUBLISHED' }));
 vi.mock('./useRunData', () => ({ useRunData: () => state.run }));
-vi.mock('./useRunAssurance', () => ({ useRunAssurance: () => ({ publication: 'UNPUBLISHED' }) }));
+vi.mock('./useRunAssurance', () => ({ useRunAssurance: () => ({ publication: state.publication }) }));
 vi.mock('./StageShell', () => ({ useScene: () => {}, Guide: ({ children }: { children: ReactNode }) => <aside>{children}</aside>, Panel: ({ title, step, children, footer, notice, testid }: { title: string; step: string; children: ReactNode; footer: ReactNode; notice: ReactNode; testid: string }) => <section data-testid={testid}><p>{step}</p><h1>{title}</h1>{notice}<div className="mc-panel-body">{children}</div>{footer}</section> }));
 vi.mock('./RegionalInspector', () => ({ RegionalInspector: ({ site }: { site: { candidate: { name: string } } }) => <section aria-label="Regional map">{site.candidate.name}</section>, TargetInspector: () => <section aria-label="Target map"/> }));
 vi.mock('./RunActivity', () => ({ RunActivity: () => <p>Persisted operation log</p> }));
@@ -20,14 +20,37 @@ vi.mock('./EnvironmentContext', () => ({ EnvironmentContext: () => <p>Stored env
 vi.mock('./EarthNomination', () => ({ EarthNomination: () => <p>Nomination boundary</p> }));
 vi.mock('./EvidenceBriefDownload', () => ({ EvidenceBriefDownload: () => <button>Download current evidence PDF</button> }));
 beforeEach(() => {
+  state.publication = 'UNPUBLISHED';
   state.run = { snapshot: { run_id: seed.runId, mode: 'synthetic', state: 'QUALIFYING', candidate_ids: seed.candidates.slice(0, 2).map(candidate => candidate.id), blocked_dependencies: [], portfolio_ids: [] }, contract: { ...seed.missionPresets.MARS, id: 'mission', name: 'Terrain rehearsal' }, candidates: seed.candidates.slice(0, 2), qualifications: [], results: [], lastEvent: { summary: 'Comparing the next accepted slope requirement.' }, connection: 'connected', loading: false, pending: false, action: vi.fn() } as unknown as ReturnType<typeof useRunData>;
 });
-function mount() { render(<MemoryRouter initialEntries={[`/runs/${seed.runId}/tour`]}><Routes><Route path="/runs/:runId/tour" element={<TourView/>}/></Routes></MemoryRouter>); }
+function tour() { return <MemoryRouter initialEntries={[`/runs/${seed.runId}/tour`]}><Routes><Route path="/runs/:runId/tour" element={<TourView/>}/></Routes></MemoryRouter>; }
+function mount() { return render(tour()); }
+it('keeps limited publication visible beside workflow completion without opening technical details', async () => {
+  state.publication = 'LIMITED';
+  state.run.snapshot = { ...state.run.snapshot!, state: 'COMPLETED', passport_id: 'registered-passport' } as S['RunSnapshot'];
+  mount();
+  await screen.findByRole('region', { name: 'Regional map' });
+  expect(screen.getByLabelText('Run publication assurance')).toHaveTextContent('LIMITED');
+  expect(screen.getByText('Run details and provenance').closest('details')).not.toHaveAttribute('open');
+  expect(state.run.action).not.toHaveBeenCalled();
+});
+it('keeps the selected map mounted while newly pinned qualification records load', async () => {
+  const view = mount();
+  const map = await screen.findByRole('region', { name: 'Regional map' });
+  state.run = { ...state.run, loading: true, qualifications: [] };
+  view.rerender(tour());
+  expect(screen.getByRole('region', { name: 'Regional map' })).toBe(map);
+  expect(screen.getByText('Location 1 of 2')).toBeVisible();
+  expect(screen.queryByTestId('tour-loading')).toBeNull();
+  expect(screen.getByText('Benchmarks for ' + seed.candidates[0]!.id)).toBeVisible();
+});
 it('opens each actual location map and keeps in-progress work visible while candidate evidence is incomplete', async () => {
   mount();
   await waitFor(() => expect(screen.getByRole('region', { name: 'Regional map' })).toHaveTextContent(seed.candidates[0]!.name));
   expect(screen.getByText('Location 1 of 2')).toBeVisible();
-  expect(screen.getByText('Comparing the next accepted slope requirement.')).toBeVisible();
+  expect(screen.getByText('Checking each requirement')).toBeVisible();
+  expect(screen.getByText(/Candidate locations are provisional/)).toBeVisible();
+  expect(screen.queryByText('Comparing the next accepted slope requirement.')).toBeNull();
   expect(screen.getByText('Investigation work log').closest('details')).toHaveAttribute('open');
   expect(screen.queryByRole('group', { name: 'Result presentation' })).toBeNull();
   expect(screen.getByRole('heading', { name: 'Benchmarks and measured results' })).toBeVisible();

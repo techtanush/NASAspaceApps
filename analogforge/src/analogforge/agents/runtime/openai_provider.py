@@ -69,6 +69,7 @@ _POLICY_FAILURE_FIELDS = {
     "EVIDENCE_NOT_ESTABLISHED": "evidence_ids",
     "ISSUE_EVIDENCE_NOT_ESTABLISHED": "issues.evidence_ids",
     "CLAIM_REFERENCE_NOT_AUTHORIZED": "payload",
+    "PUBLICATION_HOLD_REASON_REQUIRED": "payload.ready_to_publish",
 }
 _WIRE_INSTRUCTIONS = (
     "\nTask _wire_encoding describes lossless references only. When prepared_submission is omitted, it is identical "
@@ -247,10 +248,8 @@ def submission_schema(
         "type": ["string", "null"],
         "enum": [*allowed_actions, None],
         "description": (
-            "Use an exact allowed token or null; put explanations in summary or issues. "
-            "continue completes this bounded role and returns control to the workflow graph. "
-            "stop_investigation requires a supported investigation stop reason, not merely role completion. "
-            "Preserve request_review or record_unknown when the supplied facts justify them."
+            "Exact allowed token/null; explanations in summary/issues. continue ends only this role; "
+            "stop_investigation needs a supported run stop. Retain justified request_review/record_unknown."
         ),
     }
     return strict_schema(common)
@@ -292,6 +291,20 @@ def _validation_details(
         details = _nested_reference_details(task, proposal)
         if details:
             return details
+    if isinstance(error, PolicyViolation) and error.detail_code == "STATUS_INFLATION" and proposal:
+        expected = task.payload.get("authoritative_submission", task.payload.get("prepared_submission", {}))
+        computed = {row["requirement_id"]: row["proposed_status"]
+                    for row in expected.get("payload", {}).get("rows", [])}
+        details = [{"field": f"payload.rows.{index}.proposed_status", "code": "STATUS_INFLATION",
+                    "expected": computed[row["requirement_id"]],
+                    "remediation": "Retain the exact computed status, including FAIL/GAP/UNKNOWN. "
+                    "Contest evidence in issues/disposition, never by changing a computed row. "
+                    "The exact task-bound payload reference is available."}
+                   for index, row in enumerate(proposal.payload.get("rows", []))
+                   if row.get("requirement_id") in computed
+                   and row.get("proposed_status") != computed[row["requirement_id"]]]
+        if details:
+            return details[:8]
     if isinstance(error, PolicyViolation) and error.detail_code in _POLICY_FAILURE_FIELDS:
         remediation = (
             "Use only supplied committed evidence and receipt references: task.input_evidence_ids, "
@@ -301,6 +314,9 @@ def _validation_details(
             if error.detail_code in {"EVIDENCE_NOT_ESTABLISHED", "ISSUE_EVIDENCE_NOT_ESTABLISHED"}
             else "Preserve authoritative_submission facts and frozen task inputs; retain justified review or blockers."
         )
+        if error.detail_code == "PUBLICATION_HOLD_REASON_REQUIRED":
+            remediation = ("Keep false when justified: cite known unresolved issues or supply a concrete "
+                           "WARNING/BLOCKING issue and repair. Non-PASS science alone does not block an honest report.")
         return [{"field": _POLICY_FAILURE_FIELDS[error.detail_code], "code": error.detail_code,
                  "remediation": remediation}]
     if isinstance(error, ValidationError):
@@ -341,6 +357,11 @@ class OpenAIProvider:
         codec = WireCodec(task, _task_receipt_ids(task))
         wire = codec.task(_wire_task(task))
         instructions += WIRE_INSTRUCTIONS + PROJECTION_INSTRUCTIONS
+        if "target_profile_context" in task.payload:
+            instructions += (" target_profile_context contains registered target primitives. "
+                             "Pair-comparison metrics are produced downstream, not target-only scalars. "
+                             "target_coordinate_context binds source frames and geometry preparation to real receipts; "
+                             "the operator AOI is a horizontal footprint, not a source height-reference declaration.")
         if task.payload.get("untrusted_operator_context_ref"):
             instructions += OPERATOR_CONTEXT_INSTRUCTIONS
         items: list[dict[str, Any]] = [
@@ -381,7 +402,8 @@ class OpenAIProvider:
 
         for _ in range(BUDGETS["model_requests_per_invocation"]):
             charge_request()
-            final_request = request_count == BUDGETS["model_requests_per_invocation"]
+            final_request = (request_count == BUDGETS["model_requests_per_invocation"]
+                             or request_count >= task.budget.get("model_requests_per_run", float("inf")))
             request_tools = ([tool for tool in tools if tool["name"] == "submit_role_result"]
                              if final_request else tools)
             try:

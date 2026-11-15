@@ -33,3 +33,15 @@ it('explains a review pause without raw error codes in the primary message and r
   expect(code).toBeVisible();
   expect(screen.getByRole('link', { name: 'Inspect evidence and recovery options' })).toHaveAttribute('href', '/runs/run/target');
 });
+
+it('shows the admitted concern from the paused role despite its earlier workflow stage, without changing results', () => {
+  state.error=null;
+  state.data.items=[{run_id:'run',state:'QUALIFYING',status:'BLOCKED',event_type:'agent.completed',role_result_id:'review',review_concerns:[{message:'The accepted requirement needs a source-date check.',message_truncated:false,severity:'BLOCKING',requirement_label:'Terrain support'}]}, {run_id:'foreign',state:'BLOCKED',status:'BLOCKED',event_type:'agent.completed',role_result_id:'foreign-review',review_concerns:[{message:'Foreign concern',message_truncated:false,severity:'BLOCKING',requirement_label:null}]}];
+  const {rerender}=render(<MemoryRouter><RunTerminalNotice run={{...run,state:'BLOCKED'}}/></MemoryRouter>);
+  expect(screen.getByRole('region',{name:'Recorded reviewer concerns'})).toHaveTextContent('The accepted requirement needs a source-date check.');
+  expect(screen.queryByText('Foreign concern')).not.toBeInTheDocument();
+  expect(screen.getByText(/measured benchmark results remain unchanged/)).toBeVisible();
+  state.error=new Error('Forbidden');rerender(<MemoryRouter><RunTerminalNotice run={{...run,state:'BLOCKED'}}/></MemoryRouter>);
+  expect(screen.queryByRole('region',{name:'Recorded reviewer concerns'})).not.toBeInTheDocument();
+  state.error=null;
+});

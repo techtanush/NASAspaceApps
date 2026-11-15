@@ -2,7 +2,10 @@
 
 from copy import deepcopy
 
-from analogforge.agents.runtime.target_projection import target_evidence_context
+import pytest
+
+from analogforge.agents.runtime.scripted_provider import project_payload
+from analogforge.agents.runtime.target_projection import target_coordinate_context, target_evidence_context
 
 
 def target_facts():
@@ -64,3 +67,77 @@ def test_unknown_parent_cycles_cannot_add_foreign_or_unregistered_sources():
     facts["evidence_records"][0]["input_evidence_ids"] += ["missing", "earth"]
     facts["evidence_records"][3]["input_evidence_ids"] = ["profile"]
     assert target_evidence_context(facts)["source_evidence_ids"] == ["parent", "source"]
+
+
+def coordinate_facts():
+    facts = target_facts()
+    scope = {"workspace_id": "workspace", "run_id": "run", "mode": "live"}
+    target = {"body": "MARS", "bbox": [1, 2, 3, 4], "crs_wkt": None, "vertical_datum": "Unknown"}
+    facts["target"].update(**scope, id="registered-profile", target=target)
+    facts["registered_receipts"] = [
+        {**scope, "id": "geometry", "tool_name": "characterize_target", "status": "SUCCEEDED",
+         "evidence_ids": ["profile", "grid", "source"]},
+        {**scope, "id": "ingest", "tool_name": "fetch_dataset", "status": "SUCCEEDED",
+         "evidence_ids": ["ingest-source"]},
+    ]
+    facts["target_operations"] = [{**scope, "operation": "CHARACTERIZE_TARGET", "receipt_id": "geometry",
+        "status": "SUCCEEDED", "evidence_ids": ["profile", "grid", "source"], "request": {"inputs": {
+            "target": deepcopy(target), "source": {"kind": "LOCAL_DATASET", "dataset_id": "mars-terrain"}}}}]
+    facts["source_ingest_operations"] = [{**scope, "operation": "INGEST_LOCAL_DATASET", "receipt_id": "ingest",
+        "status": "SUCCEEDED", "evidence_ids": ["ingest-source"], "request": {"inputs": {"manifest": {
+            "dataset_id": "mars-terrain", "body": "MARS", "crs": {"wkt": "registered-source-wkt"},
+            "vertical_reference": "Declared areoid", "units": "m", "quantity": "ELEVATION"}}}}]
+    return facts
+
+
+def test_coordinate_context_uses_real_geometry_and_ingestion_receipts_and_keeps_operator_aoi_unchanged():
+    facts = coordinate_facts()
+    before = deepcopy(facts)
+    result = target_coordinate_context(facts)
+    assert result["geometry_validation_receipt_id"] == "geometry"
+    assert result["geometry_validation_operation"] == "CHARACTERIZE_TARGET"
+    assert result["source_frames"][0]["vertical_reference"] == "Declared areoid"
+    assert result["source_frames"][0]["ingestion_receipt_id"] == "ingest"
+    assert len(result["source_frames"][0]["manifest_sha256"]) == 64
+    result["source_frames"][0]["crs"]["wkt"] = "changed"
+    assert facts == before and facts["target"]["target"]["crs_wkt"] is None
+
+
+@pytest.mark.parametrize("defect", ["contract_receipt", "foreign_run", "foreign_mode", "wrong_aoi", "missing_scope"])
+def test_missing_or_foreign_geometry_validation_does_not_become_readiness(defect):
+    facts = coordinate_facts()
+    if defect == "contract_receipt":
+        facts["registered_receipts"][0]["tool_name"] = "inspect_contract"
+    elif defect == "foreign_run":
+        facts["target_operations"][0]["run_id"] = "another-run"
+    elif defect == "foreign_mode":
+        facts["registered_receipts"][0]["mode"] = "synthetic"
+    elif defect == "wrong_aoi":
+        facts["target_operations"][0]["request"]["inputs"]["target"]["bbox"] = [5, 6, 7, 8]
+    else:
+        facts["target"].pop("workspace_id")
+    result = target_coordinate_context(facts)
+    assert result["geometry_validation_receipt_id"] is None and result["source_frames"] == []
+    facts.update(target_coordinate_context=result, validation_receipt_id="contract-only")
+    facts["mission"]["id"] = "accepted-contract"
+    payload = project_payload("planetary_target", facts)
+    assert payload["geometry_validation_receipt_id"] is None and payload["comparison_ready"] is False
+
+
+@pytest.mark.parametrize("defect", ["dataset", "body", "receipt_scope", "failed", "evidence"])
+def test_unrelated_or_failed_ingestion_cannot_supply_a_target_source_frame(defect):
+    facts = coordinate_facts()
+    operation = facts["source_ingest_operations"][0]
+    if defect == "dataset":
+        operation["request"]["inputs"]["manifest"]["dataset_id"] = "another-dataset"
+    elif defect == "body":
+        operation["request"]["inputs"]["manifest"]["body"] = "EARTH"
+    elif defect == "receipt_scope":
+        facts["registered_receipts"][1]["workspace_id"] = "another-workspace"
+    elif defect == "failed":
+        operation["status"] = "FAILED"
+    else:
+        facts["registered_receipts"][1]["evidence_ids"] = ["foreign-source"]
+    result = target_coordinate_context(facts)
+    assert result["geometry_validation_receipt_id"] == "geometry"
+    assert result["source_frames"] == []

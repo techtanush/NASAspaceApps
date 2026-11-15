@@ -189,7 +189,7 @@ html[data-stage]{overflow:hidden}
 .mc-site-actions .button{min-height:36px;padding:0 12px;gap:6px;text-decoration:none;display:inline-flex;align-items:center;font-weight:600;font-size:13px}
 .mc-tour-nav{display:flex;align-items:center;gap:10px}.mc-tour-nav .button{min-width:36px;padding:0 8px}
 @keyframes mc-spin{to{transform:rotate(360deg)}}
-.mc-regional{position:absolute;inset:80px 480px 80px 24px;z-index:2;background:var(--surface-1);border:1px solid var(--border-strong);border-radius:12px;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.mc-regional{position:absolute;inset:80px 480px 80px 24px;z-index:2;background:var(--surface-1);border:1px solid var(--border-strong);border-radius:6px;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
 .mc-regional header h2{margin:4px 0;font-size:20px}.mc-regional header p{margin:0;color:var(--text-secondary);font-size:12px}
 .mc-regional .earth-map-panel{min-width:0}.mc-regional .map-region,.mc-regional .map-canvas{min-height:320px}
 .mc-regional .map-context{font-size:12px;line-height:1.5;margin:0 0 8px;padding:6px 10px}
@@ -355,3 +355,6 @@ html[data-stage]{overflow:hidden}
 .mc-report-provenance[open]>.mc-report-meta{margin-top:16px}
 @media print{.mc-result-presentation{display:none}.mc-report-context>*,.mc-report-provenance>*{display:block}}
 @media(max-width:767px){.mc-result-presentation>button{min-height:44px}}
+
+.mc-terminal-notice[data-state="BLOCKED"]{border-left-color:var(--state-partial)}
+.mc-terminal-notice[data-state="CANCELLED"]{border-left-color:var(--state-unknown)}

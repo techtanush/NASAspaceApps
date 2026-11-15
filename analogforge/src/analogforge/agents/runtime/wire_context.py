@@ -12,7 +12,7 @@ from analogforge.agents.schemas.task import AgentTask
 
 _UUID = r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 _UUID_RE = re.compile(_UUID)
-_DECODE = re.compile(r"~0|~[ercu][1-9][0-9]*|~")
+_DECODE = re.compile(r"~~|~[A-Za-z][0-9]+")
 _COLUMNS = {
     "gates": ["gate_id", "outcome", "reason_ref", "evidence_ref"],
     "receipts": ["id", "tool_name", "status", "evidence_ids"],
@@ -22,7 +22,7 @@ _COLUMNS = {
     "claim_gates": ["gates", "claim_id"],
 }
 WIRE_INSTRUCTIONS = (
-    "\nAliases: ~eN=evidence, ~rN=receipt, ~cN=claim, ~uN=UUID; ~0=literal ~. "
+    "\nAliases: ~eN=evidence, ~rN=receipt, ~cN=claim, ~uN=UUID; ~~=literal ~. "
     "Use supplied aliases; restore before validation. reason_ref/evidence_ref index "
     "reason_catalog/evidence_catalog (zero-based); gate_id/outcome index gate_value_catalogs. "
     "Rows pair with *_columns; retain fields/nulls/order. "
@@ -32,7 +32,7 @@ WIRE_INSTRUCTIONS = (
     "Review all outcomes/findings/UNKNOWNs/blockers. In submit_role_result, "
     'payload={"_task_payload_ref":"authoritative_submission.payload"} reuses that reviewed exact payload. '
     "Choose disposition/summary/issues/evidence_ids/next_action; or explicit payload. "
-    "Summary: one short sentence, max 800 restored characters; cite IDs in evidence_ids. "
+    "Summary: one short sentence under 160 characters, no aliases/IDs; cite evidence_ids. "
     "Schema errors are not evidence gaps or new approvals."
     " Read only missing facts."
 )
@@ -50,6 +50,26 @@ def _rows(value: Any, columns: list[str]) -> bool:
 def _compact_columns(wire: dict[str, Any]) -> None:
     payload, used = wire["payload"], []
     audit = payload.get("scientific_audit")
+    contract = payload.get("contract_context")
+    if isinstance(contract, dict) and "requirement_columns" not in contract:
+        rows = contract.get("requirements")
+        columns = list(rows[0]) if isinstance(rows, list) and len(rows) > 1 and isinstance(rows[0], dict) else []
+        if columns and isinstance(rows, list) and _rows(rows, columns):
+            contract["requirement_columns"] = columns
+            contract["requirements"] = [[row[key] for key in columns] for row in rows]
+            used.append("contract_requirements")
+    profile = payload.get("target_profile_context")
+    if isinstance(profile, dict):
+        metrics = profile.get("metrics")
+        detail = profile.get("payload")
+        if isinstance(metrics, list) and isinstance(detail, dict) and detail.get("metrics") == metrics:
+            detail.pop("metrics")
+            used.append("target_profile_metrics_copy")
+        columns = list(metrics[0]) if isinstance(metrics, list) and metrics and isinstance(metrics[0], dict) else []
+        if columns and isinstance(metrics, list) and "metric_columns" not in profile and _rows(metrics, columns):
+            profile["metric_columns"] = columns
+            profile["metrics"] = [[row[key] for key in columns] for row in metrics]
+            used.append("target_profile_metrics")
     if ("authoritative_claim_columns" not in payload
             and _rows(payload.get("authoritative_claims"), _COLUMNS["claims"])):
         payload["authoritative_claim_columns"] = _COLUMNS["claims"][:]
@@ -106,6 +126,17 @@ def expand_wire_columns(wire: dict[str, Any]) -> dict[str, Any]:
     payload = result["payload"]
     used = result.get("_wire_encoding", {}).pop("columns_v1", [])
     audit = payload.get("scientific_audit", {})
+    if "contract_requirements" in used:
+        contract = payload["contract_context"]
+        columns = contract.pop("requirement_columns")
+        contract["requirements"] = [dict(zip(columns, row, strict=True)) for row in contract["requirements"]]
+    if "target_profile_metrics" in used:
+        profile = payload["target_profile_context"]
+        columns = profile.pop("metric_columns")
+        profile["metrics"] = [dict(zip(columns, row, strict=True)) for row in profile["metrics"]]
+    if "target_profile_metrics_copy" in used:
+        profile = payload["target_profile_context"]
+        profile["payload"]["metrics"] = deepcopy(profile["metrics"])
     if "claims" in used:
         columns = payload.pop("authoritative_claim_columns")
         payload["authoritative_claims"] = [dict(zip(columns, row, strict=True))
@@ -211,7 +242,7 @@ class WireCodec:
         if isinstance(value, str):
             if value in self.aliases:
                 return self.aliases[value]
-            return self.pattern.sub(lambda match: "~0" if match[0] == "~" else self._alias(match[0]), value)
+            return self.pattern.sub(lambda match: "~~" if match[0] == "~" else self._alias(match[0]), value)
         return value
 
     def decode(self, value: Any) -> Any:
@@ -221,7 +252,7 @@ class WireCodec:
             return type(value)(self.decode(item) for item in value)
         if isinstance(value, str):
             def restore(match: re.Match[str]) -> str:
-                if match[0] == "~0":
+                if match[0] == "~~":
                     return "~"
                 if match[0] not in self.canonical:
                     raise UnknownWireAlias()
@@ -260,6 +291,12 @@ class WireCodec:
     def submission_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
         """Permit one exact task-bound payload reference; canonical validation remains mandatory."""
         result = deepcopy(schema)
+        # Ask for concise prose before generation; never truncate a returned assessment.
+        # The canonical 800-character bound still applies after alias restoration.
+        summary = result.get("properties", {}).get("summary")
+        if isinstance(summary, dict):
+            summary["maxLength"] = min(summary.get("maxLength", 800), 160)
+            summary["description"] = "One short outcome sentence. No IDs or aliases; use evidence_ids and issues."
         expected = self.task_document["payload"].get("authoritative_submission", {}).get("payload")
         if isinstance(expected, dict):
             result["properties"]["payload"] = {"anyOf": [result["properties"]["payload"], {

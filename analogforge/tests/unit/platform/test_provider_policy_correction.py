@@ -117,3 +117,47 @@ def test_unrecognized_policy_error_text_is_not_echoed():
     details = _validation_details(PolicyViolation(PRIVATE), task)
     assert PRIVATE not in str(details)
     assert details == [{"field": "arguments", "code": "schema_or_policy_validation_failed"}]
+
+
+@pytest.mark.parametrize("status", ["FAIL", "GAP", "UNKNOWN"])
+def test_qualification_correction_identifies_exact_computed_status_and_keeps_review_available(status, caplog):
+    task, context, registry, counts, _ = task_and_context()
+    evidence_id = uuid4()
+    row = {"requirement_id": "req-1", "comparison_receipt_id": None, "proposed_status": status,
+           "evidence_ids": [str(evidence_id)], "measurement_evidence_ids": [str(evidence_id)],
+           "basis": "DERIVED", "confidence": "UNASSESSED", "covered_subcriterion_ids": [],
+           "uncovered_subcriterion_ids": [], "limitations": []}
+    proposal = {**task.payload["prepared_submission"], "role_key": "qualification", "task_kind": "qualify_candidate",
+                "evidence_ids": [str(evidence_id)], "payload": {
+                    "candidate_revision_id": str(uuid4()), "qualification_draft_revision_id": str(uuid4()),
+                    "rows": [row], "qualified_use_requirement_ids": [], "partial_use_requirement_ids": [],
+                    "unsupported_use_requirement_ids": ["req-1"], "portfolio_revision_id": None,
+                    "critic_review_required": True}}
+    task = task.model_copy(update={"role_key": "qualification", "task_kind": "qualify_candidate",
+                                  "input_evidence_ids": [evidence_id],
+                                  "allowed_actions": ["continue", "request_review"],
+                                  "payload": {"prepared_submission": proposal,
+                                              "authoritative_submission": deepcopy(proposal)}})
+    context.role = task.role_key
+    invalid = deepcopy(proposal)
+    invalid["summary"] = PRIVATE
+    invalid["payload"]["rows"][0]["proposed_status"] = "PASS"
+    corrected = {**deepcopy(proposal), "summary": "The recorded criterion requires review.",
+                 "disposition": "NEEDS_USER_REVIEW", "next_action": "request_review"}
+    calls = []
+
+    class Client:
+        def create(self, **kwargs):
+            calls.append(deepcopy(kwargs))
+            return {"status": "completed", "output": [{"type": "function_call", "name": "submit_role_result",
+                    "call_id": f"proposal-{len(calls)}",
+                    "arguments": json.dumps(invalid if len(calls) == 1 else corrected)}]}
+
+    result = OpenAIProvider(Client()).run(task, registry, context)
+    feedback = next(item for item in calls[1]["input"] if item.get("type") == "function_call_output")
+    detail = json.loads(feedback["output"])["error"]["details"][0]
+    assert detail["field"] == "payload.rows.0.proposed_status" and detail["expected"] == status
+    assert PRIVATE not in feedback["output"] and PRIVATE not in caplog.text
+    assert len(calls) == counts.count("model_requests_per_run") == 2
+    assert result.disposition == "NEEDS_USER_REVIEW" and result.next_action == "request_review"
+    assert result.payload == corrected["payload"] and result.payload["rows"][0]["proposed_status"] == status

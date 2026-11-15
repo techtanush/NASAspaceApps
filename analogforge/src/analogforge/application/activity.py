@@ -109,7 +109,7 @@ def failure_code(event_type: str, status: str, payload: dict[str, Any]) -> str |
     return None
 
 
-def safe_label(value: Any, fallback: str) -> str:
+def safe_label(value: Any, fallback: str, *, limit: int = 160) -> str:
     """A bounded public record label, with credentials/URLs and controls removed."""
     if not isinstance(value, str):
         return fallback
@@ -117,7 +117,7 @@ def safe_label(value: Any, fallback: str) -> str:
     value = re.sub(r"https?://\S+", "[link omitted]", value)
     value = re.sub(r"(?i)(?:token|password|secret|api[_-]?key)\s*[:=]\s*\S+", "[REDACTED]", value)
     value = " ".join("".join(c for c in value if c.isprintable()).split())
-    return value[:160] or fallback
+    return value[:limit] or fallback
 
 
 def encode_cursor(workspace_id: str, run_id: str, seq: int) -> str:
@@ -170,6 +170,35 @@ class ActivityProjection:
             row = self.unit.get(kind, identifier)
             self.cache[key] = row if row and row.get("run_id") == self.run["id"] else None
         return self.cache[key]
+
+    def review_concerns(self, result: dict[str, Any], status: str) -> list[dict[str, Any]]:
+        """Admitted review concerns are operator-facing statements, never provider reasoning or verdicts."""
+        if status != "BLOCKED" or result.get("status") != "BLOCKED":
+            return []
+        submission = result.get("payload")
+        issues = submission.get("issues") if isinstance(submission, dict) else None
+        if not isinstance(issues, list):
+            return []
+        concerns = []
+        for issue in issues:
+            if not isinstance(issue, dict) or not isinstance(issue.get("severity"), str):
+                continue
+            if issue["severity"] not in {"WARNING", "BLOCKING"}:
+                continue
+            message = issue.get("message")
+            if not isinstance(message, str) or not message.strip():
+                continue
+            identifier = issue.get("requirement_id")
+            requirement = self.requirements.get(identifier, {}) if isinstance(identifier, str) else {}
+            public_message = safe_label(message, "Review concern unavailable", limit=801)
+            concerns.append({
+                "message": public_message[:800], "message_truncated": len(public_message) > 800,
+                "severity": issue["severity"],
+                "requirement_label": safe_label(requirement.get("label"), str(identifier)) if requirement else None,
+            })
+            if len(concerns) == 8:
+                break
+        return concerns
 
     def event(self, event: dict[str, Any]) -> dict[str, Any]:
         raw_payload = event.get("payload")
@@ -284,6 +313,7 @@ class ActivityProjection:
             "invocation_id": invocation.get("id"),
             "tool_receipt_id": receipt.get("id"),
             "role_result_id": role_result.get("id"),
+            "review_concerns": self.review_concerns(role_result, status),
             "evidence_count": len(evidence_ids),
             "evidence_ids_truncated": len(evidence_ids) > 128,
             "evidence_ids": evidence_ids[:128],

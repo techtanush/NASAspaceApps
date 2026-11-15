@@ -10,6 +10,7 @@ import time
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager, nullcontext
 from contextvars import ContextVar
+from copy import deepcopy
 from functools import partial
 from pathlib import Path
 from typing import Any, cast
@@ -137,6 +138,8 @@ class WorkflowEngine:
             cooldown=self._model_cooldown, **fallback_options(self.settings),
             min_request_interval_seconds=getattr(self.settings, "openai_min_request_interval_seconds", 0),
             primary_output_token_limit=getattr(self.settings, "openai_max_output_tokens", 4096),
+            nvidia_output_token_limit=getattr(self.settings, "nvidia_max_output_tokens", 1024),
+            primary_reasoning_effort=getattr(self.settings, "openai_reasoning_effort", None),
         )
 
     def _scenario(self, identifier: str) -> dict[str, Any]:
@@ -800,6 +803,9 @@ class WorkflowEngine:
             evidences = [e for e in evidences if e["id"] in established]
             targets = tx.list("target_profiles", {"run_id": run_id})
             target_operations = tx.list("scientific_operations", {"run_id": run_id, "operation": "CHARACTERIZE_TARGET"})
+            source_ingest_operations = tx.list(
+                "scientific_operations", {"run_id": run_id, "operation": "INGEST_LOCAL_DATASET"}
+            ) if role in {"earth_scout", "planetary_target"} else []
             candidates = tx.list("candidates", {"run_id": run_id})
             from analogforge.application import operator_context as operator_sources
 
@@ -848,8 +854,15 @@ class WorkflowEngine:
             "validation_receipt_id": receipt["id"],
             "target": targets[-1] if targets else None,
             "candidates": candidates,
+            "registered_receipts": receipts,
+            "target_operations": target_operations,
+            "source_ingest_operations": source_ingest_operations,
             **(extra or {}),
         }
+        from analogforge.agents.runtime.target_projection import target_coordinate_context
+
+        coordinate_context = target_coordinate_context(facts)
+        facts["target_coordinate_context"] = coordinate_context
         payload = project_payload(role, facts)
         choices = (extra or {}).get("allowed_choices", {})
         if role == "verification_replanning" and choices and payload.get("repair"):
@@ -876,6 +889,8 @@ class WorkflowEngine:
         )
         invocation_id = new_id()
         ledger = BudgetLedger.from_document(run.get("runtime", {}).get("budget"))
+        contract_context = {"accepted": True, "acceptance": acceptance, "contract_revision_id": mission["id"],
+                            "hash": mission["content_sha256"], "requirements": mission["requirements"]}
         task = AgentTask(
             workspace_id=UUID(workspace_id),
             run_id=UUID(run_id),
@@ -901,6 +916,11 @@ class WorkflowEngine:
                 "authoritative_claims": authoritative_claims,
                 "scientific_audit": (extra or {}).get("scientific_audit"),
                 "contract_acceptance": acceptance,
+                "contract_context": contract_context,
+                **({"target_profile_context": deepcopy(facts["target"])}
+                   if role in {"earth_scout", "planetary_target"} and facts["target"] else {}),
+                **({"target_coordinate_context": coordinate_context}
+                   if role in {"earth_scout", "planetary_target"} and facts["target"] else {}),
                 "untrusted_sources": [],
                 "authoritative_rover": rover,
                 "permitted_repairs": (extra or {}).get("diagnosis", {}).get("permitted_repairs", []),
@@ -932,8 +952,6 @@ class WorkflowEngine:
                     None,
                 )
                 if analysis is not None:
-                    from copy import deepcopy
-
                     proposed = deepcopy(proposal)
                     context_row = next(
                         (
@@ -966,13 +984,7 @@ class WorkflowEngine:
                     **({"operator_context": operator_sources.model_payload(context_snapshot)}
                        if context_snapshot["snapshot_sha256"] else {}),
                 },
-                "inspect_contract": lambda args: {
-                    "accepted": True,
-                    "acceptance": acceptance,
-                    "contract_revision_id": mission["id"],
-                    "hash": mission["content_sha256"],
-                    "requirements": mission["requirements"],
-                },
+                "inspect_contract": lambda args: deepcopy(contract_context),
                 "get_evidence": lambda args: {"evidence": [e for e in evidences if e["id"] in args["evidence_ids"]]},
             }
         )

@@ -6,7 +6,18 @@ import { ApiError } from './errors';
 import { handlers } from '../mock/handlers';
 import { workspaceId } from '../mock/state';
 const otherWorkspace='12345678-abcd-4123-8123-123456789abc';
-afterEach(()=>{vi.unstubAllGlobals();setSessionCsrf(undefined);});
+afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();setSessionCsrf(undefined);});
+it('bounds a stalled session request, clears the old token and never invents an authenticated workspace',async()=>{
+ vi.useFakeTimers();setSessionCsrf('old-workspace-token');
+ vi.stubGlobal('fetch',vi.fn((_url,init)=>new Promise((_resolve,reject)=>{
+  init.signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true});
+ })));
+ const rejected=expect(loadSession()).rejects.toMatchObject({code:'SESSION_UNAVAILABLE',retryable:true});
+ await vi.advanceTimersByTimeAsync(15000);await rejected;
+ const headers:Headers[]=[];
+ vi.stubGlobal('fetch',vi.fn(async(_url,init)=>{headers.push(new Headers(init.headers));return Response.json({revision:1});}));
+ await api.post('/missions',{});expect(headers[0]!.has('X-CSRF-Token')).toBe(false);
+});
 it('uses the authenticated server workspace instead of a fabricated development UUID and installs its CSRF before mutations',async()=>{
  const requests:{url:string;headers:Headers;credentials:unknown}[]=[];
  vi.stubGlobal('fetch',vi.fn(async(url,init)=>{requests.push({url:String(url),headers:new Headers(init.headers),credentials:init.credentials});return String(url)==='/auth/session'?Response.json({workspace_id:otherWorkspace,role:'EDITOR',csrf_token:'server-session-csrf'}):Response.json({revision:1});}));

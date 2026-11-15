@@ -52,6 +52,8 @@ class Settings(BaseSettings):
     openai_model: str | None = None
     openai_min_request_interval_seconds: float = Field(default=0, ge=0, le=60, allow_inf_nan=False)
     openai_max_output_tokens: int = Field(default=4096, ge=256, le=4096)
+    openai_reasoning_effort: Literal["none", "low", "medium", "high", "xhigh"] | None = None
+    nvidia_max_output_tokens: int = Field(default=1024, ge=256, le=4096)
     groq_api_key: SecretStr | None = None
     groq_model: str | None = None
     groq_fallback_enabled: bool = False
@@ -201,6 +203,8 @@ class Settings(BaseSettings):
             "openai_api_key",
             "openai_min_request_interval_seconds",
             "openai_max_output_tokens",
+            "openai_reasoning_effort",
+            "nvidia_max_output_tokens",
             "groq_api_key",
             "groq_model",
             "groq_fallback_enabled",
@@ -231,6 +235,10 @@ class Settings(BaseSettings):
             public["openai_min_request_interval_seconds"] = self.openai_min_request_interval_seconds
         if self.openai_max_output_tokens != 4096:
             public["openai_max_output_tokens"] = self.openai_max_output_tokens
+        if self.openai_reasoning_effort is not None:
+            public["openai_reasoning_effort"] = self.openai_reasoning_effort
+        if self.nvidia_max_output_tokens != 1024:
+            public["nvidia_max_output_tokens"] = self.nvidia_max_output_tokens
         if self.model_fallback_order is not None:
             public["model_fallback_chain"] = [
                 {"provider": provider, "model": getattr(self, provider + "_model"), "trigger": "http_429",

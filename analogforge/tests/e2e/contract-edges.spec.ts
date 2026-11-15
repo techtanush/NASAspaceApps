@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
-import {newMission,startRun,tab,api,inspectHooks,isMock,choose} from './support/workbench';
+import {newMission,startRun,runWorkbenchLink,tab,api,inspectHooks,isMock,choose} from './support/workbench';
 for(const decision of ['APPROVE_EVIDENCE','REJECT_EVIDENCE'] as const)test(`review scope ${decision} preserves frozen scientific results`,async({page})=>{
- await newMission(page,{preview:isMock()?'review-proxy':undefined});await page.getByTestId('btn-start-run').click();await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state','AWAITING_REVIEW');
+ await newMission(page,{preview:isMock()?'review-proxy':undefined});await page.getByTestId('btn-start-run').click();await (await runWorkbenchLink(page)).click();await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state','AWAITING_REVIEW',{timeout:isMock()?10000:180000});
  const runId=page.url().match(/\/runs\/([^/]+)/)![1];
  const before=await api<{pending_review:{review_id:string;kind:string;status:string}|null;mission_revision_id:string}>(page,`/runs/${runId}`);
  await tab(page,'qualification');
@@ -19,7 +19,8 @@ for(const decision of ['APPROVE_EVIDENCE','REJECT_EVIDENCE'] as const)test(`revi
 });
 test('blocked dependency retry retains accepted inputs and reaches review',async({page})=>{
  await newMission(page,{preview:isMock()?'blocked-worker':undefined});await page.getByTestId('btn-start-run').click();
- await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state',isMock()?'BLOCKED':/AWAITING_REVIEW|BLOCKED/);
+ await (await runWorkbenchLink(page)).click();
+ await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state',isMock()?'BLOCKED':/AWAITING_REVIEW|BLOCKED/,{timeout:isMock()?10000:180000});
  const runId=page.url().match(/\/runs\/([^/]+)/)![1];const before=await api<{blocked_dependencies:string[];mission_revision_id:string;rover_revision_id:string;mode:string}>(page,`/runs/${runId}`);
  if(before.body.blocked_dependencies.length){
   const retry=page.getByTestId('btn-retry-dependency').first();await expect(retry).toHaveAttribute('data-dependency-id',before.body.blocked_dependencies[0]);await inspectHooks(page);await retry.click();await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state','AWAITING_REVIEW');

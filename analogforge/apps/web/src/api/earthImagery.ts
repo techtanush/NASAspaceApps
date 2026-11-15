@@ -14,13 +14,14 @@ export const EARTH_IMAGERY_TILE_BUDGET = 256;
 const MAX_TILE_BYTES = 524288;
 const TILE_TIMEOUT_MS = 8000;
 const TILE_ROOT = 'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/GoogleMapsCompatible';
+const USGS_TILE_ROOT = 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile';
 
 export function earthImageryTileUrl(z: number, x: number, y: number, provider: EarthImageryProvider = 'eox'): string {
   if (![z, x, y].every(Number.isInteger) || z < 0 || z > earthImageryMaxZoom(provider)
     || x < 0 || y < 0 || x >= 2 ** z || y >= 2 ** z) throw new Error('Invalid satellite tile');
   // WMTS is matrix/row/column, whereas the map supplies z/x/y.
   return provider === 'usgs'
-    ? `https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/${z}/${y}/${x}`
+    ? `${USGS_TILE_ROOT}/${z}/${y}/${x}`
     : `${TILE_ROOT}/${z}/${y}/${x}.jpg`;
 }
 

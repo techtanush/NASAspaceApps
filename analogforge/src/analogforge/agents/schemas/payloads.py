@@ -92,7 +92,7 @@ class TargetPayload(PortModel):
     source_evidence_ids: list[UUID]
     measurement_evidence_ids: list[UUID]
     dimension_evidence: list[DimensionEvidence]
-    geometry_validation_receipt_id: UUID
+    geometry_validation_receipt_id: UUID | None
     comparison_ready: bool
 
 

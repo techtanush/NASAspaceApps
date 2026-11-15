@@ -18,19 +18,20 @@ import './styles/glass.css';
 import './styles/mission-control.css';
 import './styles/operator-context.css';
 import './styles/run-overview.css';
+const container=document.getElementById('root');
+const appRoot=container?createRoot(container):null;
+appRoot?.render(<main className="workspace-main" role="status" aria-live="polite"><section className="empty-state"><p className="context-label">AnalogForge</p><h1>Opening your workspace</h1><p>Checking your session. Your saved investigations will be available shortly.</p></section></main>);
 async function boot() {
   if (import.meta.env.VITE_API_MOCK === '1') {
     const { startMock } = await import('./mock/server');
     await startMock();
   }
   const session=await loadSession();
-  await Promise.all([document.fonts.load('14px Inter'), document.fonts.load('13px "IBM Plex Mono"')]);
+  // Local fonts use CSS font-display:swap. Their download must never block the workspace.
   const { default: App } = await import('./app/App');
-  const root = document.getElementById('root');
-  if (!root) throw new Error('Application root is missing');
-  createRoot(root).render(<App workspaceId={session.workspaceId} session={{workspaceId:session.workspaceId,role:session.role,authMode:session.authMode}}/>);
+  if (!appRoot) throw new Error('Application root is missing');
+  appRoot.render(<App workspaceId={session.workspaceId} session={{workspaceId:session.workspaceId,role:session.role,authMode:session.authMode}}/>);
 }
 void boot().catch((error: unknown) => {
-  const root = document.getElementById('root');
-  if(root){const detail=error as {code?:string;message?:string};createRoot(root).render(<main className="workspace-main"><section className="error-panel" role="alert" data-testid="error-panel" data-error-code={detail.code||'STARTUP_FAILED'}><h1>Workspace unavailable</h1><p>{detail.message||'The authenticated workspace could not be retrieved.'}</p><p>Check the backend connection and sign-in session, then retry.</p><button onClick={()=>location.reload()}>Retry workspace</button></section></main>);}
+  if(appRoot){const detail=error as {code?:string;message?:string};appRoot.render(<main className="workspace-main"><section className="error-panel" role="alert" data-testid="error-panel" data-error-code={detail.code||'STARTUP_FAILED'}><h1>Workspace unavailable</h1><p>{detail.message||'The authenticated workspace could not be retrieved.'}</p><p>Check the backend connection and sign-in session, then retry.</p><button onClick={()=>location.reload()}>Retry workspace</button></section></main>);}
 });

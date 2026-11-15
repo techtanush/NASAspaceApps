@@ -19,6 +19,18 @@ it('renders no invented graph when a measurement is unknown', () => {
   expect(container.querySelector('svg')).toBeNull();
 });
 
+it('keeps simple chart labels concise while technical labels and plotted evidence stay exact', () => {
+  const measured = { ...row, measurement: { ...row.measurement, value: 4.506562500000001 } };
+  const original = JSON.stringify(measured);
+  const { container, rerender } = render(<BenchmarkMeasurement row={measured} simplified/>);
+  expect(screen.getByRole('img', { name: /measured 4.507 deg/ })).toBeVisible();
+  const position = container.querySelector('circle')!.getAttribute('cx');
+  rerender(<BenchmarkMeasurement row={measured}/>);
+  expect(screen.getByRole('img', { name: /measured 4.506562500000001 deg/ })).toBeVisible();
+  expect(container.querySelector('circle')).toHaveAttribute('cx', position);
+  expect(JSON.stringify(measured)).toBe(original);
+});
+
 
 it('changes fraction labels to percentages while preserving the measured position and provenance', () => {
   const fractional = { ...row, requirement: { ...row.requirement, operator:'GTE', lower:0.05, upper:null, unit:'fraction' }, measurement: { ...row.measurement, value:0.002, unit:'fraction' } } as BenchmarkRow;

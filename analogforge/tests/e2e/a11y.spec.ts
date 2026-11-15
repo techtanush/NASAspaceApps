@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { newMission, startRun, tab, prove, isMock, inspectHooks } from './support/workbench';
+import { newMission, startRun, runWorkbenchLink, tab, prove, isMock, inspectHooks } from './support/workbench';
 
 async function assertAccessible(page: Page, screen: string) {
   const headings:Record<string,string>={S01:'Missions and runs',S02:'Mission authoring',S03:'Rover library',S04:'Mission authoring',S05:'Target evidence',S06:'Earth analog candidates',S07:'Qualification',S08:'Rover compatibility',S09:'Composite portfolio',S10:'Test lab',S11:'Test lab',S12:'Analog Passport'};
@@ -18,6 +18,7 @@ for (const width of [1440, 900, 390]) test(`UIX-07 S01–S12 accessible at ${wid
   await page.goto('/rovers'); await expect(page.getByTestId('rover-form')).toBeVisible(); await assertAccessible(page, 'S03');
   await newMission(page); await assertAccessible(page, 'S04');
   await page.getByTestId('btn-start-run').click();
+  await (await runWorkbenchLink(page)).click();
   await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state', 'AWAITING_REVIEW', { timeout: isMock() ? 10000 : 180000 });
   for (const [screen, name] of [['S05', 'target'], ['S06', 'analogs'], ['S07', 'qualification'], ['S08', 'compatibility'], ['S09', 'portfolio'], ['S10', 'test-lab']]) {
     await tab(page, name);

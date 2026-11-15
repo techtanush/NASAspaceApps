@@ -11,7 +11,8 @@ export function BenchmarkMeasurement({ row, simplified = false }: { row: Benchma
   const span = high - low || 1; const minimum = low < 0 ? low - span * .08 : 0; const maximum = high + span * .12;
   const x = (item: number) => 34 + ((item - minimum) / (maximum - minimum)) * 432;
   const unit = measurement.unit === 'none' || measurement.unit === '1' ? '' : measurement.unit ?? '';
-  const text = readableQuantity(value, unit, simplified);
+  const labelValue = simplified && unit !== 'fraction' ? Number(value.toPrecision(4)) : value;
+  const text = readableQuantity(labelValue, unit, simplified);
   const references = [...new Set(limits)];
   return <figure className="mc-measurement" data-testid="benchmark-measurement-chart" data-evidence-id={measurement.comparison_evidence_id ?? undefined}>
     <svg viewBox="0 0 500 96" role="img" aria-label={`${requirement.label}: measured ${text}. Accepted rule: ${benchmarkText(requirement, simplified)}.`}>
