@@ -160,3 +160,31 @@ def test_renderer_digest_is_stable_under_export_validation():
 
 def test_passport_metadata_requires_assurance_evidence():
     assert TABLES["passports"].c.assurance_evidence_id.nullable is False
+
+
+def test_live_preflight_receives_explicit_groq_fallback_configuration(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    import analogforge.adapters.openai.client as client_module
+    import analogforge.adapters.openai.probe as probe_module
+
+    captured = []
+
+    def configured_client(*args, **kwargs):
+        captured.append((args, kwargs))
+        return SimpleNamespace(provider="groq", model="explicit-groq-model")
+
+    monkeypatch.setattr(client_module, "ResponsesClient", configured_client)
+    monkeypatch.setattr(probe_module, "probe", lambda _: {"status": "PASSED"})
+    settings = Settings(_env_file=None, data_root=tmp_path,
+                        openai_api_key="fake-primary", openai_model="explicit-primary",
+                        groq_api_key="fake-secondary", groq_model="explicit-groq-model", groq_fallback_enabled=True)
+    report = run_preflight(settings, mode="live", scenario_id="live-hackathon-v1")
+    assert len(captured) == 1
+    args, options = captured[0]
+    assert args == ("fake-primary", "explicit-primary")
+    assert options["groq_api_key"] == "fake-secondary"
+    assert options["groq_model"] == "explicit-groq-model" and options["groq_fallback_enabled"] is True
+    gate = next(g for g in report["gates"] if g["code"] == "MODEL_CAPABILITY_READY")
+    assert "groq: explicit-groq-model" in str(gate)
+    assert "fake-secondary" not in str(report)

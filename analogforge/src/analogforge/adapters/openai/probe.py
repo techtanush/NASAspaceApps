@@ -8,6 +8,7 @@ from analogforge.agents.runtime.provider import ProviderError
 
 def probe(client: ResponsesClient) -> dict[str, str]:
     response = client.create(
+        max_output_tokens=1024,
         input="Call capability_probe with ok=true.",
         tools=[
             {
@@ -34,6 +35,7 @@ def probe(client: ResponsesClient) -> dict[str, str]:
     ):
         raise ProviderError("MODEL_CAPABILITY_FAILED", "Strict function-call probe failed")
     response2 = client.create(
+        max_output_tokens=1024,
         input=[
             *response["output"],
             {"type": "function_call_output", "call_id": calls[0]["call_id"], "output": '{"ok":true}'},

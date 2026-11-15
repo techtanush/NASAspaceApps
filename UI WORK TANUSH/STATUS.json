@@ -57,5 +57,13 @@
   "next_action": "Aradhya consumes DELIVERY.md and the v1 catalog/capability/contracts; merge contributor branches from common base, then run complete merged UI/backend gates",
   "common_handoff_ref": "refs/tags/ui-split-base-20261114",
   "validation_report": "UI WORK TANUSH/VALIDATION.json",
-  "source_sha256": "6def29012dd0f30fb1081da2c8412ba801e15157ca74d826a50abaf9b6006da3"
+  "source_sha256": "6def29012dd0f30fb1081da2c8412ba801e15157ca74d826a50abaf9b6006da3",
+  "visualization_validation_commit": "8744335a8d3b1abcf77053e2f03510b7dd48044f",
+  "model_fallback_delivery": {
+    "documentation": "UI WORK TANUSH/GROQ-FALLBACK.md",
+    "validation": "UI WORK TANUSH/GROQ-VALIDATION.json",
+    "enabled_by_default": false,
+    "trigger": "OPENAI_HTTP_429",
+    "original_rehearsal_restart_required": true
+  }
 }

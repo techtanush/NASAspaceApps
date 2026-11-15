@@ -50,6 +50,9 @@ class Settings(BaseSettings):
     oidc_client_secret: SecretStr | None = None
     openai_api_key: SecretStr | None = None
     openai_model: str | None = None
+    groq_api_key: SecretStr | None = None
+    groq_model: str | None = None
+    groq_fallback_enabled: bool = False
     earthdata_token: SecretStr | None = None
     map_tile_url: str | None = Field(default=None, repr=False)
     log_level: str = "INFO"
@@ -84,14 +87,17 @@ class Settings(BaseSettings):
         return value
 
     @field_validator(
-        "openai_api_key", "earthdata_token", "session_secret", "oidc_client_secret", "postgres_password", mode="before"
+        "openai_api_key", "groq_api_key", "earthdata_token", "session_secret", "oidc_client_secret",
+        "postgres_password",
+        mode="before",
     )
     @classmethod
     def _empty_secret(cls, value: object) -> object:
         return None if value == "" else value
 
     @field_validator(
-        "openai_model", "oidc_issuer_url", "oidc_client_id", "map_tile_url", "test_database_url", mode="before"
+        "openai_model", "groq_model", "oidc_issuer_url", "oidc_client_id", "map_tile_url", "test_database_url",
+        mode="before",
     )
     @classmethod
     def _empty_string(cls, value: object) -> object:
@@ -99,6 +105,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _validate_process(self) -> Settings:
+        if self.groq_fallback_enabled and not (self.groq_api_key and self.groq_model):
+            raise ValueError("Groq fallback requires GROQ_API_KEY and explicit GROQ_MODEL")
         if not self.database_url.startswith("postgresql+psycopg://"):
             raise ValueError("DATABASE_URL must use postgresql+psycopg")
         if self.auth_mode == "local" and self.api_host not in {"127.0.0.1", "::1", "localhost"}:
@@ -155,6 +163,9 @@ class Settings(BaseSettings):
             "session_secret",
             "oidc_client_secret",
             "openai_api_key",
+            "groq_api_key",
+            "groq_model",
+            "groq_fallback_enabled",
             "earthdata_token",
             "operator_limits_json",
             "api_docs",
@@ -162,7 +173,10 @@ class Settings(BaseSettings):
             "fake_openai_url",
             "map_tile_url",
         }
-        return self.model_dump(mode="json", exclude=excluded)
+        public = self.model_dump(mode="json", exclude=excluded)
+        if self.groq_fallback_enabled:
+            public["model_fallback"] = {"provider": "groq", "model": self.groq_model, "trigger": "openai_http_429"}
+        return public
 
     def pg_subprocess_environment(self) -> dict[str, str]:
         """Pass the selected DB password to PostgreSQL tools without placing it in argv."""
