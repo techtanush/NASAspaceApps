@@ -21,3 +21,4 @@ export const PROGRESS_STEPS = [
 ] as const;
 export const PROVING_LABEL: Record<string, string> = { DESIGNING_TEST: 'Designing the rover test', VERIFYING: 'Verifying the route independently', DIAGNOSING: 'Diagnosing a failed attempt', REPLANNING: 'Re-planning the test', BUILDING_PASSPORT: 'Building the report' };
 export const sentenceCase = (state: string) => state.toLowerCase().replaceAll('_', ' ').replace(/^./, letter => letter.toUpperCase());
+export const preparationProgress = (step: string) => step === 'PREPARE_FINGERPRINT' ? 'Preparing mission requirements' : sentenceCase(step);

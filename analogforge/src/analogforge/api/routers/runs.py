@@ -5,8 +5,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import JSONResponse
 
+from analogforge.api.contracts import public_document
 from analogforge.api.dependencies import Principal, get_principal, runtime
-from analogforge.api.router import build_route_group
+from analogforge.api.router import INTERNAL_PAYLOAD_KEYS, build_route_group
 from analogforge.application.activity import page
 
 OPERATION_IDS = frozenset(["createRun", "listRuns", "getRun", "submitRunAction", "streamRunEvents"])
@@ -18,6 +19,18 @@ def build_router() -> APIRouter:
 
 def build_activity_router() -> APIRouter:
     router = APIRouter(prefix="/api/v1")
+
+    @router.get("/workspace/recent-runs", operation_id="listRecentRuns", include_in_schema=False)
+    def recent_runs(
+        request: Request,
+        principal: Annotated[Principal, Depends(get_principal)],
+        limit: Annotated[int, Query(ge=1, le=20)] = 4,
+    ) -> JSONResponse:
+        # A bounded workspace projection, separate from the core ascending/cursor list.
+        with runtime(request).store.transaction(principal.workspace_id) as tx:
+            rows = tx.list("runs", limit=limit, newest_first=True, exclude=INTERNAL_PAYLOAD_KEYS["runs"])
+            result = {"items": [public_document(row, "RunSnapshot") for row in rows], "next_cursor": None}
+        return JSONResponse(result, headers={"Cache-Control": "no-store"})
 
     @router.get("/runs/{run_id}/activity", operation_id="getRunActivity", include_in_schema=False)
     def activity(

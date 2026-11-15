@@ -379,6 +379,7 @@ def handle(runtime: Any, job: dict[str, Any]) -> None:
             proposed = runtime.engine.prepare(
                 source, workspace_id, preparation_id=preparation_id, scenario_config_id=scenario_id,
                 mode=payload["mode"], model_request_charge=charge_fallback, provider_attempts=provider_attempts,
+                **({"rover_profile": rover} if rover is not None else {}),
                 **context_arguments,
             )
         finally:

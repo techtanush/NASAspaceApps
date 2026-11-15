@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { MotionConfig, motion, useReducedMotion } from 'motion/react';
@@ -44,10 +44,11 @@ export function useScene(scene: GlobeScene, handlers: { onPick?: (lat: number, l
 }
 export function Panel({ title, step, lead, children, footer, notice, testid }: { title: string; step?: string; lead?: ReactNode; children: ReactNode; footer?: ReactNode; notice?: ReactNode; testid?: string }) {
   const reducedMotion = useReducedMotion();
+  const body = useRef<HTMLDivElement>(null); const hasNotice = Boolean(notice);
+  useEffect(() => { if (hasNotice) body.current?.scrollTo({ top: 0, behavior: 'instant' }); }, [hasNotice]);
   return <motion.section className="mc-panel panel" data-theme="light" data-testid={testid} aria-labelledby="mc-panel-title" initial={reducedMotion ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reducedMotion ? 0 : .22, ease: [.22, 1, .36, 1] }}>
     <header className="mc-panel-head">{step && <p className="mc-eyebrow">{step}</p>}<h1 id="mc-panel-title" tabIndex={-1}>{title}</h1>{lead && <p className="mc-lead">{lead}</p>}</header>
-    {notice && <div className="mc-panel-notice">{notice}</div>}
-    <div className="mc-panel-body">{children}</div>
+    <div className="mc-panel-body" ref={body}>{notice && <div className="mc-panel-notice">{notice}</div>}{children}</div>
     {footer && <footer className="mc-panel-foot">{footer}</footer>}
   </motion.section>;
 }

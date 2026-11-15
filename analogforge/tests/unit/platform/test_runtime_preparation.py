@@ -10,6 +10,7 @@ from pydantic import SecretStr
 
 from analogforge.application.scheduler import WorkflowEngine, WorkflowError
 from analogforge.ports import catalog
+from analogforge.ports.hashing import canonical_sha256
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -61,6 +62,25 @@ def test_live_preparation_does_not_require_a_synthetic_mission_preset(tmp_path, 
     engine, mission, _, _ = live_drafting(tmp_path, monkeypatch)
     monkeypatch.setattr(engine, "_scenario", lambda _: {"body": "MARS", "mission_preset": None})
     assert engine.prepare(mission, str(uuid4()), mode="live")["target"] == mission["target"]
+
+
+def test_live_preparation_receives_exact_saved_rover_as_declaration_not_operator_background(tmp_path, monkeypatch):
+    engine, mission, _, calls = live_drafting(tmp_path, monkeypatch)
+    workspace = str(uuid4())
+    content = json.loads((ROOT / "tests/fixtures/kit/rovers/ares-1.json").read_text())
+    rover = {**content, "schema_version": "1.0", "workspace_id": workspace, "id": str(uuid4()),
+             "rover_id": str(uuid4()), "revision": 1, "created_at": "2026-11-15T00:00:00Z",
+             "content_sha256": canonical_sha256(content)}
+    engine.prepare(mission, workspace, mode="live", rover_profile=rover)
+    prompt = json.loads(calls[0]["input"])
+    assert prompt["selected_rover_profile"] == rover
+    assert prompt["selected_rover_profile"]["energy_model"]["calibration_status"] == "ASSUMED"
+    assert prompt["selected_rover_profile"]["max_obstacle_height_m"] is None
+    assert "not calibrated or observed performance" in prompt["instruction"]
+    assert "Workflow acceptance state belongs in contract metadata" in prompt["instruction"]
+    with pytest.raises(WorkflowError) as caught:
+        engine.prepare(mission, str(uuid4()), mode="live", rover_profile=rover)
+    assert caught.value.code == "REVISION_CONFLICT" and len(calls) == 1
 
 
 @pytest.mark.parametrize("assumptions", [[], ["User source scope", "User source scope"]])

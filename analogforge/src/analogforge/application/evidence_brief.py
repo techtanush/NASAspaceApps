@@ -19,6 +19,7 @@ from pydantic import ValidationError
 
 from analogforge.api.errors import ApiError
 from analogforge.application.activity import FAILURE_SUMMARIES, failure_code
+from analogforge.application.site_test_plan import field_plan
 from analogforge.application.visualization_benchmarks import site_benchmarks
 from analogforge.application.visualization_detail import (
     authorized_subject,
@@ -197,6 +198,7 @@ def build_snapshot(uow: Any, blobs: Any, run_id: str, candidate_id: str) -> dict
             snapshot["attempts"].append({key: result.get(key) for key in (
                 "id", "test_id", "outcome", "failure_category", "verified_route_sha256", "limitations",
                 "evidence_ids", "metrics")})
+    snapshot["test_plan"] = field_plan(uow, blobs, run, mission, candidate, rover, own_tests, operations)
     image_bytes = 0
     for selected, label in ((None, "Planetary target"), (candidate_id, "Earth location")):
         detail = site_detail(uow, blobs, run_id, selected)
@@ -226,6 +228,24 @@ def build_snapshot(uow: Any, blobs: Any, run_id: str, candidate_id: str) -> dict
     if len(json.dumps(snapshot, ensure_ascii=False, allow_nan=False).encode()) > MAX_INPUT:
         raise ApiError("RESOURCE_LIMIT", "This evidence snapshot exceeds the PDF input byte bound.", 422)
     return snapshot
+
+
+def build_packet(uow: Any, blobs: Any, run_id: str) -> dict[str, Any]:
+    """A bounded multi-location planning brief at one transactional run revision."""
+    run, _mission, _candidate, _aoi = authorized_subject(uow, run_id)
+    identifiers = run.get("candidate_ids", [])
+    if not identifiers or len(identifiers) > 8:
+        raise ApiError("RESOURCE_LIMIT", "The combined brief supports one to eight locations; "
+                       "use individual PDFs.", 422)
+    locations = [build_snapshot(uow, blobs, run_id, identifier) for identifier in identifiers]
+    # Concise dossier contains charts and route vectors; registered raster images remain in individual appendices.
+    for location in locations:
+        location["images"] = []
+        location.pop("snapshot_sha256")
+        location["snapshot_sha256"] = canonical_sha256(location)
+    packet = {"schema_version": "mission-test-brief.v1", "locations": locations, "run": locations[0]["run"]}
+    packet["snapshot_sha256"] = canonical_sha256(packet)
+    return packet
 
 
 def render_pdf(snapshot: dict[str, Any]) -> bytes:

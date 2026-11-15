@@ -226,7 +226,14 @@ class WorkflowEngine:
         model_request_charge: Callable[[], None] | None = None,
         provider_attempts: list[dict[str, Any]] | None = None,
         operator_context: dict[str, Any] | None = None,
+        rover_profile: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
+        if rover_profile is not None:
+            from analogforge.ports.domain_models import RoverProfile
+
+            rover_profile = RoverProfile.model_validate(rover_profile).model_dump(mode="json")
+            if rover_profile["workspace_id"] != workspace_id:
+                raise WorkflowError("REVISION_CONFLICT", "Preparation rover belongs to another workspace")
         scenario_id = (
             scenario_config_id
             or mission.get("scenario_config_id")
@@ -295,13 +302,22 @@ class WorkflowEngine:
                             "user review: mark origin PROPOSED_DEFAULT and state this in acceptance_note. "
                             "No terrain measurements, source availability, synthetic-data assumptions, rover, energy "
                             "model, sampling tasks or waypoint locations may be inferred from a practice preset. "
+                            "selected_rover_profile is the exact saved declared profile when present, otherwise null. "
+                            "Do not claim a selected profile or its declared energy model is absent. These are "
+                            "declarations, not calibrated or observed performance; operator background cannot "
+                            "override its numeric fields. A supplied rover adds no unrequested route/obstacle test. "
                             "Do not invent waypoints or claim that generated fixtures represent the user's data. "
                             "Scope statements and exclusions, including no rover experiment, belong in proposed "
-                            "assumptions, never fictitious measurement requirements. Policies with unresolved rules "
+                            "assumptions only when actually true; no rover experiment is distinct from no rover "
+                            "profile. Workflow acceptance state belongs in contract metadata, not enduring "
+                            "scientific assumptions. "
+                            "Do not add temporal claims such as 'this contract is unaccepted' to assumptions. "
+                            "Never create fictitious measurement requirements. Policies with unresolved rules "
                             "or unavailable evidence cannot promise qualification. No acceptance or measured facts."
                         ),
                         "mode": mode,
                         "draft": mission,
+                        "selected_rover_profile": rover_profile,
                         **({"untrusted_operator_context": operator_context} if operator_context else {}),
                         "algorithm_config_version": algorithms["config_version"],
                         "algorithm_config_sha256": canonical_sha256(algorithms),
@@ -782,6 +798,18 @@ class WorkflowEngine:
         if (mission["id"] != run["mission_revision_id"] or mission["content_sha256"]
                 != run.get("runtime", {}).get("mission_content_sha256")):
             raise WorkflowError("REVISION_CONFLICT", "Role contract differs from the run's pinned revision or hash")
+        rover_validation = None
+        if role == "rover_systems":
+            from analogforge.agents.runtime.rover_projection import profile_validation_report
+
+            if (not rover or rover["id"] != run.get("rover_revision_id")
+                    or rover["workspace_id"] != workspace_id
+                    or rover["content_sha256"] != run.get("runtime", {}).get("rover_content_sha256")):
+                raise WorkflowError("REVISION_CONFLICT", "Rover review requires the run's exact saved profile and hash")
+            self._charge(run_id, workspace_id, "tool_calls_per_run")
+            run, mission, rover = self._load(run_id, workspace_id)
+            assert rover is not None
+            rover_validation = profile_validation_report(rover)
         with self.store.transaction(workspace_id) as tx:
             acceptances = tx.list("mission_acceptances", {"mission_revision_id": mission["id"]})
             if not acceptances or not acceptances[0].get("accepted_at"):
@@ -840,7 +868,27 @@ class WorkflowEngine:
                 },
             )
             tx.create("tool_receipts", receipt)
+            if rover_validation is not None:
+                validation_receipt = ToolReceipt.model_validate({
+                    **envelope(workspace_id, run_id, run["mode"]),
+                    "invocation_id": new_id(), "tool_name": "validate_rover_profile", "tool_version": "1.0.0",
+                    "input_sha256": canonical_sha256(rover), "output_sha256": canonical_sha256(rover_validation),
+                    "evidence_ids": [], "status": "SUCCEEDED" if rover_validation["valid"] else "FAILED",
+                    "error_code": None if rover_validation["valid"] else "INPUT_INVALID",
+                    "elapsed_ms": 0, "cache_hit": False,
+                }).model_dump(mode="json")
+                tx.create("invocations", {
+                    "id": validation_receipt["invocation_id"], "workspace_id": workspace_id, "run_id": run_id,
+                    "preparation_id": None, "mode": run["mode"], "role": role,
+                    "status": validation_receipt["status"], "task_kind": "validate_rover_profile",
+                    "input_hash": canonical_sha256(rover), "validation_report": rover_validation,
+                })
+                tx.create("tool_receipts", validation_receipt)
         receipts.append(receipt)
+        if rover_validation is not None:
+            receipts.append(validation_receipt)
+            if not rover_validation["valid"]:
+                raise WorkflowError("INPUT_INVALID", "The pinned rover declaration failed deterministic validation")
         facts = {
             "mission": mission,
             "rover": rover,
@@ -851,7 +899,7 @@ class WorkflowEngine:
             "target_measurement_spec_id": (
                 target_operations[-1]["request"]["inputs"]["measurement_spec_id"] if target_operations else None
             ),
-            "validation_receipt_id": receipt["id"],
+            "validation_receipt_id": validation_receipt["id"] if rover_validation is not None else receipt["id"],
             "target": targets[-1] if targets else None,
             "candidates": candidates,
             "registered_receipts": receipts,
@@ -923,6 +971,9 @@ class WorkflowEngine:
                    if role in {"earth_scout", "planetary_target"} and facts["target"] else {}),
                 "untrusted_sources": [],
                 "authoritative_rover": rover,
+                **({"rover_validation_context": {
+                    "receipt_id": validation_receipt["id"], "report": deepcopy(rover_validation),
+                }} if rover_validation is not None else {}),
                 "permitted_repairs": (extra or {}).get("diagnosis", {}).get("permitted_repairs", []),
                 "allowed_choices": (extra or {}).get("allowed_choices", {}),
                 "receipt_summaries": [
@@ -988,6 +1039,13 @@ class WorkflowEngine:
                 "get_evidence": lambda args: {"evidence": [e for e in evidences if e["id"] in args["evidence_ids"]]},
             }
         )
+        if rover_validation is not None:
+            def validated_profile(arguments: dict[str, Any]) -> dict[str, Any]:
+                if arguments["profile_revision_id"] != rover_validation["profile_revision_id"]:
+                    raise PolicyViolation("ROVER_REVISION_NOT_AUTHORIZED")
+                return {"validation_receipt_id": validation_receipt["id"], "report": deepcopy(rover_validation)}
+
+            registry.handlers["validate_rover_profile"] = validated_profile
         if run["mode"] == "live":
             provider: Any = OpenAIProvider(self._provider_client())
         elif run["mode"] == "replay":

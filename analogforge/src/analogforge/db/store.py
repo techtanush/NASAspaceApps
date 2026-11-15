@@ -130,11 +130,13 @@ class UnitOfWork:
         exclude: Sequence[str] = (),
         after: tuple[str, str] | None = None,
         limit: int | None = None,
+        newest_first: bool = False,
     ) -> list[dict[str, Any]]:
         """Rows of one kind in (created_at, id) order.
 
         ``exclude`` drops stored-only payload keys inside PostgreSQL, ``after`` is a keyset position
         ``(created_at, id)`` and ``limit`` bounds the page, so a page never loads more than it returns.
+        The default ascending order preserves the core API; UI recent lists explicitly reverse it.
         """
         table = _table(kind)
         query = sa.select(_payload(table, exclude)).where(table.c.workspace_id == self.workspace_id)
@@ -151,11 +153,15 @@ class UnitOfWork:
                 query = query.where(table.c.document_json[name].astext == str(value))
         if after is not None:
             moment = datetime.fromisoformat(after[0].replace("Z", "+00:00"))
-            query = query.where(
-                sa.tuple_(table.c.created_at, table.c.id)
-                > sa.tuple_(sa.literal(moment, table.c.created_at.type), sa.literal(UUID(after[1]), table.c.id.type))
+            position = sa.tuple_(table.c.created_at, table.c.id)
+            boundary = sa.tuple_(
+                sa.literal(moment, table.c.created_at.type), sa.literal(UUID(after[1]), table.c.id.type)
             )
-        query = query.order_by(table.c.created_at, table.c.id)
+            query = query.where(position < boundary if newest_first else position > boundary)
+        query = query.order_by(
+            table.c.created_at.desc() if newest_first else table.c.created_at,
+            table.c.id.desc() if newest_first else table.c.id,
+        )
         if limit is not None:
             query = query.limit(limit)
         return [document(row) for row in self.connection.execute(query).scalars()]

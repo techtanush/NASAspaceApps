@@ -10,6 +10,7 @@ import { RunTerminalNotice } from './RunTerminalNotice';
 import { SiteTestPurpose } from './SiteTestPurpose';
 import { EvidenceBriefDownload } from './EvidenceBriefDownload';
 import { ResultPresentation } from './ResultPresentation';
+import { SiteFieldPlan } from './SiteFieldPlan';
 
 export function ReportPage() {
   const { runId } = useParams(); const [search, setSearch] = useSearchParams(); const run = useRunData(runId); const assurance = useRunAssurance(run.snapshot, run.contract, run.rover);
@@ -22,12 +23,13 @@ export function ReportPage() {
   const technical = presentationAvailable && search.get('detail') === 'technical';
   const changePresentation = (next: boolean) => setSearch(current => { if (next) current.set('detail', 'technical'); else current.delete('detail'); return current; }, { replace: true });
   return <article className="mc-report" data-theme="light" data-testid="site-report">
-    <nav className="mc-report-actions" aria-label="Report actions"><Link to={`/runs/${runId}/tour?site=${site.candidate.id}`}>Back to location</Link><EvidenceBriefDownload key={site.candidate.id} run={snapshot} candidateId={site.candidate.id}/><Button variant="ghost" onClick={() => window.print()}>Print this page</Button></nav>
+    <nav className="mc-report-actions" aria-label="Report actions"><Link to={`/runs/${runId}/tour?site=${site.candidate.id}`}>Back to location</Link><EvidenceBriefDownload key={site.candidate.id} run={snapshot} candidateId={site.candidate.id}/><EvidenceBriefDownload key={`all-${site.candidate.id}`} run={snapshot} candidateId={site.candidate.id} allLocations/><Button variant="ghost" onClick={() => window.print()}>Print this page</Button></nav>
     <header className="mc-report-heading"><p className="mc-eyebrow">AnalogForge · current evidence brief</p><h1 tabIndex={-1}>{site.candidate.name}</h1><p className="mc-report-mission">{contract.name}</p><p>{formatPlace(site.lat, site.lng)} · Location {site.index} · <ModeBadge mode={snapshot.mode}/></p></header>
     <RunTerminalNotice run={snapshot}/>
     {presentationAvailable && <ResultPresentation technical={technical} onChange={changePresentation}/>}
     <p className="mc-report-scope">Current evidence at run revision {snapshot.revision}. This brief is not an immutable published passport. It covers the terrain data and candidate windows screened by this investigation.</p>
     <SiteTestPurpose site={site}/>
+    <SiteFieldPlan key={site.candidate.id} runId={snapshot.run_id} candidateId={site.candidate.id} revision={snapshot.revision}/>
     <section className="mc-report-results" aria-label="Location benchmarks"><h2>Benchmarks and measured results</h2><BenchmarkEvidence run={snapshot} contract={contract} site={site} technical={technical}/></section>
     <details className="mc-report-context" open={technical || undefined}><summary>Weather and operating context</summary><EnvironmentContext run={snapshot} candidateId={site.candidate.id} report/></details>
     <section className="mc-report-limitations"><h2>Limits of this location</h2><ul>{site.candidate.limitations.map(item => <li key={item}>{item}</li>)}</ul><p>Earth locations cannot reproduce every planetary condition. Modeled qualification does not establish physical rover performance.</p></section>

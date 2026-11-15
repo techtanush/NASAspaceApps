@@ -20,6 +20,7 @@ from fastapi.testclient import TestClient
 
 from analogforge.api.contracts import public_document, specification
 from analogforge.api.dependencies import Principal
+from analogforge.api.errors import ApiError
 from analogforge.api.router import INTERNAL_PAYLOAD_KEYS, LISTS, READS
 from analogforge.application.seed import seed_synthetic
 from analogforge.db.store import Store
@@ -128,6 +129,53 @@ def test_a_list_page_loads_one_extra_row_not_the_table(journey_store: Store, tmp
     assert len(selects) == 1 and "LIMIT" in selects[0]
     with journey_store.engine.connect() as connection:  # the query is bounded by the limit it was given
         assert connection.execute(sa.text("select count(*) from missions")).scalar_one() >= 7
+
+
+@pytest.mark.db
+def test_recent_runs_are_scoped_bounded_and_newest_first_without_changing_core_order(journey_store: Store, tmp_path):
+    workspace, original = seed_run(journey_store)
+    other_workspace, foreign = seed_run(journey_store)
+    assert other_workspace != workspace
+    with journey_store.transaction(workspace) as unit:
+        for index in range(7):
+            unit.create("runs", {
+                **original, "id": str(uuid4()), "state": "FAILED" if index % 2 else "COMPLETED",
+                "runtime": {"private": "do-not-return-internal-runtime"},
+            })
+        expected = unit.list("runs", newest_first=True)
+        boundary = expected[2]
+        continued = unit.list("runs", newest_first=True, after=(boundary["created_at"], boundary["id"]), limit=3)
+        assert continued == expected[3:6]
+    client = make_client(journey_store, tmp_path, workspace)
+    responses: list[Any] = []
+    sql = statements(journey_store, lambda: responses.append(client.get(
+        "/api/v1/workspace/recent-runs", params={"limit": 4}, headers={"X-Workspace-ID": other_workspace},
+    )))
+    response = responses[0]
+    assert response.status_code == 200 and response.headers["cache-control"] == "no-store"
+    assert response.json() == {
+        "items": [public_document(row, "RunSnapshot") for row in expected[:4]], "next_cursor": None,
+    }
+    assert foreign["id"] not in response.text and "do-not-return-internal-runtime" not in response.text
+    selects = [s for s in sql if s.startswith("SELECT") and "FROM runs" in s]
+    assert len(selects) == 1 and "LIMIT" in selects[0] and "document_json - CAST" in selects[0]
+    assert "ORDER BY runs.created_at DESC, runs.id DESC" in selects[0]
+    core = client.get("/api/v1/runs", params={"limit": 20})
+    assert [row["id"] for row in core.json()["items"]] == [row["id"] for row in reversed(expected)]
+
+
+@pytest.mark.db
+def test_recent_runs_reject_invalid_limits_and_require_identity(journey_store: Store, tmp_path):
+    workspace, _ = seed_run(journey_store)
+    client = make_client(journey_store, tmp_path, workspace)
+    for limit in [0, 21, "not-a-number", 1.5]:
+        assert client.get("/api/v1/workspace/recent-runs", params={"limit": limit}).status_code == 422
+
+    def unauthenticated(_request):
+        raise ApiError("UNAUTHENTICATED", "A verified session is required.", 401)
+
+    client.app.state.identity_provider = unauthenticated
+    assert client.get("/api/v1/workspace/recent-runs").status_code == 401
 
 
 @pytest.mark.db

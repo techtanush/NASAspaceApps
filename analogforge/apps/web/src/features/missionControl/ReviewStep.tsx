@@ -19,6 +19,8 @@ import { ExactTargetBounds } from './PracticeTargetArea';
 import { bindOperatorContext, getContextBinding, getPinnedOperatorContext, previewOperatorContext, startContextRun, type ContextSnapshot } from '../../api/operatorContext';
 import { PinnedContextReview, SavedContextReview } from '../operatorContext/ContextReview';
 import { hasContextDraft } from '../operatorContext/OperatorContextEditor';
+import { preparationProgress } from './narrator';
+import { ContractConditions } from './ContractConditions';
 
 type S = components['schemas']; type Phase = 'idle' | 'creating' | 'preparing' | 'proposed' | 'starting';
 const pause = (ms: number, signal: AbortSignal) => new Promise<void>((resolve, reject) => { if (signal.aborted) { reject(signal.reason); return; } const finish = () => { signal.removeEventListener('abort', abort); resolve(); }; const timer = setTimeout(finish, ms); const abort = () => { clearTimeout(timer); reject(signal.reason); }; signal.addEventListener('abort', abort, { once: true }); });
@@ -72,7 +74,7 @@ export function ReviewStep() {
       setPhase('preparing'); setProgress('Proposing measurable requirements');
       const accepted = job.current ?? await api.post<S['PreparationAccepted']>(`/missions/${created.id}/fingerprint`, { expected_revision: created.revision, mode: launch.mode, rover_revision_id: rover } satisfies S['FingerprintInput'], { key: keys.current.prepare, signal: controller.current.signal, recover: () => api.get(`/missions/${created.id}`) }); job.current = accepted;
       let status = await api.get<S['JobStatus']>(`/jobs/${accepted.job_id}`, {signal:controller.current.signal});
-      for (let attempt = 0; attempt < 600 && alive.current && (status.state === 'QUEUED' || status.state === 'RUNNING'); attempt++) { setProgress(status.progress_step || 'Proposing measurable requirements'); await pause(700, controller.current.signal); status = await api.get<S['JobStatus']>(`/jobs/${accepted.job_id}`, {signal:controller.current.signal}); }
+      for (let attempt = 0; attempt < 600 && alive.current && (status.state === 'QUEUED' || status.state === 'RUNNING'); attempt++) { setProgress(preparationProgress(status.progress_step || 'Proposing measurable requirements')); await pause(700, controller.current.signal); status = await api.get<S['JobStatus']>(`/jobs/${accepted.job_id}`, {signal:controller.current.signal}); }
       if (!alive.current) return;
       if (status.state !== 'SUCCEEDED' || !status.proposed_revision_id) {
         if (status.state === 'FAILED' || status.state === 'BLOCKED' || status.state === 'CANCELLED') {
@@ -129,5 +131,6 @@ export function ReviewStep() {
     <section className="mc-coverage" data-testid="review-coverage" data-coverage={coverage.state}><div><strong>Terrain coverage: {coverage.state.toLowerCase()}</strong><p>{coverage.message}</p>{coverage.data?.datasets.map(dataset=><p className="helper" key={`${dataset.id}:${dataset.version}`}>{dataset.id} · native resolution {dataset.native_resolution_m===null?'unknown':`${dataset.native_resolution_m} m`} · comparison support {dataset.comparison_support_m===null?'unknown':`${dataset.comparison_support_m} m`}</p>)}</div></section>
     {coverage.error!=null&&<ErrorPanel error={coverage.error}/>}
     {contract && <section className="mc-requirements" data-testid="proposed-requirements" aria-label="Proposed requirements"><h2>Requirements to be locked</h2><ul>{contract.requirements.map(requirement => <li key={requirement.id} data-testid="proposed-requirement"><strong>{requirement.label}</strong><span className="mc-rule">Rule: {benchmarkText(requirement)}</span><span className="mc-tags"><span className="revision-badge">{ORIGIN_LABEL[requirement.origin]}</span>{requirement.mandatory ? <span className="revision-badge">Mandatory</span> : <span className="revision-badge">Optional</span>}</span></li>)}</ul></section>}
+    {contract && <ContractConditions contract={contract}/>}
   </Panel>;
 }
