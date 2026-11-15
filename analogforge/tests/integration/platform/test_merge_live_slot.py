@@ -53,10 +53,12 @@ def test_rehearsal_requires_hooks_and_an_isolated_config(tmp_path):
     from analogforge.application.rehearsal import bind_live_slot
 
     with pytest.raises(DatasetError, match='TEST_HARNESS'):
-        bind_live_slot(Settings(_env_file=None, data_root=tmp_path))
+        bind_live_slot(Settings(_env_file=None, data_root=tmp_path, test_hooks=False,
+                                allow_test_harness_provider=False))
     with pytest.raises(DatasetError, match='isolated'):
         bind_live_slot(Settings(_env_file=None, data_root=tmp_path, test_hooks=True,
-                                allow_test_harness_provider=True))
+                                allow_test_harness_provider=True,
+                                config_dir=Path(__file__).parents[3] / 'config'))
 
 
 def test_harness_cannot_establish_real_source_validation_or_unlabelled_claims():

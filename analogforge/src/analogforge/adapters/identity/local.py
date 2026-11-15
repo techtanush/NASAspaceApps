@@ -46,12 +46,16 @@ class IdentityService:
     def authenticate(self, token: str, workspace_id: str) -> Principal:
         with self.store.transaction(workspace_id) as unit:
             sessions = unit.list("sessions", {"token_hash": hashlib.sha256(token.encode()).hexdigest()})
-        if len(sessions) != 1:
-            raise PersistenceError("AUTHENTICATION_REQUIRED", "Session is invalid")
-        session = sessions[0]
-        if datetime.fromisoformat(session["expires_at"].replace("Z", "+00:00")) <= datetime.now(UTC):
-            raise PersistenceError("AUTHENTICATION_REQUIRED", "Session expired")
-        return Principal(session["user_id"], workspace_id, session["role"], session["csrf_token"])
+            if len(sessions) != 1:
+                raise PersistenceError("AUTHENTICATION_REQUIRED", "Session is invalid")
+            session = sessions[0]
+            if datetime.fromisoformat(session["expires_at"].replace("Z", "+00:00")) <= datetime.now(UTC):
+                raise PersistenceError("AUTHENTICATION_REQUIRED", "Session expired")
+            memberships = unit.list("workspace_memberships", {"user_id": session["user_id"]})
+            if len(memberships) != 1 or memberships[0]["role"] not in {"OWNER", "EDITOR", "VIEWER"}:
+                raise PersistenceError("AUTHENTICATION_REQUIRED", "Workspace membership is no longer valid")
+            # Permissions follow the current membership, including downgrades after login.
+            return Principal(session["user_id"], workspace_id, memberships[0]["role"], session["csrf_token"])
 
     def revoke(self, token: str, workspace_id: str) -> None:
         with self.store.transaction(workspace_id) as unit:

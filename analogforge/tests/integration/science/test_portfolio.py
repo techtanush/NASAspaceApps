@@ -189,6 +189,26 @@ def test_fixture5_inconclusive_verification_removes_route_dependent_full_but_kee
     assert cov(prelim)["R-EXPOSURE"] == "UNKNOWN" and prelim.selected_window_ids == []
 
 
+@pytest.mark.parametrize("verification", [None, "FAIL", "INCONCLUSIVE"])
+def test_route_row_without_current_pass_cannot_be_full_or_invent_a_partial(verification) -> None:
+    exposure = req("R-EXPOSURE", "unique_slope_exposure_m")
+    rows = [row("A", "R-MOB"), row("A", "R-EXPOSURE")]
+    supplied = None if verification is None else {"A": ver(verification)}
+    output = run([MOB, exposure], ["A"], rows, verification=supplied)
+    assert output.selected_window_ids == ["A"]
+    assert cov(output) == {"R-MOB": "FULL", "R-EXPOSURE": "UNKNOWN"}
+    assert output.objective_value == 1
+
+
+def test_failed_coupling_does_not_relabel_a_pass_as_supported_partial() -> None:
+    grouped = req("R-GROUP", "slope_band_area_fraction", group="G")
+    other = req("R-OTHER", "surface_temperature_min_k", group="G")
+    output = run([MOB, grouped, other], ["A"], [row("A", "R-MOB"), row("A", "R-GROUP"),
+                                               row("A", "R-OTHER", status="UNKNOWN")],
+                 verification={"A": ver("PASS")})
+    assert cov(output)["R-GROUP"] == "UNKNOWN" and cov(output)["R-OTHER"] == "UNKNOWN"
+
+
 def test_fixture6_equal_solutions_are_stable_across_input_order() -> None:
     rows = [row("S2", "R-MOB"), row("S1", "R-MOB"), row("S3", "R-MOB")]
     base = run([MOB, THERM], ["S1", "S2", "S3"], rows)

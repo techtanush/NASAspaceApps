@@ -19,16 +19,17 @@ def candidate():
 
 def test_optimizer_receives_only_the_requested_candidates_and_their_rows():
     a, b = candidate(), candidate()
+    run_id, workspace_id = str(uuid4()), str(uuid4())
     engine = object.__new__(WorkflowEngine)
-    engine._load = MagicMock(return_value=({"mode": "synthetic"}, {}, None))
-    engine._rows = MagicMock(return_value=[a, b])
+    engine._load = MagicMock(return_value=({"id": run_id, "workspace_id": workspace_id, "mode": "synthetic"}, {}, None))
+    engine._rows = MagicMock(side_effect=lambda _workspace, table, _run: [a, b] if table == "candidates" else [])
     engine._latest_qualifications = MagicMock(return_value=[{
         "candidate_id": c["id"], "requirement_id": "R-SLOPE-AVAILABILITY", "status": "PASS",
         "evaluation_stage": "FINAL", "critic_status": "UNREVIEWED",
     } for c in [a, b]])
     engine._compute = MagicMock()
     mission = json.loads((Path("tests/fixtures/kit/missions/mission-mars-mobility.json")).read_text())
-    engine._perform_pending_action(str(uuid4()), str(uuid4()), {
+    engine._perform_pending_action(run_id, workspace_id, {
         "type": "BUILD_PORTFOLIO", "payload": {"candidate_ids": [a["id"]], "max_sites": 3},
     }, mission, None, None, None)
     inputs = engine._compute.call_args.args[0]

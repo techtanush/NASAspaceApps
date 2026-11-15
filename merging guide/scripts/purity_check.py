@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import hashlib
 import json
 import re
 import subprocess
@@ -32,6 +33,27 @@ SECRET_PATTERNS = {
     'BEARER_TOKEN': re.compile(r'Bearer [A-Za-z0-9._-]{24,}'),
 }
 BIG_EXT = {'.tif', '.tiff', '.hgt', '.nc', '.img', '.zip', '.h5', '.npz', '.png', '.jpg'}
+# Reviewed, versioned visual context shipped with the globe. These are neither
+# scientific datasets nor build output. A path or a mutable manifest alone is
+# insufficient: every exception requires the exact reviewed bytes and size.
+SHIPPED_VISUAL_ASSETS = {
+    'analogforge/apps/web/public/globe/deliveries/earth-bmng-july2004.v1.jpg':
+        (1133187, '6194c0eccf55411adad6ec4bbb0857a8e3eedd700d729bd0a5980a27814693db'),
+    'analogforge/apps/web/public/globe/deliveries/moon-lroc-2019.v1.jpg':
+        (2110895, '98f512b2a9b90584805b8c44400ff91474559dfe22077f004cd13b72ddccfd43'),
+    'analogforge/apps/web/public/globe/earth-blue-marble.jpg':
+        (1461877, '228deba2e4b600146bdcb6cfa359b8ead6aacc2b1c13550a29cd82824cfa1c01'),
+}
+
+
+def reviewed_visual_asset(repo: Path, rel: str) -> bool:
+    expected = SHIPPED_VISUAL_ASSETS.get(rel)
+    p = repo / rel
+    return bool(expected and not p.is_symlink() and p.is_file()
+                and p.stat().st_size == expected[0]
+                and hashlib.sha256(p.read_bytes()).hexdigest() == expected[1])
+
+
 SCOPES = {
     'tanush': {
         'dirs': ['analogforge/src/analogforge', 'analogforge/tests/unit/platform', 'analogforge/tests/integration/platform',
@@ -408,7 +430,9 @@ def main() -> int:
         parts = rel.split('/')
         if any(x in parts for x in ('node_modules', 'dist', '.venv', '__pycache__')) or rel.startswith('analogforge/data/') or rel.endswith('/.env') or rel == 'analogforge/.env':
             sec_findings.append({'file': rel, 'pattern': 'FORBIDDEN_TRACKED_PATH', 'text': rel})
-        if p.is_file() and p.stat().st_size > 1_048_576 and Path(rel).suffix in BIG_EXT | {'.bin', '.pkl', '.parquet', '.gpkg'}:
+        if (p.is_file() and p.stat().st_size > 1_048_576
+                and Path(rel).suffix in BIG_EXT | {'.bin', '.pkl', '.parquet', '.gpkg'}
+                and not reviewed_visual_asset(repo, rel)):
             sec_findings.append({'file': rel, 'pattern': 'LARGE_BINARY', 'text': f'{p.stat().st_size} bytes'})
     record('G-05', not sec_findings, 'secrets/data/build output', sec_findings)
 

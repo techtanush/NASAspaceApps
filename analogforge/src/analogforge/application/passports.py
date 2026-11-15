@@ -21,7 +21,9 @@ from analogforge.application.assurance import (
     compile_conclusions,
 )
 from analogforge.application.missions import accepted_contract
+from analogforge.application.portfolios import evidence_ancestors
 from analogforge.db.store import Store, UnitOfWork
+from analogforge.ports import catalog
 from analogforge.ports.assurance_models import ScientificAssuranceArtifact
 from analogforge.ports.domain_models import (
     AnalogPassport,
@@ -82,6 +84,69 @@ class PassportSnapshot:
     passport_id: UUID = field(default_factory=uuid4)
     # Public QualificationDimension omits stage; preserve its authoritative context.
     final_route_requirement_ids: frozenset[str] = frozenset()
+    qualification_stages: Mapping[UUID, str] = field(default_factory=dict)
+
+
+def _validate_portfolio(snapshot: PassportSnapshot) -> None:
+    """An exported assignment must still be supported by the current site/route evidence."""
+    portfolio = snapshot.portfolio
+    if portfolio is None:
+        return
+    requirements = {req.id: req for req in snapshot.mission.requirements}
+    assignments = {item.requirement_id: item for item in portfolio.requirement_assignments}
+    candidate_ids = {candidate.id for candidate in snapshot.candidates}
+    selected = set(portfolio.candidate_ids)
+    if (len(selected) != len(portfolio.candidate_ids) or not selected <= candidate_ids
+            or set(assignments) != set(requirements)
+            or len(assignments) != len(portfolio.requirement_assignments)):
+        raise ScientificClaimRejected(["SC-15:PORTFOLIO_SCOPE_MISMATCH"])
+    rows = {(row.candidate_id, row.requirement_id): row for row in snapshot.qualifications}
+    evidence = {str(record.id): record.model_dump(mode="json") for record in snapshot.evidence}
+    latest = {attempt.candidate_id: attempt for attempt in snapshot.attempts}
+    groups: dict[str, list[str]] = {}
+    for requirement in requirements.values():
+        if (requirement.parameters.co_location_group is not None
+                and requirement.operator != "NOT_NATURALLY_REPRODUCIBLE"):
+            groups.setdefault(requirement.parameters.co_location_group, []).append(requirement.id)
+    for rid, assignment in assignments.items():
+        if (len(set(assignment.candidate_ids)) != len(assignment.candidate_ids)
+                or not set(assignment.candidate_ids) <= selected):
+            raise ScientificClaimRejected(["SC-15:PORTFOLIO_CANDIDATE_MISMATCH"])
+        if assignment.coverage not in {"FULL", "PARTIAL"}:
+            continue
+        requirement = requirements[rid]
+        if not assignment.candidate_ids or requirement.operator == "NOT_NATURALLY_REPRODUCIBLE":
+            raise ScientificClaimRejected(["SC-15:PORTFOLIO_UNSUPPORTED_COVERAGE"])
+        for candidate_id in assignment.candidate_ids:
+            row = rows.get((candidate_id, rid))
+            expected_status = "PASS" if assignment.coverage == "FULL" else "PARTIAL"
+            if row is None or row.status != expected_status or row.critic_status == "CHALLENGED":
+                raise ScientificClaimRejected(["SC-15:PORTFOLIO_QUALIFICATION_MISMATCH"])
+            route_required = (requirement.observable in catalog.ROUTE_DEPENDENT_OBSERVABLES
+                              or requirement.parameters.co_location_group is not None)
+            if not route_required:
+                continue
+            attempt = latest.get(candidate_id)
+            if (snapshot.qualification_stages.get(row.id) != "FINAL" or attempt is None
+                    or attempt.result.outcome != "PASS" or not attempt.result.verified_route_sha256
+                    or attempt.result.verified_route_sha256 != attempt.test.route_artifact_sha256):
+                raise ScientificClaimRejected(["SC-11:PORTFOLIO_ROUTE_NOT_VERIFIED"])
+            proof_ids = {str(identifier) for identifier in attempt.result.evidence_ids
+                         if str(identifier) in evidence and evidence[str(identifier)]["kind"] == "VERIFICATION"
+                         and evidence[str(identifier)]["algorithm_id"] == "verify-route"
+                         and evidence[str(identifier)].get("artifact_sha256")}
+            ancestors = evidence_ancestors([str(identifier) for identifier in row.evidence_ids], evidence)
+            if not proof_ids & ancestors:
+                raise ScientificClaimRejected(["SC-11:PORTFOLIO_ROUTE_LINEAGE_MISMATCH"])
+    for members in groups.values():
+        full = [assignments[rid] for rid in members if assignments[rid].coverage == "FULL"]
+        if full and (len(full) != len(members) or not set.intersection(*(set(item.candidate_ids) for item in full))):
+            raise ScientificClaimRejected(["SC-15:PORTFOLIO_COLOCATION_MISMATCH"])
+    residual = {rid for rid, assignment in assignments.items() if assignment.coverage != "FULL"}
+    expected_objective = sum(requirements[rid].weight for rid, item in assignments.items() if item.coverage == "FULL")
+    if (set(portfolio.residual_requirement_ids) != residual
+            or abs(portfolio.objective_value - expected_objective) > 1e-9):
+        raise ScientificClaimRejected(["SC-15:PORTFOLIO_COVERAGE_SUMMARY_MISMATCH"])
 
 
 def _validate_snapshot(snapshot: PassportSnapshot) -> None:
@@ -191,6 +256,7 @@ def _validate_snapshot(snapshot: PassportSnapshot) -> None:
         matching = [claim for claim in report.claims if claim.claim_id == f"v:{attempt.test.id}"]
         if len(matching) != 1 or matching[0].verification_status != attempt.result.outcome:
             raise ScientificClaimRejected(["SC-15:AUDIT_VERIFICATION_MISMATCH"])
+    _validate_portfolio(snapshot)
     locks = snapshot.source_locks
     for key in ("dataset_policy_sha256", "acquired_manifest_sha256", "algorithm_lock_sha256"):
         if getattr(report, key) != getattr(locks, key):
@@ -659,6 +725,9 @@ def publish_passport(
         not_run_reason=run.get("not_run_reason"),
         generated_at=created_at,
         final_route_requirement_ids=final_ids,
+        qualification_stages={UUID(raw["id"]): raw.get("payload", {}).get(
+            "evaluation_stage", raw.get("evaluation_stage", "PRELIMINARY")
+        ) for raw in current.values()},
     )
     bundle = assemble_bundle(snapshot)
     manifest_blob = blob_store.put_bytes(bundle.canonical_manifest_json.encode(), "application/json")

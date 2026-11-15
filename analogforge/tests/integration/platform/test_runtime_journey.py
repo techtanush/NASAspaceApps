@@ -127,6 +127,16 @@ def advance_until(engine, run, ws, target):
 def test_runtime_graph_end_to_end(runtime):
     engine, store, ws, make = runtime
     run = advance_until(engine, make("synthetic-graph-regression-v1"), ws, {"AWAITING_REVIEW"})
+    with store.transaction(ws) as tx:
+        mission = tx.require("mission_revisions", run["mission_revision_id"])
+        operations = tx.list("scientific_operations", {"run_id": run["id"], "operation": "COMPARE_REQUIREMENT"})
+        assert len(operations) == len(run["candidate_ids"]) * len(mission["requirements"])
+        assert len({operation["receipt_id"] for operation in operations}) == len(operations)
+        assert len({operation["request"]["request_id"] for operation in operations}) == len(operations)
+        for operation in operations:
+            receipt = tx.require("tool_receipts", operation["receipt_id"])
+            assert receipt["input_sha256"] == canonical_sha256(operation["request"])
+            assert receipt["evidence_ids"] == operation["evidence_ids"]
     run = engine.apply_action(run["id"], ws, "PROVE_IT", {}, run["revision"])
     run = advance_until(engine, run, ws, {"COMPLETED", "BLOCKED", "FAILED"})
     assert run["state"] == "COMPLETED"

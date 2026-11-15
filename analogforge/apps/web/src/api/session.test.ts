@@ -34,9 +34,14 @@ it.each([
  [{workspace_id:otherWorkspace,role:'OWNER',csrf_token:''},'empty token'],
  [{workspace_id:otherWorkspace,role:'OWNER',csrf_token:'bad\r\nheader'},'unsafe token'],
  [{workspace_id:otherWorkspace,role:'OWNER',csrf_token:'one',csrfToken:'two'},'conflicting token'],
- [{authenticated:false},'unauthenticated response'],
 ])('rejects invalid session %s (%s) with an ApiError and no workspace fallback',async(body,label)=>{
  void label;vi.stubGlobal('fetch',vi.fn(async()=>Response.json(body)));await expect(loadSession()).rejects.toMatchObject({name:'ApiError',code:'SESSION_INVALID'});
+});
+it('rejects an explicitly unauthenticated response even if it includes workspace fields and clears the old token',async()=>{
+ setSessionCsrf('previous-session-token');const headers:Headers[]=[];
+ vi.stubGlobal('fetch',vi.fn(async(_url,init)=>{headers.push(new Headers(init.headers));return Response.json({authenticated:false,workspace_id:otherWorkspace,role:'OWNER',csrf_token:'untrusted-token'});}));
+ await expect(loadSession()).rejects.toMatchObject({code:'AUTH_REQUIRED',status:401});
+ await api.post('/missions',{});expect(headers[1]!.has('X-CSRF-Token')).toBe(false);
 });
 it('401, HTTP failures, malformed JSON and network failures are named errors rather than a local workspace fallback',async()=>{
  for(const [response,code] of [[new Response('{}',{status:401}),'AUTH_REQUIRED'],[new Response('{}',{status:503}),'SESSION_UNAVAILABLE'],[new Response('not json'),'SESSION_INVALID']] as const){vi.stubGlobal('fetch',vi.fn(async()=>response));try{await loadSession();throw new Error('Expected session rejection');}catch(error){expect(error).toBeInstanceOf(ApiError);expect(error).toMatchObject({code});}}

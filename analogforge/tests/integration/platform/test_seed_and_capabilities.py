@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from contextlib import contextmanager
+from pathlib import Path
 
 import pytest
 
@@ -70,7 +71,10 @@ def test_live_mode_is_offered_once_bound_even_without_credentials(tmp_path):
 
     import yaml
 
-    unbound = Settings(_env_file=None, data_root=tmp_path / "data")
+    # This assertion describes the checked-in unbound scenario, independent of
+    # an operator's CONFIG_DIR or a preceding rehearsal's private binding.
+    unbound = Settings(_env_file=None, data_root=tmp_path / "data",
+                       config_dir=Path(__file__).parents[3] / "config")
     assert "live" not in get_capabilities(unbound)["modes"]  # unbound live scenario: allowed_modes []
     config = tmp_path / "config"
     shutil.copytree(unbound.config_dir, config)

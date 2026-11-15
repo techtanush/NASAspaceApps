@@ -15,7 +15,7 @@ python3 "merging guide/scripts/purity_check.py" --person <tanush|ayan|aradhya> -
 | G-02 | Kit frozen | `python3 "architecture files/contracts/kit/materialize.py" --verify --app <worktree>/analogforge` | `PASS` (no DRIFT/FOREIGN/MISSING) |
 | G-03 | Ownership | `python3 "team coordination/scripts/check_branch_ownership.py" --person <p> --repo <worktree> --base origin/main` | `PASS`; no violations |
 | G-04 | Forbidden patterns | `purity_check.py` + the builder's own `forbidden_scan.py` | zero findings (see §2 patterns) |
-| G-05 | No secrets/data/build output committed | `git ls-files` scans: key patterns, `.env`, `data/`, `node_modules`, `dist`, `*.tif/*.hgt/*.nc` larger than 1 MiB, signed URLs | none |
+| G-05 | No secrets/data/build output committed | `git ls-files` scans: key patterns, `.env`, `data/`, `node_modules`, `dist`, large binaries, signed URLs. Three reviewed globe JPEGs have exact path/byte-count/SHA-256 exceptions in `SHIPPED_VISUAL_ASSETS`; all other binaries retain the 1 MiB limit. | none |
 | G-06 | Dependency hygiene | `pyproject.toml` differs from kit only in own `extra-<person>`; `uv.lock` only on Tanush's branch; `pnpm-lock.yaml` only Aradhya's | true |
 | G-07 | Install from scratch | fresh venv (`uv venv && uv pip install -e ".[dev,extra-<p>]"`) / `pnpm install --frozen-lockfile` | succeeds without network surprises at import time |
 | G-08 | Builder's gate re-run | the exact commands of the guide's `05-TEST-AND-MERGE-GATES.md` | all pass; junit/Playwright reports have **0 skipped / 0 xfailed / 0 fixme** in required suites |

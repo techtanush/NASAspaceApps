@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { resolve } from 'node:path';
 async function launch(page: import('@playwright/test').Page, siteOnly=false, moon=false) {
  await page.goto('/');
  await page.getByTestId('btn-begin').click();
@@ -8,13 +9,30 @@ async function launch(page: import('@playwright/test').Page, siteOnly=false, moo
  await page.getByTestId('btn-confirm-place').click();
  await page.getByRole('button',{name:'Slope traverse',exact:true}).click();
  await page.getByTestId('btn-mission-continue').click();
+ let roverRevisionId: string | null = null;
  if(siteOnly) await page.getByTestId('rover-none').click();
- else await page.getByTestId('rover-option').filter({hasText:'ARES-1'}).click();
+ else {
+  const saved = page.waitForResponse(response => response.request().method()==='POST' && new URL(response.url()).pathname==='/api/v1/rovers');
+  await page.getByTestId('mc-rover-import').setInputFiles(resolve(import.meta.dirname,'../fixtures/kit/rovers/ares-1.json'));
+  const response = await saved;
+  expect(response.status()).toBe(201);
+  const rover = await response.json() as {id:string;name:string};
+  expect(rover.id).toMatch(/^[0-9a-f-]{36}$/i);
+  roverRevisionId = rover.id;
+  const selected = page.locator('[data-testid="rover-option"][aria-pressed="true"]');
+  await expect(selected).toHaveCount(1);
+  await expect(selected).toContainText(rover.name);
+ }
+ await expect(page.getByTestId('btn-rover-continue')).toBeEnabled();
  await page.getByTestId('btn-rover-continue').click();
  await expect(page.getByLabel('Source mode')).toHaveValue('synthetic');
+ const preparation = page.waitForRequest(request => request.method()==='POST' && /^\/api\/v1\/missions\/[^/]+\/fingerprint$/.test(new URL(request.url()).pathname));
  await page.getByTestId('btn-prepare').click();
+ expect((await preparation).postDataJSON().rover_revision_id).toBe(roverRevisionId);
  await expect(page.getByTestId('proposed-requirements')).toBeVisible();
+ const creation = page.waitForRequest(request => request.method()==='POST' && new URL(request.url()).pathname==='/api/v1/runs');
  await page.getByTestId('btn-accept-start').click();
+ expect((await creation).postDataJSON().rover_revision_id).toBe(roverRevisionId);
  await expect(page.getByTestId('site-card')).toBeVisible();
 }
 test('globe, exact-site inspection, stable selection and printable report',async({page})=>{
