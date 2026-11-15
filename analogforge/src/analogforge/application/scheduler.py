@@ -7,9 +7,10 @@ import json
 import logging
 import tempfile
 import time
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager, nullcontext
 from contextvars import ContextVar
+from functools import partial
 from pathlib import Path
 from typing import Any, cast
 from uuid import UUID
@@ -106,6 +107,9 @@ class WorkflowEngine:
             blob_store = ContentAddressedStore(Path(settings.data_root) / "blobs")
         self.blobs = blob_store
         self.registrar = Registrar(store, blob_store)
+        from analogforge.adapters.openai.client import RateLimitCooldown
+
+        self._model_cooldown = RateLimitCooldown()
         self._job_context: ContextVar[tuple[str | None, str | None]] = ContextVar(
             "workflow_job_context", default=(None, None)
         )
@@ -113,7 +117,7 @@ class WorkflowEngine:
     def _provider_client(self) -> Any:
         from urllib.parse import urlsplit
 
-        from analogforge.adapters.openai.client import ResponsesClient
+        from analogforge.adapters.openai.client import ResponsesClient, fallback_options
 
         key = getattr(self.settings, "openai_api_key", None)
         if key is not None and hasattr(key, "get_secret_value"):
@@ -129,7 +133,10 @@ class WorkflowEngine:
             parsed = urlsplit(base_url)
             if parsed.scheme not in {"http", "https"} or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}:
                 raise WorkflowError("INPUT_INVALID", "Fake provider must use a local loopback origin")
-        return ResponsesClient(key, getattr(self.settings, "openai_model", None), base_url=base_url)
+        return ResponsesClient(
+            key, getattr(self.settings, "openai_model", None), base_url=base_url,
+            cooldown=self._model_cooldown, **fallback_options(self.settings),
+        )
 
     def _scenario(self, identifier: str) -> dict[str, Any]:
         path = Path(self.settings.config_dir) / "scenarios.yaml"
@@ -212,6 +219,8 @@ class WorkflowEngine:
         preparation_id: str | None = None,
         scenario_config_id: str | None = None,
         mode: str = "synthetic",
+        model_request_charge: Callable[[], None] | None = None,
+        provider_attempts: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         scenario_id = (
             scenario_config_id
@@ -264,7 +273,12 @@ class WorkflowEngine:
             from analogforge.tools.registry import strict_schema
 
             schema = strict_schema(MissionTestContract.model_json_schema())
-            response = client.create(
+            budgeted = getattr(client, "create_budgeted", None)
+            create = (
+                partial(budgeted, model_request_charge)
+                if model_request_charge is not None and callable(budgeted) else client.create
+            )
+            request = dict(
                 input=json.dumps(
                     {
                         "instruction": (
@@ -312,6 +326,11 @@ class WorkflowEngine:
                     }
                 },
             )
+            try:
+                response = create(**request)
+            finally:
+                if provider_attempts is not None:
+                    provider_attempts.extend(getattr(client, "attempts", []))
             texts = [
                 c["text"]
                 for i in response.get("output", [])
@@ -645,7 +664,7 @@ class WorkflowEngine:
         return list(selected.values())
 
     @contextmanager
-    def _role_attempt(self, workspace_id: str, invocation_id: str) -> Iterator[None]:
+    def _role_attempt(self, workspace_id: str, invocation_id: str, provider_client: Any = None) -> Iterator[None]:
         try:
             yield
         except Exception:  # noqa: BLE001 - provider, validation and publication failures all finish diagnostics
@@ -660,6 +679,18 @@ class WorkflowEngine:
                     extra={"invocation_id": invocation_id, "error_type": type(exc).__name__},
                 )
             raise
+        finally:
+            attempts = getattr(provider_client, "attempts", None)
+            if attempts:
+                try:
+                    with self.store.transaction(workspace_id) as tx:
+                        invocation = tx.require("invocations", invocation_id, lock=True)
+                        tx.replace("invocations", invocation_id, {**invocation, "provider_attempts": attempts})
+                except Exception as exc:  # noqa: BLE001 - diagnostics must not conceal the original failure
+                    logging.getLogger(__name__).error(
+                        "role.provider_audit_failed", extra={"invocation_id": invocation_id,
+                                                            "error_type": type(exc).__name__},
+                    )
 
     def _role(
         self, role: str, task_kind: str, run_id: str, workspace_id: str, extra: dict[str, Any] | None = None
@@ -875,7 +906,7 @@ class WorkflowEngine:
                     "input_hash": canonical_sha256(task),
                 },
             )
-        with self._role_attempt(workspace_id, invocation_id):
+        with self._role_attempt(workspace_id, invocation_id, getattr(provider, "client", None)):
             submission = RoleSubmission.model_validate(provider.run(task, registry, context))
             rejected_seed = False
             try:

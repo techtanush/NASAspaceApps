@@ -7,6 +7,7 @@ SECRET_KEYS = frozenset(
     {
         "api_key",
         "openai_api_key",
+        "groq_api_key",
         "earthdata_token",
         "authorization",
         "database_url",
@@ -24,6 +25,7 @@ def sanitize(value: Any) -> Any:
         return [sanitize(v) for v in value]
     if isinstance(value, str):
         value = re.sub(r"sk-[A-Za-z0-9_-]+", "[REDACTED]", value)
+        value = re.sub(r"gsk_[A-Za-z0-9_-]+", "[REDACTED]", value)
         value = re.sub(r"postgres(?:ql)?(?:\+psycopg)?://[^\s]+", "[REDACTED]", value)
         value = re.sub(r"(?i)bearer\s+[A-Za-z0-9._-]+", "[REDACTED]", value)
     return value

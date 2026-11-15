@@ -355,9 +355,34 @@ def handle(runtime: Any, job: dict[str, Any]) -> None:
         )
         if scenario_id is None:
             raise PersistenceError("INPUT_INVALID", "No preparation scenario supports the target body and mode")
-        proposed = runtime.engine.prepare(
-            source, workspace_id, preparation_id=preparation_id, scenario_config_id=scenario_id, mode=payload["mode"]
-        )
+        def charge_fallback() -> None:
+            # Initial dispatch was reserved above; reserve the extra HTTP attempt before sending it.
+            with runtime.store.publication(workspace_id, job_id, token) as unit:
+                current = unit.require("preparations", preparation_id, lock=True)
+                _active(current)
+                if current["active_invocation_id"] != str(invocation_id):
+                    raise PersistenceError("REVISION_CONFLICT", "Preparation invocation was superseded")
+                ledger = BudgetLedger.from_document(current.get("budget"))
+                ledger.limits["preparation_model_requests"] = float(BUDGETS["preparation_model_requests"])
+                ledger.charge("preparation_model_requests")
+                unit.replace("preparations", preparation_id, {**current, "budget": ledger.document()})
+
+        provider_attempts: list[dict[str, Any]] = []
+        try:
+            proposed = runtime.engine.prepare(
+                source, workspace_id, preparation_id=preparation_id, scenario_config_id=scenario_id,
+                mode=payload["mode"], model_request_charge=charge_fallback, provider_attempts=provider_attempts,
+            )
+        finally:
+            if provider_attempts:
+                with runtime.store.publication(workspace_id, job_id, token) as unit:
+                    invocation = unit.require("agent_invocations", str(invocation_id), lock=True)
+                    last = provider_attempts[-1]
+                    unit.replace("agent_invocations", str(invocation_id), {
+                        **invocation, "provider": last["provider"], "model": last["model"],
+                        "provider_attempts": provider_attempts,
+                        "usage_json": {"model_dispatches": len(provider_attempts), "completion_confirmed": False},
+                    })
         for field in ("name", "objective", "target"):
             if proposed[field] != source[field]:
                 raise PersistenceError("MODEL_OUTPUT_INVALID", "Preparation changed a supplied mission field")
@@ -445,7 +470,7 @@ def handle(runtime: Any, job: dict[str, Any]) -> None:
                     "status": "SUCCEEDED",
                     "output_json": result.model_dump(mode="json"),
                     "sealed_sha256": canonical_sha256(sealed),
-                    "usage_json": {"model_dispatches": 1, "completion_confirmed": True},
+                    "usage_json": {"model_dispatches": len(provider_attempts) or 1, "completion_confirmed": True},
                 },
             )
             current_job = unit.require("jobs", job_id)

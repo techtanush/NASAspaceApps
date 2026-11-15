@@ -7,6 +7,7 @@ import logging
 import time
 from collections.abc import Sequence
 from copy import deepcopy
+from functools import partial
 from typing import Any, Literal
 from uuid import UUID
 
@@ -342,12 +343,27 @@ class OpenAIProvider:
         tools = [{**tool, "parameters": codec.schema(tool["parameters"])} for tool in tools]
         correction_used = False
         transport_attempts = 0
-        for _ in range(BUDGETS["model_requests_per_invocation"]):
+
+        request_count = 0
+
+        def charge_request() -> None:
+            nonlocal request_count
+            if request_count >= BUDGETS["model_requests_per_invocation"]:
+                raise _output_failure(task, "REQUEST_BUDGET_EXHAUSTED")
             if context.charge:
                 context.charge("model_requests_per_invocation")
                 context.charge("model_requests_per_run")
+            request_count += 1
+
+        for _ in range(BUDGETS["model_requests_per_invocation"]):
+            charge_request()
             try:
-                response = self.client.create(
+                create_budgeted = getattr(self.client, "create_budgeted", None)
+                create = (
+                    partial(create_budgeted, charge_request)
+                    if callable(create_budgeted) else self.client.create
+                )
+                response = create(
                     instructions=instructions, input=items, tools=tools, tool_choice="required", max_output_tokens=4096,
                 )
                 transport_attempts = 0
@@ -358,6 +374,21 @@ class OpenAIProvider:
                 self.sleep(2**transport_attempts)
                 continue
             except APIStatusError as exc:
+                if (
+                    getattr(self.client, "provider", None) == "groq" and exc.status_code == 400
+                    and isinstance(exc.body, dict) and exc.body.get("code") == "tool_use_failed"
+                ):
+                    # Groq can reject malformed tool generation before returning a tool call.
+                    # Share the existing single correction allowance; never parse/execute failed_generation.
+                    if correction_used:
+                        raise _output_failure(task, "REPEATED_INVALID_ARGUMENTS") from exc
+                    correction_used = True
+                    transport_attempts = 0
+                    items.append({"role": "user", "content": json.dumps({"error": {
+                        "code": "MODEL_OUTPUT_INVALID",
+                        "message": "Return exactly one registered function call satisfying its supplied strict schema.",
+                    }})})
+                    continue
                 if exc.status_code in {401, 403}:
                     raise ProviderError("PROVIDER_AUTH_FAILED", "Provider credentials were rejected") from exc
                 transport_attempts += 1

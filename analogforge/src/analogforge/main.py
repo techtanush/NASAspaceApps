@@ -60,6 +60,10 @@ class PlatformRuntime:
 
 class ContractFastAPI(FastAPI):
     def openapi(self) -> dict[str, Any]:
+        if getattr(getattr(self.state, "settings", None), "visualization_enabled", False):
+            from analogforge.api.visualization_contracts import effective_specification
+
+            return effective_specification()
         return specification()
 
 
@@ -200,6 +204,10 @@ def create_app(
     from analogforge.api.routers.auth import router as auth_router
 
     application.include_router(auth_router)
+    if getattr(settings, "visualization_enabled", False):
+        from analogforge.api.routers.visualization import build_visualization_router
+
+        application.include_router(build_visualization_router())
     return application
 
 

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "body": "MARS",
+  "bbox": [
+    137.25,
+    -4.95,
+    137.55,
+    -4.65
+  ],
+  "scenario_config_id": "example-unconfigured",
+  "dataset_lock_id": null,
+  "state": "UNKNOWN",
+  "basis": "UNAVAILABLE",
+  "reason": "Planning fixture: coverage API is not implemented or enabled.",
+  "datasets": []
+}

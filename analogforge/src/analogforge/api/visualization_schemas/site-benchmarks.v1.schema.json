@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "candidate_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "mission_revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "dataset_lock_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "requirement": {
+            "$ref": "#/components/schemas/Requirement"
+          },
+          "qualification_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "PARTIAL",
+              "FAIL",
+              "GAP",
+              "UNKNOWN"
+            ]
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "measurement": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "support_scale_m": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              },
+              "comparison_evidence_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "receipt_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "unit",
+              "support_scale_m",
+              "comparison_evidence_id",
+              "receipt_id",
+              "reason"
+            ]
+          },
+          "test_result_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "requirement",
+          "qualification_id",
+          "status",
+          "explanation",
+          "measurement",
+          "test_result_ids"
+        ]
+      }
+    },
+    "test_result_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "candidate_id",
+    "mission_revision_id",
+    "dataset_lock_id",
+    "requirements",
+    "test_result_ids"
+  ]
+}

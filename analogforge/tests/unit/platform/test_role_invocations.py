@@ -227,3 +227,28 @@ def test_role_cleanup_error_preserves_original_and_logs_no_private_exception(rol
     assert caught.value is failure
     assert "role.invocation_finalize_failed" in caplog.text
     assert "private database" not in caplog.text
+
+
+@pytest.mark.parametrize("failure", [False, True])
+def test_actual_provider_trace_persists_for_success_and_failure(role_attempt, monkeypatch, failure):
+    from types import SimpleNamespace
+
+    engine, store, workspace, run_id, _ = role_attempt
+    attempts = [{"provider": "openai", "model": "primary", "status": "FAILED", "http_status": 429},
+                {"provider": "groq", "model": "secondary", "status": "SUCCEEDED"}]
+    monkeypatch.setattr(engine, "_provider_client", lambda: SimpleNamespace(attempts=attempts))
+
+    def propose(_provider, task, _registry, _context):
+        if failure:
+            raise ProviderError("MODEL_OUTPUT_INVALID", "Rejected proposal")
+        return task.payload["prepared_submission"]
+
+    monkeypatch.setattr(OpenAIProvider, "run", propose)
+    if failure:
+        with pytest.raises(ProviderError):
+            engine._role("mission_director", "advance_workflow", run_id, workspace)
+    else:
+        engine._role("mission_director", "advance_workflow", run_id, workspace)
+    row = active_invocation(store)
+    assert row["status"] == ("FAILED" if failure else "SUCCEEDED")
+    assert row["provider_attempts"] == attempts

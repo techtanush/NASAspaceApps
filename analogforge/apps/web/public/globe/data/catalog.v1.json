@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "assets": [
+    {
+      "body": "EARTH",
+      "surface_path": "globe/deliveries/earth-bmng-july2004.v1.jpg",
+      "relief_path": null,
+      "placeholder": false,
+      "attribution": "Earth visual context: NASA Earth Observatory / Reto Stockli, NASA GSFC; Blue Marble Next Generation, July 2004. Downsampled for display by AnalogForge. No NASA endorsement.",
+      "source_uri": "https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/",
+      "source_product": "NASA Blue Marble Next Generation base map, July 2004, 5400x2700 visual composite",
+      "usage_terms": "NASA imagery usage guidelines: https://www.nasa.gov/nasa-brand-center/images-and-media/ . Educational/informational visualization with source acknowledgement; no implied endorsement. NASA identifiers are not licensed. This texture is visual context only.",
+      "sha256": "6194c0eccf55411adad6ec4bbb0857a8e3eedd700d729bd0a5980a27814693db",
+      "bytes": 1133187,
+      "width": 4096,
+      "height": 2048,
+      "longitude_convention": "NEG180_180",
+      "north_up": true,
+      "purpose": "VISUAL_CONTEXT_ONLY",
+      "relief_sha256": null,
+      "relief_bytes": null
+    },
+    {
+      "body": "MARS",
+      "surface_path": "globe/deliveries/mars-viking-nasa.v1.jpg",
+      "relief_path": null,
+      "placeholder": false,
+      "attribution": "Mars visual context: NASA / Jet Propulsion Laboratory and Caltech; Viking imagery processed at USGS. Original NASA 3D Resources texture, 1440x720. No NASA endorsement.",
+      "source_uri": "https://science.nasa.gov/3d-resources/mars/",
+      "source_product": "NASA 3D Resources Mars image texture; Viking imagery processed at USGS, JPL/Caltech planetary map database",
+      "usage_terms": "NASA imagery usage guidelines: https://www.nasa.gov/nasa-brand-center/images-and-media/ . Educational/informational visualization with NASA/JPL-Caltech and USGS acknowledgement; no implied endorsement. This public NASA texture is visual context only, not a scientific dataset redistribution.",
+      "sha256": "12ec6bf02ebd42a246edc778cb2ce8c595b4d9f0892badf0bfff8abb2303c780",
+      "bytes": 972896,
+      "width": 1440,
+      "height": 720,
+      "longitude_convention": "NEG180_180",
+      "north_up": true,
+      "purpose": "VISUAL_CONTEXT_ONLY",
+      "relief_sha256": null,
+      "relief_bytes": null
+    },
+    {
+      "body": "MOON",
+      "surface_path": "globe/deliveries/moon-lroc-2019.v1.jpg",
+      "relief_path": null,
+      "placeholder": false,
+      "attribution": "Moon visual context: NASA SVS / Ernie Wright; NASA / GSFC / Arizona State University, LRO LROC WAC and LOLA. CGI Moon Kit 2019 aesthetic color map with polar fill and source inpainting. No NASA endorsement.",
+      "source_uri": "https://svs.gsfc.nasa.gov/4720/",
+      "source_product": "NASA SVS CGI Moon Kit, original 2019 LROC WAC color map with polar fill, 4096x2048 RGB TIFF",
+      "usage_terms": "NASA imagery usage guidelines: https://www.nasa.gov/nasa-brand-center/images-and-media/ . Educational/informational visualization with NASA SVS/LRO/GSFC/ASU acknowledgement; no implied endorsement. Source is optimized for appearance; quantitative science must use original instrument products.",
+      "sha256": "98f512b2a9b90584805b8c44400ff91474559dfe22077f004cd13b72ddccfd43",
+      "bytes": 2110895,
+      "width": 4096,
+      "height": 2048,
+      "longitude_convention": "NEG180_180",
+      "north_up": true,
+      "purpose": "VISUAL_CONTEXT_ONLY",
+      "relief_sha256": null,
+      "relief_bytes": null
+    }
+  ]
+}

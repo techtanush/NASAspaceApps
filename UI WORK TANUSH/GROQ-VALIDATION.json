@@ -1,0 +1,161 @@
+{
+  "schema_version": "1.0",
+  "feature": "Budgeted Groq fallback for OpenAI HTTP 429",
+  "validated_at_utc": "2026-11-15T03:02:45.580427+00:00",
+  "branch": "tanush/platform-agents-integration",
+  "extends_visualization_commit": "8744335a8d3b1abcf77053e2f03510b7dd48044f",
+  "source_sha256": "589bf8b7778195db043d58234bdc941fc67c44a158092183398438014df63ab9",
+  "source_hash_definition": "SHA256 of compact sorted-key JSON mapping the changed Python paths to file SHA256; excludes handoff docs and private runtime state.",
+  "source_manifest": {
+    "analogforge/scripts/mutation_check.py": "a1f5b4bd23b7b0dfd6e10acfeefe2c8f4f9e4332796ab958253fc289585a3ee2",
+    "analogforge/src/analogforge/adapters/openai/client.py": "748c4587d0d6d452a2caabdf81918b80bd656cba6a4ccf243a99e5fbe7ee5b3c",
+    "analogforge/src/analogforge/adapters/openai/probe.py": "d7a40620aa7c29142ace37a23da03485eb57d66f6d3c0094c16d252c9247be95",
+    "analogforge/src/analogforge/agents/runtime/openai_provider.py": "39258feec1090672e66afe3f3b5a39c854db8c1d4472386150e7b747c45e1311",
+    "analogforge/src/analogforge/agents/runtime/sanitize.py": "37c6bc27db4615c7f6a614fbaedc93fb7624ed06b11b32d994527538117d4b3e",
+    "analogforge/src/analogforge/application/preflight.py": "9fbc975fc65c864f6fef28547764f30eb4cbfb19be3c0d5625bdcaead892e3ac",
+    "analogforge/src/analogforge/application/scheduler.py": "447e4916a8d1e62e9093883836a20694d667ee8a8c623a261d9ed4909bd3df85",
+    "analogforge/src/analogforge/jobs/handlers/prepare_fingerprint.py": "83839bf112739a29bceb549f04fd458b1d6b42c1fd87dfe0723dfca1e359c5d1",
+    "analogforge/src/analogforge/settings.py": "2c6441cab3eb3d44b99d9323097c57d8876eb41da1dba250ae2334d95a546bf2",
+    "analogforge/tests/integration/platform/test_preparation_context.py": "9f9a4e4d76c59c6b3b16a7627bbece00109eab88ada601640cf9f916542bde90",
+    "analogforge/tests/integration/platform/test_seed_and_capabilities.py": "bd67656920994d6aefce64a5e5483679fdec2f8574e90f12e7c9000f8413da05",
+    "analogforge/tests/unit/platform/test_groq_fallback.py": "5f38265b50878438cc4911e53ced1c5917ae20f83f042a3c61321cb7c94763a0",
+    "analogforge/tests/unit/platform/test_role_invocations.py": "c89a2e272f69bc5b0e7a77ca2ab8ee59c04b20e2ee99b898046485d81c3bf6ca"
+  },
+  "test_phases": {
+    "broad_platform_regression": {
+      "status": "PASS",
+      "tests": 855,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 835.684,
+      "science_impl": "real",
+      "renderer_impl": "real",
+      "source_phase": "Started before final tool/JSON generation-correction guards. The final affected provider/preparation paths were rerun below; this is not a claim of a second full-suite run on final source."
+    },
+    "final_affected_provider_preparation_regression": {
+      "status": "PASS",
+      "tests": 707,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 55.078,
+      "scope": "All platform unit tests plus live-provider HTTP rehearsal, durable preparation context, and seed/capability/preflight integration tests, after final correction guards."
+    },
+    "frozen_contract_kit": {
+      "status": "PASS",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.039
+    },
+    "counting_note": "Suites overlap. Do not add test counts as unique coverage."
+  },
+  "mutation_check": {
+    "status": "PASS",
+    "killed": 20,
+    "total": 20,
+    "note": "M14 logging-leak mutation anchor updated to follow the public_config local variable; its assertion-sensitive kill remains intact."
+  },
+  "static_checks": {
+    "ruff": "PASS",
+    "strict_mypy": "PASS (244 source files)",
+    "forbidden_scan": "PASS (0 findings)",
+    "frozen_kit_materialization_verifier": "PASS",
+    "docs_validation": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "live_checks": {
+    "key_catalog_authentication": "PASS",
+    "strict_tool_and_structured_continuation": "PASS observed on GPT-OSS 120B and 20B using real Groq inference",
+    "configured_secondary_model": "openai/gpt-oss-20b",
+    "primary_fault_injection": "OpenAI 429 simulated locally with MockTransport; no OpenAI inference was requested by these additional probes.",
+    "representative_role": {
+      "status": "PASSED",
+      "role": "mission_director",
+      "disposition": "COMPLETE",
+      "actual_requests": 6,
+      "charged_requests": 6,
+      "validated": true
+    },
+    "role_attempts": [
+      {
+        "provider": "openai",
+        "model": "primary-not-contacted",
+        "status": "FAILED",
+        "http_status": 429
+      },
+      {
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "status": "SUCCEEDED"
+      },
+      {
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "status": "FAILED",
+        "http_status": 400
+      },
+      {
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "status": "FAILED",
+        "http_status": 429
+      },
+      {
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "status": "FAILED",
+        "http_status": 429
+      },
+      {
+        "provider": "groq",
+        "model": "openai/gpt-oss-20b",
+        "status": "SUCCEEDED"
+      }
+    ],
+    "mission_preparation": {
+      "scope": "UNACCEPTED_FIXTURE_CONTRACT_PROTOCOL_ONLY",
+      "model": "openai/gpt-oss-20b",
+      "stored_records": 0,
+      "status": "PASSED",
+      "user_fields_preserved": true,
+      "acceptance_required": true,
+      "charges": 2,
+      "actual_requests": 2,
+      "attempts": [
+        {
+          "provider": "openai",
+          "model": "primary-not-contacted",
+          "status": "FAILED",
+          "http_status": 429
+        },
+        {
+          "provider": "groq",
+          "model": "openai/gpt-oss-20b",
+          "status": "SUCCEEDED"
+        }
+      ]
+    },
+    "limits_seen": "120B daily quota nearly exhausted; tool/JSON generation rejections and secondary rate limits were encountered, retained as typed failures or handled by the existing bounded correction/retry policies. No budget cap or validation gate was relaxed."
+  },
+  "credential_handling": {
+    "committed_credentials": false,
+    "private_local_file_mode": "0600",
+    "secret_excluded_from_public_config_and_hash": true,
+    "private_configuration_ignored_by_git": true
+  },
+  "runtime_activation": {
+    "original_live_process_updated": false,
+    "next_step": "Merge integrated backend source and restart backend/worker with the private settings. The old local server does not hot-reload these changes."
+  },
+  "limitations": [
+    "These real-provider probes exercise one role and a proposed fixture contract; they do not constitute a complete live NASA mission or physical scientific validation.",
+    "Groq has independent account/model rate and token limits; fallback cannot guarantee unlimited capacity.",
+    "Default deployments remain primary-only until explicit private Groq configuration is enabled.",
+    "Final merged UI/browser journeys with Aradhya remain required, as documented by the separate UI handoff.",
+    "Historical visualization VALIDATION.json and prior science results remain scoped to their recorded commit; they were not relabeled as new Groq checks."
+  ],
+  "existing_warning": "pytest-asyncio default fixture-loop-scope deprecation; no skipped tests accepted"
+}

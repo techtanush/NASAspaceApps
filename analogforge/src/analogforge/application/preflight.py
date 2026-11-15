@@ -274,14 +274,15 @@ def run_preflight(
                     settings.openai_api_key.get_secret_value(),
                     settings.openai_model,
                     base_url=settings.fake_openai_url if settings.test_hooks else None,
+                    **client_module.fallback_options(settings),
                 )
                 probe.probe(client)
                 add(
                     "MODEL",
                     True,
                     "MODEL_CAPABILITY_READY",
-                    "OpenAI Responses API",
-                    "Strict tool and structured result probe passed",
+                    "Configured Responses provider",
+                    f"Strict tool and structured result probe passed ({client.provider}: {client.model})",
                 )
             except Exception as exc:  # noqa: BLE001 - model provider errors become a failed gate
                 add(
