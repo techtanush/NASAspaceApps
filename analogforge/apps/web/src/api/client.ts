@@ -9,7 +9,7 @@ export interface RequestOptions { signal?: AbortSignal; key?: string; recover?: 
 export async function raw(path: string, init: RequestInit = {}): Promise<Response> {
   const headers = new Headers(init.headers);
   headers.set('Accept', headers.get('Accept') || 'application/json');
-  if (init.body) headers.set('Content-Type', 'application/json');
+  if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
   if (csrfToken && init.method && init.method !== 'GET') headers.set('X-CSRF-Token', csrfToken);
   const response = await fetch(`${API_BASE}${path}`, { ...init, credentials: 'same-origin', headers });
   if (!response.ok && response.status !== 202) {

@@ -1,0 +1,28 @@
+.operator-context{min-width:0;overflow-wrap:anywhere;border-top:1px solid var(--border-subtle);padding-top:16px}
+.operator-context h2{font-size:15px;line-height:1.4;margin:0;letter-spacing:-.02em}.operator-context h3{font-size:13px;line-height:1.4;margin:0}
+.operator-context textarea{width:100%;min-height:84px;resize:vertical}
+.operator-context .checkbox-label{display:flex;align-items:start;gap:8px;font-size:13px;line-height:1.5}
+.operator-context .checkbox-label input{width:auto;margin-top:4px;flex:none}
+.operator-document,.operator-features fieldset{padding:14px 0;border:0;border-top:1px solid var(--border-subtle);border-radius:0;min-width:0}
+.operator-features{display:flex;flex-direction:column;gap:12px;min-width:0}
+.operator-source-text{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 var(--font-mono);max-height:240px;overflow:auto;padding:12px;background:var(--surface-2)}
+.operator-context details{margin:8px 0}.operator-context summary{min-height:32px;cursor:pointer;font-size:13px}
+.operator-context.form-stack{gap:12px}.operator-context>.helper{margin:0;font-size:12px;line-height:1.5}
+.operator-context .form-field{gap:5px}.operator-context .form-field>label,.operator-context .field-label{font-size:12px;font-weight:500;color:var(--text-primary)}
+.operator-context .helper,.operator-context .form-hint{font-size:11px;line-height:1.5}
+.operator-context .operator-document .helper{margin:0}.operator-document>a{font-size:11px;text-underline-offset:3px}
+.operator-context .actions{gap:8px}.operator-context .actions .button{font-size:12px;min-height:36px}
+.operator-context .checkbox-label{font-size:12px}.operator-context-identity{font-size:11px;padding-top:8px;border-top:1px solid var(--border-subtle)}
+.operator-context-identity p{margin:4px 0}.operator-context-identity .hash{font-size:10px}
+.operator-context-limits>summary{font-size:11px;color:var(--text-secondary)}
+.operator-context [role=status]{font-size:11px;color:var(--text-secondary);line-height:1.5}
+.operator-feature-summary{margin:12px 0}.operator-feature-summary>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;padding:8px 0;border-bottom:1px solid var(--border-subtle)}
+.operator-feature-summary dd{margin:0}.operator-feature-summary .helper{display:block}
+@media print{.operator-source-text{max-height:none;overflow:visible}.operator-context details{break-inside:avoid}}
+
+/* Keep the supporting-file control consistent with the review workspace. */
+.mc-panel .operator-context input[type=file]{padding:4px;min-height:44px;font-size:12px;line-height:28px;border-color:var(--border-subtle);border-radius:var(--radius-2);background:var(--surface-1);color:var(--text-secondary)}
+.mc-panel .operator-context input[type=file]::file-selector-button{padding:6px 12px;margin-right:10px;border:0;border-radius:var(--radius-2);background:var(--surface-3);color:var(--text-primary);font:500 12px/20px var(--font-sans);cursor:pointer}
+.mc-panel .operator-context input[type=file]::file-selector-button:hover{background:var(--surface-2)}
+.mc-panel .operator-context .helper,.mc-panel .operator-context .form-hint,.mc-panel .operator-context .checkbox-label{font-size:12px}
+.mc-panel .operator-context .form-field>label,.mc-panel .operator-context .field-label{font-size:13px}

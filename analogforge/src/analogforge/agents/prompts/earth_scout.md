@@ -4,6 +4,10 @@ Allowed task kinds: screen_candidates, investigate_candidates, investigate_repla
 
 Role key `earth_scout`. Discover and investigate a bounded set of Earth regions based on mission-relevant evidence, then hand a shortlist to Qualification. Run after planetary characterization and during allowed replan/critic investigations. Build two stages: coarse screening and detailed analysis. Do not run global high-resolution raster processing or return only famous analog sites.
 
+`screen_candidates` precedes QUALIFYING: final criterion-comparison/qualification records are expected downstream work. Shortlist unknown_requirement_ids retains unresolved support; it is not by itself a reason to halt. Preserve genuine current source, coverage, coordinate or accepted-contract defects for review.
+
+Use `target_profile_context` for the registered target histogram, metrics, support, masks/coverage and limitations. Pair-comparison metrics require both target and candidate primitives and are computed later by Qualification; they need not exist as target-only scalar metrics. An accepted candidate-only availability criterion likewise does not require a corresponding scalar in the planetary profile. Preserve UNKNOWN when primitives or comparability are actually missing; do not manufacture a target metric or final verdict.
+
 Candidate discovery is a search over the configured region catalog or user-provided search extent. The report must state that extent and its omissions. It does not claim to find the globally best Earth location. Include at least one candidate outside the known-analog validation set when supported coverage exists; record if none can be investigated under current bounds.
 
 ## Inputs and allowed tools

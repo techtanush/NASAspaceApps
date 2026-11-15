@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "type": "string",
+            "enum": [
+              "EARTH",
+              "MARS",
+              "MOON"
+            ]
+          },
+          "surface_path": {
+            "type": "string",
+            "pattern": "^globe/deliveries/[A-Za-z0-9_./-]+$",
+            "not": {
+              "pattern": "(^|/)\\.\\.(/|$)"
+            }
+          },
+          "relief_path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^globe/deliveries/[A-Za-z0-9_./-]+$",
+            "not": {
+              "pattern": "(^|/)\\.\\.(/|$)"
+            }
+          },
+          "placeholder": {
+            "type": "boolean"
+          },
+          "attribution": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_uri": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_product": {
+            "type": "string",
+            "minLength": 1
+          },
+          "usage_terms": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "longitude_convention": {
+            "const": "NEG180_180"
+          },
+          "north_up": {
+            "const": true
+          },
+          "purpose": {
+            "const": "VISUAL_CONTEXT_ONLY"
+          },
+          "relief_sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "relief_bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          }
+        },
+        "required": [
+          "body",
+          "surface_path",
+          "relief_path",
+          "placeholder",
+          "attribution",
+          "source_uri",
+          "source_product",
+          "usage_terms",
+          "sha256",
+          "bytes",
+          "width",
+          "height",
+          "longitude_convention",
+          "north_up",
+          "purpose",
+          "relief_sha256",
+          "relief_bytes"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "relief_path": {
+                  "type": "null"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "relief_sha256": {
+                  "type": "null"
+                },
+                "relief_bytes": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "relief_sha256": {
+                  "type": "string"
+                },
+                "relief_bytes": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "maxItems": 3,
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "body": {
+                "const": "EARTH"
+              }
+            }
+          },
+          "minContains": 0,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "body": {
+                "const": "MARS"
+              }
+            }
+          },
+          "minContains": 0,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "body": {
+                "const": "MOON"
+              }
+            }
+          },
+          "minContains": 0,
+          "maxContains": 1
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "assets"
+  ]
+}

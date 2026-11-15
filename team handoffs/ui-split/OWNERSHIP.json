@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "basis": "refs/tags/ui-split-base-20261114",
+  "aradhya_branch": "aradhya/frontend-experience",
+  "tanush_branch": "tanush/platform-agents-integration",
+  "aradhya_owns": [
+    "UI WORK ARADHYA/**",
+    "analogforge/apps/web/src/**",
+    "analogforge/apps/web/design/**",
+    "analogforge/apps/web/docs/**",
+    "analogforge/apps/web/package.json",
+    "analogforge/apps/web/THIRD-PARTY.md",
+    "analogforge/pnpm-lock.yaml",
+    "analogforge/tests/e2e/**",
+    "analogforge/scripts/ui/**",
+    "analogforge/apps/web/vite.config.ts",
+    "analogforge/apps/web/playwright.config.ts",
+    "analogforge/apps/web/eslint.config.js",
+    "analogforge/apps/web/tsconfig*.json",
+    "analogforge/package.json"
+  ],
+  "tanush_owns": [
+    "UI WORK TANUSH/**",
+    "analogforge/src/analogforge/**",
+    "analogforge/scripts/data/**",
+    "analogforge/tests/unit/platform/**",
+    "analogforge/tests/integration/platform/**",
+    "analogforge/tests/contracts/platform/**",
+    "analogforge/tests/unit/science/**",
+    "analogforge/tests/integration/science/**",
+    "analogforge/tests/contracts/science/**",
+    "analogforge/apps/web/public/globe/data/**",
+    "analogforge/apps/web/public/globe/deliveries/**"
+  ],
+  "frozen_shared": [
+    "team handoffs/ui-split/**",
+    "analogforge/contracts/**",
+    "architecture files/contracts/**",
+    "analogforge/apps/web/src/generated/**",
+    "analogforge/src/analogforge/ports/**",
+    "analogforge/tests/contracts/kit/**"
+  ],
+  "conditional_aradhya": [
+    "architecture files/41-FRONTEND-DESIGN-SYSTEM-AND-PROFESSIONAL-UI-STANDARD.md: narrow documented Mission Control exception",
+    "team coordination/contracts/architecture-baseline.json: doc41 entry only"
+  ],
+  "integration_owner": "Tanush; additive contract/kit and generated-client coordination follow architecture35",
+  "prohibited": [
+    "Force push",
+    "Credentials or private raster publication",
+    "Weakening scientific/test/audit gates",
+    "Cross-owner changes without a documented small seam change"
+  ]
+}

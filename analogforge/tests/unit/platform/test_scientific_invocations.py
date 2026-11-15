@@ -208,3 +208,89 @@ def test_late_publication_rejection_rolls_back_successful_invocation_and_operati
     assert store.list("scientific_operations") == []
     assert store.list("target_profiles") == []
     assert store.list("tool_receipts")[-1]["status"] == "FAILED"
+
+
+def test_science_start_is_committed_before_cpu_execution(rejected_computation, monkeypatch):
+    engine, store, inputs, workspace, run_id, job = rejected_computation
+    engine.science = ReturnedScience("LIMITED")
+    events = []
+
+    def record(_run_id, event_type, payload, _mode):
+        assert store.in_publication
+        events.append((event_type, deepcopy(payload)))
+
+    def compute(service, request, context, **_kwargs):
+        assert events[0][0] == "tool.started"
+        assert events[0][1]["operation"] == inputs.operation
+        assert store.list("invocations")[0]["status"] == "RUNNING"
+        assert not store.in_publication
+        return service.execute(request, context)
+
+    monkeypatch.setattr(store, "append_event", record)
+    monkeypatch.setattr(cpu, "run_science", compute)
+    engine._compute(inputs, run_id, workspace, job_id=job["id"], lease_token=job["lease_token"])
+    assert [event[0] for event in events] == ["tool.started", "tool.completed"]
+    assert events[-1][1]["status"] == "LIMITED"
+
+
+def test_science_cpu_failure_records_failed_transition_without_fabricating_receipt(rejected_computation, monkeypatch):
+    engine, store, inputs, workspace, run_id, job = rejected_computation
+    events = []
+    monkeypatch.setattr(store, "append_event", lambda _run, kind, payload, _mode: events.append((kind, payload)))
+
+    def fail(*_args, **_kwargs):
+        raise RuntimeError("private provider/token detail")
+
+    monkeypatch.setattr(cpu, "run_science", fail)
+    with pytest.raises(RuntimeError):
+        engine._compute(inputs, run_id, workspace, job_id=job["id"], lease_token=job["lease_token"])
+    assert [e[0] for e in events] == ["tool.started", "tool.completed"]
+    assert events[-1][1]["status"] == "FAILED" and "private" not in str(events)
+    assert store.list("tool_receipts") == [] and store.list("scientific_operations") == []
+
+
+def test_science_start_cannot_run_after_lease_loss(rejected_computation, monkeypatch):
+    from analogforge.db.store import LeaseLost
+
+    engine, store, inputs, workspace, run_id, job = rejected_computation
+
+    @contextmanager
+    def lost(*_args):
+        raise LeaseLost()
+        yield
+
+    monkeypatch.setattr(store, "publication", lost)
+    monkeypatch.setattr(cpu, "run_science", lambda *_a, **_k: pytest.fail("Lost lease executed work"))
+    with pytest.raises(LeaseLost):
+        engine._compute(inputs, run_id, workspace, job_id=job["id"], lease_token=job["lease_token"])
+    assert store.list("invocations") == []
+
+
+def test_science_start_cannot_run_after_cancellation_at_the_execution_boundary(rejected_computation, monkeypatch):
+    from analogforge.ports.science import ScienceCancelled
+
+    engine, store, inputs, workspace, run_id, _job = rejected_computation
+    events = []
+    monkeypatch.setattr(engine, "_charge", lambda *_args: store.require("runs", run_id).update(state="CANCELLED"))
+    monkeypatch.setattr(store, "append_event", lambda *_args: events.append(_args))
+    monkeypatch.setattr(cpu, "run_science", lambda *_a, **_k: pytest.fail("Cancelled work executed"))
+    with pytest.raises(ScienceCancelled):
+        engine._compute(inputs, run_id, workspace)
+    assert store.list("invocations") == [] and events == []
+
+
+def test_science_deadline_is_a_blocked_attempt_not_a_scientific_failure(rejected_computation, monkeypatch):
+    from analogforge.ports.science import ScienceDeadlineExceeded
+
+    engine, store, inputs, workspace, run_id, job = rejected_computation
+    events = []
+    monkeypatch.setattr(store, "append_event", lambda _run, kind, payload, _mode: events.append((kind, payload)))
+
+    def timeout(*_args, **_kwargs):
+        raise ScienceDeadlineExceeded()
+
+    monkeypatch.setattr(cpu, "run_science", timeout)
+    with pytest.raises(ScienceDeadlineExceeded):
+        engine._compute(inputs, run_id, workspace, job_id=job["id"], lease_token=job["lease_token"])
+    assert events[-1][1]["status"] == "BLOCKED"
+    assert store.list("tool_receipts") == [] and store.list("scientific_operations") == []

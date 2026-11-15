@@ -1,0 +1,41 @@
+{
+  "owner": "Aradhya",
+  "branch": "aradhya/frontend-experience",
+  "status": "FRONTEND_VERIFIED_LOCAL_REVIEW_READY",
+  "common_handoff_sha": "52f41e58091a735527ef819beb4bdfb7bb6d1ed9",
+  "common_handoff_ref": "refs/tags/ui-split-base-20261114",
+  "betterui_source": "fc5e084c8b4e9e895604ba4be85e78fe2864fe7c",
+  "tasks": {
+    "A0": "IMPLEMENTED: preserved workbench routes, recorded design exception and notices",
+    "A1": "IMPLEMENTED: explicit source mode, preparation cleanup/retry identity, inline rover editor and preserved route state",
+    "A2": "IMPLEMENTED: pinned individual sites, mixed cluster chooser, assurance, stable selection and explicit terminal states",
+    "A3": "IMPLEMENTED: URL-selected regional/target inspectors, existing manifest identity checks and unavailable states",
+    "A4": "IMPLEMENTED: printable current-evidence summary and existing immutable passport links",
+    "A5": "FRONTEND VERIFIED: optional catalog, desktop/mobile/WebGL/fallback/print; real-backend and merged gates pending"
+  },
+  "delivered_schema_version": "planning-v1",
+  "runtime_endpoints_added": [],
+  "tests_executed_by_contributor": [
+    "Node 22.16.0 / pnpm 10.22.0 frozen-lockfile install PASS",
+    "TypeScript noEmit, ESLint, production build PASS",
+    "Full isolated frontend baseline 154/154 PASS",
+    "Frontend contracts 3/3 PASS",
+    "Python kit/renderer/UI contracts 171/171 PASS",
+    "Legacy mock browser journeys 15/15 PASS",
+    "Mission Control mock browser journeys 4/4 PASS and design-smoke PASS",
+    "Mobile axe: zero serious/critical violations, no checks disabled",
+    "WebGL rendering plus no-WebGL fallback verified",
+    "Three-page browser PDF rendered and visually inspected",
+    "Forbidden scan zero findings; tokens 150/150; production audit PASS; pnpm audit --prod zero vulnerabilities; git diff --check PASS",
+    "Mutation probes: full run 34/36; two surviving shell probes killed on focused recheck after markup consolidation; all 36 detected across runs, no fresh full-gate claim"
+  ],
+  "limitations": [
+    "No push or deployment performed",
+    "Real-backend bootstrap blocked: local PostgreSQL 17 has no PostGIS extension; no real-backend or merged gate claimed",
+    "Optional Tanush data endpoints are not invented or probed; absent imagery retains clearly labelled fallback",
+    "Mars/Moon bundled global imagery remains placeholder context; synthetic practice layers do not represent terrain at the named location",
+    "Production build retains existing large-chunk warning for the globe/map dependencies",
+    "Full mutation command was not repeated after narrow shell consolidation; raw full-run and focused-recheck evidence both retained"
+  ],
+  "next_action": "Review local frontend diff and evidence; complete isolated real-backend and merged gates with PostGIS and delivered data before release"
+}

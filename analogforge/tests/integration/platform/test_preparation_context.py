@@ -338,3 +338,69 @@ def test_changed_queued_draft_stops_before_charging_or_dispatching(
         assert unit.list("agent_invocations", {"preparation_id": preparation["record"]["id"]}) == []
         assert unit.require("jobs", job["id"])["error"]["code"] == "REVISION_CONFLICT"
         assert unit.require("preparations", preparation["record"]["id"])["status"] == "FAILED"
+
+
+@pytest.mark.db
+@pytest.mark.parametrize("case", ["valid", "json_generation_correction", "invalid_json", "budget_exhausted"])
+def test_preparation_groq_fallback_counts_actual_requests_and_retains_acceptance_gate(
+    preparation: dict[str, Any], monkeypatch: pytest.MonkeyPatch, case: str
+) -> None:
+    import httpx
+
+    from tests.unit.platform.test_groq_fallback import configured, response
+
+    runtime, workspace = preparation["runtime"], preparation["workspace"]
+    proposal = runtime.engine.prepare({**preparation["draft"], "id": str(uuid4())}, workspace)
+    runtime.settings.openai_api_key = SecretStr("primary-marker")
+    runtime.settings.openai_model = "primary-model"
+    runtime.settings.groq_api_key = SecretStr("secondary-marker")
+    runtime.settings.groq_model = "secondary-model"
+    runtime.settings.groq_fallback_enabled = True
+    with runtime.store.transaction(workspace) as unit:
+        record = unit.require("preparations", preparation["record"]["id"])
+        record["mode"] = "live"
+        if case == "budget_exhausted":
+            record["budget"] = {"counters": {"preparation_model_requests": 3}}
+        unit.replace("preparations", record["id"], record)
+    preparation["record"] = record
+
+    generated_count = []
+
+    def proposed_response(body: dict[str, Any]) -> httpx.Response:
+        generated_count.append(True)
+        if case == "json_generation_correction" and len(generated_count) == 1:
+            return httpx.Response(400, json={"error": {"code": "json_validate_failed", "message": "Rejected JSON"}})
+        text = "{" if case == "invalid_json" else json.dumps(proposal)
+        return httpx.Response(200, json=response(body, [{
+            "type": "message", "id": "msg_test", "role": "assistant", "status": "completed",
+            "content": [{"type": "output_text", "text": text, "annotations": []}],
+        }]))
+
+    client, seen = configured(groq_handler=proposed_response)
+    monkeypatch.setattr(runtime.engine, "_provider_client", lambda: client)
+    dispatch(preparation)
+    with runtime.store.transaction(workspace) as unit:
+        saved = unit.require("preparations", record["id"])
+        invocation = unit.list("agent_invocations", {"preparation_id": record["id"]})[0]
+        expected = 1 if case == "budget_exhausted" else (3 if case == "json_generation_correction" else 2)
+        assert len(seen) == len(invocation["provider_attempts"]) == expected
+        assert invocation["usage_json"]["model_dispatches"] == expected
+        assert saved["budget"]["counters"]["preparation_model_requests"] == (
+            4 if case == "budget_exhausted" else expected
+        )
+        assert invocation["provider"] == ("openai" if case == "budget_exhausted" else "groq")
+        assert invocation["model"] == ("primary-model" if case == "budget_exhausted" else "secondary-model")
+        assert saved["status"] == {
+            "valid": "SUCCEEDED", "json_generation_correction": "SUCCEEDED",
+            "invalid_json": "FAILED", "budget_exhausted": "BLOCKED",
+        }[case]
+        if case in {"valid", "json_generation_correction"}:
+            revision = unit.require("mission_revisions", saved["proposed_revision_id"])
+            assert revision["accepted_at"] is None
+        else:
+            assert saved["error"]["code"] == (
+                "BUDGET_EXHAUSTED" if case == "budget_exhausted" else "MODEL_OUTPUT_INVALID"
+            )
+            assert unit.list("mission_revisions") == []
+        assert unit.list("mission_acceptances") == []
+        assert unit.list("runs") == unit.list("evidence") == []

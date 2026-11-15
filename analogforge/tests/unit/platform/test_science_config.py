@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import shutil
-from contextlib import nullcontext
 from pathlib import Path
 from types import SimpleNamespace
 from uuid import uuid4
@@ -19,6 +18,7 @@ from analogforge.ports import catalog
 from analogforge.ports.domain_models import AreaOfInterest
 from analogforge.ports.science_payloads import CharacterizeTargetInput, CharacterizeTargetPayload, SourceSelector
 from analogforge.settings import Settings
+from tests.unit.platform.test_scientific_invocations import WorkerStoreDouble
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -38,14 +38,15 @@ def configured_settings(tmp_path):
 def test_worker_executes_configured_support_with_its_pinned_hash(configured_settings, monkeypatch):
     settings = configured_settings
     seed_synthetic(None, settings)
-    transaction = SimpleNamespace(list=lambda *_: [], create=lambda *_: None)
-    store = SimpleNamespace(transaction=lambda _: nullcontext(transaction))
+    workspace_id, run_id = str(uuid4()), str(uuid4())
+    store = WorkerStoreDouble(workspace_id, run_id)
     engine = WorkflowEngine(store, settings)
-    run = {
+    run = store.require("runs", run_id)
+    run.update({
         "state": "CHARACTERIZING", "mode": "synthetic", "scenario_config_id": "synthetic-mars-mobility-v1",
         "config_sha256": "0" * 64, "dataset_lock_id": catalog.DATASET_LOCK_SYNTHETIC,
         "runtime": {"algorithm_lock_sha256": engine._algorithm_lock()},
-    }
+    })
     monkeypatch.setattr(engine, "_load", lambda *_: (run, {}, None))
     monkeypatch.setattr(engine, "_charge", lambda *_: None)
     # Keep the actual subprocess and facade; isolate unrelated persistence/publication.
@@ -56,7 +57,7 @@ def test_worker_executes_configured_support_with_its_pinned_hash(configured_sett
         source=SourceSelector(kind="SYNTHETIC_FIXTURE", fixture_id=catalog.FIXTURE_MARS_TARGET),
         measurement_spec_id=catalog.MEASUREMENT_SPEC_TARGET,
         requested_dimensions=["TERRAIN"],
-    ), str(uuid4()), str(uuid4()))
+    ), run_id, workspace_id)
     assert result.status in {"SUCCEEDED", "LIMITED"}, result.issues
     assert isinstance(result.payload, CharacterizeTargetPayload)
     assert result.payload.metrics

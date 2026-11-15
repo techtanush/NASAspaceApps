@@ -1,6 +1,7 @@
 """Discovery consumes the science shortlist order independently of collection ordering."""
 
 from copy import deepcopy
+from types import SimpleNamespace
 from uuid import uuid4
 
 from analogforge.application.registrar import RegisteredResult
@@ -41,6 +42,7 @@ def test_discovery_pins_and_analyzes_science_order_before_selecting_rank_one(mon
     analyzed = []
     engine = object.__new__(WorkflowEngine)
     engine.store = store
+    engine.settings = SimpleNamespace(environment_context_enabled=False)
     monkeypatch.setattr(engine, "_scenario", lambda _: {
         "earth_source": {"kind": "LOCAL_DATASET", "dataset_id": "test-dem"},
         "search_region_set_id": "test-regions", "reference_set_id": "test-references", "operator_limits": {},

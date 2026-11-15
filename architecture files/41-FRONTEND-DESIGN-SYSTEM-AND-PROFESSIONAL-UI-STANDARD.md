@@ -95,6 +95,8 @@ The following are defects, not style choices. Items marked **[scan]** are enforc
 
 **Dependency policy for UI libraries.** Allowed: React 19, React Router, TanStack Query/Table/Virtual, MapLibre, d3 primitives (`d3-scale`, `d3-shape`, `d3-axis`, `d3-array`, `d3-format`, `d3-time-format`), `lucide-react`, Radix primitives (`@radix-ui/react-dialog|popover|tooltip|tabs|select|toggle-group|dropdown-menu|visually-hidden`), `@fontsource/inter`, `@fontsource/ibm-plex-mono`, `clsx`. **Banned:** component kits that impose a look (MUI, Ant Design, Chakra, Mantine, Bootstrap, Tailwind-UI templates, shadcn *copied wholesale with its default styling*), animation libraries (`framer-motion`, `gsap`, `lottie`), chart kits with animated defaults (Chart.js, ECharts, Recharts default theme), CSS-in-JS runtime. Styling is **plain CSS modules or one global stylesheet using the token variables** (no utility-class framework needed). Every dependency is pinned, licensed (recorded), and imported locally (no CDN).
 
+**User-directed amendment, 14–15 November 2026:** the operator explicitly requested Motion (motion.dev) for the redesigned Mission Control. Pinned `motion@14.14.0` is permitted only for short stage entrances and user-directed view transitions, with reduced-motion support. This supersedes the blanket animation-library ban for that package and scope; GSAP, Lottie and unapproved animation dependencies remain banned. The glass/scientific-surface rules, exact data, stable geometry and quiet-motion requirements still apply. See [implementation decision](../team%20handoffs/aradhya/DECISIONS.md).
+
 ## 4. Theme model
 
 * **Dark ("Mission Console Dark") is the default.** `:root, [data-theme="dark"]`.
@@ -412,3 +414,10 @@ Machine checks (`scripts/ui/visual_audit.mjs`, gate UIX-13) and human/agent revi
 
 ## 21. Anti-gaming
 The visual audit may not be satisfied by: disabling checks, allow-listing selectors wholesale, scoping tests to hand-picked elements, hiding content with `display:none` to dodge overflow, or lowering thresholds. `forbidden_scan.py` and the merging guide verify the audit script's thresholds equal this document's. The merging agent re-runs the audit itself on the merged build and performs its own hands-on design review (MRG-11).
+
+
+## Decision D-2026-11-14-MISSION-CONTROL
+
+The product owner requested the globe-led Mission Control flow and exact-location inspection. For `/`, `/start/*`, and `/runs/:id/tour` only, an interactive body globe, spatial camera transitions, contextual starfield and guided setup panel are permitted. The globe navigates actual selected footprints; it is visual context, never a measurement source. The existing engineering workbench stays at `/workbench` with all run deep links preserved. Regional evidence uses prepared immutable display layers and body-specific renderers, not magnified global textures.
+
+This exception is limited to the stage composition and user-directed navigation. No automatic looping globe motion, scanning effect, or decorative pulse is required. Reduced motion removes camera animation and pulses. Tokens, glass boundaries, legibility, keyboard/list alternatives, scientific statuses, source mode, assurance and validation gates remain binding. Report pages are light and print-first. No threshold, frozen scientific contract, or audit check is weakened.

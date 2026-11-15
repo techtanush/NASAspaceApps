@@ -86,26 +86,38 @@ export async function waitForAuditData(page){
  }
  throw new Error('Scientific display requests did not settle');
 }
-async function beginLoadedCohort(page,{width,height,theme,density}){
+async function beginLoadedCohort(page,{width,height,theme,density,expectedHeading}){
  await page.setViewportSize({width,height});
  await page.evaluate(({theme,density})=>{localStorage.setItem('af.theme',theme);localStorage.setItem('af.density',density);},{theme,density}); // allowed: view-preference
  const state=auditStates.get(page);if(state)for(const request of state.inflight)state.navigationAborts.add(request);
  // Use a fresh document navigation: Chromium's hard reload can temporarily bypass
  // the preview service worker, whose startup then schedules a second reload.
  // A new document still records all initial layout shifts without that race.
- await page.goto(page.url(),{waitUntil:'load'});await page.locator('main h1').waitFor({state:'visible',timeout:60000});
+ await page.goto(page.url(),{waitUntil:'load'});
+ await page.getByTestId('app-shell').waitFor({state:'visible',timeout:60000});
+ await page.waitForFunction(heading=>document.querySelector('main h1')?.textContent?.trim()===heading,expectedHeading,{timeout:60000});
  await waitForAuditData(page);
  return page.evaluate(()=>{window.__auditMeasureCLS=false;return window.__auditCLS||0;});
 }
 export const reports=[];
 export const manifest=[];
 const hash=b=>createHash('sha256').update(b).digest('hex');
+async function waitForAuditFonts(page){
+ // Startup deliberately does not await fonts. Visual captures must request both
+ // contract families explicitly: fonts.ready alone never loads an unused face.
+ await page.evaluate(async()=>{
+  await Promise.all(['14px "Inter"','13px "IBM Plex Mono"'].map(face=>document.fonts.load(face)));
+  await document.fonts.ready;
+ });
+}
 export async function auditPage(page,name,{theme='dark',density='default',width=1440,height=900,focus=true,spacing=false,anchor=null,scrollToEnd=[],expectedHeading=null}={}){
  // Release the preceding frame's decoded screenshot buffers on memory-constrained runners.
  if(typeof globalThis.gc==='function')globalThis.gc();
  await page.waitForLoadState('load');
+ await page.getByTestId('app-shell').waitFor({state:'visible',timeout:60000});
+ const routeHeading=expectedHeading??await page.locator('main h1').innerText();
  const measureLoad=['S01','S06','S07','S10','S12'].some(prefix=>name.startsWith(prefix));
- if(measureLoad)await beginLoadedCohort(page,{width,height,theme,density});else{await page.evaluate(()=>{window.__auditMeasureCLS=false;});await page.setViewportSize({width,height});}
+ if(measureLoad)await beginLoadedCohort(page,{width,height,theme,density,expectedHeading:routeHeading});else{await page.evaluate(()=>{window.__auditMeasureCLS=false;});await page.setViewportSize({width,height});}
  await page.evaluate(()=>{if(!document.querySelector('[role=dialog]')&&document.activeElement instanceof HTMLElement)document.activeElement.blur();window.scrollTo(0,0);for(const element of document.querySelectorAll('*')){const style=getComputedStyle(element);if(/auto|scroll/.test(style.overflow+style.overflowX+style.overflowY)){element.scrollTop=0;if(element.matches('.run-tabs')){const active=element.querySelector('[aria-current=page]');if(active)element.scrollLeft+=active.getBoundingClientRect().left-element.getBoundingClientRect().left;}else element.scrollLeft=0;}}});
  if(expectedHeading){const actual=await page.locator('main h1').innerText();if(actual!==expectedHeading)throw new Error(`Expected ${expectedHeading} after navigation; observed ${actual}`);}
  // Use the application's preference controls so header labels and effective styles agree.
@@ -114,7 +126,7 @@ export async function auditPage(page,name,{theme='dark',density='default',width=
   const control=page.getByTestId(id);for(let attempt=0;attempt<3&&await control.getAttribute(attribute)!==value;attempt++){await control.evaluate(node=>node.click());await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(resolve)));}
  }
  await page.evaluate(({theme,density})=>{document.documentElement.dataset.theme=theme; document.documentElement.dataset.density=density;},{theme,density});
- await page.evaluate(()=>document.fonts.ready);
+ await waitForAuditFonts(page);
  const spacingStyle=spacing?await page.addStyleTag({content:'*{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important}p{margin-bottom:2em!important}'}):null;
  // Supplemental review frames retain the real viewport and scroll the real UI;
  // canonical all-screen captures above still start at the normal page origin.
@@ -281,7 +293,7 @@ export async function auditGlyphs(page){
  });reports.push({screen:'styleguide-glyphs',findings:result});return result;
 }
 export async function captureStyleguide(page,{theme,density,directory=resolve(root,'apps/web/docs/design-review')}){
- await page.evaluate(()=>document.fonts.ready);
+ await waitForAuditFonts(page);
  const size=await page.evaluate(()=>({width:document.documentElement.clientWidth,height:Math.max(document.documentElement.scrollHeight,document.body.scrollHeight)}));
  const midpoint=Math.floor(size.height/2),clips=[{x:0,y:0,width:size.width,height:Math.min(size.height,midpoint+24)},{x:0,y:Math.max(0,midpoint-24),width:size.width,height:size.height-Math.max(0,midpoint-24)}];
  mkdirSync(directory,{recursive:true});const captures=[];
@@ -311,6 +323,17 @@ export function auditProduction(){
   ['AJV embedded schema identifier',/^https:\/\/raw\.githubusercontent\.com\/ajv-validator\/ajv\/master\/lib\/refs\/data\.json#/],
   ['library documentation',/^https:\/\/(?:react\.dev\/errors\/|reactrouter\.com\/en\/main\/routers\/|radix-ui\.com\/primitives\/docs\/|maplibre\.org\/|github\.com\/mapbox\/mapbox-gl-js\/issues\/|github\.com\/ungap\/url-search-params)/],
  ];
+ // Exact inert library identifiers, documentation and license references observed in the locked bundles.
+ // This classification does not authorize a runtime external resource; resources above are still rejected.
+ for (const [category,url] of [
+  ['MapLibre URL-parser sentinel','https://maplibre.invalid/'],
+  ['MapLibre WebGL help','https://wiki.openstreetmap.org/wiki/This_map_requires_WebGL'],
+  ['Three.js issue reference','https://github.com/mrdoob/three.js/issues/32012'],
+  ['Three.js shader attribution','https://www.shadertoy.com/view/WtyXRy'],
+  ['Three.js font attribution','http://www.magenta.gr/'],
+  ['Three.js font license','http://www.ellak.gr/fonts/MgOpen/license.html'],
+  ['Polished error documentation','https://github.com/styled-components/polished/blob/main/src/internalHelpers/errors.md#']
+ ]) permitted.push([category,{test:value=>value===url}]);
  const classified=[];
  for(const filename of files){
   if(!/\.(?:js|css|html)$/.test(filename))continue;const content=readFileSync(filename,'utf8');

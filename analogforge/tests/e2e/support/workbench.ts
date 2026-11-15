@@ -70,7 +70,7 @@ export async function api<T = Record<string, unknown>>(page: Page, path: string,
 }
 export async function newMission(page: Page, options: { moon?: boolean; rover?: string | null; scenario?: string; mode?: string; preview?: string } = {}) {
  page.on('pageerror',error=>console.error('Browser error:',error.message));
- await page.goto(options.preview ? `/?mockScenario=${encodeURIComponent(options.preview)}` : '/');
+ await page.goto(options.preview ? `/workbench?mockScenario=${encodeURIComponent(options.preview)}` : '/workbench');
  await expect(page.getByTestId('app-shell')).toBeVisible();
  await expect(page.getByTestId('btn-new-mission')).toBeVisible();
  await inspectHooks(page);
@@ -82,6 +82,7 @@ export async function newMission(page: Page, options: { moon?: boolean; rover?: 
  const dialog = page.getByRole('dialog');
  if (await dialog.isVisible()) await dialog.getByRole('button', { name: /confirm|change body/i }).click();
  await page.getByTestId('input-objective').fill(options.moon ? 'Evaluate lunar polar thermal and terrain analogs.' : 'Test geological sampling mobility with 100 m unique exposure on 12–18 degree slopes and return with reserve.');
+ await page.getByText('Exact coordinates and data reference', {exact:true}).click();
  await choose(page, 'select-target-preset', options.moon ? 'Moon' : 'Mars');
  await expect(page.locator('[data-testid=save-indicator][data-save-state=saved]')).toBeVisible();
  if (options.rover === null) await page.getByTestId('btn-continue-no-rover').click();
@@ -97,6 +98,7 @@ export async function newMission(page: Page, options: { moon?: boolean; rover?: 
  // Job completion precedes retrieval of the accepted-contract proposal.
  await expect(page.getByTestId('btn-accept-contract')).toBeEnabled();
  await inspectHooks(page);
+ await page.getByText('Advanced data settings', {exact:true}).click();
  await choose(page, 'select-scenario', options.scenario || (options.moon ? 'synthetic-moon-gap-v1' : 'synthetic-mars-mobility-v1'));
  await choose(page, 'select-mode', options.mode || 'synthetic');
  await expect(page.getByTestId('btn-accept-contract')).toBeEnabled();
@@ -108,10 +110,20 @@ export async function startRun(page: Page, options: Parameters<typeof newMission
  await newMission(page, options);
  await expect(page.getByTestId('btn-start-run')).toBeEnabled();
  await page.getByTestId('btn-start-run').click();
+ await (await runWorkbenchLink(page)).click();
  await expect(page.getByTestId('run-state-banner')).toBeVisible();
  await expect(page.getByTestId('run-state-banner')).toHaveAttribute('data-state', options.moon ? /COMPLETED|AWAITING_REVIEW/ : 'AWAITING_REVIEW', { timeout: isMock() ? 10000 : 180000 });
  await inspectHooks(page);
  return page.url().match(/\/runs\/([^/?]+)/)![1];
+}
+/** Legacy science journeys explicitly enter the secondary workbench from the main location view. */
+export async function runWorkbenchLink(page: Page) {
+ await expect(page).toHaveURL(/\/runs\/[^/?]+\/tour(?:\?|$)/);
+ await expect(page.locator('[data-testid=tour], [data-testid=run-progress]')).toBeVisible();
+ // The progress panel can become the completed tour between observation and click.
+ // Keep the locator live across that transition instead of pinning its old container.
+ return page.locator('[data-testid=run-progress], [data-testid=tour]')
+  .getByRole('link', {name:/^(?:Open evidence workbench|Evidence workbench)$/});
 }
 export async function tab(page: Page, name: string) {
  await page.locator(`[data-testid=run-nav-tab][data-tab="${name}"]`).click();

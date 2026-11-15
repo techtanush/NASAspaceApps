@@ -20,7 +20,7 @@ from tests.integration.platform.test_live_rehearsal import task_and_context
     ("planetary_target", "payload", "coverage_receipt_ids", "receipt", "array"),
     ("planetary_target", "payload", "source_evidence_ids", "evidence", "array"),
     ("planetary_target", "payload", "measurement_evidence_ids", "evidence", "array"),
-    ("planetary_target", "payload", "geometry_validation_receipt_id", "receipt", "scalar"),
+    ("planetary_target", "payload", "geometry_validation_receipt_id", "receipt", "nullable"),
     ("planetary_target", "DimensionEvidence", "evidence_ids", "evidence", "array"),
     ("earth_scout", "payload", "screening_receipt_id", "receipt", "nullable"),
     ("earth_scout", "ShortlistItem", "evidence_ids", "evidence", "array"),
@@ -126,8 +126,12 @@ def test_empty_nested_namespaces_preserve_empty_arrays_and_nullable_receipts_wit
 
 
 def test_no_authorized_required_receipt_fails_before_provider_request():
-    task, context, registry, _, _ = target_task()
-    task = task.model_copy(update={"payload": {"receipt_summaries": [], "prepared_submission": {"payload": {}}}})
+    # Requirements always needs a validation receipt; an uncharacterized target
+    # can legitimately report no geometry receipt and remain unready.
+    task, context, registry, _, _ = task_and_context()
+    task = task.model_copy(update={"role_key": "requirements", "task_kind": "validate_requirements",
+                                  "payload": {"receipt_summaries": [], "prepared_submission": {"payload": {}}}})
+    context.role = task.role_key
 
     class Client:
         def create(self, **kwargs):

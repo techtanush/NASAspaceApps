@@ -60,6 +60,10 @@ class PlatformRuntime:
 
 class ContractFastAPI(FastAPI):
     def openapi(self) -> dict[str, Any]:
+        if getattr(getattr(self.state, "settings", None), "visualization_enabled", False):
+            from analogforge.api.visualization_contracts import effective_specification
+
+            return effective_specification()
         return specification()
 
 
@@ -91,7 +95,7 @@ def create_app(
         allow_origins=list(settings.allowed_origins),
         allow_credentials=True,
         allow_methods=["GET", "POST"],
-        allow_headers=["Content-Type", "Idempotency-Key", "Last-Event-ID", "X-CSRF-Token"],
+        allow_headers=["Content-Type", "Idempotency-Key", "Last-Event-ID", "X-CSRF-Token", "X-Upload-Filename"],
         expose_headers=["ETag", "X-Artifact-SHA256", "Retry-After", "Content-Disposition"],
     )
 
@@ -197,9 +201,25 @@ def create_app(
         return JSONResponse(safe.envelope(getattr(request.state, "request_id", None)), status_code=503)
 
     application.include_router(build_router())
+    from analogforge.api.routers.runs import build_activity_router
+
+    application.include_router(build_activity_router())
+    from analogforge.api.routers.environment import build_environment_router
+
+    application.include_router(build_environment_router())
+    from analogforge.api.routers.operator_context import router as operator_context_router
+
+    application.include_router(operator_context_router)
+    from analogforge.api.routers.evidence_briefs import router as evidence_brief_router
+
+    application.include_router(evidence_brief_router)
     from analogforge.api.routers.auth import router as auth_router
 
     application.include_router(auth_router)
+    if getattr(settings, "visualization_enabled", False):
+        from analogforge.api.routers.visualization import build_visualization_router
+
+        application.include_router(build_visualization_router())
     return application
 
 

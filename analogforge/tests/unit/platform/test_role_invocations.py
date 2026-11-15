@@ -47,6 +47,31 @@ def active_invocation(store):
     return next(row for row in store.list("invocations") if row["task_kind"] == "advance_workflow")
 
 
+def test_scout_receives_exact_registered_target_primitives_without_inventing_a_comparison(role_attempt, monkeypatch):
+    engine, store, workspace, run_id, _ = role_attempt
+    profile = {"id": str(uuid4()), "run_id": run_id, "workspace_id": workspace,
+               "metrics": [{"metric_id": "surface_slope_deg:mean", "value": 9.25,
+                            "uncertainty_note": "Not quantified", "support_scale_m": 500}],
+               "payload": {"slope_histogram": {"edges": [0, 5, 10], "area_fraction": [0.25, 0.75],
+                                               "support_scale_m": 500},
+                           "unavailable_dimensions": [{"dimension": "SCIENCE", "reason_code": "NO_COVERAGE"}]}}
+    store.create("target_profiles", deepcopy(profile))
+    store.require("runs", run_id)["target_profile_id"] = profile["id"]
+    captured = []
+
+    def review(_provider, task, *_):
+        supplied = task.payload["target_profile_context"]
+        assert supplied == profile
+        assert "slope_w1_deg" not in str(supplied)  # A pair comparison is not a planetary scalar.
+        supplied["metrics"][0]["value"] = -999
+        captured.append(task)
+        return task.payload["prepared_submission"]
+
+    monkeypatch.setattr(OpenAIProvider, "run", review)
+    engine._role("earth_scout", "screen_candidates", run_id, workspace)
+    assert len(captured) == 1 and store.require("target_profiles", profile["id"]) == profile
+
+
 def test_accepted_proposed_default_has_exact_pinned_acceptance_context(role_attempt, monkeypatch):
     engine, store, workspace, run_id, _ = role_attempt
     acceptance = store.list("mission_acceptances")[0]
@@ -60,6 +85,7 @@ def test_accepted_proposed_default_has_exact_pinned_acceptance_context(role_atte
             "acceptance_id": acceptance["id"], "accepted_at": acceptance["accepted_at"],
             "mission_revision_id": str(task.contract_revision_id), "contract_sha256": task.contract_hash,
             "scope": "OPERATOR_CRITERIA_FOR_PINNED_REVISION", "scientific_validation": False,
+            "requirement_ids": ["req-1"],
         }
         contract = registry.execute("inspect_contract", {"contract_revision_id": str(task.contract_revision_id)},
                                     context, call_id="inspect-accepted")
@@ -136,7 +162,9 @@ def test_late_role_publication_failure_rolls_back_success_and_finishes_failed(ro
     engine._job_context.set((job["id"], job["lease_token"]))
     staged = []
 
-    def reject_event(*_args):
+    def reject_event(_run_id, event_type, payload, *_args):
+        if event_type == "agent.started" or payload.get("status") == "FAILED":
+            return {}
         staged.append(active_invocation(store)["status"])
         raise PolicyViolation("TEST_PUBLICATION_REJECTED")
 
@@ -227,3 +255,74 @@ def test_role_cleanup_error_preserves_original_and_logs_no_private_exception(rol
     assert caught.value is failure
     assert "role.invocation_finalize_failed" in caplog.text
     assert "private database" not in caplog.text
+
+
+@pytest.mark.parametrize("failure", [False, True])
+def test_actual_provider_trace_persists_for_success_and_failure(role_attempt, monkeypatch, failure):
+    from types import SimpleNamespace
+
+    engine, store, workspace, run_id, _ = role_attempt
+    attempts = [{"provider": "openai", "model": "primary", "status": "FAILED", "http_status": 429},
+                {"provider": "groq", "model": "secondary", "status": "SUCCEEDED"}]
+    monkeypatch.setattr(engine, "_provider_client", lambda: SimpleNamespace(attempts=attempts))
+
+    def propose(_provider, task, _registry, _context):
+        if failure:
+            raise ProviderError("MODEL_OUTPUT_INVALID", "Rejected proposal")
+        return task.payload["prepared_submission"]
+
+    monkeypatch.setattr(OpenAIProvider, "run", propose)
+    if failure:
+        with pytest.raises(ProviderError):
+            engine._role("mission_director", "advance_workflow", run_id, workspace)
+    else:
+        engine._role("mission_director", "advance_workflow", run_id, workspace)
+    row = active_invocation(store)
+    assert row["status"] == ("FAILED" if failure else "SUCCEEDED")
+    assert row["provider_attempts"] == attempts
+
+
+def test_role_start_is_committed_and_fenced_before_provider_execution(role_attempt, monkeypatch):
+    engine, store, workspace, run_id, job = role_attempt
+    engine._job_context.set((job["id"], job["lease_token"]))
+    events = []
+
+    def record(_run_id, event_type, payload, _mode):
+        assert store.in_publication
+        events.append((event_type, deepcopy(payload)))
+
+    def propose(_provider, task, *_args):
+        assert events[0][0] == "agent.started"
+        assert events[0][1]["invocation_id"] == str(task.invocation_id)
+        assert active_invocation(store)["status"] == "RUNNING"
+        assert not store.in_publication  # No transaction/row lock held across provider work.
+        return task.payload["prepared_submission"]
+
+    monkeypatch.setattr(store, "append_event", record)
+    monkeypatch.setattr(OpenAIProvider, "run", propose)
+    engine._role("mission_director", "advance_workflow", run_id, workspace)
+    assert [event[0] for event in events] == ["agent.started", "agent.completed"]
+    assert events[-1][1]["status"] == "SUCCEEDED"
+
+
+def test_role_start_cannot_invoke_provider_after_lease_loss(role_attempt, monkeypatch):
+    from contextlib import contextmanager
+
+    from analogforge.db.store import LeaseLost
+
+    engine, store, workspace, run_id, job = role_attempt
+    engine._job_context.set((job["id"], job["lease_token"]))
+    events = []
+
+    @contextmanager
+    def lost(*_args):
+        raise LeaseLost()
+        yield
+
+    monkeypatch.setattr(store, "publication", lost)
+    monkeypatch.setattr(store, "append_event", lambda *_args: events.append(_args))
+    monkeypatch.setattr(OpenAIProvider, "run", lambda *_args: pytest.fail("A lost lease invoked the provider"))
+    with pytest.raises(LeaseLost):
+        engine._role("mission_director", "advance_workflow", run_id, workspace)
+    assert events == []
+    assert not any(invocation["task_kind"] == "advance_workflow" for invocation in store.list("invocations"))

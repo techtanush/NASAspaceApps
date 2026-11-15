@@ -161,7 +161,13 @@ def mutate(
     if operation_id == "saveMissionDraft":
         return 201, missions.save_draft(uow, str(record_id), body)
     if operation_id == "createMissionRevision":
-        return 201, missions.propose(uow, str(record_id), body["contract"], body["expected_revision"])
+        from analogforge.application import operator_context
+
+        header = uow.require("missions", str(record_id), lock=True)
+        context = operator_context.preparation_snapshot(uow, header["current_draft_id"], None)
+        revision = missions.propose(uow, str(record_id), body["contract"], body["expected_revision"])
+        operator_context.pin(uow, rt.blobs, "MISSION_REVISION", revision["id"], context)
+        return 201, revision
     if operation_id == "acceptMissionRevision":
         return 200, missions.accept(uow, str(record_id), body, principal.subject_id)
     if operation_id == "createRover":
@@ -169,11 +175,14 @@ def mutate(
     if operation_id == "createRoverRevision":
         return 201, rovers.create(uow, workspace_id, body["profile"], str(record_id), body["expected_revision"])
     if operation_id == "prepareMissionFingerprint":
-        mission = uow.require("missions", str(record_id))
+        from analogforge.application import operator_context
+
+        mission = uow.require("missions", str(record_id), lock=True)
         missions.check_revision(mission, body["expected_revision"])
         runs.require_live(rt.settings, body["mode"])
         if body["rover_revision_id"]:
-            uow.require("rover_revisions", body["rover_revision_id"])
+            uow.require("rover_revisions", body["rover_revision_id"], lock=True)
+        context = operator_context.preparation_snapshot(uow, mission["current_draft_id"], body["rover_revision_id"])
         preparation_id = missions.uid()
         uow.create(
             "preparations",
@@ -184,6 +193,7 @@ def mutate(
                 "status": "QUEUED",
             },
         )
+        operator_context.pin(uow, rt.blobs, "PREPARATION", preparation_id, context)
         job = uow.enqueue("PREPARE_FINGERPRINT", {**body, "mission_id": record_id}, preparation_id=preparation_id)
         return 202, {
             "preparation_id": preparation_id,

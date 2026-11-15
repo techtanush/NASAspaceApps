@@ -61,6 +61,13 @@ def validate_authoritative_payload(task: AgentTask, submission: RoleSubmission) 
         if identifier not in allowed:
             raise PolicyViolation("NESTED_REFERENCE_NOT_AUTHORIZED")
     payload = submission.payload
+    if task.role_key == "evidence_passport" and payload.get("ready_to_publish") is False:
+        known_unresolved = set(expected.get("unresolved_issue_ids", []))
+        cited_unresolved = set(payload.get("unresolved_issue_ids", [])) & known_unresolved
+        explained = any(issue.severity in {"WARNING", "BLOCKING"} and issue.code.strip() and issue.message.strip()
+                        for issue in submission.issues)
+        if not cited_unresolved and not explained:
+            raise PolicyViolation("PUBLICATION_HOLD_REASON_REQUIRED")
     for field, authoritative in (
         ("contract_revision_id", str(task.contract_revision_id)),
         ("contract_hash", task.contract_hash),

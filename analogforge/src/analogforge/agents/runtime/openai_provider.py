@@ -7,6 +7,7 @@ import logging
 import time
 from collections.abc import Sequence
 from copy import deepcopy
+from functools import partial
 from typing import Any, Literal
 from uuid import UUID
 
@@ -18,6 +19,12 @@ from analogforge.agents.prompts.bundle import prompt_bundle
 from analogforge.agents.runtime.invocation import _nested_references, validate_submission
 from analogforge.agents.runtime.provider import ProviderError
 from analogforge.agents.runtime.provider_backoff import provider_backoff
+from analogforge.agents.runtime.tool_projection import (
+    OPERATOR_CONTEXT_INSTRUCTIONS,
+    PROJECTION_INSTRUCTIONS,
+    project_tool_result,
+    specialize_tool_schemas,
+)
 from analogforge.agents.runtime.wire_context import (
     WIRE_INSTRUCTIONS,
     UnknownWireAlias,
@@ -62,6 +69,7 @@ _POLICY_FAILURE_FIELDS = {
     "EVIDENCE_NOT_ESTABLISHED": "evidence_ids",
     "ISSUE_EVIDENCE_NOT_ESTABLISHED": "issues.evidence_ids",
     "CLAIM_REFERENCE_NOT_AUTHORIZED": "payload",
+    "PUBLICATION_HOLD_REASON_REQUIRED": "payload.ready_to_publish",
 }
 _WIRE_INSTRUCTIONS = (
     "\nTask _wire_encoding describes lossless references only. When prepared_submission is omitted, it is identical "
@@ -240,10 +248,8 @@ def submission_schema(
         "type": ["string", "null"],
         "enum": [*allowed_actions, None],
         "description": (
-            "Use an exact allowed token or null; put explanations in summary or issues. "
-            "continue completes this bounded role and returns control to the workflow graph. "
-            "stop_investigation requires a supported investigation stop reason, not merely role completion. "
-            "Preserve request_review or record_unknown when the supplied facts justify them."
+            "Exact allowed token/null; explanations in summary/issues. continue ends only this role; "
+            "stop_investigation needs a supported run stop. Retain justified request_review/record_unknown."
         ),
     }
     return strict_schema(common)
@@ -285,6 +291,20 @@ def _validation_details(
         details = _nested_reference_details(task, proposal)
         if details:
             return details
+    if isinstance(error, PolicyViolation) and error.detail_code == "STATUS_INFLATION" and proposal:
+        expected = task.payload.get("authoritative_submission", task.payload.get("prepared_submission", {}))
+        computed = {row["requirement_id"]: row["proposed_status"]
+                    for row in expected.get("payload", {}).get("rows", [])}
+        details = [{"field": f"payload.rows.{index}.proposed_status", "code": "STATUS_INFLATION",
+                    "expected": computed[row["requirement_id"]],
+                    "remediation": "Retain the exact computed status, including FAIL/GAP/UNKNOWN. "
+                    "Contest evidence in issues/disposition, never by changing a computed row. "
+                    "The exact task-bound payload reference is available."}
+                   for index, row in enumerate(proposal.payload.get("rows", []))
+                   if row.get("requirement_id") in computed
+                   and row.get("proposed_status") != computed[row["requirement_id"]]]
+        if details:
+            return details[:8]
     if isinstance(error, PolicyViolation) and error.detail_code in _POLICY_FAILURE_FIELDS:
         remediation = (
             "Use only supplied committed evidence and receipt references: task.input_evidence_ids, "
@@ -294,13 +314,28 @@ def _validation_details(
             if error.detail_code in {"EVIDENCE_NOT_ESTABLISHED", "ISSUE_EVIDENCE_NOT_ESTABLISHED"}
             else "Preserve authoritative_submission facts and frozen task inputs; retain justified review or blockers."
         )
+        if error.detail_code == "PUBLICATION_HOLD_REASON_REQUIRED":
+            remediation = ("Keep false when justified: cite known unresolved issues or supply a concrete "
+                           "WARNING/BLOCKING issue and repair. Non-PASS science alone does not block an honest report.")
         return [{"field": _POLICY_FAILURE_FIELDS[error.detail_code], "code": error.detail_code,
                  "remediation": remediation}]
     if isinstance(error, ValidationError):
-        return [
-            {"field": ".".join(str(part) for part in item["loc"]), "code": item["type"]}
-            for item in error.errors(include_input=False, include_url=False)[:8]
-        ]
+        details = []
+        for item in error.errors(include_input=False, include_url=False)[:8]:
+            detail: dict[str, Any] = {"field": ".".join(str(part) for part in item["loc"]), "code": item["type"]}
+            # Only schema-owned numeric bounds; never exception input/message/context prose.
+            bounds = {key: value for key, value in item.get("ctx", {}).items()
+                      if key in {"max_length", "min_length"}
+                      and isinstance(value, int) and not isinstance(value, bool)}
+            if bounds:
+                detail["constraints"] = bounds
+            if item["loc"] == ("summary",) and item["type"] == "string_too_long":
+                detail["remediation"] = (
+                    "Use one short outcome sentence without identifiers; cite evidence_ids instead. "
+                    "The character limit applies after restoring wire aliases."
+                )
+            details.append(detail)
+        return details
     if isinstance(error, json.JSONDecodeError):
         return [{"field": "arguments", "code": "invalid_json"}]
     if str(error) in {"Unlisted next action", "Unlisted action"}:
@@ -321,7 +356,14 @@ class OpenAIProvider:
         instructions, _ = prompt_bundle(task.role_key)
         codec = WireCodec(task, _task_receipt_ids(task))
         wire = codec.task(_wire_task(task))
-        instructions += WIRE_INSTRUCTIONS
+        instructions += WIRE_INSTRUCTIONS + PROJECTION_INSTRUCTIONS
+        if "target_profile_context" in task.payload:
+            instructions += (" target_profile_context contains registered target primitives. "
+                             "Pair-comparison metrics are produced downstream, not target-only scalars. "
+                             "target_coordinate_context binds source frames and geometry preparation to real receipts; "
+                             "the operator AOI is a horizontal footprint, not a source height-reference declaration.")
+        if task.payload.get("untrusted_operator_context_ref"):
+            instructions += OPERATOR_CONTEXT_INSTRUCTIONS
         items: list[dict[str, Any]] = [
             {"role": "user", "content": json.dumps({"task": wire}, separators=(",", ":"), ensure_ascii=False)}
         ]
@@ -339,16 +381,40 @@ class OpenAIProvider:
                 ),
             }
         )
-        tools = [{**tool, "parameters": codec.schema(tool["parameters"])} for tool in tools]
+        tools = specialize_tool_schemas(task, tools)
+        tools = [{**tool, "parameters": (
+            codec.submission_schema(tool["parameters"]) if tool["name"] == "submit_role_result"
+            else codec.schema(tool["parameters"])
+        )} for tool in tools]
         correction_used = False
         transport_attempts = 0
-        for _ in range(BUDGETS["model_requests_per_invocation"]):
+
+        request_count = 0
+
+        def charge_request() -> None:
+            nonlocal request_count
+            if request_count >= BUDGETS["model_requests_per_invocation"]:
+                raise _output_failure(task, "REQUEST_BUDGET_EXHAUSTED")
             if context.charge:
                 context.charge("model_requests_per_invocation")
                 context.charge("model_requests_per_run")
+            request_count += 1
+
+        for _ in range(BUDGETS["model_requests_per_invocation"]):
+            charge_request()
+            final_request = (request_count == BUDGETS["model_requests_per_invocation"]
+                             or request_count >= task.budget.get("model_requests_per_run", float("inf")))
+            request_tools = ([tool for tool in tools if tool["name"] == "submit_role_result"]
+                             if final_request else tools)
             try:
-                response = self.client.create(
-                    instructions=instructions, input=items, tools=tools, tool_choice="required", max_output_tokens=4096,
+                create_budgeted = getattr(self.client, "create_budgeted", None)
+                create = (
+                    partial(create_budgeted, charge_request)
+                    if callable(create_budgeted) else self.client.create
+                )
+                response = create(
+                    instructions=instructions, input=items, tools=request_tools, tool_choice="required",
+                    max_output_tokens=4096,
                 )
                 transport_attempts = 0
             except (APIConnectionError, APITimeoutError) as exc:
@@ -358,8 +424,32 @@ class OpenAIProvider:
                 self.sleep(2**transport_attempts)
                 continue
             except APIStatusError as exc:
+                if (
+                    getattr(self.client, "provider", None) == "groq" and exc.status_code == 400
+                    and isinstance(exc.body, dict) and exc.body.get("code") == "tool_use_failed"
+                ):
+                    # Groq can reject malformed tool generation before returning a tool call.
+                    # Share the existing single correction allowance; never parse/execute failed_generation.
+                    if correction_used:
+                        raise _output_failure(task, "REPEATED_INVALID_ARGUMENTS") from exc
+                    correction_used = True
+                    transport_attempts = 0
+                    items.append({"role": "user", "content": json.dumps({"error": {
+                        "code": "MODEL_OUTPUT_INVALID",
+                        "message": "Return exactly one registered function call satisfying its supplied strict schema.",
+                    }})})
+                    continue
                 if exc.status_code in {401, 403}:
                     raise ProviderError("PROVIDER_AUTH_FAILED", "Provider credentials were rejected") from exc
+                provider_body = exc.body if isinstance(exc.body, dict) else {}
+                provider_error = provider_body.get("error", provider_body)
+                error_code = provider_error.get("code") if isinstance(provider_error, dict) else None
+                if exc.status_code == 413 or isinstance(error_code, str) and error_code in {
+                    "context_length_exceeded", "request_too_large", "input_too_large", "tokens_exceeded",
+                }:
+                    raise ProviderError(
+                        "RESOURCE_LIMIT", "Provider input/context size exceeds the available request budget", False
+                    ) from exc
                 transport_attempts += 1
                 if exc.status_code not in {429, 500, 502, 503, 504} or transport_attempts >= 3:
                     code = "PROVIDER_RATE_LIMITED" if exc.status_code == 429 else "SOURCE_UNAVAILABLE"
@@ -380,10 +470,14 @@ class OpenAIProvider:
             # Continuation items remain private/in-memory; no reasoning is persisted or rendered.
             items.extend(output)
             call = calls[0]
+            if final_request and call["name"] != "submit_role_result":
+                raise _output_failure(task, "REQUEST_BUDGET_EXHAUSTED")
             proposal = None
             feedback = False
             try:
-                arguments = codec.decode(json.loads(call["arguments"]))
+                raw_arguments = json.loads(call["arguments"])
+                arguments = (codec.submission(raw_arguments) if call["name"] == "submit_role_result"
+                             else codec.decode(raw_arguments))
                 if call["name"] == "submit_role_result":
                     proposal = RoleSubmission.model_validate(arguments)
                     validate_submission(task, proposal)
@@ -396,6 +490,11 @@ class OpenAIProvider:
             except (json.JSONDecodeError, ValidationError, ValueError) as exc:
                 feedback = True
                 details = _validation_details(exc, task, proposal)
+                logging.getLogger(__name__).warning(
+                    "provider.arguments_rejected.%s", ",".join(detail["code"] for detail in details),
+                    extra={"invocation_id": str(task.invocation_id), "role": task.role_key,
+                           "validation_fields": [detail["field"] for detail in details]},
+                )
                 if isinstance(exc, PolicyViolation):
                     detail_code = details[0]["code"]
                     logging.getLogger(__name__).warning(
@@ -413,7 +512,9 @@ class OpenAIProvider:
                         "details": details,
                     }
                 }
+            projected = result if feedback else project_tool_result(task, call["name"], arguments, result)
+            wire_result = projected if feedback else codec.result(projected, call_id=call["call_id"])
             items.append({"type": "function_call_output", "call_id": call["call_id"],
-                          "output": json.dumps(result if feedback else codec.result(result),
+                          "output": json.dumps(wire_result,
                                                separators=(",", ":"), ensure_ascii=False)})
         raise _output_failure(task, "REQUEST_BUDGET_EXHAUSTED")

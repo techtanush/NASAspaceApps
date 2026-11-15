@@ -16,11 +16,13 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from typing import Literal
+from uuid import UUID
 
+from analogforge.ports import catalog
 from analogforge.ports.common import RuntimeMode
 from analogforge.ports.domain_models import MeasuredMetric, Requirement
 from analogforge.ports.science import EvidenceHandle
-from analogforge.ports.science_payloads import Histogram, VerificationSummary
+from analogforge.ports.science_payloads import Histogram, VerificationSummary, VerifyRoutePayload
 from analogforge.science.comparison.scale import check_support_window
 from analogforge.science.comparison.w1 import w1_from_histograms
 from analogforge.science.config import ObservablePolicy, default_thresholds
@@ -77,6 +79,14 @@ class SideEvidence:
 
 
 @dataclass(frozen=True)
+class RouteVerificationContext:
+    """Private verified artifact context; the frozen summary remains unchanged."""
+
+    evidence_id: UUID
+    report: VerifyRoutePayload
+
+
+@dataclass(frozen=True)
 class PolicyContext:
     requirement: Requirement
     policy_id: str
@@ -85,6 +95,7 @@ class PolicyContext:
     candidate: SideEvidence
     target: SideEvidence
     verification: VerificationSummary | None
+    verification_context: RouteVerificationContext | None = None
 
 
 @dataclass(frozen=True)
@@ -631,6 +642,42 @@ def _analysis_scale(ctx: PolicyContext) -> float | None:
     return max(scales) if scales else None
 
 
+def _exposure_violation_for_requirement(ctx: PolicyContext, metric: MeasuredMetric | None) -> bool | None:
+    """Scope a code-only shortfall using the exact independently produced report.
+
+    A missing/ambiguous report cannot turn a different requirement's shortfall
+    into either a failure or proof of support for this requirement.
+    """
+    detail, summary, req = ctx.verification_context, ctx.verification, ctx.requirement
+    if detail is None or summary is None or metric is None or metric.value is None:
+        return None
+    if not any(h.evidence_id == detail.evidence_id and h.kind == "VERIFICATION"
+               and h.algorithm_id == "verify-route" for h in ctx.candidate.handles):
+        return None
+    report = detail.report
+    if (report.outcome != summary.outcome or report.failure_category != summary.failure_category
+            or report.metrics != summary.metrics or [v.code for v in report.violations] != summary.violation_codes):
+        return None
+    rows = [row for row in report.benchmark_rows if row.requirement_id == req.id
+            and row.constraint_id == catalog.constraint_exposure(req.id)]
+    if len(rows) != 1:
+        return None
+    row = rows[0]
+    if (row.unit != "m" or metric.unit != "m" or req.unit != "m" or row.threshold != req.lower
+            or row.measured is None or row.measured != metric.value or row.margin is None or row.threshold is None
+            or abs(row.margin - (row.measured - row.threshold)) > ctx.policy.tolerance):
+        return None
+    meets = evaluate_threshold(metric.value, "GTE", req.lower, None, ctx.policy.tolerance).meets
+    if row.status != ("PASS" if meets else "FAIL"):
+        return None
+    exposure_violations = [v for v in report.violations if v.code in _EXPOSURE_VIOLATIONS]
+    if any(v.requirement_id is None or v.constraint_id != catalog.constraint_exposure(v.requirement_id)
+           for v in exposure_violations):
+        return None
+    own = any(v.requirement_id == req.id for v in exposure_violations)
+    return own if own != meets else None
+
+
 def route_dependent(ctx: PolicyContext) -> PolicyDecision:
     """Route rows: ``PRELIMINARY`` until a verification is supplied, then decided from the verifier's metrics."""
     req = ctx.requirement
@@ -753,6 +800,15 @@ def route_dependent(ctx: PolicyContext) -> PolicyDecision:
             numeric_decided=True,
             direct_evidence=True,
         )
+    if kind == "exposure" and named_violation:
+        scoped = _exposure_violation_for_requirement(ctx, metric)
+        if scoped is None:
+            return replace(
+                base,
+                explanation="Exposure shortfall identity could not be bound to this requirement; support is unknown.",
+                limitations=("Code-only exposure violations cannot be assigned across requirements.",),
+            )
+        named_violation = scoped
     if metric is not None and metric.value is not None:
         verdict = evaluate_threshold(metric.value, "GTE", req.lower, None, ctx.policy.tolerance)
         meets = verdict.meets and not named_violation

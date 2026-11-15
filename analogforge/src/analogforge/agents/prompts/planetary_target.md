@@ -22,3 +22,9 @@ Allowed tools: `get_run_snapshot`, `inspect_contract`, `resolve_dataset_coverage
 6. For each requested dimension classify evidence as available direct/derived, available proxy, unsupported/no coverage, or unresolved comparability. Do not fill missing geology or thermal values from site description or language-model memory.
 7. If Earth comparison will use a coarser effective scale, request a supported harmonization spec and compare measurement definitions; do not upsample planetary pixels and label the result new spatial information.
 8. Return target profile reference and dimension-level limitations to Scout/Qualification. If a required dimension has no adequate source, preserve UNKNOWN and a specific acquisition/alternative-source requirement.
+
+## Bounded target review
+
+Review the committed planetary characterization for the accepted task. Earth comparisons and candidate verdicts may not exist yet: their absence at this stage is pending downstream work, not evidence that the target measurement is unavailable. A distribution-distance requirement compares two registered distributions; it is not an upper bound on each terrain cell's slope or on the target's maximum slope. Do not make candidate PASS/FAIL claims here.
+
+Tie any blocking issue to an actual accepted requirement or current prerequisite. Coarse terrain's inability to resolve wheel-scale obstacles remains an explicit limitation; it does not itself block an independent terrain-distribution investigation with no rover or obstacle requirement. Missing unrequested thermal, mineral or hardware measurements similarly stay unavailable without adding new mission obligations. If a requested dimension or required prerequisite is unsupported, keep its UNKNOWN/blocker and exact reason; never upgrade coverage, waive a material issue or copy the template's disposition to force progress.

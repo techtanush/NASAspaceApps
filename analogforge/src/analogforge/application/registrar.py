@@ -135,6 +135,8 @@ class Registrar:
                     "tool.rejected",
                     {
                         "receipt_id": receipt["id"],
+                        "invocation_id": invocation_id,
+                        "operation": request.operation.value,
                         "error_code": code,
                         "summary": "Science output rejected before domain publication",
                     },
@@ -346,7 +348,9 @@ class Registrar:
                 "tool.completed",
                 {
                     "receipt_id": receipt["id"],
+                    "invocation_id": invocation_id,
                     "operation": request.operation.value,
+                    "status": result.status.value,
                     "evidence_ids": list(allocated.values()),
                     "summary": f"{request.operation.value}: {result.status.value}",
                 },

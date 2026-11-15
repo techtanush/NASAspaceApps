@@ -144,9 +144,9 @@ MUTANTS = (
         "M14",
         "write DSN to application log",
         "settings.py",
-        'return self.model_dump(mode="json", exclude=excluded)',
+        'public = self.model_dump(mode="json", exclude=excluded)',
         '__import__("logging").getLogger("analogforge").warning(self.database_url)\n'
-        '        return self.model_dump(mode="json", exclude=excluded)',
+        '        public = self.model_dump(mode="json", exclude=excluded)',
         "tests/unit/platform/test_secrets.py::test_secret_values_absent_from_public_surfaces",
     ),
     Mutant(

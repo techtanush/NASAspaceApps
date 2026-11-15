@@ -30,6 +30,7 @@ test('MRG-03 real persisted attempts, frozen inputs, assurance, artifacts and ex
     expect(sha(await response.body())).toBe(layer.image_artifact_sha256);
   }
   await tab(page, 'target');
+  await page.getByRole('button', { name: 'Measured terrain', exact: true }).click();
   await expect(page.locator('[data-testid=planetary-panel] svg image')).toHaveCount(1);
   await expect(page.getByText('The prepared image could not load. Numeric evidence remains available.')).toHaveCount(0);
   await tab(page, 'analogs');
@@ -106,7 +107,7 @@ test('MRG-03 real persisted attempts, frozen inputs, assurance, artifacts and ex
 test('MRG-11 real list loading reserves geometry before asynchronous row details arrive', async ({page})=>{
   expect(process.env.E2E_TARGET).toBe('real');
   await installAuditInstrumentation(page);
-  await page.goto('/');
+  await page.goto('/workbench');
   const start=reports.length;
   for(const [width,height] of [[1920,1080],[1440,900],[1280,800],[1024,768],[768,1024],[390,844]]){
     for(const theme of ['dark','light'])await auditPage(page,'S01',{width,height,theme,focus:false});

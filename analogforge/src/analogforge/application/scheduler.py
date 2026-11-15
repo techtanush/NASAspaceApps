@@ -7,9 +7,11 @@ import json
 import logging
 import tempfile
 import time
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager, nullcontext
 from contextvars import ContextVar
+from copy import deepcopy
+from functools import partial
 from pathlib import Path
 from typing import Any, cast
 from uuid import UUID
@@ -47,6 +49,7 @@ from analogforge.ports.science import (
     EvidenceHandle,
     ScienceCancelled,
     ScienceComputationResult,
+    ScienceDeadlineExceeded,
     ScienceOperation,
     ScienceOptions,
     ScienceRequest,
@@ -64,8 +67,6 @@ from analogforge.ports.science_payloads import (
     DesignBenchmarkInput,
     DiagnoseResultInput,
     IngestLocalDatasetInput,
-    OptimizePortfolioInput,
-    QualificationRowInput,
     ResolveCoverageInput,
     ScreenCandidatesInput,
     SearchRouteInput,
@@ -106,6 +107,9 @@ class WorkflowEngine:
             blob_store = ContentAddressedStore(Path(settings.data_root) / "blobs")
         self.blobs = blob_store
         self.registrar = Registrar(store, blob_store)
+        from analogforge.adapters.openai.client import RateLimitCooldown
+
+        self._model_cooldown = RateLimitCooldown()
         self._job_context: ContextVar[tuple[str | None, str | None]] = ContextVar(
             "workflow_job_context", default=(None, None)
         )
@@ -113,7 +117,7 @@ class WorkflowEngine:
     def _provider_client(self) -> Any:
         from urllib.parse import urlsplit
 
-        from analogforge.adapters.openai.client import ResponsesClient
+        from analogforge.adapters.openai.client import ResponsesClient, fallback_options
 
         key = getattr(self.settings, "openai_api_key", None)
         if key is not None and hasattr(key, "get_secret_value"):
@@ -129,7 +133,14 @@ class WorkflowEngine:
             parsed = urlsplit(base_url)
             if parsed.scheme not in {"http", "https"} or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}:
                 raise WorkflowError("INPUT_INVALID", "Fake provider must use a local loopback origin")
-        return ResponsesClient(key, getattr(self.settings, "openai_model", None), base_url=base_url)
+        return ResponsesClient(
+            key, getattr(self.settings, "openai_model", None), base_url=base_url,
+            cooldown=self._model_cooldown, **fallback_options(self.settings),
+            min_request_interval_seconds=getattr(self.settings, "openai_min_request_interval_seconds", 0),
+            primary_output_token_limit=getattr(self.settings, "openai_max_output_tokens", 4096),
+            nvidia_output_token_limit=getattr(self.settings, "nvidia_max_output_tokens", 1024),
+            primary_reasoning_effort=getattr(self.settings, "openai_reasoning_effort", None),
+        )
 
     def _scenario(self, identifier: str) -> dict[str, Any]:
         path = Path(self.settings.config_dir) / "scenarios.yaml"
@@ -212,6 +223,9 @@ class WorkflowEngine:
         preparation_id: str | None = None,
         scenario_config_id: str | None = None,
         mode: str = "synthetic",
+        model_request_charge: Callable[[], None] | None = None,
+        provider_attempts: list[dict[str, Any]] | None = None,
+        operator_context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         scenario_id = (
             scenario_config_id
@@ -264,7 +278,12 @@ class WorkflowEngine:
             from analogforge.tools.registry import strict_schema
 
             schema = strict_schema(MissionTestContract.model_json_schema())
-            response = client.create(
+            budgeted = getattr(client, "create_budgeted", None)
+            create = (
+                partial(budgeted, model_request_charge)
+                if model_request_charge is not None and callable(budgeted) else client.create
+            )
+            request = dict(
                 input=json.dumps(
                     {
                         "instruction": (
@@ -283,6 +302,7 @@ class WorkflowEngine:
                         ),
                         "mode": mode,
                         "draft": mission,
+                        **({"untrusted_operator_context": operator_context} if operator_context else {}),
                         "algorithm_config_version": algorithms["config_version"],
                         "algorithm_config_sha256": canonical_sha256(algorithms),
                         "observable_policy_catalog": policy_catalog,
@@ -312,6 +332,15 @@ class WorkflowEngine:
                     }
                 },
             )
+            if operator_context:
+                from analogforge.application.operator_context import INSTRUCTIONS
+
+                request["instructions"] = INSTRUCTIONS
+            try:
+                response = create(**request)
+            finally:
+                if provider_attempts is not None:
+                    provider_attempts.extend(getattr(client, "attempts", []))
             texts = [
                 c["text"]
                 for i in response.get("output", [])
@@ -421,19 +450,30 @@ class WorkflowEngine:
         lease_token: str | None = None,
         publish: Any = None,
     ) -> RegisteredResult:
-        run, _, _ = self._load(run_id, workspace_id)
+        run, mission, rover = self._load(run_id, workspace_id)
         if run["state"] == "CANCELLED" or run.get("cancel_requested_at"):
             raise ScienceCancelled()
         scenario = self._scenario(run["scenario_config_id"])
         policy = self._source_policy(run, scenario)
-        cache_key = canonical_sha256(
-            {
+        verification_requests: dict[str, dict[str, Any]] = {}
+        needs_verification_binding = (isinstance(inputs, CompareRequirementInput)
+                                      and inputs.requirement.observable == "unique_slope_exposure_m"
+                                      and inputs.verification is not None
+                                      and "EXPOSURE_SHORTFALL" in inputs.verification.violation_codes)
+        if needs_verification_binding:
+            from analogforge.application.verification_scope import current_verification_requests
+
+            with self.store.transaction(workspace_id) as tx:
+                verification_requests = current_verification_requests(tx, inputs, run, mission, rover)
+        cache_inputs = {
                 "operation": inputs.operation,
                 "inputs": inputs.model_dump(mode="json"),
                 "source_policy": policy.model_dump(mode="json"),
                 "config_sha256": run["config_sha256"],
-            }
-        )
+        }
+        if needs_verification_binding:
+            cache_inputs["verification_requests_sha256"] = canonical_sha256(verification_requests)
+        cache_key = canonical_sha256(cache_inputs)
         self._charge(run_id, workspace_id, "tool_calls_per_run")
         with self.store.transaction(workspace_id) as tx:
             cached = tx.list("scientific_operations", {"run_id": run_id, "cache_key": cache_key})
@@ -531,6 +571,7 @@ class WorkflowEngine:
                 entry["dataset_id"]: {file["path"]: file["sha256"] for file in entry["files"]}
                 for entry in frozen_lock["datasets"]
             },
+            verification_requests=verification_requests,
         )
 
         def cancelled() -> None:
@@ -540,16 +581,25 @@ class WorkflowEngine:
 
         from analogforge.jobs.cpu import run_science
 
-        result = run_science(
-            service,
-            request,
-            context,
-            timeout_seconds=float(request.options.max_seconds or 30),
-            check_cancelled=cancelled,
-        )
-        result = ScienceComputationResult.model_validate(result)
         invocation_id = new_id()
-        with self.store.transaction(workspace_id) as tx:
+        publication = (
+            self.store.publication(workspace_id, job_id, lease_token)
+            if job_id and lease_token
+            else self.store.transaction(workspace_id)
+        )
+        with publication as tx:
+            current = tx.require("runs", run_id, lock=True)
+            if current["state"] == "CANCELLED" or current.get("cancel_requested_at"):
+                raise ScienceCancelled()
+            candidate = getattr(inputs, "candidate", None)
+            candidate_id = str(candidate.candidate_id) if candidate and candidate.candidate_id else None
+            constraints = getattr(inputs, "constraints", None)
+            if candidate_id is None and constraints is not None:
+                matches = tx.list("candidates", {"run_id": run_id, "window_id": constraints.candidate_window_id})
+                candidate_id = matches[0]["id"] if matches else None
+            requirement = getattr(inputs, "requirement", None)
+            activity = {"operation": inputs.operation, "invocation_id": invocation_id,
+                        "candidate_id": candidate_id, "requirement_id": requirement.id if requirement else None}
             tx.create(
                 "invocations",
                 {
@@ -562,8 +612,11 @@ class WorkflowEngine:
                     "status": "RUNNING",
                     "task_kind": inputs.operation,
                     "input_hash": canonical_sha256(request),
+                    "candidate_id": candidate_id,
+                    "requirement_id": activity["requirement_id"],
                 },
             )
+            tx.append_event(run_id, "tool.started", {**activity, "summary": f"Started {inputs.operation}"}, run["mode"])
         operation_id = new_id()
 
         def apply(tx: Any, registered: RegisteredResult) -> None:
@@ -603,6 +656,14 @@ class WorkflowEngine:
                 publish(tx, registered)
 
         try:
+            result = run_science(
+                service,
+                request,
+                context,
+                timeout_seconds=float(request.options.max_seconds or 30),
+                check_cancelled=cancelled,
+            )
+            result = ScienceComputationResult.model_validate(result)
             return self.registrar.register(
                 request,
                 result,
@@ -615,7 +676,7 @@ class WorkflowEngine:
                 lease_token=lease_token,
                 apply_payload=apply,
             )
-        except Exception:  # noqa: BLE001 - every rejected publication terminates its diagnostic invocation
+        except Exception as failure:  # noqa: BLE001 - every failed attempt terminates its diagnostic invocation
             try:
                 with self.store.transaction(workspace_id) as tx:
                     tx.replace(
@@ -626,6 +687,8 @@ class WorkflowEngine:
                     "science.invocation_finalize_failed",
                     extra={"invocation_id": invocation_id, "error_type": type(exc).__name__},
                 )
+            self._record_attempt_failure(workspace_id, invocation_id, "tool.completed", failure,
+                                         job_id=job_id, lease_token=lease_token)
             raise
 
     def _scratch_root(self) -> Path:
@@ -645,21 +708,69 @@ class WorkflowEngine:
         return list(selected.values())
 
     @contextmanager
-    def _role_attempt(self, workspace_id: str, invocation_id: str) -> Iterator[None]:
+    def _role_attempt(self, workspace_id: str, invocation_id: str, provider_client: Any = None) -> Iterator[None]:
         try:
             yield
-        except Exception:  # noqa: BLE001 - provider, validation and publication failures all finish diagnostics
+        except Exception as failure:  # noqa: BLE001 - failures finish diagnostics without exposing exception text
+            unfinished = False
             try:
                 with self.store.transaction(workspace_id) as tx:
                     invocation = tx.require("invocations", invocation_id, lock=True)
                     if invocation["status"] == "RUNNING":
+                        unfinished = True
                         tx.replace("invocations", invocation_id, {**invocation, "status": "FAILED"})
             except Exception as exc:  # noqa: BLE001 - cleanup cannot hide the original rejection
                 logging.getLogger(__name__).error(
                     "role.invocation_finalize_failed",
                     extra={"invocation_id": invocation_id, "error_type": type(exc).__name__},
                 )
+            if unfinished:
+                job_id, lease_token = self._job_context.get()
+                self._record_attempt_failure(workspace_id, invocation_id, "agent.completed", failure,
+                                             job_id=job_id, lease_token=lease_token)
             raise
+        finally:
+            attempts = getattr(provider_client, "attempts", None)
+            if attempts:
+                try:
+                    with self.store.transaction(workspace_id) as tx:
+                        invocation = tx.require("invocations", invocation_id, lock=True)
+                        tx.replace("invocations", invocation_id, {**invocation, "provider_attempts": attempts})
+                except Exception as exc:  # noqa: BLE001 - diagnostics must not conceal the original failure
+                    logging.getLogger(__name__).error(
+                        "role.provider_audit_failed", extra={"invocation_id": invocation_id,
+                                                            "error_type": type(exc).__name__},
+                    )
+
+    def _record_attempt_failure(
+        self, workspace_id: str, invocation_id: str, event_type: str, failure: Exception,
+        *, job_id: str | None = None, lease_token: str | None = None,
+    ) -> None:
+        """Append a safe failed-attempt transition only while this worker can publish."""
+        try:
+            publication = (
+                self.store.publication(workspace_id, job_id, lease_token)
+                if job_id and lease_token else self.store.transaction(workspace_id)
+            )
+            with publication as tx:
+                invocation = tx.require("invocations", invocation_id)
+                run = tx.require("runs", invocation["run_id"])
+                if run["state"] == "CANCELLED" or run.get("cancel_requested_at"):
+                    return
+                blocked = isinstance(failure, ScienceDeadlineExceeded) or getattr(failure, "code", None) in {
+                    "TOOL_TIMEOUT", "SOURCE_UNAVAILABLE", "PROVIDER_AUTH_FAILED", "PROVIDER_RATE_LIMITED",
+                    "SCIENCE_FACADE_MISSING", "RENDERER_MISSING",
+                }
+                status = "BLOCKED" if blocked else "FAILED"
+                tx.append_event(run["id"], event_type, {
+                    "invocation_id": invocation_id, "role": invocation["role"],
+                    "task_kind": invocation["task_kind"], "status": status,
+                    "summary": "Execution attempt could not complete",
+                }, run["mode"])
+        except Exception as exc:  # noqa: BLE001 - lost leases and diagnostics never conceal the original error
+            logging.getLogger(__name__).warning(
+                "activity.failure_publication_skipped", extra={"error_type": type(exc).__name__},
+            )
 
     def _role(
         self, role: str, task_kind: str, run_id: str, workspace_id: str, extra: dict[str, Any] | None = None
@@ -681,6 +792,7 @@ class WorkflowEngine:
                 "mission_revision_id": mission["id"],
                 "contract_sha256": mission["content_sha256"],
                 "scope": "OPERATOR_CRITERIA_FOR_PINNED_REVISION",
+                "requirement_ids": [requirement["id"] for requirement in mission["requirements"]],
                 "scientific_validation": False,
             }
             evidences = tx.list("evidence", {"run_id": run_id})
@@ -690,7 +802,14 @@ class WorkflowEngine:
             }
             evidences = [e for e in evidences if e["id"] in established]
             targets = tx.list("target_profiles", {"run_id": run_id})
+            target_operations = tx.list("scientific_operations", {"run_id": run_id, "operation": "CHARACTERIZE_TARGET"})
+            source_ingest_operations = tx.list(
+                "scientific_operations", {"run_id": run_id, "operation": "INGEST_LOCAL_DATASET"}
+            ) if role in {"earth_scout", "planetary_target"} else []
             candidates = tx.list("candidates", {"run_id": run_id})
+            from analogforge.application import operator_context as operator_sources
+
+            context_snapshot = operator_sources.pinned(tx, "RUN", run_id)
             receipt = ToolReceipt.model_validate(
                 {
                     **envelope(workspace_id, run_id, run["mode"]),
@@ -728,11 +847,22 @@ class WorkflowEngine:
             "run": run,
             "scenario": scenario,
             "evidence_ids": [e["id"] for e in evidences],
+            "evidence_records": evidences,
+            "target_measurement_spec_id": (
+                target_operations[-1]["request"]["inputs"]["measurement_spec_id"] if target_operations else None
+            ),
             "validation_receipt_id": receipt["id"],
             "target": targets[-1] if targets else None,
             "candidates": candidates,
+            "registered_receipts": receipts,
+            "target_operations": target_operations,
+            "source_ingest_operations": source_ingest_operations,
             **(extra or {}),
         }
+        from analogforge.agents.runtime.target_projection import target_coordinate_context
+
+        coordinate_context = target_coordinate_context(facts)
+        facts["target_coordinate_context"] = coordinate_context
         payload = project_payload(role, facts)
         choices = (extra or {}).get("allowed_choices", {})
         if role == "verification_replanning" and choices and payload.get("repair"):
@@ -759,6 +889,8 @@ class WorkflowEngine:
         )
         invocation_id = new_id()
         ledger = BudgetLedger.from_document(run.get("runtime", {}).get("budget"))
+        contract_context = {"accepted": True, "acceptance": acceptance, "contract_revision_id": mission["id"],
+                            "hash": mission["content_sha256"], "requirements": mission["requirements"]}
         task = AgentTask(
             workspace_id=UUID(workspace_id),
             run_id=UUID(run_id),
@@ -784,6 +916,11 @@ class WorkflowEngine:
                 "authoritative_claims": authoritative_claims,
                 "scientific_audit": (extra or {}).get("scientific_audit"),
                 "contract_acceptance": acceptance,
+                "contract_context": contract_context,
+                **({"target_profile_context": deepcopy(facts["target"])}
+                   if role in {"earth_scout", "planetary_target"} and facts["target"] else {}),
+                **({"target_coordinate_context": coordinate_context}
+                   if role in {"earth_scout", "planetary_target"} and facts["target"] else {}),
                 "untrusted_sources": [],
                 "authoritative_rover": rover,
                 "permitted_repairs": (extra or {}).get("diagnosis", {}).get("permitted_repairs", []),
@@ -791,6 +928,10 @@ class WorkflowEngine:
                 "receipt_summaries": [
                     {k: r[k] for k in ("id", "tool_name", "status", "evidence_ids")} for r in receipts
                 ],
+                **({"untrusted_operator_context_ref": {
+                    "snapshot_sha256": context_snapshot["snapshot_sha256"], "read_tool": "get_run_snapshot",
+                    "trust": "UNTRUSTED_CONTEXT", "scientific_authority": "NONE",
+                }} if context_snapshot["snapshot_sha256"] else {}),
             },
         )
         seeded_defect = False
@@ -811,8 +952,6 @@ class WorkflowEngine:
                     None,
                 )
                 if analysis is not None:
-                    from copy import deepcopy
-
                     proposed = deepcopy(proposal)
                     context_row = next(
                         (
@@ -840,14 +979,12 @@ class WorkflowEngine:
         )
         registry = ToolRegistry(
             {
-                "get_run_snapshot": lambda args: {"run_revision": run["revision"], "snapshot": run},
-                "inspect_contract": lambda args: {
-                    "accepted": True,
-                    "acceptance": acceptance,
-                    "contract_revision_id": mission["id"],
-                    "hash": mission["content_sha256"],
-                    "requirements": mission["requirements"],
+                "get_run_snapshot": lambda args: {
+                    "run_revision": run["revision"], "snapshot": run,
+                    **({"operator_context": operator_sources.model_payload(context_snapshot)}
+                       if context_snapshot["snapshot_sha256"] else {}),
                 },
+                "inspect_contract": lambda args: deepcopy(contract_context),
                 "get_evidence": lambda args: {"evidence": [e for e in evidences if e["id"] in args["evidence_ids"]]},
             }
         )
@@ -860,7 +997,16 @@ class WorkflowEngine:
             provider = ReplayProvider(run.get("runtime", {}).get("role_recordings", {}))
         else:
             provider = ScriptedProvider()
-        with self.store.transaction(workspace_id) as tx:
+        active_job, active_token = self._job_context.get()
+        publication = (
+            self.store.publication(workspace_id, active_job, active_token)
+            if active_job and active_token
+            else self.store.transaction(workspace_id)
+        )
+        with publication as tx:
+            current = tx.require("runs", run_id, lock=True)
+            if current["state"] == "CANCELLED" or current.get("cancel_requested_at"):
+                raise ScienceCancelled()
             tx.create(
                 "invocations",
                 {
@@ -873,9 +1019,16 @@ class WorkflowEngine:
                     "status": "RUNNING",
                     "task_kind": task_kind,
                     "input_hash": canonical_sha256(task),
+                    "candidate_id": (extra or {}).get("candidate", {}).get("id"),
                 },
             )
-        with self._role_attempt(workspace_id, invocation_id):
+            tx.append_event(
+                run_id, "agent.started",
+                {"role": role, "task_kind": task_kind, "invocation_id": invocation_id,
+                 "candidate_id": (extra or {}).get("candidate", {}).get("id"),
+                 "summary": f"Started {catalog.ROLE_DISPLAY_NAMES[role]} task"}, run["mode"],
+            )
+        with self._role_attempt(workspace_id, invocation_id, getattr(provider, "client", None)):
             submission = RoleSubmission.model_validate(provider.run(task, registry, context))
             rejected_seed = False
             try:
@@ -964,7 +1117,10 @@ class WorkflowEngine:
                 tx.append_event(
                     run_id,
                     "agent.proposal_rejected" if rejected_seed else "agent.completed",
-                    {"role": role, "invocation_id": invocation_id, "summary": submission.summary},
+                    {"role": role, "task_kind": task_kind, "invocation_id": invocation_id,
+                     "status": result["status"], "role_result_id": result["id"],
+                     "evidence_count": len(result["evidence_ids"]),
+                     "summary": submission.summary},
                     run["mode"],
                 )
 
@@ -981,6 +1137,29 @@ class WorkflowEngine:
             return submission
 
     def _qualify(
+        self,
+        run_id: str,
+        workspace_id: str,
+        candidates: list[dict[str, Any]],
+        mission: dict[str, Any],
+        rover: dict[str, Any] | None,
+        *,
+        verification_by_candidate: dict[str, VerificationSummary] | None = None,
+        job_id: str | None = None,
+        lease_token: str | None = None,
+    ) -> None:
+        from analogforge.jobs.cpu import science_session
+
+        for candidate in candidates:
+            # Reuse imports within one candidate; every computation still has its own
+            # request, scratch directory, deadline, cancellation and fenced registrar.
+            with science_session():
+                self._qualify_candidate(
+                    run_id, workspace_id, [candidate], mission, rover,
+                    verification_by_candidate=verification_by_candidate, job_id=job_id, lease_token=lease_token,
+                )
+
+    def _qualify_candidate(
         self,
         run_id: str,
         workspace_id: str,
@@ -1481,6 +1660,11 @@ class WorkflowEngine:
                         job_id,
                         lease_token,
                     )
+            if candidates and getattr(self.settings, "environment_context_enabled", False):
+                from analogforge.application.environment import capture
+
+                capture(self.store, self.blobs, self.settings, workspace_id, run_id,
+                        job_id=job_id, lease_token=lease_token)
             self._role(
                 "earth_scout",
                 "screen_candidates",
@@ -2321,21 +2505,11 @@ class WorkflowEngine:
                 tx.replace("runs", run_id, fresh, fresh["revision"])
 
             self._compute(
-                OptimizePortfolioInput(
-                    requirements=mission["requirements"],
-                    candidates=[discovery.reference(c) for c in candidates],
-                    qualification_rows=[
-                        QualificationRowInput(
-                            candidate_window_id=next(
-                                c["window_id"] for c in candidates if c["id"] == q["candidate_id"]
-                            ),
-                            requirement_id=q["requirement_id"],
-                            status=q["status"],
-                            evaluation_stage=q.get("evaluation_stage", "FINAL"),
-                            critic_blocking_open=q["critic_status"] == "CHALLENGED",
-                        )
-                        for q in rows
-                    ],
+                portfolios.optimizer_inputs(
+                    run=run, mission=mission, rover=rover, candidates=candidates, qualifications=rows,
+                    tests=self._rows(workspace_id, "tests", run_id),
+                    results=self._rows(workspace_id, "test_results", run_id),
+                    evidence=self._rows(workspace_id, "evidence", run_id),
                     max_sites=int(pending["payload"].get("max_sites", 3)),
                 ),
                 run_id,

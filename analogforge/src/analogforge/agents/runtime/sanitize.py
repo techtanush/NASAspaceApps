@@ -7,6 +7,14 @@ SECRET_KEYS = frozenset(
     {
         "api_key",
         "openai_api_key",
+        "groq_api_key",
+        "openrouter_api_key",
+        "anthropic_api_key",
+        "sambanova_api_key",
+        "nvidia_api_key",
+        "gemini_api_key",
+        "x-api-key",
+        "x-goog-api-key",
         "earthdata_token",
         "authorization",
         "database_url",
@@ -24,6 +32,9 @@ def sanitize(value: Any) -> Any:
         return [sanitize(v) for v in value]
     if isinstance(value, str):
         value = re.sub(r"sk-[A-Za-z0-9_-]+", "[REDACTED]", value)
+        value = re.sub(r"gsk_[A-Za-z0-9_-]+", "[REDACTED]", value)
+        value = re.sub(r"nvapi-[A-Za-z0-9_-]+", "[REDACTED]", value)
+        value = re.sub(r"AIza[A-Za-z0-9_-]+", "[REDACTED]", value)
         value = re.sub(r"postgres(?:ql)?(?:\+psycopg)?://[^\s]+", "[REDACTED]", value)
         value = re.sub(r"(?i)bearer\s+[A-Za-z0-9._-]+", "[REDACTED]", value)
     return value

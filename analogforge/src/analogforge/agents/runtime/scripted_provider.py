@@ -3,6 +3,7 @@
 from typing import Any
 
 from analogforge.agents.runtime.provider import ProviderError
+from analogforge.agents.runtime.target_projection import target_evidence_context
 from analogforge.agents.schemas.submission import RoleSubmission
 from analogforge.agents.schemas.task import AgentTask
 from analogforge.tools.registry import ToolContext, ToolRegistry
@@ -26,7 +27,6 @@ def project_payload(role: str, facts: dict[str, Any]) -> dict[str, Any]:
     candidate = facts.get("candidate") or {}
     test = facts.get("test") or {}
     result = facts.get("result") or {}
-    evidence = facts.get("evidence_ids", [])
     if role == "mission_director":
         return {
             "dispatch_role": None,
@@ -77,11 +77,13 @@ def project_payload(role: str, facts: dict[str, Any]) -> dict[str, Any]:
             "target_revision_id": mission["id"],
             "target_profile_revision_id": target["id"] if target else None,
             "coverage_receipt_ids": facts.get("coverage_receipt_ids", []),
-            "source_evidence_ids": [],
-            "measurement_evidence_ids": evidence,
-            "dimension_evidence": [],
-            "geometry_validation_receipt_id": receipt,
-            "comparison_ready": target is not None,
+            **target_evidence_context(facts),
+            "geometry_validation_receipt_id": facts.get("target_coordinate_context", {}).get(
+                "geometry_validation_receipt_id"
+            ),
+            "comparison_ready": bool(target and facts.get("target_coordinate_context", {}).get(
+                "geometry_validation_receipt_id"
+            )),
         }
     if role == "earth_scout":
         screening = facts.get("screening", {})

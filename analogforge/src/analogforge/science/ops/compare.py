@@ -12,7 +12,8 @@ import numpy as np
 
 from analogforge.ports import catalog
 from analogforge.ports.common import Body, EvidenceRef
-from analogforge.ports.science import ComputationStatus, EvidenceHandle
+from analogforge.ports.hashing import bytes_sha256, canonical_sha256
+from analogforge.ports.science import ComputationStatus, EvidenceHandle, ScienceRequest
 from analogforge.ports.science_payloads import (
     AnalyzeCandidatePayload,
     AssessCompatibilityInput,
@@ -21,9 +22,12 @@ from analogforge.ports.science_payloads import (
     CharacterizeTargetPayload,
     CompareRequirementInput,
     Histogram,
+    VerificationSummary,
+    VerifyRouteInput,
+    VerifyRoutePayload,
 )
 from analogforge.science.comparison.compare import CompareInputs, compare_requirement
-from analogforge.science.comparison.policies import SideEvidence
+from analogforge.science.comparison.policies import RouteVerificationContext, SideEvidence
 from analogforge.science.compatibility import assess_compatibility
 from analogforge.science.features.coverage import QUALITY_NO_FULL_SUPPORT, QUALITY_OK
 from analogforge.science.features.histogram import area_weighted_histogram, to_port_histogram
@@ -159,6 +163,60 @@ def _candidate_histogram(
     return None, None
 
 
+def _verification_context(
+    env: OpEnv, handles: tuple[EvidenceHandle, ...], summary: VerificationSummary | None, candidate: CandidateRef,
+) -> RouteVerificationContext | None:
+    """Load one exact registered verifier report without expanding frozen wire inputs."""
+    if summary is None or "EXPOSURE_SHORTFALL" not in summary.violation_codes:
+        return None
+    matching = []
+    bindings = getattr(env.context, "verification_requests", {})
+    for handle in handles:
+        if (handle.kind != "VERIFICATION" or handle.algorithm_id != "verify-route"
+                or handle.artifact_sha256 is None or handle.mode != env.request.mode or handle.body != "EARTH"):
+            continue
+        env.check()
+        try:
+            binding = bindings.get(str(handle.evidence_id))
+            if (not isinstance(binding, dict) or summary.test_result_id is None or candidate.candidate_id is None
+                    or binding.get("evidence_id") != str(handle.evidence_id)
+                    or binding.get("artifact_sha256") != handle.artifact_sha256
+                    or binding.get("workspace_id") != str(env.context.workspace_id)
+                    or binding.get("run_id") != str(env.context.run_id) or binding.get("mode") != env.request.mode
+                    or binding.get("candidate_id") != str(candidate.candidate_id)
+                    or binding.get("candidate_window_id") != candidate.window_id
+                    or binding.get("test_result_id") != str(summary.test_result_id)):
+                continue
+            source_request = ScienceRequest.model_validate(binding["request"])
+            source = source_request.inputs
+            if (not isinstance(source, VerifyRouteInput) or source_request.operation.value != "VERIFY_ROUTE"
+                    or source_request.mode != env.request.mode or source.constraints.mode != env.request.mode
+                    or source.constraints.candidate_window_id != candidate.window_id
+                    or source.constraints_sha256 != binding.get("constraints_sha256")
+                    or source.route_sha256 != binding.get("route_sha256")
+                    or canonical_sha256(source_request) != binding.get("receipt_input_sha256")
+                    or canonical_sha256(source.constraints) != source.constraints_sha256
+                    or canonical_sha256(source.route) != source.route_sha256):
+                continue
+            source_env = OpEnv(source_request, env.context, env.cfg)
+            expected_params = source_env.params_hash("verify-route", source_env.operation_params(),
+                                                    [source.constraints_sha256, source.route_sha256])
+            if (handle.parameters_sha256 != expected_params
+                    or handle.algorithm_version != env.cfg.algorithm_version("verify-route")):
+                continue
+            raw = env.artifact_path(handle).read_bytes()
+            if bytes_sha256(raw) != handle.artifact_sha256:
+                continue
+            report = VerifyRoutePayload.model_validate_json(raw)
+        except (OSError, ValueError, KeyError, TypeError, OpBlocked):
+            continue
+        if (report.outcome == summary.outcome and report.failure_category == summary.failure_category
+                and report.metrics == summary.metrics
+                and [v.code for v in report.violations] == summary.violation_codes):
+            matching.append(RouteVerificationContext(handle.evidence_id, report))
+    return matching[0] if len(matching) == 1 else None
+
+
 def run_compare(env: OpEnv) -> OpOutcome:
     inp = env.request.inputs
     assert isinstance(inp, CompareRequirementInput)
@@ -179,6 +237,8 @@ def run_compare(env: OpEnv) -> OpOutcome:
             candidate=SideEvidence(handles=cand_handles, histogram=cand_hist, coverage=cand_coverage),
             target=SideEvidence(handles=target_handles, histogram=target_hist),
             verification=inp.verification,
+            verification_context=(_verification_context(env, cand_handles, inp.verification, inp.candidate)
+                                  if inp.observable_policy_id == "route-exposure-v1" else None),
         ),
         env.cfg,
     )

@@ -10,6 +10,30 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+# Exact, user-selected official imagery endpoints; never a domain-wide URL exemption.
+IMAGERY_URLS = {
+    "apps/web/src/api/planetaryImagery.ts": {
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile",
+        "https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm",
+        "https://trek.nasa.gov/tiles/apidoc/trekAPI.html?body=mars",
+        "https://trek.nasa.gov/tiles/apidoc/trekAPI.html?body=moon",
+    },
+    "apps/web/src/api/earthImagery.ts": {
+        "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/GoogleMapsCompatible",
+        "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile",
+    },
+    "apps/web/src/maps/EarthImagery.tsx": {
+        "https://cloudless.eox.at", "https://eox.at", "https://creativecommons.org/licenses/by/4.0/",
+        "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer",
+    },
+}
+
+
+def approved_imagery_url_line(path: str, line: str) -> bool:
+    urls = re.findall(r"https?://[^\s'\"`<>)]+", line)
+    return bool(urls) and all(url in IMAGERY_URLS.get(path, set()) for url in urls)
+
+
 SCANS = [
     ("unsafe-dom", r"dangerouslySetInnerHTML|\binnerHTML\s*=|\beval\s*\(|new Function\s*\(|document\.write\s*\("),
     ("unfinished", r"\b(?:TO" + r"DO|FIX" + r"ME|HA" + r"CK|XXX|NotImplementedError)\b"),
@@ -127,7 +151,9 @@ def scan_glass_stylesheet(css: str, contract: dict[str, object]) -> list[dict[st
                 if re.sub(r"blur\([^)]*\)|saturate\(\s*(?:1(?:\.[0-6]\d*)?)\s*\)", "", value).strip():
                     add("glass-filter-function", value, selector)
             if "gradient" in value:
-                if re.findall(r"([\w-]*gradient)\(", value) != ["radial-gradient"] * len(re.findall(r"gradient\(", value)):
+                if re.findall(r"([\w-]*gradient)\(", value) != ["radial-gradient"] * len(
+                    re.findall(r"gradient\(", value)
+                ):
                     add("glass-gradient-kind", "only radial gradients are permitted", selector)
                 if selectors != [ambient]:
                     add("glass-gradient-outside-ambient", "gradients belong to the ambient element only", selector)
@@ -241,7 +267,8 @@ def scan(root: Path = ROOT) -> list[dict[str, object]]:
                 findings.append({"path": relative, "rule": "unfinished-copy"})
             if "/mock/" not in relative:
                 for line, value in enumerate(content.splitlines(), 1):
-                    if not value.lstrip().startswith(("//", "*")) and re.search(r"https?://", value):
+                    if (not value.lstrip().startswith(("//", "*")) and re.search(r"https?://", value)
+                            and not approved_imagery_url_line(relative, value)):
                         findings.append({"path": relative, "line": line, "rule": "absolute-url"})
                 if "/format/time." not in relative and re.search(r"Math\.random|Date\.now|new Date\(\)", content):
                     findings.append({"path": relative, "rule": "nondeterministic-display"})

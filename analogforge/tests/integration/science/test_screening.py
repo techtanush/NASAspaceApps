@@ -155,3 +155,99 @@ def test_generated_grid_candidate_names_follow_source_provenance(tmp_path: Path,
     assert result.payload.shortlist_window_ids and result.payload.windows
     prefix = catalog.PRACTICE_CANDIDATE_NAME_PREFIX if is_synthetic else "Terrain "
     assert all(window.name == prefix + window.window_id for window in result.payload.windows)
+
+
+def test_no_complete_candidate_windows_reports_no_coverage_instead_of_system_failure(screened, monkeypatch) -> None:
+    from support.practice import local
+
+    from analogforge.ports.science_payloads import ScreenCandidatesInput
+    from analogforge.science.ops import screen as operation
+
+    flow, target, _ = screened
+    monkeypatch.setattr(operation, "region_windows", lambda *args: [])
+    result, _ = flow.call(ScreenCandidatesInput(
+        search_region_set_id=catalog.SEARCH_REGION_PRACTICE, source=local("practice-earth-grid-v1"),
+        target_metrics=target.metrics, target_histogram=target.slope_histogram,
+        requirements=load_mission("mission-mars-mobility").requirements, max_detailed=6,
+        reference_set_id=catalog.REFERENCE_SET_PRACTICE,
+    ), datasets=["practice-earth-grid-v1"])
+    assert result.status.value == "BLOCKED" and result.payload is None
+    assert [(issue.code, issue.detail_code) for issue in result.issues] == [("NO_COVERAGE", "NO_COMPLETE_WINDOWS")]
+
+
+def test_screen_operation_retains_two_benchmark_specialists_instead_of_a_failing_compromise(screened, monkeypatch):
+    """Controlled synthetic feature fractions isolate shortlist policy from terrain derivative math."""
+    from support.practice import local
+
+    from analogforge.ports.science_payloads import ScreenCandidatesInput
+    from analogforge.science.ops import screen as operation
+
+    flow, _, _ = screened
+    original_windows = operation.region_windows
+    def three_windows(region, grid):
+        by = {window.window_id: window for window in original_windows(region, grid)}
+        return [by[A], by[B], by[KNOWN]]
+    monkeypatch.setattr(operation, "region_windows", three_windows)
+    fractions = iter([.4, .4, .8, 0, 0, .8])
+    monkeypatch.setattr(operation, "band_area_fraction", lambda *args: next(fractions))
+    template = load_mission("mission-mars-mobility").requirements[0]
+    requirements = [template.model_copy(update={
+        "id": identifier, "observable": "slope_band_area_fraction", "operator": "GTE", "lower": .6,
+        "unit": "fraction", "parameters": template.parameters.model_copy(update={
+            "slope_band_deg": band, "co_location_group": None,
+        }),
+    }) for identifier, band in [("R-A", [0, 5]), ("R-B", [10, 15])]]
+    result, _ = flow.call(ScreenCandidatesInput(
+        search_region_set_id=catalog.SEARCH_REGION_PRACTICE, source=local("practice-earth-grid-v1"),
+        target_metrics=[], target_histogram=None, requirements=requirements, max_detailed=2,
+        reference_set_id=catalog.REFERENCE_SET_PRACTICE,
+    ), datasets=["practice-earth-grid-v1"])
+    assert result.payload is not None, result.issues
+    assert result.payload.shortlist_window_ids == [B, KNOWN]
+    assert next(window for window in result.payload.windows if window.window_id == A).rank == 1
+    assert any("not an optimal portfolio or a qualification result" in text for text in result.payload.limitations)
+
+
+def test_screen_operation_retains_a_w1_specialist_at_actual_common_support(screened, monkeypatch):
+    """Measured feature controls isolate band/W1 retention while real preparation supplies common support."""
+    from support.practice import local
+
+    from analogforge.ports.science_payloads import ScreenCandidatesInput
+    from analogforge.science.ops import screen as operation
+
+    flow, target, _ = screened
+    original_windows = operation.region_windows
+    def three_windows(region, grid):
+        by = {window.window_id: window for window in original_windows(region, grid)}
+        return [by[A], by[B], by[KNOWN]]
+    monkeypatch.setattr(operation, "region_windows", three_windows)
+    fractions, distances, supports = iter([.8, .8, 0]), iter([4.0, 5.0, 1.0]), []
+    monkeypatch.setattr(operation, "band_area_fraction", lambda *args: next(fractions))
+    def observed_w1(prepared, *args):
+        assert prepared is not None
+        supports.append(prepared.support_m)
+        return next(distances), None
+    monkeypatch.setattr(operation, "_w1_for_window", observed_w1)
+    template = load_mission("mission-mars-mobility").requirements[0]
+    band = template.model_copy(update={
+        "id": "R-BAND", "observable": "slope_band_area_fraction", "operator": "GTE", "lower": .6,
+        "unit": "fraction", "parameters": template.parameters.model_copy(update={
+            "slope_band_deg": [0, 5], "co_location_group": None,
+        }),
+    })
+    assert target.slope_histogram is not None
+    common_support = target.slope_histogram.support_scale_m
+    w1 = band.model_copy(update={
+        "id": "R-W1", "observable": "slope_distribution_w1_deg", "operator": "LTE", "lower": None,
+        "upper": 2.0, "unit": "deg", "minimum_support_scale_m": common_support,
+        "maximum_support_scale_m": common_support,
+        "parameters": band.parameters.model_copy(update={"slope_band_deg": None}),
+    })
+    result, _ = flow.call(ScreenCandidatesInput(
+        search_region_set_id=catalog.SEARCH_REGION_PRACTICE, source=local("practice-earth-grid-v1"),
+        target_metrics=target.metrics, target_histogram=target.slope_histogram, requirements=[band, w1], max_detailed=2,
+        reference_set_id=catalog.REFERENCE_SET_PRACTICE,
+    ), datasets=["practice-earth-grid-v1"])
+    assert result.payload is not None, result.issues
+    assert result.payload.shortlist_window_ids == [A, KNOWN]
+    assert supports == [common_support] * 3

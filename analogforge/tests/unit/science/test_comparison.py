@@ -402,15 +402,15 @@ def test_exposure_row_follows_the_verifiers_measurement() -> None:
     fail = run(
         "R-EXPOSURE", candidate=cand, verification=summary("FAIL", "ROUTE", ("EXPOSURE_SHORTFALL",), (exposure(0.0),))
     )
-    assert (fail.status, fail.reason_code, fail.measured_value) == ("FAIL", "ROUTE_FAILED", 0.0)
-    # a violation code overrides a (suspiciously) passing metric: the row cannot be PASS
+    assert (fail.status, fail.reason_code, fail.measured_value) == ("UNKNOWN", "ROUTE_NOT_VERIFIED", None)
+    # A code-only violation with no requirement identity cannot contradict a passing metric into a supported FAIL.
     contradicted = run(
         "R-EXPOSURE", candidate=cand, verification=summary("FAIL", "ROUTE", ("EXPOSURE_SHORTFALL",), (exposure(150.0),))
     )
-    assert contradicted.status == "FAIL"
-    # infeasible diagnosis (no route exists): named exposure row fails with INSUFFICIENT_EXPOSURE
+    assert contradicted.status == "UNKNOWN"
+    # A code-only infeasibility summary cannot identify which exposure requirement was proved impossible.
     infeasible = run("R-EXPOSURE", candidate=cand, verification=summary("FAIL", "ANALOG", ("EXPOSURE_SHORTFALL",)))
-    assert (infeasible.status, infeasible.reason_code) == ("FAIL", "INSUFFICIENT_EXPOSURE")
+    assert (infeasible.status, infeasible.reason_code) == ("UNKNOWN", "ROUTE_NOT_VERIFIED")
     # another row of the same attempt is not failed by this attempt's exposure violation
     other = run("R-TASKS", candidate=cand, verification=summary("FAIL", "ANALOG", ("EXPOSURE_SHORTFALL",)))
     assert (other.status, other.reason_code) == ("UNKNOWN", "ROUTE_NOT_VERIFIED") and other.evaluation_stage == "FINAL"

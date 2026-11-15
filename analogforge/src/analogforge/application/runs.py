@@ -54,7 +54,10 @@ def create(
     contract = accepted_contract(uow, body["mission_revision_id"])
     if contract["accepted_at"] is None:
         raise ApiError("CONTRACT_NOT_ACCEPTED", "Accept the displayed mission revision before running.", 409)
-    rover = uow.require("rover_revisions", body["rover_revision_id"]) if body["rover_revision_id"] else None
+    rover = uow.require("rover_revisions", body["rover_revision_id"], lock=True) if body["rover_revision_id"] else None
+    from analogforge.application import operator_context
+
+    context = operator_context.run_snapshot(uow, contract["id"], rover["id"] if rover else None)
     scenario = scenarios.get(body["scenario_config_id"])
     if scenario is None:
         raise ApiError("INPUT_INVALID", "Unknown scenario configuration.")
@@ -157,6 +160,9 @@ def create(
         },
     }
     uow.create("runs", stored)
+    from analogforge.adapters.storage.cas import ContentAddressedStore
+
+    operator_context.pin(uow, ContentAddressedStore(settings.data_root), "RUN", run_id, context)
     job = uow.enqueue("ADVANCE_RUN", {"run_id": run_id}, run_id=run_id)
     uow.append_event(
         run_id, "run.state_changed", {"summary": "Accepted inputs pinned; investigation queued."}, body["mode"]

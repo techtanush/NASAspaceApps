@@ -92,7 +92,7 @@ class TargetPayload(PortModel):
     source_evidence_ids: list[UUID]
     measurement_evidence_ids: list[UUID]
     dimension_evidence: list[DimensionEvidence]
-    geometry_validation_receipt_id: UUID
+    geometry_validation_receipt_id: UUID | None
     comparison_ready: bool
 
 
@@ -257,7 +257,11 @@ class PassportPayload(PortModel):
     unresolved_issue_ids: list[UUID]
     not_verified_requirement_ids: list[str]
     export_artifact_ids: list[UUID]
-    ready_to_publish: bool
+    ready_to_publish: bool = Field(description=(
+        "Whether this exact report can be published accurately, including disclosed FAIL/GAP/UNKNOWN or not-run "
+        "results. This is report readiness, not all-PASS mission criteria, physical rover validation or deployment "
+        "approval. If false, identify the concrete report/evidence defect in issues or unresolved_issue_ids."
+    ))
 
 
 PAYLOAD_MODELS: dict[str, type[PortModel]] = {

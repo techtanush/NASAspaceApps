@@ -1,0 +1,202 @@
+{
+  "recipe": "nasa-global-visual-context/1.0",
+  "purpose": "VISUAL_CONTEXT_ONLY",
+  "sources_manifest_sha256": "79dc8d4b3ce2154dca19c16fdf729a29037c813ae9589fe9a9ac6f013be39f7d",
+  "encoder": {
+    "pillow": "13.0.0",
+    "libjpeg": "6.2"
+  },
+  "coordinate_layout": {
+    "west": -180,
+    "east": 180,
+    "north": 90,
+    "south": -90,
+    "positive_longitude_direction": "EAST",
+    "pixel_interpretation": "AREA"
+  },
+  "quantitative_terrain": false,
+  "analysis_support_m": null,
+  "sources": [
+    {
+      "body": "EARTH",
+      "cache_filename": "earth-blue-marble-july2004.jpg",
+      "download_uri": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-base/july/world.200407.3x5400x2700.jpg",
+      "product_uri": "https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/",
+      "source_product": "NASA Blue Marble Next Generation base map, July 2004, 5400x2700 visual composite",
+      "product_time_context": "July 2004 monthly MODIS-derived composite; not live imagery or a single acquisition.",
+      "source_sha256": "f55226d46d27e05511f2118dc6aa24f5dbf9b6b2cddc87cc6e0e7dd067c00b11",
+      "source_bytes": 1617810,
+      "source_dimensions": [
+        5400,
+        2700
+      ],
+      "source_west": -180,
+      "source_north_up": true,
+      "delivery_path": "globe/deliveries/earth-bmng-july2004.v1.jpg",
+      "delivery_dimensions": [
+        4096,
+        2048
+      ],
+      "encoding": "JPEG_Q90_444",
+      "attribution": "Earth visual context: NASA Earth Observatory / Reto Stockli, NASA GSFC; Blue Marble Next Generation, July 2004. Downsampled for display by AnalogForge. No NASA endorsement.",
+      "usage_terms": "NASA imagery usage guidelines: https://www.nasa.gov/nasa-brand-center/images-and-media/ . Educational/informational visualization with source acknowledgement; no implied endorsement. NASA identifiers are not licensed. This texture is visual context only.",
+      "source_processing_caveats": "Published RGB composite, not raw observations. No quantitative elevation, source validity mask or height datum is supplied by this visual image. No additional padding or inpainting is performed here.",
+      "orientation_controls": [
+        {
+          "name": "Sahara interior",
+          "longitude": 20,
+          "latitude": 25,
+          "expected_visual": "bright warm desert"
+        },
+        {
+          "name": "Central Pacific",
+          "longitude": -140,
+          "latitude": 0,
+          "expected_visual": "dark blue ocean"
+        },
+        {
+          "name": "Amazon interior",
+          "longitude": -65,
+          "latitude": -5,
+          "expected_visual": "dark green vegetation"
+        },
+        {
+          "name": "Antarctica interior",
+          "longitude": 0,
+          "latitude": -82,
+          "expected_visual": "bright southern ice"
+        }
+      ],
+      "delivery_sha256": "6194c0eccf55411adad6ec4bbb0857a8e3eedd700d729bd0a5980a27814693db",
+      "delivery_bytes": 1133187,
+      "operations": {
+        "longitude_roll_pixels": 0,
+        "vertical_flip": false,
+        "resample": "LANCZOS",
+        "padding": false,
+        "inpainting": false,
+        "height_transformation": "NONE"
+      }
+    },
+    {
+      "body": "MARS",
+      "cache_filename": "mars-viking-nasa.jpg",
+      "download_uri": "https://assets.science.nasa.gov/content/dam/science/cds/3d/resources/image/mars/Mars.jpg",
+      "product_uri": "https://science.nasa.gov/3d-resources/mars/",
+      "source_product": "NASA 3D Resources Mars image texture; Viking imagery processed at USGS, JPL/Caltech planetary map database",
+      "product_time_context": "NASA resource download dated June 2, 2025; JPEG metadata records September 3, 2008 processing. Viking mission imagery composite, not current observations; exact acquisition range not specified by this download.",
+      "source_sha256": "12ec6bf02ebd42a246edc778cb2ce8c595b4d9f0892badf0bfff8abb2303c780",
+      "source_bytes": 972896,
+      "source_dimensions": [
+        1440,
+        720
+      ],
+      "source_west": -180,
+      "source_north_up": true,
+      "delivery_path": "globe/deliveries/mars-viking-nasa.v1.jpg",
+      "delivery_dimensions": [
+        1440,
+        720
+      ],
+      "encoding": "SOURCE_BYTES",
+      "attribution": "Mars visual context: NASA / Jet Propulsion Laboratory and Caltech; Viking imagery processed at USGS. Original NASA 3D Resources texture, 1440x720. No NASA endorsement.",
+      "usage_terms": "NASA imagery usage guidelines: https://www.nasa.gov/nasa-brand-center/images-and-media/ . Educational/informational visualization with NASA/JPL-Caltech and USGS acknowledgement; no implied endorsement. This public NASA texture is visual context only, not a scientific dataset redistribution.",
+      "source_processing_caveats": "Color image texture with baked source shading; not a MOLA elevation map or current surface photography. No quantitative validity mask, height datum or effective ground resolution is supplied. Preserved at its native 1440x720 dimensions instead of inventing 4K detail. No padding, color adjustment or inpainting is performed here.",
+      "orientation_controls": [
+        {
+          "name": "Olympus Mons",
+          "longitude": -133.8,
+          "latitude": 18.65,
+          "expected_visual": "volcano in northwest quadrant",
+          "coordinate_source_uri": "https://planetarynames.wr.usgs.gov/Feature/4453"
+        },
+        {
+          "name": "Hellas Planitia",
+          "longitude": 70.5,
+          "latitude": -42.43,
+          "expected_visual": "bright basin in southeast quadrant",
+          "coordinate_source_uri": "https://planetarynames.wr.usgs.gov/Feature/2432"
+        },
+        {
+          "name": "Syrtis Major context",
+          "longitude": 69,
+          "latitude": 8,
+          "expected_visual": "dark northern albedo region",
+          "coordinate_source_uri": "https://planetarynames.wr.usgs.gov/SearchResults?Target=20_Mars"
+        }
+      ],
+      "delivery_sha256": "12ec6bf02ebd42a246edc778cb2ce8c595b4d9f0892badf0bfff8abb2303c780",
+      "delivery_bytes": 972896,
+      "operations": {
+        "longitude_roll_pixels": 0,
+        "vertical_flip": false,
+        "resample": "NONE",
+        "padding": false,
+        "inpainting": false,
+        "height_transformation": "NONE"
+      }
+    },
+    {
+      "body": "MOON",
+      "cache_filename": "moon-lroc-2019-4k.tif",
+      "download_uri": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_4k.tif",
+      "product_uri": "https://svs.gsfc.nasa.gov/4720/",
+      "source_product": "NASA SVS CGI Moon Kit, original 2019 LROC WAC color map with polar fill, 4096x2048 RGB TIFF",
+      "product_time_context": "Original 2019 CGI Moon Kit color texture derived from LRO composite observations; this delivery deliberately uses the smaller original map, not the separately published 2025 revised 16-bit product.",
+      "source_sha256": "918649a7f8ed2f1329b2cd95bb0d25483befdcb60ae1a66db681a637cc21344f",
+      "source_bytes": 13095388,
+      "source_dimensions": [
+        4096,
+        2048
+      ],
+      "source_west": -180,
+      "source_north_up": true,
+      "delivery_path": "globe/deliveries/moon-lroc-2019.v1.jpg",
+      "delivery_dimensions": [
+        4096,
+        2048
+      ],
+      "encoding": "JPEG_Q90_444",
+      "attribution": "Moon visual context: NASA SVS / Ernie Wright; NASA / GSFC / Arizona State University, LRO LROC WAC and LOLA. CGI Moon Kit 2019 aesthetic color map with polar fill and source inpainting. No NASA endorsement.",
+      "usage_terms": "NASA imagery usage guidelines: https://www.nasa.gov/nasa-brand-center/images-and-media/ . Educational/informational visualization with NASA SVS/LRO/GSFC/ASU acknowledgement; no implied endorsement. Source is optimized for appearance; quantitative science must use original instrument products.",
+      "source_processing_caveats": "Source product already adjusts exposure/white balance, inpaints high-latitude dropouts and fills latitudes outside 70N..70S using lower-resolution monochromatic LOLA albedo. These are source aesthetic operations, not new AnalogForge data. RGB darkness is not a nodata mask. No quantitative elevation, height datum or analysis support is delivered. No additional fill/inpainting is performed here.",
+      "orientation_controls": [
+        {
+          "name": "Tycho",
+          "longitude": -11.32,
+          "latitude": -43.37,
+          "expected_visual": "bright crater/ray region south and slightly west of image center",
+          "coordinate_source_uri": "https://science.nasa.gov/resource/tycho-craters-central-peak-on-the-moon/"
+        },
+        {
+          "name": "Mare Crisium context",
+          "longitude": 59.1,
+          "latitude": 17,
+          "expected_visual": "dark mare northeast of image center"
+        },
+        {
+          "name": "Oceanus Procellarum context",
+          "longitude": -57.4,
+          "latitude": 18.4,
+          "expected_visual": "dark mare northwest of image center"
+        },
+        {
+          "name": "Equatorial farside context",
+          "longitude": 150,
+          "latitude": 0,
+          "expected_visual": "brighter cratered highlands"
+        }
+      ],
+      "delivery_sha256": "98f512b2a9b90584805b8c44400ff91474559dfe22077f004cd13b72ddccfd43",
+      "delivery_bytes": 2110895,
+      "operations": {
+        "longitude_roll_pixels": 0,
+        "vertical_flip": false,
+        "resample": "NONE",
+        "padding": false,
+        "inpainting": false,
+        "height_transformation": "NONE"
+      }
+    }
+  ]
+}

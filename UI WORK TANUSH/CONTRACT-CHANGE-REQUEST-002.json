@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "request_id": "VIZ-002",
+  "requester": "tanush",
+  "status": "COMPATIBLE_EXTENSION_VALIDATED",
+  "owner": "tanush",
+  "current_contract_sha256": "e12d367326e478ca7fe60fb10f6d482991e6569863b0e9952c6a0a3327a63756",
+  "affected_fields_or_paths": [
+    "Optional six GET visualization paths; frozen core paths/schemas unchanged",
+    "ANALOGFORGE_VISUALIZATION opt-in setting",
+    "Packaged version1 visualization response schemas"
+  ],
+  "before": "Frozen 43 core operations; no source coverage or scoped regional visualization read projection",
+  "after": "The frozen 43 core operations and schemas are unchanged. Six optional authenticated read-only operations are described by effective OpenAPI and /visualization/openapi.json. Disabled by default.",
+  "reason": "Provide Aradhya stable capability/coverage/detail/benchmark reads without modifying the frozen kit or creating a competing scientific manifest. No existing API can return validated operator dataset footprints before a run.",
+  "scientific_meaning_changes": false,
+  "compatibility": "ADDITIVE_CORE_UNCHANGED",
+  "affected_consumers": [
+    "Aradhya visualization API adapter/types",
+    "Tanush backend projection/coverage CLI"
+  ],
+  "required_migration": "None. Enable ANALOGFORGE_VISUALIZATION=1 explicitly; regenerate a separate visualization client from export-openapi --include-visualization. Preserve frozen core generation.",
+  "required_tests": [
+    "Core operations and schemas unchanged",
+    "Every optional operation registered, documented and response-validated",
+    "Disabled flag returns 404; authentication and workspace boundaries enforced",
+    "Offline coverage index and current lock integrity",
+    "Regional artifact body, source, digest and receipt alignment",
+    "Exact benchmark status, measurement and attempt scope",
+    "Feature flag excluded from scientific configuration digest"
+  ],
+  "accepted_checkpoint_sha": "52f41e58091a735527ef819beb4bdfb7bb6d1ed9"
+}

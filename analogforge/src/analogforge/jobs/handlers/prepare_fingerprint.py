@@ -13,7 +13,7 @@ from openai import APITimeoutError, AuthenticationError, OpenAIError, RateLimitE
 from pydantic import AwareDatetime, Field
 
 from analogforge.api.errors import ApiError
-from analogforge.application import missions
+from analogforge.application import missions, operator_context
 from analogforge.db.store import LeaseLost, PersistenceError
 from analogforge.domain.budgets import BudgetExceeded, BudgetLedger
 from analogforge.domain.validators import validate_mission_content
@@ -245,14 +245,16 @@ def _reserve(
             "workspace_id": workspace_id,
             "revision": header["revision"],
         }
-        source_hash = canonical_sha256(
-            {
+        source_inputs = {
                 "draft": draft,
                 "rover_sha256": rover["content_sha256"] if rover else None,
                 "mode": payload["mode"],
                 "expected_revision": payload["expected_revision"],
             }
-        )
+        context = operator_context.pinned(unit, "PREPARATION", preparation_id)
+        if context["snapshot_sha256"]:
+            source_inputs["operator_context_sha256"] = context["snapshot_sha256"]
+        source_hash = canonical_sha256(source_inputs)
         ledger = BudgetLedger.from_document(preparation.get("budget"))
         ledger.limits["preparation_model_requests"] = float(BUDGETS["preparation_model_requests"])
         try:
@@ -355,12 +357,47 @@ def handle(runtime: Any, job: dict[str, Any]) -> None:
         )
         if scenario_id is None:
             raise PersistenceError("INPUT_INVALID", "No preparation scenario supports the target body and mode")
-        proposed = runtime.engine.prepare(
-            source, workspace_id, preparation_id=preparation_id, scenario_config_id=scenario_id, mode=payload["mode"]
-        )
+        def charge_fallback() -> None:
+            # Initial dispatch was reserved above; reserve the extra HTTP attempt before sending it.
+            with runtime.store.publication(workspace_id, job_id, token) as unit:
+                current = unit.require("preparations", preparation_id, lock=True)
+                _active(current)
+                if current["active_invocation_id"] != str(invocation_id):
+                    raise PersistenceError("REVISION_CONFLICT", "Preparation invocation was superseded")
+                ledger = BudgetLedger.from_document(current.get("budget"))
+                ledger.limits["preparation_model_requests"] = float(BUDGETS["preparation_model_requests"])
+                ledger.charge("preparation_model_requests")
+                unit.replace("preparations", preparation_id, {**current, "budget": ledger.document()})
+
+        provider_attempts: list[dict[str, Any]] = []
+        with runtime.store.transaction(workspace_id) as unit:
+            context = operator_context.pinned(unit, "PREPARATION", preparation_id)
+        context_arguments = {"operator_context": operator_context.model_payload(context)} if (
+            context["snapshot_sha256"]
+        ) else {}
+        try:
+            proposed = runtime.engine.prepare(
+                source, workspace_id, preparation_id=preparation_id, scenario_config_id=scenario_id,
+                mode=payload["mode"], model_request_charge=charge_fallback, provider_attempts=provider_attempts,
+                **context_arguments,
+            )
+        finally:
+            if provider_attempts:
+                with runtime.store.publication(workspace_id, job_id, token) as unit:
+                    invocation = unit.require("agent_invocations", str(invocation_id), lock=True)
+                    last = provider_attempts[-1]
+                    unit.replace("agent_invocations", str(invocation_id), {
+                        **invocation, "provider": last["provider"], "model": last["model"],
+                        "provider_attempts": provider_attempts,
+                        "usage_json": {"model_dispatches": len(provider_attempts), "completion_confirmed": False},
+                    })
         for field in ("name", "objective", "target"):
             if proposed[field] != source[field]:
                 raise PersistenceError("MODEL_OUTPUT_INVALID", "Preparation changed a supplied mission field")
+        remaining_assumptions = iter(proposed.get("assumptions", []))
+        for assumption in source.get("assumptions", []):
+            if not any(returned == assumption for returned in remaining_assumptions):
+                raise PersistenceError("MODEL_OUTPUT_INVALID", "Preparation changed a supplied operator assumption")
         supplied = {row["id"]: row for row in source.get("requirements", [])}
         returned = {row["id"]: row for row in proposed["requirements"]}
         for identifier, requirement in supplied.items():
@@ -419,6 +456,7 @@ def handle(runtime: Any, job: dict[str, Any]) -> None:
             if invocation["status"] != "RUNNING" or current_preparation["active_invocation_id"] != str(invocation_id):
                 raise PersistenceError("REVISION_CONFLICT", "Preparation invocation was superseded")
             revision = missions.propose(unit, header["id"], content, payload["expected_revision"])
+            operator_context.pin(unit, runtime.blobs, "MISSION_REVISION", revision["id"], context)
             result = _result(task, "SUCCEEDED", revision, validation_receipt.id, None)
             submission = _receipt(
                 task,
@@ -445,7 +483,7 @@ def handle(runtime: Any, job: dict[str, Any]) -> None:
                     "status": "SUCCEEDED",
                     "output_json": result.model_dump(mode="json"),
                     "sealed_sha256": canonical_sha256(sealed),
-                    "usage_json": {"model_dispatches": 1, "completion_confirmed": True},
+                    "usage_json": {"model_dispatches": len(provider_attempts) or 1, "completion_confirmed": True},
                 },
             )
             current_job = unit.require("jobs", job_id)

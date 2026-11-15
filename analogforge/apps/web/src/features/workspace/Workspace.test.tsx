@@ -15,6 +15,6 @@ describe('UX-001 terminal state and scientific outcome are independent',()=>{
   const result:S['TestResult']={schema_version:'1.0',id:run.test_result_ids[0]!,workspace_id:run.workspace_id,run_id:run.run_id,mode:run.mode,created_at:run.created_at,test_id:run.test_ids[0]!,outcome,failure_category:outcome==='PASS'?null:outcome==='FAIL'?'ROUTE':'DATA',search_status:'FOUND',verified_route_sha256:outcome==='PASS'?'b'.repeat(64):null,metrics:[],violations:[],evidence_ids:[],verifier_version:'test-fixture',limitations:[]};
   vi.mocked(api.get).mockImplementation(async(path:string)=>path.startsWith('/test-results/')?result:path==='/runs'?{items:[run],next_cursor:null}:path==='/capabilities'?{scenario_config_ids:[]}:{items:[],next_cursor:null});
   render(<QueryClientProvider client={new QueryClient({defaultOptions:{queries:{retry:false}}})}><MemoryRouter><Workspace/></MemoryRouter></QueryClientProvider>);
-  const row=await screen.findByTestId('run-row');expect(row).toHaveAttribute('data-state','COMPLETED');expect(await within(row).findByText(outcome)).toBeVisible();expect(within(row).getByText('COMPLETED')).toBeVisible();
+  const row=await screen.findByTestId('run-row');expect(row).toHaveAttribute('data-state','COMPLETED');expect(await within(row).findByText(outcome)).toBeVisible();expect(within(row).getByText('COMPLETED')).toBeVisible();expect(within(row).getByRole('link',{name:`Open run ${run.run_id}`})).toHaveAttribute('href',`/runs/${run.run_id}/tour`);
  });
 });

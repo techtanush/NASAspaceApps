@@ -1,0 +1,27 @@
+# Current location evidence PDF
+
+`GET /api/v1/runs/{run_id}/candidates/{candidate_id}/evidence-brief.pdf` is an optional authenticated extension outside the frozen core OpenAPI. It returns actual `application/pdf` bytes with an attachment filename, `no-store`, `nosniff`, the PDF SHA-256, private snapshot SHA-256 and observed run revision in response headers. It accepts no query parameters. An active, blocked or failed run can download a brief once its selected candidate and accepted mission are persisted; a published passport is not required.
+
+The heading is **Current evidence brief**. The report explicitly identifies itself as an unassured snapshot, not an Analog Passport. Existing immutable passport publication and HTML/JSON/CSV export remain unchanged. The report shows saved mission/rover revision numbers, IDs and content hashes; target and Earth location geometry; declared regional screening scope; accepted criterion labels, operands, mandatory flags, weights, co-location groups, support requirements and notes; committed qualification statuses and compatible measurements; scoped attempts; gaps, limits and source references. A terminal cause comes only from the latest matching persisted run event's allowlisted code. An unknown cause is not replaced by an earlier failure or provider prose.
+
+The application reuses `authorized_subject`, `site_benchmarks` and `site_detail`. Wrong-workspace, wrong-run, unpinned-candidate or unaccepted-mission references return 404. Invalid UUIDs or unsupported query parameters return the usual `INPUT_INVALID` JSON error envelope with status 422. No hash alone authorizes access. Qualification FAIL/GAP/UNKNOWN and critic state remain verbatim; a missing compatible numeric comparison is not rendered as zero. Numeric criterion plots use only the existing validated comparison projection. Analysis histograms require an exact scoped operation request, receipt hash, candidate/target identity, registered summary artifact, analysis ancestry and compatible support. Stored display images require the existing manifest/operation/receipt/geometry/content checks. No source acquisition, model call, simulation, qualification or scientific aggregate runs during this read.
+
+Rendering uses pinned open-source `reportlab==5.1.0` and its bundled embedded Vera fonts. Plain source strings are escaped before layout; the child receives only authorized JSON and inline image bytes, no credentials or artifact paths. The isolated child has a 15-second wall deadline, 10-second CPU limit, 512 MiB memory bound (Linux address-space limit; macOS parent RSS monitoring), and is killed and reaped on failure. One renderer may run per API process. Bounds are 128 accepted criteria, 128 pinned tests/results, 512 candidate evidence references, 1,024 scientific operations, 128 metrics/histogram bins per subject, 8 MiB serialized input, 40 pages and 8 MiB PDF output. At most two verified views per subject and 3 MiB combined source image bytes are embedded; any view omission is stated explicitly. There is no silent omission of accepted criterion rows. Busy rendering returns `RESOURCE_LIMIT`/429; exceeded rendering bounds return `RESOURCE_LIMIT`/422 or `TOOL_TIMEOUT`/422. These failures do not create a placeholder PDF or publish a passport.
+
+Every location PDF has three reading levels, in this order:
+
+1. **Executive summary:** mission and selected location, saved investigation state, saved PASS/FAIL/UNKNOWN/GAP counts, required versus optional criteria, and the regional evidence boundary. These counts summarize committed verdicts; they are not a new score or ranking.
+2. **Simplified overview:** the accepted mission objective, the location's individual test criteria in plain language, compatible measured values and graphs, missing-evidence explanations and physical-test limitations.
+3. **Technical details:** full accepted operands, parameters, support scales, criterion and critic states, exact numeric values, registered histograms and terrain views, scoped rover attempts, scientific terminology, assumptions, source references, revision IDs and hashes. A glossary explains AOI, comparison support, slope distributions, Wasserstein-1 and evidence provenance.
+
+The download always includes all three sections, regardless of the screen's Simplified / Technical details toggle. Bounds and authority checks are identical for every section. Formatting a value more concisely in a graph does not remove its full precision from the technical tables. A failed or incomplete investigation remains identified as such in the executive summary and technical record.
+
+Focused offline verification:
+
+```sh
+rtk proxy .venv/bin/python .runtime/profile.py activity pytest -q tests/unit/platform/test_evidence_brief.py tests/integration/platform/test_evidence_brief.py
+```
+
+The PostgreSQL test acquires no external source or provider data. It produces a clearly labelled synthetic-fixture PDF from actual persisted science operations, verifies both site and target histogram ancestry, and checks that downloading a failed run starts no work. Synthetic QA is not evidence that a genuine NASA live mission completed or qualified its criteria.
+
+Dependency sources: [ReportLab 5.1.0 on PyPI](https://pypi.org/project/reportlab/5.1.0/), [official layout guide](https://docs.reportlab.com/reportlab/userguide/ch5_platypus/), [embedded TrueType font guide](https://docs.reportlab.com/reportlab/userguide/ch3_fonts/).

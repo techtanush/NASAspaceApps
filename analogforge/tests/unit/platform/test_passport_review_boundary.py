@@ -88,7 +88,8 @@ def passport_events(store):
     return [event for event in store.list("run_events") if event["event_type"] == "passport.created"]
 
 
-@pytest.mark.parametrize("response", ["review", "not_ready", "blocking", "provider_failure", "warning", "accept"])
+@pytest.mark.parametrize("response", ["review", "not_ready", "unexplained_not_ready", "justified_after_correction",
+                                      "blocking", "provider_failure", "warning", "accept"])
 def test_real_draft_review_precedes_publication_and_runs_outside_transactions(publication_ready, monkeypatch, response):
     engine, store, _blobs, workspace, run_id, depth = publication_ready
     before_revision = store.require("runs", run_id)["revision"]
@@ -105,8 +106,12 @@ def test_real_draft_review_precedes_publication_and_runs_outside_transactions(pu
             proposal = deepcopy(task["payload"]["prepared_submission"])
             if response == "review":
                 proposal.update(disposition="NEEDS_USER_REVIEW", next_action="request_review")
-            if response == "not_ready":
+            if response in {"not_ready", "unexplained_not_ready", "justified_after_correction"}:
                 proposal["payload"]["ready_to_publish"] = False
+                if response == "not_ready" or response == "justified_after_correction" and len(calls) == 2:
+                    proposal["issues"] = [{"code": "LINEAGE_REVIEW", "severity": "WARNING", "requirement_id": None,
+                                           "evidence_ids": [], "message": "Review the unresolved source lineage.",
+                                           "recommended_action": "Inspect the registered source ancestry."}]
             if response in {"blocking", "warning"}:
                 proposal["issues"] = [{"code": "EVIDENCE_LIMITATION", "severity": "BLOCKING" if response == "blocking"
                                        else "WARNING", "requirement_id": None, "evidence_ids": [],
@@ -116,8 +121,10 @@ def test_real_draft_review_precedes_publication_and_runs_outside_transactions(pu
 
     monkeypatch.setattr(engine, "_provider_client", lambda: Client())
     run, mission, rover = engine._load(run_id, workspace)
-    if response in {"review", "not_ready", "blocking", "provider_failure"}:
-        with pytest.raises(ProviderError if response == "provider_failure" else WorkflowRolePaused):
+    if response in {"review", "not_ready", "unexplained_not_ready", "justified_after_correction",
+                    "blocking", "provider_failure"}:
+        with pytest.raises(ProviderError if response in {"provider_failure", "unexplained_not_ready"}
+                           else WorkflowRolePaused):
             engine._advance_step(run, mission, rover, workspace, None, None)
         assert store.list("passports") == exports(store) == passport_events(store) == []
         assert not store.require("runs", run_id).get("passport_id")
@@ -126,10 +133,11 @@ def test_real_draft_review_precedes_publication_and_runs_outside_transactions(pu
         assert completed["state"] == "COMPLETED"
         assert len(store.list("passports")) == len(exports(store)) == len(passport_events(store)) == 1
         assert store.require("runs", run_id)["revision"] > before_revision
-    assert len(calls) == 1
+    assert len(calls) == (2 if response in {"unexplained_not_ready", "justified_after_correction"} else 1)
     invocation = next(row for row in store.list("invocations") if row["task_kind"] == "assemble_passport")
-    assert invocation["status"] == ("FAILED" if response == "provider_failure" else "SUCCEEDED")
-    if response in {"blocking", "not_ready"}:
+    assert invocation["status"] == ("FAILED" if response in {"provider_failure", "unexplained_not_ready"}
+                                    else "SUCCEEDED")
+    if response in {"blocking", "not_ready", "justified_after_correction"}:
         assert store.list("role_results")[0]["status"] == store.list("agent_actions")[0]["status"] == "BLOCKED"
 
 

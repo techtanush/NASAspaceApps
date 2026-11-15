@@ -42,6 +42,7 @@ STAGES: dict[int, tuple[str, ...]] = {
         "scenario_bindings",
         "dataset_locks",
     ),
+    8: ("operator_documents", "operator_contexts", "operator_context_bindings", "operator_context_pins"),
 }
 IMMUTABLE = frozenset(
     {
@@ -58,6 +59,10 @@ IMMUTABLE = frozenset(
         "test_results",
         "passports",
         "export_artifacts",
+        "operator_documents",
+        "operator_contexts",
+        "operator_context_bindings",
+        "operator_context_pins",
     }
 )
 
@@ -367,6 +372,18 @@ _table(
 _table("scenario_bindings", _text("scenario_config_id", False), _text("dataset_lock_id"))
 _table("dataset_locks", _text("lock_id", False), _text("sha256", False), _text("relative_path", False))
 
+_table("operator_documents", _text("original_sha256", False))
+_table("operator_contexts", _text("kind", False), _uuid("rover_revision_id"), _text("context_sha256", False),
+       sa.ForeignKeyConstraint(["workspace_id", "rover_revision_id"],
+                               ["rover_revisions.workspace_id", "rover_revisions.id"]))
+_table("operator_context_bindings", _text("target_kind", False), _uuid("target_id", False),
+       _int("context_revision", "1"), _uuid("context_id"),
+       sa.UniqueConstraint("workspace_id", "target_kind", "target_id", "context_revision"),
+       sa.ForeignKeyConstraint(["workspace_id", "context_id"],
+                               ["operator_contexts.workspace_id", "operator_contexts.id"]))
+_table("operator_context_pins", _text("target_kind", False), _uuid("target_id", False), _text("snapshot_sha256", False),
+       sa.UniqueConstraint("workspace_id", "target_kind", "target_id"))
+
 
 def migrate_stage(connection: sa.Connection, stage: int) -> None:
     """Run one forward-only schema stage; safe on seeded earlier revisions."""
@@ -389,7 +406,7 @@ def migrate_stage(connection: sa.Connection, stage: int) -> None:
         """)
         )
         for name, table in TABLES.items():
-            if name == "workspaces":
+            if name == "workspaces" or name in STAGES[8]:
                 continue
             connection.execute(sa.text(f'ALTER TABLE "{name}" ENABLE ROW LEVEL SECURITY'))
             connection.execute(sa.text(f'DROP POLICY IF EXISTS workspace_scope ON "{name}"'))
@@ -427,3 +444,11 @@ def migrate_stage(connection: sa.Connection, stage: int) -> None:
             sa.text("""CREATE TRIGGER evidence_cycle_guard BEFORE INSERT ON evidence_edges
            FOR EACH ROW EXECUTE FUNCTION check_evidence_cycle()""")
         )
+    if stage == 8:
+        for name in STAGES[8]:
+            connection.execute(sa.text(f'ALTER TABLE "{name}" ENABLE ROW LEVEL SECURITY'))
+            connection.execute(sa.text(f'''CREATE POLICY workspace_scope ON "{name}" USING
+                (workspace_id::text = current_setting('app.workspace_id', true)) WITH CHECK
+                (workspace_id::text = current_setting('app.workspace_id', true))'''))
+            connection.execute(sa.text(f'''CREATE TRIGGER immutable_guard BEFORE UPDATE OR DELETE ON "{name}"
+                FOR EACH ROW EXECUTE FUNCTION deny_immutable_change()'''))

@@ -58,7 +58,7 @@ def test_migrations_all_tables_constraints_indexes(platform_store: Store) -> Non
     assert any(index["name"] == "ix_candidates_earth_extent" for index in inspector.get_indexes("candidates"))
     with platform_store.engine.connect() as connection:
         assert connection.execute(sa.text("SELECT postgis_version()")).scalar_one()
-        assert connection.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one() == "0007"
+        assert connection.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one() == "0008"
 
 
 @pytest.mark.db

@@ -1,0 +1,159 @@
+{
+  "schema_version": "1.0",
+  "status": "PASS_BACKEND_SCOPE",
+  "recorded_at": "2026-11-15T02:33:15.791130+00:00",
+  "scope": "Tanush visualization backend and static imagery delivery; frontend integration has a separate gate",
+  "common_base": "52f41e58091a735527ef819beb4bdfb7bb6d1ed9",
+  "source_manifest": {
+    "common_base": "52f41e58091a735527ef819beb4bdfb7bb6d1ed9",
+    "algorithm": "SHA-256 of UTF-8 json.dumps(file_hashes,sort_keys=True,separators=(comma,colon)); each value hashes exact file bytes",
+    "source_sha256": "6def29012dd0f30fb1081da2c8412ba801e15157ca74d826a50abaf9b6006da3",
+    "file_hashes": {
+      "analogforge/apps/web/public/globe/data/catalog.v1.json": "208e55e46d837ad45c28f8d397a34fc36993246c6844a25caa4af91c5cf5b6e0",
+      "analogforge/apps/web/public/globe/data/preparation.v1.json": "e820c0b88e24b22b38258f017655c5ae4ae771df5ee3f63af2b5152fd93387df",
+      "analogforge/apps/web/public/globe/deliveries/earth-bmng-july2004.v1.jpg": "6194c0eccf55411adad6ec4bbb0857a8e3eedd700d729bd0a5980a27814693db",
+      "analogforge/apps/web/public/globe/deliveries/mars-viking-nasa.v1.jpg": "12ec6bf02ebd42a246edc778cb2ce8c595b4d9f0892badf0bfff8abb2303c780",
+      "analogforge/apps/web/public/globe/deliveries/moon-lroc-2019.v1.jpg": "98f512b2a9b90584805b8c44400ff91474559dfe22077f004cd13b72ddccfd43",
+      "analogforge/scripts/data/globe_context_sources.v1.json": "79dc8d4b3ce2154dca19c16fdf729a29037c813ae9589fe9a9ac6f013be39f7d",
+      "analogforge/scripts/data/prepare_globe_context.py": "f03a0db14dc83831be3e9860e722f754ce71aaaf7077ac63c1473419ae80018d",
+      "analogforge/src/analogforge/adapters/storage/cas.py": "d53b99e02f0c4942152daed25ed39f1e1da89811b314d39e1cc3047b23719320",
+      "analogforge/src/analogforge/api/routers/visualization.py": "c681c1c129f625d9ab925d8683dad53abc659c9e1e6cf9b6bbeded9e4a24465e",
+      "analogforge/src/analogforge/api/visualization_contracts.py": "5d2e05b78078a73fb443debbd343b2ba01114216c0b7d491feef4aa366d99f97",
+      "analogforge/src/analogforge/api/visualization_schemas/capabilities.v1.schema.json": "8cb381f892dfd67acfc299de5dd00070de7f423ed5c20c240fdaee5588003303",
+      "analogforge/src/analogforge/api/visualization_schemas/coverage.v1.schema.json": "7c3e62e2ffda6a1843ef2509a62c3261244f710be0d27a7592bbe6dc784e39f0",
+      "analogforge/src/analogforge/api/visualization_schemas/imagery-catalog.v1.schema.json": "2a14d81728e1aed8519bf44aa12dfc7629ea26f2acb0cfa08fdea2ae3668e1f7",
+      "analogforge/src/analogforge/api/visualization_schemas/site-benchmarks.v1.schema.json": "f49fbd14cd9c23a932e594bd8c621e4fca6fa1bed1b5c13b91175040e6721945",
+      "analogforge/src/analogforge/api/visualization_schemas/site-detail.v1.schema.json": "83a02a5206845927e3a1a0d3851342ea2e68903931b67470e500257213647f53",
+      "analogforge/src/analogforge/application/visualization_benchmarks.py": "a834a5663a1e36b35d750ac836a4fbc6bb5ff9ad46b8a1d8d876ac0e07e569b3",
+      "analogforge/src/analogforge/application/visualization_coverage.py": "5593180dcac2e697b203243540afc1f82cbc06c33be5470da655c52c791e7558",
+      "analogforge/src/analogforge/application/visualization_detail.py": "7c495c8424c377b11c7f23b5ed1a5c18951a30c6f7b3d9cd3d9085f1bc745f43",
+      "analogforge/src/analogforge/cli.py": "fbed1a6d9ffebfd0ca76fd5e551fa9361a0b4f0d2880bd13f420aab0ce442dd3",
+      "analogforge/src/analogforge/main.py": "51125f22d3eb4631401d171bbeb5a46602ea361d4269e1e303ff7567734b460e",
+      "analogforge/src/analogforge/settings.py": "cf324d532b6643ff781817404c14005739e174376b5b465470e3f53701501d6c",
+      "analogforge/tests/integration/platform/test_visualization_api.py": "98193b6a0be046ecfeae8483309da79f1a95762c997e5bcaafba7be58f2e1665",
+      "analogforge/tests/integration/platform/test_visualization_coverage.py": "2fae7d3a117f6994101808108b21341f500c1be05e938792b6a5f4f99472e2f4",
+      "analogforge/tests/unit/platform/test_visualization_api_contract.py": "e5c0cf4a078dce47fbf6b2f7696fb978102cc61ae8bd6fa0d52d3c9f9c854960",
+      "analogforge/tests/unit/platform/test_visualization_benchmarks.py": "2c90e805ac057edbf3026e967caf6906a0b42e9915d5603fb716937ba841bd2f",
+      "analogforge/tests/unit/platform/test_visualization_blob_limits.py": "b1709a5e25177150d2e6756fd59f8d50d20ce702ede3598799eb3aa00cf1ebf7",
+      "analogforge/tests/unit/platform/test_visualization_catalog.py": "efb7237ff70d7129a0327ddee90da6a8603cc999337b7425d1d044d01dd08ada",
+      "analogforge/tests/unit/platform/test_visualization_coverage.py": "0ef6e1a3335d0fff413be664ff17f6a176a790fd1dee90ce46793489c078b03e",
+      "analogforge/tests/unit/platform/test_visualization_detail.py": "fec2b6c8c2d7a2255614f02e0a0104c1e3eb225abcda2982b10aa2dbdc1546ea",
+      "team handoffs/ui-split/schemas/imagery-catalog.v1.schema.json": "2a14d81728e1aed8519bf44aa12dfc7629ea26f2acb0cfa08fdea2ae3668e1f7"
+    }
+  },
+  "suites": {
+    "platform_real_science_and_renderer": {
+      "tests": 815,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 832.766
+    },
+    "science_property_integration_replay_renderer_ui_contracts": {
+      "tests": 1190,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 162.61
+    },
+    "isolated_frozen_contract_kit": {
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.314
+    }
+  },
+  "total_backend_tests": 2025,
+  "new_visualization_tests_in_platform_suite": 186,
+  "superseded_interrupted_attempt": {
+    "platform_passed": 813,
+    "platform_failed": 2,
+    "diagnosis": "Confirmed macOS clamshell sleep and DarkWake intervals match database wall-clock gaps; leases correctly expired while suspended",
+    "focused_clean_recheck_passed": 3,
+    "guard_or_source_changes_to_obtain_recheck": 0,
+    "final_full_run": "Fresh empty database, serial execution with process-scoped idle-sleep prevention; final suite above supersedes the interrupted attempt"
+  },
+  "mutations": {
+    "platform": {
+      "killed": 20,
+      "passing_baselines": 20
+    },
+    "science": {
+      "killed": 16,
+      "passing_baselines": 16
+    }
+  },
+  "static": {
+    "full_ruff": "PASS",
+    "strict_mypy": "PASS (244 source files, excluding frozen ports)",
+    "frozen_kit_materialization": "PASS; no changes or problems",
+    "documentation": "PASS",
+    "platform_forbidden_findings": 0,
+    "science_forbidden_findings": 0,
+    "final_wiring": "PASS (16 checks)",
+    "round_ownership": "PASS; zero frontend source changes",
+    "configured_secret_scan": "PASS; no secret values logged",
+    "diff_whitespace": "PASS"
+  },
+  "packaging": {
+    "wheel_build": "PASS",
+    "packaged_schemas": 5,
+    "wheel_matches_current_source": true,
+    "combined_openapi_typescript_generation": "PASS",
+    "generated_declaration_strict_typecheck": "PASS"
+  },
+  "actual_nasa_rehearsal": {
+    "mode": "LIVE",
+    "database_transaction_read_only_enforced": true,
+    "coverage_http_cases": 6,
+    "available_target_and_candidate_subjects": 5,
+    "authorized_png_http_reads_with_verified_digest": 10,
+    "exact_benchmarks_preserved": 4,
+    "qualification_states": [
+      "PASS",
+      "PASS",
+      "FAIL",
+      "FAIL"
+    ],
+    "comparison_support_m": 500,
+    "measurement_unit": "deg",
+    "database_records_unchanged": true,
+    "source_lock_manifest_config_bytes_unchanged": true,
+    "model_or_provider_calls": 0,
+    "new_qualification_claims": false
+  },
+  "runtime": {
+    "visualization_flag": "ANALOGFORGE_VISUALIZATION=1",
+    "default_enabled": false,
+    "core_contract_changed": false,
+    "new_database_migrations": 0,
+    "new_dependencies": 0,
+    "new_api_keys_required": 0
+  },
+  "reproduction_commands": [
+    "uv run --locked pytest tests/contracts/kit -q",
+    "AF_SCIENCE_IMPL=real AF_RENDERER_IMPL=real uv run --locked pytest tests/unit/platform tests/integration/platform tests/contracts/platform -q --strict-markers -p no:randomly",
+    "uv run --locked pytest tests/unit/science tests/property/science tests/integration/science tests/replay/science tests/contracts/science tests/unit/passport_renderer tests/contracts/ui -q --strict-markers",
+    "uv run --locked ruff check src tests scripts/data/prepare_globe_context.py --extend-exclude tests/contracts/kit",
+    "uv run --locked mypy src/analogforge --exclude src/analogforge/ports",
+    "uv run --locked python scripts/mutation_check.py --json out/viz-platform-mutations.json",
+    "uv run --locked python scripts/science/mutation_check.py --json out/viz-science-mutations.json",
+    "uv run --locked analogforge export-openapi --include-visualization --out out/openapi.visualization.json"
+  ],
+  "execution_environment": "Existing locked Python 3.13 environment with current Tanush PYTHONPATH; isolated empty PostgreSQL test databases; real science and renderer; model/provider secrets cleared. Node 22.21.1 used for declaration generation/typecheck. No changes to source or active limits to force passing results.",
+  "warnings": [
+    "Existing pytest-asyncio fixture-loop-default deprecation",
+    "Existing pvl PendingDeprecationWarning"
+  ],
+  "not_executed_in_backend_branch": [
+    "New UI browser and accessibility journeys",
+    "Final merged frontend/backend make check and browser/mutation gates"
+  ],
+  "limitations": [
+    "Global Mars context is native 1440x720, not new high-resolution terrain",
+    "No new actual LIVE lunar regional source was added",
+    "Coverage basis is validated footprint, not per-cell mask or mission qualification",
+    "No physical field validation or rover verification is inferred from display checks"
+  ]
+}

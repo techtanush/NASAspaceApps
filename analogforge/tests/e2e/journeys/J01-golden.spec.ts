@@ -6,7 +6,15 @@ import { startRun, tab, prove, api, inspectHooks, isMock } from '../support/work
 const sha = (data: string | Buffer) => createHash('sha256').update(data).digest('hex');
 test('J01 full Mars investigation, immutable fail/replan/pass and independently verified exports', async ({ page }) => {
  const errors: string[] = []; page.on('pageerror', e => errors.push(e.message));
- const external: string[] = []; page.on('request', r => { if (/^https?:/.test(r.url()) && !['localhost','127.0.0.1'].includes(new URL(r.url()).hostname)) external.push(r.url()); });
+ // The product now displays public orbital/satellite context. This offline journey
+ // aborts only the exact visual tile endpoints; all other external traffic still fails.
+ // A blocked image request supplies no fake pixels or scientific evidence.
+ const imagery = /^https:\/\/(?:astro\.arcgis\.com\/arcgis\/rest\/services\/OnMars\/CTX\/MapServer\/tile\/\d+\/\d+\/\d+|basemap\.nationalmap\.gov\/arcgis\/rest\/services\/USGSImageryOnly\/MapServer\/tile\/\d+\/\d+\/\d+|tiles\.maps\.eox\.at\/wmts\/1\.0\.0\/s2cloudless_3857\/default\/GoogleMapsCompatible\/\d+\/\d+\/\d+\.jpg)$/;
+ const imageryAttempts: string[] = [], blockedImagery: string[] = [];
+ // MSW forwards imagery through its service worker in mock mode. Only worker-owned
+ // network requests are routable there; the matching frame event is a second, non-egress event.
+ await page.context().route(imagery, async route => { blockedImagery.push(route.request().url()); await route.abort('blockedbyclient'); });
+ const external: string[] = []; page.context().on('request', r => { if (/^https?:/.test(r.url()) && !['localhost','127.0.0.1'].includes(new URL(r.url()).hostname)) { if(imagery.test(r.url())) { if(!isMock()||r.serviceWorker())imageryAttempts.push(r.url()); } else external.push(r.url()); } });
  const runId = await startRun(page);
  await expect(page.getByTestId('mode-badge')).toHaveAttribute('data-mode','synthetic');
  const pinnedRun=await api<{rover_revision_id:string}>(page,`/runs/${runId}`);const pinnedRover=await api<{name:string;revision:number}>(page,`/rover-revisions/${pinnedRun.body.rover_revision_id}`);await expect(page.getByTestId('run-state-banner')).toContainText(`Rover ${pinnedRover.body.name} rev ${pinnedRover.body.revision}`);
@@ -67,6 +75,7 @@ test('J01 full Mars investigation, immutable fail/replan/pass and independently 
  await page.reload(); await expect(page.getByTestId('passport-view')).toHaveAttribute('data-draft','false'); await expect(page.getByTestId('attempt-row')).toHaveCount(3);
  await inspectHooks(page); const snapshot=await api<{state:string;passport_id:string;last_event_seq:number}>(page,`/runs/${runId}`); expect(snapshot.status).toBe(200); expect(snapshot.body.state).toBe('COMPLETED');
  if(!isMock()) { const results=await api<{items: {id:string;evidence_ids:string[]}[]}>(page,`/tests?run_id=${runId}`); expect(results.body.items.length).toBe(3); for(const result of results.body.items) expect(result.id).toBeTruthy(); }
- await page.goto('/');await expect(page.getByTestId('run-row').first()).toBeVisible();await inspectHooks(page);
+ await page.goto('/workbench');await expect(page.getByTestId('run-row').first()).toBeVisible();await inspectHooks(page);
  expect(errors).toEqual([]); expect(external).toEqual([]);
+ expect(blockedImagery.sort()).toEqual(imageryAttempts.sort());
 });

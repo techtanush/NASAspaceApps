@@ -30,6 +30,14 @@ def case():
     return task, context, registry, counts
 
 
+@pytest.mark.parametrize("prose", ["approx ~5 m", "reserve ~20%", "~0.5 km", "~0", "~", "a ~~ b"])
+def test_ordinary_model_approximation_text_is_not_an_alias_or_changed_quantity(prose):
+    task, *_ = case()
+    codec = WireCodec(task, _task_receipt_ids(task))
+    assert codec.decode({"summary": prose}) == {"summary": prose.replace("~~", "~")}
+    assert codec.decode(codec.encode({"summary": prose})) == {"summary": prose}
+
+
 def test_complete_task_roundtrip_preserves_case_negative_findings_null_tuple_values_and_original_inputs():
     task, *_ = case()
     original = deepcopy(task.model_dump(mode="json"))
@@ -44,6 +52,26 @@ def test_complete_task_roundtrip_preserves_case_negative_findings_null_tuple_val
     assert {gate["outcome"] for gate in restored["payload"]["scientific_audit"]["claim_gates"][0]["gates"]} == {
         "SATISFIED", "UNSATISFIED", "NOT_APPLICABLE", "NOT_ASSESSED"}
     codec.decode(codec.encode({"a": "UUID with suffix " + str(uuid4()) + "XYZ"}))
+
+
+@pytest.mark.parametrize("heterogeneous", [False, True])
+def test_registered_target_profile_roundtrips_all_primitives_and_duplicate_metrics_without_mutation(heterogeneous):
+    task, *_ = case()
+    metrics = [{"metric_id": "derived:p05", "value": -3.5, "unit": "m", "uncertainty": None},
+               {"metric_id": "derived:p95", "value": 12.25, "unit": "m", "uncertainty": None}]
+    if heterogeneous:
+        metrics[1]["future"] = {"unresolved": None}
+    profile = {"id": str(uuid4()), "metrics": metrics, "payload": {"metrics": deepcopy(metrics),
+               "slope_histogram": {"edges": [0, 5, 10], "area_fraction": [0.75, 0.25],
+                                   "support_scale_m": 500, "valid_area_m2": 1000000}},
+               "unavailable_dimensions": [{"reason": "NO_COVERAGE"}]}
+    task = task.model_copy(update={"payload": {**task.payload, "target_profile_context": profile}})
+    original = deepcopy(task.model_dump(mode="json"))
+    codec = WireCodec(task, _task_receipt_ids(task))
+    wire = codec.task(_wire_task(task))
+    assert "metrics" not in wire["payload"]["target_profile_context"]["payload"]
+    assert _expand_wire_task(codec.decode(wire)) == original
+    assert task.model_dump(mode="json") == original
 
 
 @pytest.mark.parametrize("defect", ["extra_gate", "missing_gate", "receipt_collision", "evidence_extra",
@@ -129,7 +157,7 @@ def test_gate_value_catalogs_preserve_every_literal_and_fall_back_on_collisions_
     assert task.model_dump(mode="json") == original
 
 
-@pytest.mark.parametrize("alias", ["~e999999", "~z1", "~e01", "~", "Untrusted text ~r999999"])
+@pytest.mark.parametrize("alias", ["~e999999", "~z1", "~e01", "Untrusted text ~r999999"])
 def test_unknown_aliases_in_any_field_are_rejected_without_echoing_values(alias):
     task, *_ = case()
     codec = WireCodec(task, _task_receipt_ids(task))
