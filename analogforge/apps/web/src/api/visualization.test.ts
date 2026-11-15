@@ -1,0 +1,18 @@
+import {describe,expect,it} from 'vitest';
+import {parseVisualization,verifyBenchmarks,verifyDetail,type VisualizationBenchmarks,type VisualizationDetail} from './visualization';
+import type {components} from '../generated/schema';
+import seed from '../mock/fixtures/seed.json';
+import {measurementText} from '../features/missionControl/BenchmarkEvidence';
+type S=components['schemas'];
+const candidate=seed.candidates[0]!;
+const requirement=seed.missionPresets.MARS.requirements[0] as S['Requirement'];
+const run={run_id:seed.runId,workspace_id:seed.workspaceId,mission_revision_id:'d5c59269-515d-4147-a15a-01069aa75b88',dataset_lock_id:'lock',candidate_ids:[candidate.id],qualification_ids:[],test_result_ids:[],rover_revision_id:null} as unknown as S['RunSnapshot'];
+const detail:VisualizationDetail={schema_version:'1.0',run_id:run.run_id,candidate_id:candidate.id,body:'EARTH',bbox:candidate.aoi.bbox,dataset_lock_id:'lock',availability:'UNAVAILABLE',reason:'No usable layers',display_layer_manifest_ids:[]};
+const row={requirement,qualification_id:null,status:'UNKNOWN' as const,explanation:'Awaiting evidence',measurement:{value:null,unit:null,support_scale_m:null,comparison_evidence_id:null,receipt_id:null,reason:'No compatible comparison'},test_result_ids:[]};
+const benchmarks:VisualizationBenchmarks={schema_version:'1.0',run_id:run.run_id,candidate_id:candidate.id,mission_revision_id:run.mission_revision_id,dataset_lock_id:'lock',requirements:[row],test_result_ids:[]};
+describe('optional visualization consumer boundaries',()=>{
+  it('validates delivered v1 payloads and rejects unknown fields and versions',()=>{expect(parseVisualization('detail',detail)).toEqual(detail);expect(parseVisualization('benchmarks',benchmarks)).toEqual(benchmarks);expect(()=>parseVisualization('detail',{...detail,schema_version:'2.0'})).toThrow();expect(()=>parseVisualization('detail',{...detail,workspace_id:'foreign'})).toThrow();});
+  it('rejects cross-run, cross-site, wrong-body, wrong-geometry and wrong-lock detail',()=>{const subject={runId:run.run_id,candidateId:candidate.id,body:'EARTH' as const,bbox:candidate.aoi.bbox,lock:'lock'};expect(verifyDetail(detail,subject)).toBe(detail);for(const changed of [{run_id:'other'},{candidate_id:null},{body:'MARS' as const},{bbox:[0,0,1,1]},{dataset_lock_id:'other'},{display_layer_manifest_ids:['layer']}])expect(()=>verifyDetail({...detail,...changed},subject)).toThrow();});
+  it('keeps the accepted requirement exact and never borrows another candidate result',()=>{expect(verifyBenchmarks(benchmarks,run,candidate.id,[requirement])).toBe(benchmarks);for(const changed of [{candidate_id:'other'},{dataset_lock_id:'other'},{mission_revision_id:'other'},{requirements:[{...row,requirement:{...requirement,upper:999}}]},{test_result_ids:['foreign-result']}])expect(()=>verifyBenchmarks({...benchmarks,...changed},run,candidate.id,[requirement])).toThrow();});
+  it('preserves a real zero and requires compatible positive support plus evidence',()=>{const measurement={value:0,unit:requirement.unit,support_scale_m:500,comparison_evidence_id:'evidence',receipt_id:'receipt',reason:''};const value={...benchmarks,requirements:[{...row,measurement}]};expect(verifyBenchmarks(value,run,candidate.id,[requirement]).requirements[0]!.measurement.value).toBe(0);expect(measurementText(measurement)).toContain('Measured 0');for(const changed of [{support_scale_m:0},{support_scale_m:null},{receipt_id:null},{unit:'incompatible'}])expect(()=>verifyBenchmarks({...value,requirements:[{...row,measurement:{...measurement,...changed}}]},run,candidate.id,[requirement])).toThrow();});
+});

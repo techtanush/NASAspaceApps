@@ -1,0 +1,11 @@
+import {describe,it,expect} from 'vitest';
+import type {components} from '../generated/schema';
+import {parseEnvironment,environmentReason} from './environment';
+const run={run_id:'run',workspace_id:'workspace',mode:'live',mission_revision_id:'mission',candidate_ids:['site']} as components['schemas']['RunSnapshot'];
+const empty={schema_version:'environment.v1',run_id:'run',mode:'live',status:'UNKNOWN',reason_code:'NOT_CAPTURED',snapshot_sha256:null,qualification_supported:false,operating_limits:[],limitations:[],earth_candidates:[],nasa_reference:null};
+describe('stored operating context boundary',()=>{
+ it('keeps uncaptured context unknown with no invented samples or limits',()=>{expect(parseEnvironment(empty,run).status).toBe('UNKNOWN');expect(environmentReason('NOT_CAPTURED')).toContain('No stored');});
+ it('rejects foreign runs, sites, modes and unsupported qualification claims',()=>{for(const change of [{run_id:'other'},{workspace_id:'other'},{mode:'synthetic'},{qualification_supported:true},{operating_limits:[{value:1}]},{earth_candidates:[{candidate_id:'foreign',status:'AVAILABLE'}]}])expect(()=>parseEnvironment({...empty,...change},run)).toThrow();});
+ it('rejects claimed selected-planetary-AOI applicability from a historical rover point',()=>{expect(()=>parseEnvironment({...empty,status:'CAPTURED',workspace_id:run.workspace_id,mission_revision_id:run.mission_revision_id,snapshot_sha256:'a'.repeat(64),nasa_reference:{selected_aoi_applicability:'AVAILABLE'}},run)).toThrow('Historical rover');});
+ it('preserves an actual zero in a captured candidate-scoped Earth sample',()=>{const value={...empty,status:'CAPTURED',workspace_id:run.workspace_id,mission_revision_id:run.mission_revision_id,snapshot_sha256:'a'.repeat(64),earth_candidates:[{candidate_id:'site',status:'AVAILABLE',reason_code:'OPERATING_CONTEXT_ONLY',weather:{body:'EARTH',query:{start:'2026-11-14T12:00:00Z',end:'2026-11-14T15:00:00Z',source:'mix'},fetched_at:'2026-11-14T11:59:00Z',provenance:{response_sha256:'b'.repeat(64)},limitations:[],samples:[{parameter:'temperature',quantity:'air_temperature',unit:'degC',valid_at:'2026-11-14T12:00:00Z',value:0}]}}]};expect(parseEnvironment(value,run).earth_candidates[0]?.weather?.samples[0]?.value).toBe(0);expect(()=>parseEnvironment({...value,mission_revision_id:'foreign'},run)).toThrow();});
+});

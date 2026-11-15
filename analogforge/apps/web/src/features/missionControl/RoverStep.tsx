@@ -37,12 +37,14 @@ export function RoverStep() {
     catch (cause) { setError(cause); } finally { setSaving(false); }
   };
   const list = latestRevisions(rovers.data?.items ?? []); const chosen = plan.noRover || plan.roverRevisionId !== null;
+  const nameCounts = new Map<string, number>(); for (const rover of list) nameCounts.set(rover.name, (nameCounts.get(rover.name) ?? 0) + 1);
   return <Panel testid="rover-step" step="Step 3 of 4" title="Which rover?" lead="Choose the rover to test, add one, or qualify the site without a rover."
     footer={<><Button variant="ghost" onClick={() => navigate('/start/mission')}><ArrowLeft size={16} aria-hidden="true"/>Back</Button><Button variant="primary" data-testid="btn-rover-continue" disabled={!chosen || saving} disabledReason="Choose a rover or the site-only option." onClick={() => navigate('/start/review')}>Continue<ArrowRight size={16} aria-hidden="true"/></Button></>}>
     <Guide>The rover’s limits set the benchmark. Every result is tied to this exact rover revision.</Guide>
     {rovers.isPending ? <Skeleton label="Retrieving saved rovers"/> : rovers.error ? <ErrorPanel error={rovers.error} onRetry={() => { void rovers.refetch(); }}/> :
-      <ul className="mc-rovers" data-testid="rover-options">{list.map(rover => { const selected = plan.roverRevisionId === rover.id; return <li key={rover.id}><button type="button" className="mc-rover" data-testid="rover-option" data-rover={rover.name} aria-pressed={selected} onClick={() => update({ roverRevisionId: rover.id, roverName: rover.name, noRover: false })}>
+      <ul className="mc-rovers" data-testid="rover-options">{list.map(rover => { const selected = plan.roverRevisionId === rover.id; return <li key={rover.id}><button type="button" className="mc-rover" data-testid="rover-option" data-rover={rover.name} data-rover-id={rover.rover_id} data-rover-revision-id={rover.id} aria-pressed={selected} onClick={() => update({ roverRevisionId: rover.id, roverName: rover.name, noRover: false })}>
         <span className="mc-rover-head"><strong>{rover.name}</strong><span className="revision-badge">rev {rover.revision}</span>{selected && <Check size={16} aria-hidden="true"/>}</span>
+        {(nameCounts.get(rover.name) ?? 0) > 1 && <span className="mc-energy mono" title={rover.rover_id}>Rover ID {rover.rover_id.slice(0, 8)}</span>}
         <span className="mc-specs">{SPECS.map(spec => <span key={spec.key}><em>{spec.label}</em>{rover[spec.key] === null || rover[spec.key] === undefined ? 'Unknown' : `${String(rover[spec.key])} ${spec.unit}`}</span>)}</span>
         <span className="mc-energy" data-energy={rover.energy_model?.calibration_status ?? 'NONE'}>{rover.energy_model ? `Energy model: ${rover.energy_model.calibration_status === 'CALIBRATED' ? 'calibrated' : 'assumed, not calibrated'}` : 'No energy model: route results will be inconclusive'}</span>
       </button></li>; })}

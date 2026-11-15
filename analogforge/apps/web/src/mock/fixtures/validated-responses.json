@@ -33,7 +33,8 @@
         "local_dataset"
       ],
       "dataset_locks": [
-        "practice-lock-v1"
+        "practice-lock-v1",
+        "synthetic-policy-v1"
       ],
       "export_formats": [
         "html",
@@ -63,7 +64,7 @@
         "synthetic",
         "replay"
       ],
-      "default_dataset_lock_id": "practice-lock-v1",
+      "default_dataset_lock_id": "synthetic-policy-v1",
       "operator_limits": {
         "search_max_expansions": 100000,
         "search_max_seconds": 60,

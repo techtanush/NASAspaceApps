@@ -54,6 +54,9 @@ class Settings(BaseSettings):
     groq_model: str | None = None
     groq_fallback_enabled: bool = False
     earthdata_token: SecretStr | None = None
+    meteomatics_username: SecretStr | None = None
+    meteomatics_password: SecretStr | None = None
+    environment_context_enabled: bool = Field(default=False, validation_alias="ANALOGFORGE_ENVIRONMENT_CONTEXT")
     map_tile_url: str | None = Field(default=None, repr=False)
     log_level: str = "INFO"
     worker_cpu_concurrency: int = Field(default=2, ge=1, le=8)
@@ -88,7 +91,7 @@ class Settings(BaseSettings):
 
     @field_validator(
         "openai_api_key", "groq_api_key", "earthdata_token", "session_secret", "oidc_client_secret",
-        "postgres_password",
+        "postgres_password", "meteomatics_username", "meteomatics_password",
         mode="before",
     )
     @classmethod
@@ -167,6 +170,9 @@ class Settings(BaseSettings):
             "groq_model",
             "groq_fallback_enabled",
             "earthdata_token",
+            "meteomatics_username",
+            "meteomatics_password",
+            "environment_context_enabled",
             "operator_limits_json",
             "api_docs",
             "visualization_enabled",

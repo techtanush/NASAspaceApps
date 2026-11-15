@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { GlobeStage, type GlobeScene } from '../../maps/GlobeStage';
 import { STEPS, useMissionControl, type StepId } from './state';
+import { useWorkspaceSession } from '../../app/WorkspaceContext';
 
 function stepFor(pathname: string): StepId | null {
   if (pathname.startsWith('/start/')) return (pathname.split('/')[2] as StepId) ?? null;
@@ -19,11 +20,12 @@ function StepRail({ current }: { current: StepId }) {
 }
 function Stage() {
   const { scene, handlers } = useMissionControl(); const location = useLocation(); const step = stepFor(location.pathname);
+  const session=useWorkspaceSession();
   useEffect(() => { document.documentElement.dataset.stage = 'true'; return () => { delete document.documentElement.dataset.stage; }; }, []);
   return <div className="mc" data-theme="dark" data-testid="mission-control" data-layout={scene.layout ?? 'center'}>
     <GlobeStage scene={scene} onPick={handlers.onPick} onMarkerSelect={handlers.onMarkerSelect}/>
     <header className="mc-header"><Link to="/" className="wordmark"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" fill="none"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>AnalogForge</Link>
-      <nav className="mc-header-links" aria-label="Other views"><Link to="/workbench">Evidence workbench</Link><Link to="/rovers">Rovers</Link><Link to="/about">About</Link></nav></header>
+      <div className="mc-workspace-context" aria-label="Workspace context"><span>{session?.authMode==='local'?'Local workspace':'Workspace'}</span>{session&&<strong>{session.role.charAt(0)+session.role.slice(1).toLowerCase()}</strong>}</div><nav className="mc-header-links" aria-label="Other views"><Link to="/workbench">Evidence workbench</Link><Link to="/rovers">Rovers</Link><Link to="/about">About</Link></nav></header>
     <div className="mc-content" data-regional={/view=(regional|target)/.test(location.search) ? 'true' : 'false'}><Outlet/></div>
     {step && <StepRail current={step}/>}
   </div>;
@@ -35,9 +37,10 @@ export function useScene(scene: GlobeScene, handlers: { onPick?: (lat: number, l
   useEffect(() => { setScene(scene); }, [key]);
   useEffect(() => { setHandlers(handlers); return () => setHandlers({}); }, [handlers.onPick, handlers.onMarkerSelect]);
 }
-export function Panel({ title, step, lead, children, footer, testid }: { title: string; step?: string; lead?: ReactNode; children: ReactNode; footer?: ReactNode; testid?: string }) {
+export function Panel({ title, step, lead, children, footer, notice, testid }: { title: string; step?: string; lead?: ReactNode; children: ReactNode; footer?: ReactNode; notice?: ReactNode; testid?: string }) {
   return <section className="mc-panel panel" data-testid={testid} aria-labelledby="mc-panel-title">
     <header className="mc-panel-head">{step && <p className="mc-eyebrow">{step}</p>}<h1 id="mc-panel-title" tabIndex={-1}>{title}</h1>{lead && <p className="mc-lead">{lead}</p>}</header>
+    {notice && <div className="mc-panel-notice">{notice}</div>}
     <div className="mc-panel-body">{children}</div>
     {footer && <footer className="mc-panel-foot">{footer}</footer>}
   </section>;

@@ -30,6 +30,9 @@ WIRE_INSTRUCTIONS = (
     "authoritative_claims/claim_gates use authoritative_claim_columns/claim_gate_columns. "
     "Omitted prepared_submission equals authoritative_submission. Tool outputs wrap value plus audit_paths: at those "
     "paths, _task_audit_ref means the full task scientific_audit. "
+    "At task_paths, _task_value_ref points to that exact task value; at table_paths, _wire_table columns/rows "
+    "reconstruct every original record and field, preserving nulls/order. _tool_result_ref reuses the complete "
+    "earlier result with that call_id, not an evidence ID. These references omit no scientific fact. "
     "Review every outcome/finding, including UNKNOWN/blockers."
 )
 
@@ -167,6 +170,17 @@ class WireCodec:
         self.canonical: dict[str, str] = {}
         self.counts = dict.fromkeys("ercu", 0)
         self.audit = deepcopy(task.payload.get("scientific_audit"))
+        self.task_document = task.model_dump(mode="json")
+        self.task_values: dict[str, tuple[list[str], Any]] = {}
+        self.results: dict[str, Any] = {}
+        self.result_ids: dict[str, str] = {}
+        values = [([key], value) for key, value in self.task_document.items() if key != "payload"]
+        values.extend((["payload", key], value) for key, value in self.task_document["payload"].items()
+                      if key != "prepared_submission" or "authoritative_submission" not in task.payload)
+        for path, value in values:
+            key = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            if len(key) >= 256:
+                self.task_values.setdefault(key, (path, deepcopy(value)))
         for identifier in sorted(map(str, task.input_evidence_ids)):
             self._alias(identifier, "e")
         for identifier in sorted(set(receipt_ids)):
@@ -242,24 +256,69 @@ class WireCodec:
         _prune_definitions(result)
         return result
 
-    def result(self, canonical_result: Any) -> dict[str, Any]:
+    def result(self, canonical_result: Any, *, call_id: str | None = None) -> dict[str, Any]:
+        key = json.dumps(canonical_result, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        prior = self.result_ids.get(key) if call_id is not None else None
+        if call_id is not None and prior is not None and canonical_result == self.results[prior]:
+            self.results[call_id] = deepcopy(canonical_result)
+            return {"value": {"_tool_result_ref": prior}, "audit_paths": [], "result_ref": prior}
         paths: list[list[str | int]] = []
+        task_paths: list[dict[str, Any]] = []
+        table_paths: list[list[str | int]] = []
+
         def project(value: Any, path: list[str | int]) -> Any:
             if self.audit is not None and value == self.audit:
                 paths.append(path)
                 return {"_task_audit_ref": True}
+            serialized = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            reference = self.task_values.get(serialized)
+            if reference is not None and value == reference[1]:
+                task_paths.append({"path": path, "task_path": reference[0]})
+                return {"_task_value_ref": reference[0]}
+            if isinstance(value, list) and len(value) >= 2 and all(isinstance(row, dict) for row in value):
+                columns = list(value[0])
+                if all(set(row) == set(columns) for row in value):
+                    rows = [[row[column] for column in columns] for row in value]
+                    compact = {"_wire_table": {"columns": columns, "rows": rows}}
+                    if len(json.dumps(compact, separators=(",", ":"))) + 64 < len(serialized):
+                        table_paths.append(path)
+                        return {"_wire_table": {"columns": columns, "rows": [
+                            [project(cell, [*path, index, column]) for column, cell in zip(columns, row, strict=True)]
+                            for index, row in enumerate(rows)
+                        ]}}
             if isinstance(value, dict):
                 return {key: project(item, [*path, key]) for key, item in value.items()}
             if isinstance(value, (list, tuple)):
                 return type(value)(project(item, [*path, index]) for index, item in enumerate(value))
             return value
-        return {"value": self.encode(project(canonical_result, [])), "audit_paths": self.encode(paths)}
+        result = {"value": self.encode(project(canonical_result, [])), "audit_paths": self.encode(paths)}
+        if task_paths:
+            result["task_paths"] = self.encode(task_paths)
+        if table_paths:
+            result["table_paths"] = self.encode(table_paths)
+        if call_id is not None:
+            self.results[call_id] = deepcopy(canonical_result)
+            self.result_ids.setdefault(key, call_id)
+        return result
 
     def expand_result(self, wire: dict[str, Any]) -> Any:
+        if "result_ref" in wire:
+            return deepcopy(self.results[wire["result_ref"]])
         paths = {tuple(path) for path in self.decode(wire["audit_paths"])}
+        task_paths = {tuple(item["path"]): item["task_path"] for item in self.decode(wire.get("task_paths", []))}
+        table_paths = {tuple(path) for path in self.decode(wire.get("table_paths", []))}
+
         def restore(value: Any, path: tuple[str | int, ...]) -> Any:
             if path in paths:
                 return deepcopy(self.audit)
+            if path in task_paths:
+                source: Any = self.task_document
+                for key in task_paths[path]:
+                    source = source[key]
+                return deepcopy(source)
+            if path in table_paths:
+                table = value["_wire_table"]
+                value = [dict(zip(table["columns"], row, strict=True)) for row in table["rows"]]
             if isinstance(value, dict):
                 return {key: restore(item, (*path, key)) for key, item in value.items()}
             if isinstance(value, (list, tuple)):

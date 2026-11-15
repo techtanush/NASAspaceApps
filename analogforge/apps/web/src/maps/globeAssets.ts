@@ -17,6 +17,7 @@ export interface GlobeAsset {
   atmosphere: { color: string; altitude: number } | null;
   radiusKm: number;
   label: string;
+  context?: {sourceProduct:string;sourceUri:string;usageTerms:string;width:number;height:number};
 }
 
 const base = `${import.meta.env.BASE_URL}globe/`;

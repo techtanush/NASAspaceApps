@@ -10,8 +10,7 @@ import { Button, Dialog, EmptyState, ErrorPanel, FormField, Input, Select, Skele
 import { PlanetaryPanel } from '../../maps/PlanetaryPanel';
 import { RoverEditor } from '../rovers/RoverEditor';
 import { RequirementTable } from './RequirementTable';
-import mars from '../../../../../tests/fixtures/kit/missions/mission-mars-mobility.json';
-import moon from '../../../../../tests/fixtures/kit/missions/mission-moon-gap.json';
+import { marsPractice as mars, moonPractice as moon } from './practicePresets';
 type S=components['schemas'];type Draft=S['MissionDraftInput'];type Header=S['MissionHeader'];type Contract=S['MissionTestContract'];
 const customTarget=(body:Draft['target']['body']):Draft['target']=>({...((body==='MARS'?mars:moon).target as Draft['target']),vertical_datum:'Unknown'});
 const parseCoordinate=(value:string):number=>/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(value.trim())?Number(value):NaN;

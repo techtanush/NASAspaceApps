@@ -154,7 +154,7 @@ export function dispatch(method:string,path:string,body:unknown,headers=new Head
  const result=mutate(entity,objectId,action,body);if(result.status<400){db.idempotency[cacheKey]={body:serialized,status:result.status,value:clone(result.body)};saveDatabase();}return result;
  }
  if(entity==='health')return json({status:'ok'});
- if(entity==='capabilities')return json({modes:['synthetic','replay','live'],live_ai_configured:false,earthdata_configured:false,worker_healthy:true,adapters:['synthetic_practice','local_dataset'],dataset_locks:['practice-lock-v1'],export_formats:['html','json','csv'],scenario_config_ids:scenarios.map(s=>s.id),default_scenario_config_id:scenarios[0]!.id});
+ if(entity==='capabilities')return json({modes:['synthetic','replay','live'],live_ai_configured:false,earthdata_configured:false,worker_healthy:true,adapters:['synthetic_practice','local_dataset'],dataset_locks:['practice-lock-v1','synthetic-policy-v1'],export_formats:['html','json','csv'],scenario_config_ids:scenarios.map(s=>s.id),default_scenario_config_id:scenarios[0]!.id});
  if(entity==='configuration')return scenarios.find(s=>s.id===action)?json(scenarios.find(s=>s.id===action)):error('NOT_FOUND','Scenario not found',404);
  if(entity==='missions')return objectId?(db.missions[objectId]?json(db.missions[objectId]):error('NOT_FOUND','Mission not found',404)):list(Object.values(db.missions),url);
  if(entity==='mission-drafts')return db.drafts[objectId!]?json(db.drafts[objectId!]):error('NOT_FOUND','Draft not found',404);

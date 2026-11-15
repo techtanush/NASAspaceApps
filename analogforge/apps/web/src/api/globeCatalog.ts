@@ -6,7 +6,7 @@ import { GLOBE_ASSETS, type GlobeAsset, type GlobeBody } from '../maps/globeAsse
 const consumerSchema = structuredClone(schema);
 Object.assign(consumerSchema.properties.assets.items.properties.relief_path.not, {type:'string'});
 const validate = new Ajv2020({ strict: false, allErrors: true }).compile(consumerSchema);
-interface CatalogAsset {body:GlobeBody;surface_path:string;relief_path:string|null;placeholder:boolean;attribution:string;sha256:string;bytes:number;width:number;height:number;relief_sha256:string|null;relief_bytes:number|null}
+interface CatalogAsset {body:GlobeBody;surface_path:string;relief_path:string|null;placeholder:boolean;attribution:string;sha256:string;bytes:number;width:number;height:number;relief_sha256:string|null;relief_bytes:number|null;source_product:string;source_uri:string;usage_terms:string}
 export function parseGlobeCatalog(value: unknown): CatalogAsset[] {
   if (!validate(value)) throw new Error('Unsupported imagery catalog');
   const assets = (value as {assets:CatalogAsset[]}).assets;
@@ -29,9 +29,11 @@ export async function loadGlobeCatalog(signal:AbortSignal, remember:(url:string)
   if (!response.ok) return GLOBE_ASSETS;
   const result = {...GLOBE_ASSETS};
   for (const asset of parseGlobeCatalog(await response.json())) {
-    const surface = await verifiedImage(asset.surface_path,asset.sha256,asset.bytes,signal); remember(surface);
-    const relief = asset.relief_path ? await verifiedImage(asset.relief_path,asset.relief_sha256!,asset.relief_bytes!,signal) : null; if (relief) remember(relief);
-    result[asset.body] = {...GLOBE_ASSETS[asset.body],surface,relief,placeholder:asset.placeholder,attribution:asset.attribution};
+    try {
+      const surface = await verifiedImage(asset.surface_path,asset.sha256,asset.bytes,signal); remember(surface);
+      const relief = asset.relief_path ? await verifiedImage(asset.relief_path,asset.relief_sha256!,asset.relief_bytes!,signal) : null; if (relief) remember(relief);
+      result[asset.body] = {...GLOBE_ASSETS[asset.body],surface,relief,placeholder:asset.placeholder,attribution:asset.attribution,context:{sourceProduct:asset.source_product,sourceUri:asset.source_uri,usageTerms:asset.usage_terms,width:asset.width,height:asset.height}};
+    }catch(error){if(signal.aborted)throw error;/* A failed body retains its labelled fallback; other verified bodies can still load. */}
   }
   return result;
 }

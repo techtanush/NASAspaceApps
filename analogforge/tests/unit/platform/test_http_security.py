@@ -43,6 +43,26 @@ def error_document(response: httpx.Response, status: int) -> dict[str, Any]:
 
 
 @pytest.mark.db
+def test_local_session_declares_automatic_workspace_access(journey_store: Store, tmp_path: Path) -> None:
+    settings = Settings(
+        _env_file=None,
+        database_url=journey_store.engine.url.render_as_string(hide_password=False),
+        data_root=tmp_path / "data",
+        auth_mode="local",
+    )
+    with TestClient(create_app(settings=settings, store=journey_store)) as client:
+        before = client.get("/auth/session")
+        assert before.status_code == 200
+        assert before.headers["Cache-Control"] == "no-store"
+        assert before.json()["auth_mode"] == "local"
+        assert before.json()["role"] == "OWNER" and before.json()["authenticated"] is True
+        assert before.json()["csrf_token"] is None
+        assert client.post("/auth/logout").status_code == 204
+        assert client.get("/auth/session").json() == before.json()
+        assert client.get("/auth/login", params={"workspace_id": before.json()["workspace_id"]}).status_code == 409
+
+
+@pytest.mark.db
 def test_artifact_ranges_missing_bytes_tamper_and_workspace_authorization(journey_store: Store, tmp_path: Path) -> None:
     workspace, run = seed_run(journey_store)
     foreign, _ = seed_run(journey_store)
@@ -285,6 +305,7 @@ def test_oidc_real_http_login_callback_pkce_membership_csrf_and_logout(journey_s
         session = client.get("/auth/session")
         assert session.status_code == 200 and session.headers["Cache-Control"] == "no-store"
         assert session.json()["role"] == "EDITOR" and session.json()["workspace_id"] == workspace
+        assert session.json()["auth_mode"] == "oidc"
         csrf = session.json()["csrf_token"]
         body = {
             key: json.loads((FIXTURES / "missions" / "mission-graph-regression.json").read_text())[key]

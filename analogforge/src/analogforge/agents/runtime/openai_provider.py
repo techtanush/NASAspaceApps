@@ -19,6 +19,11 @@ from analogforge.agents.prompts.bundle import prompt_bundle
 from analogforge.agents.runtime.invocation import _nested_references, validate_submission
 from analogforge.agents.runtime.provider import ProviderError
 from analogforge.agents.runtime.provider_backoff import provider_backoff
+from analogforge.agents.runtime.tool_projection import (
+    PROJECTION_INSTRUCTIONS,
+    project_tool_result,
+    specialize_tool_schemas,
+)
 from analogforge.agents.runtime.wire_context import (
     WIRE_INSTRUCTIONS,
     UnknownWireAlias,
@@ -322,7 +327,7 @@ class OpenAIProvider:
         instructions, _ = prompt_bundle(task.role_key)
         codec = WireCodec(task, _task_receipt_ids(task))
         wire = codec.task(_wire_task(task))
-        instructions += WIRE_INSTRUCTIONS
+        instructions += WIRE_INSTRUCTIONS + PROJECTION_INSTRUCTIONS
         items: list[dict[str, Any]] = [
             {"role": "user", "content": json.dumps({"task": wire}, separators=(",", ":"), ensure_ascii=False)}
         ]
@@ -340,6 +345,7 @@ class OpenAIProvider:
                 ),
             }
         )
+        tools = specialize_tool_schemas(task, tools)
         tools = [{**tool, "parameters": codec.schema(tool["parameters"])} for tool in tools]
         correction_used = False
         transport_attempts = 0
@@ -391,6 +397,15 @@ class OpenAIProvider:
                     continue
                 if exc.status_code in {401, 403}:
                     raise ProviderError("PROVIDER_AUTH_FAILED", "Provider credentials were rejected") from exc
+                provider_body = exc.body if isinstance(exc.body, dict) else {}
+                provider_error = provider_body.get("error", provider_body)
+                error_code = provider_error.get("code") if isinstance(provider_error, dict) else None
+                if exc.status_code == 413 or isinstance(error_code, str) and error_code in {
+                    "context_length_exceeded", "request_too_large", "input_too_large", "tokens_exceeded",
+                }:
+                    raise ProviderError(
+                        "RESOURCE_LIMIT", "Provider input/context size exceeds the available request budget", False
+                    ) from exc
                 transport_attempts += 1
                 if exc.status_code not in {429, 500, 502, 503, 504} or transport_attempts >= 3:
                     code = "PROVIDER_RATE_LIMITED" if exc.status_code == 429 else "SOURCE_UNAVAILABLE"
@@ -444,7 +459,9 @@ class OpenAIProvider:
                         "details": details,
                     }
                 }
+            projected = result if feedback else project_tool_result(task, call["name"], arguments, result)
+            wire_result = projected if feedback else codec.result(projected, call_id=call["call_id"])
             items.append({"type": "function_call_output", "call_id": call["call_id"],
-                          "output": json.dumps(result if feedback else codec.result(result),
+                          "output": json.dumps(wire_result,
                                                separators=(",", ":"), ensure_ascii=False)})
         raise _output_failure(task, "REQUEST_BUDGET_EXHAUSTED")

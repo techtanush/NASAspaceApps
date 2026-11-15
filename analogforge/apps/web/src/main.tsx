@@ -26,7 +26,7 @@ async function boot() {
   const { default: App } = await import('./app/App');
   const root = document.getElementById('root');
   if (!root) throw new Error('Application root is missing');
-  createRoot(root).render(<App workspaceId={session.workspaceId}/>);
+  createRoot(root).render(<App workspaceId={session.workspaceId} session={{workspaceId:session.workspaceId,role:session.role,authMode:session.authMode}}/>);
 }
 void boot().catch((error: unknown) => {
   const root = document.getElementById('root');

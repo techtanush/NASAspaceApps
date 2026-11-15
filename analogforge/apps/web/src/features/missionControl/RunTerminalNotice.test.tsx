@@ -1,0 +1,24 @@
+import { expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import type { components } from '../../generated/schema';
+import { RunTerminalNotice } from './RunTerminalNotice';
+const state = vi.hoisted(() => ({ error: null as unknown, data: { items: [] as Record<string, unknown>[] } }));
+vi.mock('./RunActivity', () => ({ useRunActivity: () => state }));
+const run = { run_id: 'run', state: 'FAILED' } as components['schemas']['RunSnapshot'];
+it('keeps a safe recorded terminal reason and recovery link visible alongside retained evidence', () => {
+  state.data.items = [{ run_id: 'run', state: 'FAILED', status: 'FAILED', event_type: 'run.failed', summary: 'The model response failed required checks; no invalid proposal was accepted.', failure_code: 'MODEL_OUTPUT_INVALID' }];
+  const { rerender } = render(<MemoryRouter><RunTerminalNotice run={run}/></MemoryRouter>);
+  expect(screen.getByTestId('run-terminal-notice')).toHaveTextContent('MODEL_OUTPUT_INVALID');
+  expect(screen.getByRole('status', { name: 'Recorded investigation outcome' })).toHaveAttribute('aria-live', 'polite');
+  expect(screen.getByRole('status', { name: 'Recorded investigation outcome' })).toHaveAttribute('aria-atomic', 'true');
+  expect(screen.getByText(/no invalid proposal/)).toBeVisible();
+  expect(screen.getByRole('link', { name: 'Inspect evidence and recovery options' })).toHaveAttribute('href', '/runs/run/target');
+  state.error = new Error('Unauthorized');
+  rerender(<MemoryRouter><RunTerminalNotice run={run}/></MemoryRouter>);
+  expect(screen.queryByText(/no invalid proposal/)).not.toBeInTheDocument();
+  expect(screen.getByTestId('run-terminal-notice')).toHaveTextContent('recorded reason is unavailable');
+  state.error = null;
+  rerender(<MemoryRouter><RunTerminalNotice run={{ ...run, state: 'COMPLETED' }}/></MemoryRouter>);
+  expect(screen.queryByTestId('run-terminal-notice')).not.toBeInTheDocument();
+});

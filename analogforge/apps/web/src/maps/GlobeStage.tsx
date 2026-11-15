@@ -116,5 +116,6 @@ export function GlobeStage({ scene, onPick, onMarkerSelect }: { scene: GlobeScen
     <div ref={container} className="mc-globe-canvas" role="img" aria-label={`Interactive globe of ${asset.label}. Every action is also available from the panel.`}/>
     {state === 'unavailable' && <div className="mc-globe-fallback" data-testid="globe-fallback"><p>The 3-D globe is not available in this browser.</p><p className="helper">Use the coordinate fields and site list; every step works without it.</p></div>}
     <p className="mc-globe-credit" data-testid="globe-credit" data-placeholder={asset.placeholder}>{asset.attribution}</p>
+    {asset.context&&<details className="mc-globe-source"><summary>Imagery source and limits</summary><strong>{asset.context.sourceProduct}</strong><p>{asset.attribution}</p><p>{asset.context.width} × {asset.context.height} global context pixels · north up, east-positive longitude. Zooming does not add source detail. This image does not establish scientific coverage.</p><p>{asset.context.usageTerms}</p><p className="mono">{asset.context.sourceUri}</p></details>}
   </div>;
 }

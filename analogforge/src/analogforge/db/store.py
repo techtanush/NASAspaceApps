@@ -278,6 +278,21 @@ class UnitOfWork:
             raise PersistenceError("RESOURCE_LIMIT", "Event payload exceeds 16 KiB")
         return self.create("run_events", event)
 
+    def activity_events(
+        self, run_id: str, *, after: int = 0, limit: int = 26, through: int | None = None
+    ) -> Sequence[dict[str, Any]]:
+        """Bounded durable activity replay in run-local sequence order, independent of timestamps."""
+        table = _table("run_events")
+        query = (
+            sa.select(table.c.document_json)
+            .where(table.c.workspace_id == self.workspace_id, table.c.run_id == run_id, table.c.seq > after)
+            .order_by(table.c.seq)
+            .limit(limit)
+        )
+        if through is not None:
+            query = query.where(table.c.seq <= through)
+        return [document(row) for row in self.connection.execute(query).scalars()]
+
     def enqueue(
         self,
         kind: str,

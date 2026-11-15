@@ -201,6 +201,12 @@ def create_app(
         return JSONResponse(safe.envelope(getattr(request.state, "request_id", None)), status_code=503)
 
     application.include_router(build_router())
+    from analogforge.api.routers.runs import build_activity_router
+
+    application.include_router(build_activity_router())
+    from analogforge.api.routers.environment import build_environment_router
+
+    application.include_router(build_environment_router())
     from analogforge.api.routers.auth import router as auth_router
 
     application.include_router(auth_router)

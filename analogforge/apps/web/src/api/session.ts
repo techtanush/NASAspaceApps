@@ -1,6 +1,6 @@
 import { setSessionCsrf } from './client';
 import { ApiError } from './errors';
-export interface Session {workspaceId:string;role:'OWNER'|'EDITOR'|'VIEWER';csrfToken?:string}
+export interface Session {workspaceId:string;role:'OWNER'|'EDITOR'|'VIEWER';csrfToken?:string;authMode?:'local'|'oidc'}
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function sessionError(code:string,message:string,status:number,retryable=false):ApiError {
  return new ApiError(status,{error:{code,message,request_id:crypto.randomUUID(),retryable,details:{}}});
@@ -25,7 +25,8 @@ export async function loadSession():Promise<Session> {
  const csrf=hasSnake?body.csrf_token:body.csrfToken;
  if((hasSnake||hasCamel)&&(typeof csrf!=='string'||csrf.length===0||csrf.length>4096||[...csrf].some(character=>character.charCodeAt(0)<=32||character.charCodeAt(0)===127)))throw sessionError('SESSION_INVALID','The session supplied an invalid CSRF token.',502);
  if(hasSnake&&hasCamel&&body.csrf_token!==body.csrfToken)throw sessionError('SESSION_INVALID','The session supplied conflicting CSRF token fields.',502);
- const session:Session={workspaceId,role:role as Session['role'],...(typeof csrf==='string'?{csrfToken:csrf}:{})};
+ if(body.auth_mode!==undefined&&!['local','oidc'].includes(String(body.auth_mode)))throw sessionError('SESSION_INVALID','The session supplied an unsupported authentication mode.',502);
+ const session:Session={workspaceId,role:role as Session['role'],...(typeof csrf==='string'?{csrfToken:csrf}:{}),...(body.auth_mode?{authMode:body.auth_mode as Session['authMode']}:{})};
  setSessionCsrf(session.csrfToken);
  return session;
 }

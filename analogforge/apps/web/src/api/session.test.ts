@@ -27,6 +27,7 @@ it('a null token (platform local mode: no cookie session) is treated as absent, 
  vi.stubGlobal('fetch',vi.fn(async(_url,init)=>{void _url;headers.push(new Headers(init.headers));return ++calls===1?Response.json({authenticated:true,user_id:'22222222-2222-4222-8222-222222222222',workspace_id:otherWorkspace,role:'OWNER',csrf_token:null}):Response.json({revision:1});}));
  expect(await loadSession()).toEqual({workspaceId:otherWorkspace,role:'OWNER'});await api.post('/missions',{});expect(headers[1]!.has('X-CSRF-Token')).toBe(false);
 });
+it('retains explicit authentication mode metadata without guessing from CSRF absence',async()=>{vi.stubGlobal('fetch',vi.fn(async()=>Response.json({workspace_id:otherWorkspace,role:'OWNER',auth_mode:'local',csrf_token:null})));expect(await loadSession()).toEqual({workspaceId:otherWorkspace,role:'OWNER',authMode:'local'});vi.stubGlobal('fetch',vi.fn(async()=>Response.json({workspace_id:otherWorkspace,role:'OWNER'})));expect((await loadSession()).authMode).toBeUndefined();});
 it.each([
  [{workspace_id:otherWorkspace,role:'OWNER',csrf_token:42},'numeric token'],
  [{workspace_id:'not-a-uuid',role:'OWNER'},'workspace'],

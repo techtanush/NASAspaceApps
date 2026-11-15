@@ -1,0 +1,357 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "run_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "candidate_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "mission_revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "dataset_lock_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "requirement": {
+            "$ref": "#/components/schemas/Requirement"
+          },
+          "qualification_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "PARTIAL",
+              "FAIL",
+              "GAP",
+              "UNKNOWN"
+            ]
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "measurement": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "value": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "support_scale_m": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              },
+              "comparison_evidence_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "receipt_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "unit",
+              "support_scale_m",
+              "comparison_evidence_id",
+              "receipt_id",
+              "reason"
+            ]
+          },
+          "test_result_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "requirement",
+          "qualification_id",
+          "status",
+          "explanation",
+          "measurement",
+          "test_result_ids"
+        ]
+      }
+    },
+    "test_result_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "candidate_id",
+    "mission_revision_id",
+    "dataset_lock_id",
+    "requirements",
+    "test_result_ids"
+  ],
+  "components": {
+    "schemas": {
+      "Requirement": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "dimension": {
+            "type": "string",
+            "enum": [
+              "TERRAIN",
+              "SCIENCE",
+              "OPERATIONS",
+              "THERMAL",
+              "ILLUMINATION",
+              "ARIDITY",
+              "GRAVITY",
+              "ATMOSPHERE",
+              "RADIATION",
+              "REGOLITH"
+            ]
+          },
+          "observable": {
+            "type": "string"
+          },
+          "operator": {
+            "type": "string",
+            "enum": [
+              "BETWEEN",
+              "GTE",
+              "LTE",
+              "EQUALS",
+              "PRESENT",
+              "NOT_NATURALLY_REPRODUCIBLE"
+            ]
+          },
+          "lower": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "upper": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unit": {
+            "type": "string"
+          },
+          "mandatory": {
+            "type": "boolean"
+          },
+          "weight": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "evidence_scope": {
+            "type": "string",
+            "enum": [
+              "regional_context",
+              "terrain_model",
+              "field_validation"
+            ]
+          },
+          "minimum_support_scale_m": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maximum_support_scale_m": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "origin": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "TARGET_DERIVED",
+              "PROPOSED_DEFAULT"
+            ]
+          },
+          "acceptance_note": {
+            "type": "string"
+          },
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "slope_band_deg": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 90
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "exposure_counting": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "UNIQUE_UNDIRECTED_EDGE_DISTANCE",
+                      "TOTAL_TRAVERSED_DISTANCE"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "task_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "co_location_group": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "comparison_rule_id": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "temporal_support": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "slope_band_deg",
+              "exposure_counting",
+              "task_ids",
+              "co_location_group",
+              "comparison_rule_id",
+              "temporal_support"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "dimension",
+          "observable",
+          "operator",
+          "lower",
+          "upper",
+          "unit",
+          "mandatory",
+          "weight",
+          "evidence_scope",
+          "minimum_support_scale_m",
+          "maximum_support_scale_m",
+          "origin",
+          "acceptance_note",
+          "parameters"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

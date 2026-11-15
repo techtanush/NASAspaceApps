@@ -14,6 +14,8 @@ import { useMissionControl } from './state';
 import { formatPlace } from './coordinates';
 import { chooseLaunch } from './scenario';
 import { benchmarkText, ORIGIN_LABEL } from './tour';
+import { useCoverage } from './coverage';
+import { ExactTargetBounds } from './PracticeTargetArea';
 
 type S = components['schemas']; type Phase = 'idle' | 'creating' | 'preparing' | 'proposed' | 'starting';
 const pause = (ms: number, signal: AbortSignal) => new Promise<void>((resolve, reject) => { if (signal.aborted) { reject(signal.reason); return; } const finish = () => { signal.removeEventListener('abort', abort); resolve(); }; const timer = setTimeout(finish, ms); const abort = () => { clearTimeout(timer); reject(signal.reason); }; signal.addEventListener('abort', abort, { once: true }); });
@@ -24,23 +26,37 @@ export function ReviewStep() {
   const capabilities = useApi<S['CapabilityReport']>(workspace, '/capabilities');
   const scenarios = useQuery({ queryKey: ['workspace', workspace, 'mc-scenarios', capabilities.data?.scenario_config_ids], enabled: !!capabilities.data, queryFn: ({ signal }) => Promise.all((capabilities.data?.scenario_config_ids ?? []).map(id => api.get<S['ScenarioConfig']>(`/configuration/scenarios/${id}`, { signal }))) });
   const [sourceMode, setSourceMode] = useState<S['RuntimeMode']>('synthetic');
+  const launch = capabilities.data && scenarios.data ? chooseLaunch(plan.body, capabilities.data, scenarios.data.map(scenario => ({...scenario,allowed_modes:scenario.allowed_modes.filter(mode => mode === sourceMode)}))) : null;
+  const coverage=useCoverage(plan.body,box?.ok?box.bbox:null,launch?.scenario);
   const [phase, setPhase] = useState<Phase>('idle'); const [progress, setProgress] = useState(''); const [error, setError] = useState<unknown>(null);
   const [header, setHeader] = useState<S['MissionHeader'] | null>(null); const [contract, setContract] = useState<S['MissionTestContract'] | null>(null); const alive = useRef(true); const controller = useRef(new AbortController()); const keys = useRef({draft:commandKey(),prepare:commandKey(),accept:commandKey(),start:commandKey()}); const job = useRef<S['PreparationAccepted'] | null>(null); const lockedContract = useRef<S['MissionTestContract'] | null>(null); const issuing = useRef(false);
+  const refreshPreparation = useRef(false);
   useEffect(() => { alive.current = true; controller.current = new AbortController(); return () => { alive.current = false; controller.current.abort(); }; }, []);
   if (!ready) return <Navigate to="/start/rover" replace/>;
-  const launch = capabilities.data && scenarios.data ? chooseLaunch(plan.body, capabilities.data, scenarios.data.map(scenario => ({...scenario,allowed_modes:scenario.allowed_modes.filter(mode => mode === sourceMode)}))) : null;
   const rover = plan.noRover ? null : plan.roverRevisionId;
   const prepare = async () => {
     if (!launch || !box.ok || issuing.current) return; issuing.current = true; setError(null); setPhase('creating'); setProgress('Saving the mission draft');
     try {
-      const draft: S['MissionDraftInput'] = { name: plan.name.trim(), objective: plan.objective.trim(), target: { body: plan.body, bbox: [...box.bbox], longitude_convention: 'NEG180_180', latitude_type: 'PLANETOCENTRIC', crs_wkt: null, vertical_datum: 'Unknown' } };
-      const created = header ?? await api.post<S['MissionHeader']>('/missions', draft, { key: keys.current.draft, signal: controller.current.signal, recover: () => api.get('/missions') }); if (!alive.current) return; setHeader(created);
+      const draft: S['MissionDraftInput'] = { name: plan.name.trim(), objective: plan.objective.trim(), target: plan.exactTarget ?? { body: plan.body, bbox: [...box.bbox], longitude_convention: 'NEG180_180', latitude_type: 'PLANETOCENTRIC', crs_wkt: null, vertical_datum: 'Unknown' } };
+      let created = header ?? await api.post<S['MissionHeader']>('/missions', draft, { key: keys.current.draft, signal: controller.current.signal, recover: () => api.get('/missions') });
+      if (refreshPreparation.current) {
+        created = await api.get<S['MissionHeader']>(`/missions/${created.id}`, { signal: controller.current.signal });
+        if (!alive.current) return;
+        refreshPreparation.current = false;
+      }
+      if (!alive.current) return; setHeader(created);
       setPhase('preparing'); setProgress('Proposing measurable requirements');
       const accepted = job.current ?? await api.post<S['PreparationAccepted']>(`/missions/${created.id}/fingerprint`, { expected_revision: created.revision, mode: launch.mode, rover_revision_id: rover } satisfies S['FingerprintInput'], { key: keys.current.prepare, signal: controller.current.signal, recover: () => api.get(`/missions/${created.id}`) }); job.current = accepted;
       let status = await api.get<S['JobStatus']>(`/jobs/${accepted.job_id}`, {signal:controller.current.signal});
       for (let attempt = 0; attempt < 600 && alive.current && (status.state === 'QUEUED' || status.state === 'RUNNING'); attempt++) { setProgress(status.progress_step || 'Proposing measurable requirements'); await pause(700, controller.current.signal); status = await api.get<S['JobStatus']>(`/jobs/${accepted.job_id}`, {signal:controller.current.signal}); }
       if (!alive.current) return;
-      if (status.state !== 'SUCCEEDED' || !status.proposed_revision_id) throw status.error ?? new Error(`Requirement preparation ended as ${status.state.toLowerCase()}.`);
+      if (status.state !== 'SUCCEEDED' || !status.proposed_revision_id) {
+        if (status.state === 'FAILED' || status.state === 'BLOCKED' || status.state === 'CANCELLED') {
+          // Only a confirmed terminal job permits a new logical preparation command.
+          job.current = null; keys.current.prepare = commandKey(); refreshPreparation.current = true;
+        }
+        throw status.error ?? new Error(`Requirement preparation ended as ${status.state.toLowerCase()}.`);
+      }
       const proposed = await api.get<S['MissionTestContract']>(`/mission-revisions/${status.proposed_revision_id}`);
       setHeader(await api.get<S['MissionHeader']>(`/missions/${created.id}`)); setContract(proposed); setPhase('proposed');
     } catch (cause) { if (alive.current) { setError(cause); setPhase('idle'); } } finally { issuing.current = false; }
@@ -62,15 +78,18 @@ export function ReviewStep() {
     {phase === 'idle' && !header && <label className="form-field">Source mode<select value={sourceMode} onChange={event => setSourceMode(event.target.value as S['RuntimeMode'])}><option value="synthetic">Synthetic practice</option><option value="replay">Recorded replay</option><option value="live">Live model and data (API usage)</option></select></label>}
     {capabilities.error && <ErrorPanel error={capabilities.error}/>}{scenarios.error && <ErrorPanel error={scenarios.error}/>}
     <dl className="mc-summary" data-testid="review-summary">
-      <div><dt>Place</dt><dd>{GLOBE_ASSETS[plan.body].label} · {formatPlace(plan.lat!, plan.lng!)} · {plan.sizeKm} km area</dd><Link to="/start/place">Edit</Link></div>
+      <div><dt>Place</dt><dd>{GLOBE_ASSETS[plan.body].label} · {formatPlace(plan.lat!, plan.lng!)} · {plan.exactTarget ? 'exact target bounds' : `${plan.sizeKm} km area`}{plan.exactTarget && <ExactTargetBounds target={plan.exactTarget}/>}</dd><Link to="/start/place">Edit</Link></div>
       <div><dt>Mission</dt><dd><strong>{plan.name}</strong><span>{plan.objective}</span></dd><Link to="/start/mission">Edit</Link></div>
       <div><dt>Rover</dt><dd>{plan.noRover ? 'None: site qualification only' : plan.roverName}</dd><Link to="/start/rover">Edit</Link></div>
       <div><dt>Data</dt><dd>{launch ? <>{launch.scenario.name} <ModeBadge mode={launch.mode}/></> : capabilities.isPending || scenarios.isPending ? 'Checking configured data sources' : 'No runnable data source'}</dd></div>
     </dl>
+    {plan.practiceSource && launch?.mode === 'synthetic' && launch.scenario.id === plan.practiceSource.scenarioId && launch.scenario.default_dataset_lock_id === plan.practiceSource.datasetLockId && <p className="helper">Using the bundled synthetic practice target, with its exact configured bounds and reference. This is not NASA coverage or field qualification.</p>}
     {busy && <div className="mc-working" role="status" data-testid="prepare-status" data-phase={phase}><Skeleton label={progress || 'Working'}/><p>{progress}</p></div>}
     {error !== null && <ErrorPanel error={error} onRetry={phase === 'idle' ? () => { void prepare(); } : undefined}/>}
     {contract && <p className="helper mono">Contract revision {contract.revision} · {contract.content_sha256}</p>}
     {launch && <p className="helper mono">Dataset lock: {launch.scenario.default_dataset_lock_id}</p>}
+    <section className="mc-coverage" data-testid="review-coverage" data-coverage={coverage.state}><div><strong>Terrain coverage: {coverage.state.toLowerCase()}</strong><p>{coverage.message}</p>{coverage.data?.datasets.map(dataset=><p className="helper" key={`${dataset.id}:${dataset.version}`}>{dataset.id} · native resolution {dataset.native_resolution_m===null?'unknown':`${dataset.native_resolution_m} m`} · comparison support {dataset.comparison_support_m===null?'unknown':`${dataset.comparison_support_m} m`}</p>)}</div></section>
+    {coverage.error!=null&&<ErrorPanel error={coverage.error}/>}
     {contract && <section className="mc-requirements" data-testid="proposed-requirements" aria-label="Proposed requirements"><h2>Requirements to be locked</h2><ul>{contract.requirements.map(requirement => <li key={requirement.id} data-testid="proposed-requirement"><strong>{requirement.label}</strong><span className="mc-rule">Rule: {benchmarkText(requirement)}</span><span className="mc-tags"><span className="revision-badge">{ORIGIN_LABEL[requirement.origin]}</span>{requirement.mandatory ? <span className="revision-badge">Mandatory</span> : <span className="revision-badge">Optional</span>}</span></li>)}</ul></section>}
   </Panel>;
 }

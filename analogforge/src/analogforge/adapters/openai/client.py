@@ -150,8 +150,19 @@ class ResponsesClient:
     def _request(self, **kwargs: Any) -> dict[str, Any]:
         sdk = self.client if self.provider == "openai" else self.groq
         assert sdk is not None
-        if self.provider == "groq" and "input" in kwargs:
-            kwargs = {**kwargs, "input": portable_input(kwargs["input"])}
+        if self.provider == "groq":
+            # Leave headroom for the complete input/tool schemas on the fallback
+            # provider's smaller request budget. Incomplete proposals still fail closed.
+            output_budget = kwargs.get("max_output_tokens", 1024)
+            if isinstance(output_budget, int):
+                kwargs = {**kwargs, "max_output_tokens": min(output_budget, 1024)}
+            if self.model in {"openai/gpt-oss-20b", "openai/gpt-oss-120b"}:
+                # Groq counts reasoning against max_output_tokens. Its documented
+                # low effort leaves more of this bounded budget for complete tool arguments.
+                # https://console.groq.com/docs/responses-api#reasoning
+                kwargs = {**kwargs, "reasoning": {**(kwargs.get("reasoning") or {}), "effort": "low"}}
+            if "input" in kwargs:
+                kwargs = {**kwargs, "input": portable_input(kwargs["input"])}
         attempt: dict[str, Any] = {"provider": self.provider, "model": self.model, "status": "FAILED"}
         self.attempts.append(attempt)
         try:

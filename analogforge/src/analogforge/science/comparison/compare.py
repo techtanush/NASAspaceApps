@@ -36,6 +36,7 @@ from analogforge.science.comparison.policies import (
     POLICY_FUNCTIONS,
     PolicyContext,
     PolicyDecision,
+    RouteVerificationContext,
     SideEvidence,
     gap_decision,
     underspecified,
@@ -71,6 +72,7 @@ class CompareInputs:
     candidate: SideEvidence
     target: SideEvidence
     verification: VerificationSummary | None = None
+    verification_context: RouteVerificationContext | None = None
 
 
 @dataclass(frozen=True)
@@ -354,7 +356,8 @@ def _resolve(inputs: CompareInputs, config: ScienceConfig) -> tuple[PolicyDecisi
     ctx_policy = policy if policy is not None else config.policy(expected) if expected is not None else None
     placeholder = ctx_policy if ctx_policy is not None else next(iter(config.algorithms.observable_policies.values()))
     ctx = PolicyContext(
-        req, inputs.policy_id, placeholder, inputs.mode, inputs.candidate, inputs.target, inputs.verification
+        req, inputs.policy_id, placeholder, inputs.mode, inputs.candidate, inputs.target, inputs.verification,
+        inputs.verification_context,
     )
     if expected is None:
         return (
@@ -377,7 +380,8 @@ def _resolve(inputs: CompareInputs, config: ScienceConfig) -> tuple[PolicyDecisi
             inputs.policy_id,
         )
     ctx = PolicyContext(
-        req, inputs.policy_id, policy, inputs.mode, inputs.candidate, inputs.target, inputs.verification
+        req, inputs.policy_id, policy, inputs.mode, inputs.candidate, inputs.target, inputs.verification,
+        inputs.verification_context,
     )
     try:
         return POLICY_FUNCTIONS[inputs.policy_id](ctx), policy, inputs.policy_id

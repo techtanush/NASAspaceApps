@@ -117,6 +117,7 @@ def session(request: Request) -> JSONResponse:
             "role": principal.role,
             "csrf_token": principal.csrf_token,
         }
+    document["auth_mode"] = request.app.state.settings.auth_mode
     return JSONResponse(document, headers={"Cache-Control": "no-store"})
 
 

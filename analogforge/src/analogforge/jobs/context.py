@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from analogforge.db.store import PersistenceError
 from analogforge.ports.science import LocalScienceContext
@@ -20,6 +21,7 @@ def _hash_file(path: Path) -> str:
 @dataclass
 class WorkerScienceContext(LocalScienceContext):
     dataset_checksums: dict[str, dict[str, str]] = field(default_factory=dict)
+    verification_requests: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     def read_artifact(self, sha256: str) -> Path:
         self.check_cancelled()
