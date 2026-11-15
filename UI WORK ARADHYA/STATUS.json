@@ -1,0 +1,25 @@
+{
+  "owner": "Aradhya",
+  "branch": "aradhya/frontend-experience",
+  "status": "HANDOFF_READY_IMPLEMENTATION_INCOMPLETE",
+  "common_handoff_sha": null,
+  "betterui_source": "fc5e084c8b4e9e895604ba4be85e78fe2864fe7c",
+  "tasks": {
+    "A0": "NOT_STARTED_IN_THIS_ROUND",
+    "A1": "NOT_STARTED_IN_THIS_ROUND",
+    "A2": "NOT_STARTED_IN_THIS_ROUND",
+    "A3": "NOT_STARTED_IN_THIS_ROUND",
+    "A4": "NOT_STARTED_IN_THIS_ROUND",
+    "A5": "NOT_STARTED_IN_THIS_ROUND"
+  },
+  "delivered_schema_version": "planning-v1",
+  "runtime_endpoints_added": [],
+  "tests_executed_by_contributor": [],
+  "limitations": [
+    "Claude partial implementation inherited; new UI not merge-ready",
+    "Optional proposed API features not implemented by handoff",
+    "Global texture zoom does not increase scientific resolution"
+  ],
+  "next_action": "Read local README and shared contract, record common base, begin ordered tasks",
+  "common_handoff_ref": "refs/tags/ui-split-base-20261114"
+}

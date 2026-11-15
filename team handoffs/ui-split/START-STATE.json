@@ -1,0 +1,31 @@
+{
+  "date_local": "2026-11-14",
+  "base_main": "1721844d827795bfd0a003df769934d8657e9b57",
+  "betterui_tip": "fc5e084c8b4e9e895604ba4be85e78fe2864fe7c",
+  "aleph_reviewed_commit": "1b307cdb7c470a7715da497ba406355dfe7d3163",
+  "handoff_kind": "Planning plus inherited partial UI; no new runtime implementation",
+  "fresh_inherited_frontend_checks": {
+    "frozen_lock_install": "PASS",
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "vitest": {
+      "passed": 144,
+      "files": 33
+    },
+    "ui_forbidden_scan": "PASS"
+  },
+  "not_run_for_betterui": [
+    "production build",
+    "new Mission Control tests",
+    "browser journeys",
+    "real backend UI run",
+    "full merged suite",
+    "mutation gates",
+    "visual/responsive audit"
+  ],
+  "claude_snapshots": {
+    "UI-PLAN.md": "bae23919f99892a884ea843f7024780a62c0b116019d1698424892048493d916",
+    "PROGRESS.md": "09321ebd980eba19264ea4ec5527971e45e664a570e35ace8dda7f69655d18f3"
+  },
+  "common_handoff_ref": "refs/tags/ui-split-base-20261114"
+}

@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "scope": "Planning docs, planning schemas/samples and inherited frontend baseline only; implementation unfinished",
+  "files_before_receipt": 32,
+  "planning_schema_samples_valid": 3,
+  "claude_snapshots_byte_identical": true,
+  "local_markdown_links_valid": true,
+  "credential_scan": "PASS",
+  "inherited_frontend": {
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "unit_passed": 144,
+    "ui_forbidden": "PASS"
+  },
+  "new_feature_browser_validation": "NOT_RUN",
+  "new_feature_merge_readiness": "INCOMPLETE"
+}

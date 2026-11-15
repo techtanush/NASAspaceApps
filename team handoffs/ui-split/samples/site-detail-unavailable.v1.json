@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "run_id": "00000000-0000-4000-8000-000000000001",
+  "candidate_id": null,
+  "body": "MARS",
+  "bbox": [
+    137.25,
+    -4.95,
+    137.55,
+    -4.65
+  ],
+  "dataset_lock_id": null,
+  "availability": "UNAVAILABLE",
+  "reason": "Planning fixture: no registered regional display artifacts supplied.",
+  "display_layer_manifest_ids": []
+}

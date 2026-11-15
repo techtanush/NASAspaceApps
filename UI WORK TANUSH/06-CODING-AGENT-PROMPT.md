@@ -1,0 +1,11 @@
+# Coding-agent execution prompt — Tanush
+
+Implement AnalogForge's visualization DATA/backend on `tanush/platform-agents-integration`. Read every UI WORK TANUSH file and the shared ui-split contract/ownership/schemas, Claude's BETTERUI plan/progress and named architecture sources first. Record common seed SHA. Aradhya independently owns the frontend; do not edit TS/React/CSS or build a second UI.
+
+Deliver T0–T5: precise source inventory, versioned licensed global visual catalog/assets, actual regional Earth/Mars displays with aligned metadata/masks, safe coverage/detail read projections only where existing APIs need them, evidence-backed benchmark reads and meaningful backend tests. The user must be able to select each site (including adjacent clustered windows) and inspect its actual detailed terrain through Aradhya's viewer. Detail is bounded by real source resolution and does not change comparison support or scientific outcomes.
+
+Use existing NASADEM/MOLA intake, body geometry, source locks, preparation utility, display layer manifests, job/registrar/artifact authorization and immutable publication. Maintain exact body/CRS/height datum/nodata/provenance. Never invent terrain, values, margins, coverage, PASS, portfolio assignments, field validation or live readiness. Missing data remains explicit. No additional keys, quota/billing changes or provider purchase is necessary for core work.
+
+Aleph is a reviewed design/implementation reference. Adopt checkpoint/layer preparation ideas as appropriate, not Google scraping, an Earth-only Mercator math port to Mars or an undocumented capture server. Keep its optional open-source import path isolated and outside qualification until fully validated. Preserve required MIT notices if code is copied.
+
+Honor exclusive ownership and frozen contracts. If additive API is needed, implement a small versioned, compatibility-tested contract slice first and report the exact schema/capability so Aradhya can generate types. Continue independent data work while UI uses unavailable fixtures. Test actual endpoints/data preparation and provide exact source hashes, gates and limitations. Commit/push coherent owned changes and leave final integration gates to the actual merged tree; no force pushes or unrelated edits.
