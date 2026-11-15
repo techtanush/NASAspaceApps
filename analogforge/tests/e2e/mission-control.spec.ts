@@ -85,6 +85,17 @@ test('globe, exact-site inspection, stable selection and printable report',async
  if(process.env.E2E_TARGET==='real'){await expect(page.getByText(/Satellite imagery unavailable\. Measured terrain/)).toBeVisible();expect(blockedSatellite.length).toBeGreaterThan(0);}
  await expect(page.getByTestId('globe-stage')).toHaveAttribute('data-state','ready');
  const first=new URL(page.url()).searchParams.get('site');
+ // This practice fixture places all candidates nearby. The globe must not stack
+ // their labels or combine their individual qualification results.
+ await page.getByTestId('btn-all-sites').click();
+ const nearby=page.locator('.mc-ticker[data-group="true"]');
+ await expect(nearby).toHaveCount(1);
+ await expect(nearby).toHaveAttribute('data-member-count',String(await page.getByTestId('site-chip').count()));
+ await expect(nearby).toHaveAttribute('data-status','UNKNOWN');
+ await expect(nearby).toContainText('nearby sites');
+ await nearby.click();
+ await expect(page.getByTestId('regional-inspector')).toBeVisible();
+ expect(new URL(page.url()).searchParams.get('site')).toBe(first);
  await page.getByRole('button',{name:'Inspect location',exact:true}).click();
  await expect(page.getByTestId('regional-inspector')).toBeVisible();
  await page.locator('[data-testid="tour"] .mc-panel-body').evaluate(body=>{body.scrollTop=body.scrollHeight;});

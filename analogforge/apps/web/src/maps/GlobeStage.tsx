@@ -1,8 +1,9 @@
 import { loadGlobeCatalog } from '../api/globeCatalog';
 import { useEffect, useRef, useState } from 'react';
 import { GLOBE_ASSETS, GLOBE_INK, STARFIELD, type GlobeBody } from './globeAssets';
+import { markerElement, markerOverlays, type GlobeMarker, type MarkerOverlay } from './globeMarkers';
 
-export interface GlobeMarker { id: string; lat: number; lng: number; label: string; status?: string; index?: number }
+export type { GlobeMarker } from './globeMarkers';
 export interface GlobeScene {
   body: GlobeBody;
   focus?: { lat: number; lng: number; altitude?: number } | null;
@@ -14,7 +15,7 @@ export interface GlobeScene {
   layout?: 'hero' | 'panel' | 'center';
   scanning?: boolean;
 }
-interface OverlayDatum { kind: 'pin' | 'marker'; lat: number; lng: number; marker?: GlobeMarker; selected?: boolean }
+type OverlayDatum = MarkerOverlay | { kind: 'pin'; lat: number; lng: number };
 type Instance = import('globe.gl').GlobeInstance;
 
 const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -25,15 +26,6 @@ function pinElement(): HTMLElement {
   const element = document.createElement('div'); element.className = 'mc-pin'; element.setAttribute('aria-hidden', 'true');
   const stem = document.createElement('span'); stem.className = 'mc-pin-stem'; const head = document.createElement('span'); head.className = 'mc-pin-head';
   element.append(head, stem); return element;
-}
-function markerElement(datum: OverlayDatum, select: (id: string) => void): HTMLElement {
-  const marker = datum.marker!; const element = document.createElement('div'); element.className = 'mc-ticker';
-  element.dataset.status = marker.status ?? 'UNKNOWN'; element.dataset.selected = String(Boolean(datum.selected)); element.dataset.markerId = marker.id;
-  element.setAttribute('aria-hidden', 'true');
-  const badge = document.createElement('span'); badge.className = 'mc-ticker-index'; badge.textContent = String(marker.index ?? '');
-  const label = document.createElement('span'); label.className = 'mc-ticker-label'; label.textContent = marker.label;
-  element.append(badge, label); element.style.pointerEvents = 'auto'; element.addEventListener('click', event => { event.stopPropagation(); select(marker.id); });
-  return element;
 }
 function boxPath(box: number[]): number[][] {
   const [west, south, east, north] = box as [number, number, number, number]; const steps = 12; const points: number[][] = [];
@@ -107,7 +99,7 @@ export function GlobeStage({ scene, onPick, onMarkerSelect, onSurfaceDetail }: {
   const markersKey = JSON.stringify([scene.markers ?? [], scene.selectedMarker ?? null, scene.pin ?? null]);
   useEffect(() => {
     const instance = globe.current; if (!ready || !instance) return;
-    const data: OverlayDatum[] = (scene.markers ?? []).map(marker => ({ kind: 'marker', lat: marker.lat, lng: marker.lng, marker, selected: marker.id === scene.selectedMarker }));
+    const data: OverlayDatum[] = markerOverlays(scene.markers ?? [], scene.selectedMarker);
     if (scene.pin) data.push({ kind: 'pin', lat: scene.pin.lat, lng: scene.pin.lng });
     instance.htmlElementsData(data);
     const selected = (scene.markers ?? []).find(marker => marker.id === scene.selectedMarker);
