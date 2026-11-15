@@ -6,6 +6,7 @@ import { Link, useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { Check, ChevronLeft, ChevronRight, ExternalLink, Globe2, Loader } from 'lucide-react';
 import { Button, ConnectionIndicator, ErrorPanel, ModeBadge, ResultBadge, Skeleton, PublicationBadge } from '../../components/ui';
 import type { GlobeMarker } from '../../maps/GlobeStage';
+import { groupNearbyLocations } from '../../maps/globeMarkers';
 import { Guide, Panel, useScene } from './StageShell';
 import { useRunData } from './useRunData';
 import { buildCoverage, buildSites, STATUS_WORD, type Site } from './tour';
@@ -23,13 +24,6 @@ import { ResultPresentation } from './ResultPresentation';
 
 const ORIGIN: Record<string, string> = { KNOWN_CONTROL: 'Known control', DISCOVERED: 'Discovered', USER_SUPPLIED: 'Nominated', SYNTHETIC_CONTROL: 'Synthetic practice' };
 const TERMINAL = ['FAILED', 'BLOCKED', 'CANCELLED'];
-/** Sites closer together than this share one globe ticker; the panel shows their local arrangement. */
-const CLUSTER_DEG = 1.5;
-function clusters(sites: Site[]): Site[][] {
-  const groups: Site[][] = [];
-  for (const site of sites) { const home = groups.find(group => Math.abs(group[0]!.lat - site.lat) < CLUSTER_DEG && Math.abs(group[0]!.lng - site.lng) < CLUSTER_DEG); if (home) home.push(site); else groups.push([site]); }
-  return groups;
-}
 function LocalMap({ group, selected, onSelect }: { group: Site[]; selected: string; onSelect: (id: string) => void }) {
   const boxes = group.map(site => site.candidate.aoi.bbox as number[]); const west = Math.min(...boxes.map(box => box[0]!)), south = Math.min(...boxes.map(box => box[1]!)), east = Math.max(...boxes.map(box => box[2]!)), north = Math.max(...boxes.map(box => box[3]!));
   const spanX = east - west || 1, spanY = north - south || 1; const width = 320, height = Math.max(72, Math.min(200, Math.round((width * spanY) / spanX)));
@@ -41,7 +35,7 @@ export function TourView() {
   const { runId } = useParams(); const run = useRunData(runId); const { snapshot, contract } = run; const assurance = useRunAssurance(snapshot, contract, run.rover);
   const sites = useMemo(() => (contract ? buildSites(run.candidates, contract.requirements, run.qualifications) : []), [contract, run.candidates, run.qualifications]);
   const coverage = useMemo(() => (contract ? buildCoverage(contract.requirements, sites) : []), [contract, sites]);
-  const groups = useMemo(() => clusters(sites), [sites]);
+  const groups = useMemo(() => groupNearbyLocations(sites), [sites]);
   const [search, setSearch] = useSearchParams();
   const [selectionError, setSelectionError] = useState<unknown>(null);
   const selectedId = search.get('site') ?? search.get('candidate');
@@ -96,6 +90,7 @@ export function TourView() {
     {!researching && <ResultPresentation technical={technical} onChange={changePresentation}/>}
     {assurance.error && <ErrorPanel error={assurance.error}/>}
     <div className="mc-view-switch" role="group" aria-label="Evidence view"><Button variant="secondary" aria-pressed={!regional && !targetDetail} onClick={() => { setView('globe'); setOverview(false); }}>Globe</Button><Button variant="secondary" aria-label="Inspect location" aria-pressed={regional} onClick={() => { setView('regional'); setOverview(false); }}>Site detail</Button><Button variant="secondary" aria-label="Target evidence" aria-pressed={targetDetail} onClick={() => setView('target')}>Target</Button></div>
+    {!regional && !targetDetail && groups.some(items => items.length > 1) && <p className="helper">Nearby globe markers are grouped for readability. Choose an individual location from the site list or use Previous / Next; each has its own map, benchmarks and report.</p>}
     {researching && <div className="mc-research-status" role="status"><p className="mc-working-line"><Loader size={14} className="mc-spin" aria-hidden="true"/>{working ?? 'Research is still running'}</p><p>Candidate locations are provisional while the remaining evidence is checked. Follow the work log for each recorded operation.</p></div>}
     <details className="mc-activity-disclosure" open={researching || technical || undefined}><summary>Investigation work log</summary><RunActivity run={snapshot}/></details>
     {selected && <p className="sr-only" role="status" aria-live="polite" aria-atomic="true" data-testid="site-selection-announcement">Site {selected.index} of {sites.length}: {selected.candidate.name}. {STATUS_WORD[selected.status]}.</p>}

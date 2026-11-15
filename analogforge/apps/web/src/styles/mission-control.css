@@ -99,6 +99,8 @@ html[data-stage]{overflow:hidden}
 .mc-ticker:hover,.mc-ticker[data-selected=true]{border-color:var(--accent);background:var(--surface-3)}
 .mc-ticker[data-selected=false] .mc-ticker-label{display:none}
 .mc-ticker[data-selected=false]{padding:3px}
+.mc-ticker[data-group=true]{padding:4px 10px 4px 4px;gap:7px}
+.mc-ticker[data-group=true] .mc-ticker-label{display:inline}
 
 @keyframes mc-rise{from{opacity:0;transform:translateY(calc(-50% + 12px))}to{opacity:1;transform:translateY(-50%)}}
 @keyframes mc-slide{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
