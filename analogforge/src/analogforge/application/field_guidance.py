@@ -4,7 +4,7 @@ from typing import Any
 
 
 def field_guidance(requirement: dict[str, Any]) -> dict[str, str]:
-    observable = requirement.get("observable")
+    observable = str(requirement.get("observable") or "")
     parameters = requirement.get("parameters") or {}
     band = parameters.get("slope_band_deg")
     band_text = (

@@ -26,12 +26,13 @@ export function RegionalInspector({ runId, site, run }: { runId: string; site: S
   const matching=layers.matching.filter(layer=>layer.workspace_id===workspace&&layer.mode===site.candidate.mode);
   const candidates = useMemo(() => [{...site.candidate, name:siteName(site)}], [site]);
   return <section className="mc-regional" aria-label={`Regional evidence for ${siteName(site)}`} data-testid="regional-inspector">
-    <header><p className="mc-eyebrow">Regional evidence</p><h2>{siteName(site)}</h2><p>Selected footprint · {site.candidate.aoi.body} · {site.candidate.mode}</p></header>
+    <header><p className="mc-eyebrow">Location map</p><h2>{siteName(site)}</h2><p>Satellite imagery shows the landscape. The blue outline is this test region.</p></header>
     {layers.loading && <Skeleton label="Loading selected-site layers"/>}
     {layers.error && <ErrorPanel error={layers.error} onRetry={() => { void layers.refetch(); }}/ >}
-    {!layers.loading && !layers.error && matching.length === 0 && <p className="mc-detail-notice" role="status">Terrain imagery unavailable for this site. The boundary is the registered candidate footprint; it is not a terrain measurement.</p>}
-    {layers.detail&&<p className="mc-detail-notice" data-testid="detail-availability">Regional data: {layers.detail.availability.toLowerCase()}. {layers.detail.reason}</p>}
-    <EarthMap key={site.candidate.id} candidates={candidates} selected={site.candidate.id} candidateLabels={{[site.candidate.id]:`Site ${site.index}`}} onSelect={() => {}} layers={matching} allowSatelliteImagery/>
+    {!layers.loading && !layers.error && matching.length === 0 && <p className="mc-detail-notice" role="status">Terrain measurements unavailable for this site. The boundary is the registered candidate footprint; it is not a terrain measurement.</p>}
+
+    <EarthMap key={site.candidate.id} candidates={candidates} selected={site.candidate.id} candidateLabels={{[site.candidate.id]:`Site ${site.index}`}} onSelect={() => {}} layers={matching} allowSatelliteImagery autoLoad/>
+    {layers.detail&&<details className="mc-source"><summary>Terrain data status</summary><p className="mc-detail-notice" data-testid="detail-availability">Regional data: {layers.detail.availability.toLowerCase()}. {layers.detail.reason}</p></details>}
     {matching.map(layer => <details key={layer.id} className="mc-source"><summary>{layer.layer_kind} · source and resolution</summary><p>Comparison support: {layer.support_scale_m === null ? 'Unknown' : `${layer.support_scale_m} m`}. Native / effective source resolution: see source receipts.</p><p>Height reference: {site.candidate.aoi.vertical_datum}</p><p className="mono">Display CRS: {layer.display_crs_wkt}</p><p>No-data: transparent mask · {layer.width_px} × {layer.height_px} display pixels</p><p className="mono">Source evidence: {layer.source_evidence_ids.join(', ') || 'Unknown'}</p></details>)}
     <p className="mc-detail-notice">Zoom changes the display, not the evidence resolution. Layer units, comparison support and limitations appear below the map.</p>
   </section>;

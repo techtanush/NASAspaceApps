@@ -21,3 +21,13 @@ it('retains the tour label and starts with one identified opaque raster while ke
   expect(screen.getByTestId('raster-selection')).toHaveTextContent('Selected raster overlay');
   expect(screen.getByTestId('raster-selection')).toHaveTextContent('SLOPE (deg)');
 });
+
+it('keeps analysis colors hidden when satellite imagery is the default, including before WebGL initializes', () => {
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
+  const candidate = seed.candidates[0] as components['schemas']['EarthAnalogCandidate'];
+  render(<EarthMap candidates={[candidate]} selected={candidate.id} onSelect={() => {}} allowSatelliteImagery autoLoad/>);
+  expect(screen.queryByTestId('raster-selection')).toBeNull();
+  expect(screen.getByRole('status')).toHaveTextContent('Map unavailable');
+  expect(screen.queryByText('Loading satellite tiles…')).toBeNull();
+  expect(screen.getByRole('button', {name:'Measured terrain view'})).toBeDisabled();
+});

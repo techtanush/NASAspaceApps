@@ -43,7 +43,7 @@ export function supportsUsgsDetail(aoi: Aoi): boolean {
   return w! >= -125 && e! <= -66 && s! >= 25 && n! <= 49;
 }
 
-export function EarthImagery({ map, aoi, onActiveChange, autoLoad = false, preferHighDetail = false }: { map: MapInstance | null; aoi: Aoi; onActiveChange: (active: boolean) => void; autoLoad?: boolean; preferHighDetail?: boolean }) {
+export function EarthImagery({ map, aoi, onActiveChange, onViewChange, autoLoad = false, preferHighDetail = false }: { map: MapInstance | null; aoi: Aoi; onActiveChange: (active: boolean) => void; onViewChange?: (satellite: boolean) => void; autoLoad?: boolean; preferHighDetail?: boolean }) {
   const bounds = earthImageryBounds(aoi), key = bounds?.join(',') ?? '';
   const usgsEligible = supportsUsgsDetail(aoi);
   const [choice, setChoice] = useState<EarthImageryProvider>(preferHighDetail && usgsEligible ? 'usgs' : 'eox');
@@ -95,16 +95,16 @@ export function EarthImagery({ map, aoi, onActiveChange, autoLoad = false, prefe
     } catch { setStatus('failed'); setRequested(false); }
     return cleanup;
   }, [requested, map, key, onActiveChange, provider, maxZoom]);
-  return <section className="earth-imagery" aria-label="Optional satellite visual context">
+  return <section className="earth-imagery" aria-label="Satellite visual context">
     <div className="inline-fields"><button type="button" disabled={!map || !bounds} onClick={() => {
-      if (requested) { setRequested(false); setStatus('offline'); }
-      else { setStatus('loading'); setRequested(true); }
-    }}>{requested ? 'Measured terrain view' : 'Load satellite imagery'}</button><span className="helper">{requested ? 'Satellite imagery view · prepared measurements temporarily hidden' : 'Measured terrain / offline extent view'}</span></div>
+      if (requested) { setRequested(false); setStatus('offline'); onViewChange?.(false); }
+      else { setStatus('loading'); setRequested(true); onViewChange?.(true); }
+    }}>{requested ? 'Measured terrain view' : 'Load satellite imagery'}</button>{!requested && status !== 'offline' && onViewChange && <button type="button" onClick={() => onViewChange(false)}>View terrain measurements</button>}<span className="helper">{requested ? 'Satellite imagery · visual context' : 'Satellite imagery is off'}</span></div>
     <p className="helper">{provider === 'usgs' ? 'Historical aerial · USDA / USGS · 2017–2021 regional mosaic' : 'Historical satellite · 2016/2017'}{bounds&&<> · finest tile near selected site ~{earthImageryGroundSampling(aoi, provider)!.toFixed(1)} m/pixel</>} · visual context only.</p>
     {!bounds && <p className="helper">Satellite imagery requires a local Earth footprint in WGS84 geographic coordinates, below 85° latitude.</p>}
-    {status === 'loading' && <p role="status">Loading satellite tiles…</p>}
+    {status === 'loading' && map && <p role="status">Loading satellite tiles…</p>}
     {status === 'failed' && <p role="status">Satellite imagery unavailable. Measured terrain and the offline footprint view remain available. Select Load satellite imagery to retry.</p>}
-    {status === 'limited' && <p role="status">This view reached its 256-tile limit. Measured terrain and the offline footprint view have been restored. Select Load satellite imagery for another bounded view.</p>}
+    {status === 'limited' && <p role="status">This view reached its 256-tile limit. Satellite loading has stopped. The offline footprint and an explicit terrain-measurement view remain available. Select Load satellite imagery for another bounded view.</p>}
     <details><summary>Imagery source and resolution</summary>
     {usgsEligible && <label>Imagery layer<select value={provider} onChange={event => {
       setChoice(event.target.value as EarthImageryProvider);

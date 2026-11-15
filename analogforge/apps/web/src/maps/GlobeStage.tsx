@@ -12,7 +12,7 @@ export interface GlobeScene {
   markers?: GlobeMarker[];
   selectedMarker?: string | null;
   autoRotate?: boolean;
-  layout?: 'hero' | 'panel' | 'center';
+  layout?: 'hero' | 'panel' | 'center' | 'dashboard';
   scanning?: boolean;
 }
 type OverlayDatum = MarkerOverlay | { kind: 'pin'; lat: number; lng: number };
@@ -110,7 +110,7 @@ export function GlobeStage({ scene, onPick, onMarkerSelect, onSurfaceDetail }: {
   useEffect(() => { const instance = globe.current; if (!ready || !instance) return; instance.pathsData(scene.box ? [boxPath(scene.box)] : []); }, [ready, boxKey]);
   const asset = assets[scene.body];
   return <div className="mc-globe" data-testid="globe-stage" data-body={scene.body} data-state={state} data-scanning={scene.scanning ? 'true' : 'false'}>
-    <div ref={container} className="mc-globe-canvas" role="img" aria-label={`Interactive globe of ${asset.label}. Every action is also available from the panel.`}/>
+    <div ref={container} className="mc-globe-canvas" role="region" aria-label={`Interactive globe of ${asset.label}. Every action is also available from the panel.`}/>
     {state === 'unavailable' && <div className="mc-globe-fallback" data-testid="globe-fallback"><p>The 3-D globe is not available in this browser.</p><p className="helper">Use the coordinate fields and site list; every step works without it.</p></div>}
     <p className="mc-globe-credit" data-testid="globe-credit" data-placeholder={asset.placeholder}>{asset.attribution}</p>
     {asset.context&&<details className="mc-globe-source"><summary>Imagery source and limits</summary><strong>{asset.context.sourceProduct}</strong><p>{asset.attribution}</p><p>{asset.context.width} × {asset.context.height} global context pixels · north up, east-positive longitude. Zooming does not add source detail. This image does not establish scientific coverage.</p><p>{asset.context.usageTerms}</p><p className="mono">{asset.context.sourceUri}</p></details>}

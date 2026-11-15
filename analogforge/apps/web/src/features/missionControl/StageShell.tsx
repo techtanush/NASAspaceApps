@@ -28,11 +28,11 @@ function Stage() {
   const session=useWorkspaceSession();
   useEffect(() => { document.documentElement.dataset.stage = 'true'; return () => { delete document.documentElement.dataset.stage; }; }, []);
   return <div className="mc" data-theme="dark" data-testid="mission-control" data-layout={scene.layout ?? 'center'}>
-    <GlobeStage scene={scene} onPick={handlers.onPick} onMarkerSelect={handlers.onMarkerSelect} onSurfaceDetail={openSurfaceDetail}/>
+    {scene.layout !== 'dashboard' && <GlobeStage scene={scene} onPick={handlers.onPick} onMarkerSelect={handlers.onMarkerSelect} onSurfaceDetail={openSurfaceDetail}/>}
     <header className="mc-header"><Link to="/" className="wordmark"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" fill="none"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>AnalogForge</Link>
       {session?.authMode !== 'local' && <div className="mc-workspace-context" aria-label="Workspace context"><span>Workspace</span>{session&&<strong>{session.role.charAt(0)+session.role.slice(1).toLowerCase()}</strong>}</div>}<nav className="mc-header-links" aria-label="Other views"><Link to="/workbench">Evidence workbench</Link><Link to="/rovers">Rovers</Link><Link to="/about">About</Link></nav></header>
     <div className="mc-content" data-regional={/view=(regional|target)/.test(location.search) ? 'true' : 'false'}><Outlet/></div>
-    {step && <StepRail current={step}/>}
+    {step && scene.layout !== 'dashboard' && <StepRail current={step}/>}
   </div>;
 }
 export function StageShell() { return <MotionConfig reducedMotion="user"><Stage/></MotionConfig>; }

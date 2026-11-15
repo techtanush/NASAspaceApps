@@ -392,3 +392,23 @@ html[data-stage]{overflow:hidden}
  .mc-content[data-regional=true] .mc-regional{top:104px;bottom:54vh;left:8px;right:8px;height:auto;min-height:140px}.mc-content[data-regional=true] .mc-panel{top:48vh;bottom:40px;height:auto;max-height:none}.mc-content[data-regional=true] .mc-regional .map-region,.mc-content[data-regional=true] .mc-regional .map-canvas{min-height:150px}.mc-content[data-regional=true] .mc-regional>header{flex-shrink:0}
  .mc-hero{top:auto;bottom:44px;max-height:calc(100dvh - 140px)}.mc-scroll-cue{padding:5px 16px}.mc-overview-coverage table{font-size:11px}
 }
+
+/* Research → Earth pins → location detail, with a separate full results workspace. */
+.mc-site-anchor{position:relative;width:0;height:0;pointer-events:none}
+.mc-site-anchor-dot{position:absolute;width:7px;height:7px;left:-3.5px;top:-3.5px;background:var(--text-primary);border:1px solid var(--canvas);border-radius:50%;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+.mc-site-leader{position:absolute;left:0;top:0;height:1px;background:color-mix(in srgb,var(--accent) 75%,transparent);transform-origin:0 50%;pointer-events:none}
+.mc-site-anchor .mc-ticker{position:absolute;transform:translate(-50%,-50%);width:34px;min-width:34px;max-width:none;height:34px;padding:3px!important;border-radius:50%;justify-content:center;background:var(--text-primary);color:var(--canvas);border:2px solid var(--accent);box-shadow:0 3px 14px color-mix(in srgb,var(--canvas) 45%,transparent)}
+.mc-site-anchor .mc-ticker-index{width:24px;height:24px;color:var(--canvas);background:transparent!important;font-size:13px}
+.mc-site-anchor .mc-ticker:hover,.mc-site-anchor .mc-ticker:focus-visible,.mc-site-anchor .mc-ticker[data-selected=true]{background:color-mix(in srgb,var(--accent) 35%,var(--text-primary));outline:3px solid color-mix(in srgb,var(--accent) 40%,transparent);outline-offset:2px}
+.mc-earth-directory>p{font-size:13px;line-height:1.6;margin:0 0 14px}.mc-earth-directory ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.mc-earth-directory li button{width:100%;display:grid;grid-template-columns:32px minmax(0,1fr) 16px;align-items:center;gap:10px;text-align:left;padding:12px;border:1px solid var(--border-subtle);border-radius:var(--radius-overlay);background:var(--surface-2);color:var(--text-primary);cursor:pointer}
+.mc-earth-directory li button:hover{border-color:var(--accent);background:var(--surface-3)}.mc-earth-directory strong{font-size:13px;font-weight:600;display:block}.mc-earth-directory .helper{font-size:11px;display:block;margin-top:4px;line-height:1.5}
+.mc-directory-number{display:grid;place-items:center;border-radius:50%;width:30px;height:30px;background:color-mix(in srgb,var(--accent) 12%,var(--surface-1));color:var(--accent);font:600 12px var(--font-mono)}
+.mc[data-layout=dashboard]{background:var(--canvas)}
+.mc[data-layout=dashboard] .mc-panel{inset:76px 32px 24px;width:auto;max-width:1280px;margin-inline:auto;border-radius:var(--radius-overlay)}
+.mc[data-layout=dashboard] .mc-panel-head{padding:24px 32px 16px}.mc[data-layout=dashboard] .mc-panel-body{padding:16px 32px 32px}
+.mc[data-layout=dashboard] .mc-location-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:767px){.mc[data-layout=dashboard] .mc-panel{inset:66px 8px 8px;border-radius:var(--radius-overlay)}.mc[data-layout=dashboard] .mc-panel-head{padding:18px}.mc[data-layout=dashboard] .mc-panel-body{padding:8px 18px 18px}.mc[data-layout=dashboard] .mc-location-cards{grid-template-columns:1fr}.mc-site-anchor .mc-ticker{width:32px;height:32px}}
+
+.mc-regional{border-radius:var(--radius-overlay);background:var(--surface-1)}
+.mc-location-exports{flex-wrap:wrap}.mc-location-exports .mc-pdf-download{margin:0}

@@ -44,13 +44,16 @@ CRITERIA = {
     'completed_task_count': 'Completion of assigned science tasks',
     'final_battery_reserve_pct': 'Battery reserve at the required finish',
     'surface_temperature_min_k': 'Minimum surface temperature',
-    'mineral_class_present': 'Required mineral context', 'ground_clearance_m': 'Rover ground clearance',
+    'mineral_class_present': 'Mineral context', 'ground_clearance_m': 'Rover ground clearance',
     'planetary_gravity': 'Planetary gravity', 'planetary_atmosphere': 'Planetary atmosphere',
 }
 
 
 def criterion_name(requirement: dict[str, Any]) -> str:
-    return CRITERIA.get(requirement.get('observable'), requirement['label'])
+    label = CRITERIA.get(str(requirement.get('observable') or ''), str(requirement['label']))
+    if requirement.get('mandatory') is False and '(optional)' not in label.lower():
+        label += ' (optional)'
+    return label
 
 
 def readable_state(state: str) -> str:
@@ -99,18 +102,23 @@ def accepted_rule(requirement: dict[str, Any]) -> str:
     unit = requirement.get("unit", "")
     lower, upper = requirement.get("lower"), requirement.get("upper")
     if requirement["operator"] == "LTE":
-        return f"At most {simple_quantity(upper, unit)}"
-    if requirement["operator"] == "GTE":
-        return f"At least {simple_quantity(lower, unit)}"
-    if requirement["operator"] == "BETWEEN":
-        return f"Between {simple_quantity(lower, unit)} and {simple_quantity(upper, unit)}"
-    if requirement["operator"] == "EQUALS":
-        return f"Equal to {simple_quantity(lower if lower is not None else upper, unit)}"
-    if requirement["operator"] == "PRESENT":
-        return "The accepted feature must be present"
-    if requirement["operator"] == "NOT_NATURALLY_REPRODUCIBLE":
-        return "This planetary condition cannot be naturally reproduced on Earth"
-    return f"{requirement['operator']} {unit}".strip()
+        rule = f"At most {simple_quantity(upper, unit)}"
+    elif requirement["operator"] == "GTE":
+        rule = f"At least {simple_quantity(lower, unit)}"
+    elif requirement["operator"] == "BETWEEN":
+        rule = f"Between {simple_quantity(lower, unit)} and {simple_quantity(upper, unit)}"
+    elif requirement["operator"] == "EQUALS":
+        rule = f"Equal to {simple_quantity(lower if lower is not None else upper, unit)}"
+    elif requirement["operator"] == "PRESENT":
+        rule = "The accepted feature must be present"
+    elif requirement["operator"] == "NOT_NATURALLY_REPRODUCIBLE":
+        rule = "This planetary condition cannot be naturally reproduced on Earth"
+    else:
+        rule = f"{requirement['operator']} {unit}".strip()
+    band = (requirement.get("parameters") or {}).get("slope_band_deg")
+    if isinstance(band, list) and len(band) == 2:
+        rule += f"; slope band {band[0]} to {band[1]} deg"
+    return rule
 
 
 # ReportLab ships no type declarations.
@@ -629,6 +637,7 @@ def render_packet(document: dict[str, Any]) -> bytes:
         requirements = location["benchmarks"]["requirements"]
         statuses = [row["status"] for row in requirements]
         supported = [criterion_name(row["requirement"]) + ": " + accepted_rule(row["requirement"])
+                     + (" (partial evidence)" if row["status"] == "PARTIAL" else "")
                      for row in requirements if row["status"] in {"PASS", "PARTIAL"}]
         next_step = ("Inspect recorded route and checkpoints; survey before a field trial."
                      if location["test_plan"].get("route")
@@ -637,7 +646,8 @@ def render_packet(document: dict[str, Any]) -> bytes:
                      + position(location["test_plan"]["center"]),
                      "\n".join(supported) or "No supported rehearsal established yet.",
                      f"{statuses.count('PASS')} met; {statuses.count('FAIL')} unmet; "
-                     f"{statuses.count('UNKNOWN')} need evidence; {statuses.count('GAP')} Earth limitations.\n"
+                     f"{statuses.count('PARTIAL')} partly met; {statuses.count('UNKNOWN')} need evidence; "
+                     f"{statuses.count('GAP')} Earth limitations.\n"
                      + next_step])
     story.append(matrix(rows, [WIDTH * .29, WIDTH * .41, WIDTH * .30]))
     coverage = [["Mission benchmark", "Locations with a recorded match"]]

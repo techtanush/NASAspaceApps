@@ -2,6 +2,7 @@ export interface GlobeMarker { id: string; lat: number; lng: number; label: stri
 export interface MarkerOverlay {
   kind: 'marker'; lat: number; lng: number; marker: GlobeMarker;
   members: readonly GlobeMarker[]; selected: boolean;
+  labelOffset: [number, number];
 }
 
 /** Display grouping only. Retain the original objects and never move a site or infer a result. */
@@ -22,26 +23,33 @@ export function groupNearbyLocations<T extends { lat: number; lng: number }>(loc
 }
 
 export function markerOverlays(markers: readonly GlobeMarker[], selectedId?: string | null): MarkerOverlay[] {
-  return groupNearbyLocations(markers).map(members => {
-    const selected = members.find(marker => marker.id === selectedId);
-    const marker = selected ?? members[0]!;
-    // Anchor to a real member, never an invented centroid or displaced coordinate.
-    return { kind: 'marker', lat: marker.lat, lng: marker.lng, marker, members, selected: Boolean(selected) };
-  });
+  return groupNearbyLocations(markers).flatMap(neighbors => neighbors.map((marker, index) => {
+    // Spread only the labels. Each leader starts at its own unchanged geographic anchor.
+    const angle = -Math.PI / 2 + index * 2 * Math.PI / neighbors.length;
+    const radius = neighbors.length > 1 ? Math.max(62, neighbors.length * 10) : 30;
+    return { kind: 'marker' as const, lat: marker.lat, lng: marker.lng, marker, members: [marker], selected: marker.id === selectedId,
+      labelOffset: neighbors.length > 1 ? [Math.round(Math.cos(angle) * radius), Math.round(Math.sin(angle) * radius)] as [number, number] : [0, -30] as [number, number] };
+  }));
 }
 
 export function markerElement(datum: MarkerOverlay, select: (id: string) => void): HTMLElement {
-  const { marker, members } = datum; const grouped = members.length > 1;
-  const element = document.createElement('div'); element.className = 'mc-ticker';
-  // A display group has no aggregate scientific status, even when one member passes.
-  element.dataset.status = grouped ? 'UNKNOWN' : marker.status ?? 'UNKNOWN';
+  const { marker, labelOffset: [x, y] } = datum;
+  const element = document.createElement('div'); element.className = 'mc-site-anchor';
+  const pin = document.createElement('span'); pin.className = 'mc-site-anchor-dot';
+  const leader = document.createElement('span'); leader.className = 'mc-site-leader';
+  leader.style.width = `${Math.hypot(x, y)}px`; leader.style.transform = `rotate(${Math.atan2(y, x)}rad)`;
+  const button = document.createElement('button'); button.type = 'button'; button.className = 'mc-ticker';
+  button.style.left = `${x}px`; button.style.top = `${y}px`;
+  button.dataset.status = marker.status ?? 'UNKNOWN';
+  button.setAttribute('aria-label', `Open location ${marker.index ?? ''}: ${marker.label}`);
+  button.title = `${marker.label} · ${marker.lat.toFixed(5)}, ${marker.lng.toFixed(5)}`;
+  button.dataset.markerId = marker.id;
+  button.dataset.selected = String(datum.selected);
+  button.dataset.group = 'false';
+  const badge = document.createElement('span'); badge.className = 'mc-ticker-index'; badge.textContent = String(marker.index ?? '');
+  button.append(badge); button.style.pointerEvents = 'auto';
+  button.addEventListener('click', event => { event.stopPropagation(); select(marker.id); });
+  element.append(leader, pin, button);
   element.dataset.selected = String(datum.selected); element.dataset.markerId = marker.id;
-  element.dataset.group = String(grouped); element.dataset.memberCount = String(members.length);
-  element.setAttribute('aria-hidden', 'true');
-  element.title = grouped ? `${members.length} nearby sites. Opens site ${marker.index ?? marker.label}; every location is available in the site list.` : marker.label;
-  const badge = document.createElement('span'); badge.className = 'mc-ticker-index'; badge.textContent = String(grouped ? members.length : marker.index ?? '');
-  const label = document.createElement('span'); label.className = 'mc-ticker-label'; label.textContent = grouped ? 'nearby sites' : marker.label;
-  element.append(badge, label); element.style.pointerEvents = 'auto';
-  element.addEventListener('click', event => { event.stopPropagation(); select(marker.id); });
   return element;
 }

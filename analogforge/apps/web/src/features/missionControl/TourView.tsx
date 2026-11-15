@@ -3,7 +3,7 @@ import type { components } from '../../generated/schema';
 import { useRunAssurance } from './useRunAssurance';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { Check, ChevronLeft, ChevronRight, ExternalLink, Globe2, Loader } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, ExternalLink, Globe2, LayoutDashboard, Loader } from 'lucide-react';
 import { Button, ConnectionIndicator, ErrorPanel, ModeBadge, ResultBadge, Skeleton, PublicationBadge } from '../../components/ui';
 import type { GlobeMarker } from '../../maps/GlobeStage';
 import { groupNearbyLocations } from '../../maps/globeMarkers';
@@ -43,8 +43,16 @@ export function TourView() {
   const setSelectedId = useCallback((id: string) => setSearch(current => { current.set('site', id); current.set('view', 'regional'); return current; }, { replace: true }),[setSearch]);
   const regional = search.get('view') === 'regional'; const targetDetail = search.get('view') === 'target';
   const setView = (view: string) => setSearch(current => { if (view) current.set('view', view); else current.delete('view'); return current; });
-  const overview = search.get('view') === 'overview' || (!selectedId && !targetDetail);
-  const showOverview = () => setSearch(current => { current.delete('site'); current.delete('candidate'); current.set('view', 'overview'); return current; }, { replace: true });
+  const dashboard = search.get('view') === 'dashboard' || search.get('view') === 'overview';
+  const overview = dashboard || (!selectedId && !targetDetail);
+  const showOverview = useCallback(() => setSearch(current => { current.delete('site'); current.delete('candidate'); current.set('view', 'globe'); return current; }, { replace: true }), [setSearch]);
+  const showDashboard = () => setSearch(current => { current.delete('site'); current.delete('candidate'); current.set('view', 'dashboard'); return current; });
+  const researching = !!snapshot && !TERMINAL.includes(snapshot.state) && !['COMPLETED', 'AWAITING_REVIEW'].includes(snapshot.state);
+  const wasResearching = useRef(researching);
+  useEffect(() => {
+    if (wasResearching.current && !researching && sites.length) showOverview();
+    wasResearching.current = researching;
+  }, [researching, sites.length, showOverview]);
   const selected = sites.find(site => site.candidate.id === selectedId) ?? null; const group = selected ? groups.find(items => items.includes(selected)) ?? [selected] : [];
   const siteCard = useRef<HTMLElement>(null); const previousSite = useRef<string | null>(null);
   useEffect(() => {
@@ -57,10 +65,10 @@ export function TourView() {
   const markers = useMemo<GlobeMarker[]>(() => sites.map(site=>({id:site.candidate.id,lat:site.lat,lng:site.lng,label:siteName(site),status:site.status,index:site.index})), [sites]);
   const selectSite = (id:string) => { setSelectedId(id); };
   const onMarkerSelect = useCallback((id: string) => { setSelectedId(id); }, [setSelectedId]);
-  const touring = sites.length > 0; const target = contract ? boxCentre(contract.target.bbox) : null;
+  const touring = sites.length > 0 && !researching; const target = contract ? boxCentre(contract.target.bbox) : null;
   const overviewFocus = sites[0];
   useScene(touring
-    ? { body: 'EARTH', layout: 'panel', autoRotate: false, markers, selectedMarker: selected?.candidate.id ?? null, box: selected ? selected.candidate.aoi.bbox : null, focus: overview || !selected ? { lat: overviewFocus?.lat ?? 20, lng: overviewFocus?.lng ?? 0, altitude: 2.3 } : { lat: selected.lat, lng: selected.lng, altitude: 0.95 } }
+    ? { body: 'EARTH', layout: dashboard ? 'dashboard' : 'panel', autoRotate: false, markers, selectedMarker: selected?.candidate.id ?? null, box: selected ? selected.candidate.aoi.bbox : null, focus: overview || !selected ? { lat: overviewFocus?.lat ?? 20, lng: overviewFocus?.lng ?? 0, altitude: 2.3 } : { lat: selected.lat, lng: selected.lng, altitude: 0.95 } }
     : { body: contract?.target.body ?? 'MARS', layout: 'panel', autoRotate: false, scanning: true, focus: target ? { ...target, altitude: 1.7 } : null, pin: target, box: contract ? contract.target.bbox : null }, { onMarkerSelect });
   if (run.error) return <Panel title="Investigation unavailable" testid="tour-error"><ErrorPanel error={run.error}/></Panel>;
   // New qualification IDs can arrive while their scoped records are fetching.
@@ -73,7 +81,7 @@ export function TourView() {
     return <Panel testid="run-progress" step="Investigation" title={snapshot.state === 'BLOCKED' ? 'Investigation paused' : stopped ? `Investigation ${sentenceCase(snapshot.state).toLowerCase()}` : snapshot.state === 'COMPLETED' ? 'No Earth sites were found' : 'Working on your investigation'} lead={contract.name} notice={stopped ? <RunTerminalNotice run={snapshot}/> : undefined}
       footer={<><Link to={`/runs/${snapshot.run_id}/target`}>Open evidence workbench</Link>{!stopped && snapshot.state !== 'COMPLETED' && <Button variant="secondary" data-testid="btn-cancel-run" disabled={run.pending} onClick={() => { void run.action({ action_type: 'CANCEL', expected_revision: snapshot.revision, payload: {} }); }}>Cancel</Button>}</>}>
       {badges}
-      <Guide>{stopped ? 'The run stopped before any Earth site was assessed. The reason is recorded in the evidence workbench.' : 'AnalogForge is measuring the target and screening Earth terrain. This view updates by itself.'}</Guide>
+      <Guide>{stopped ? 'The run stopped before a location plan was ready. Its recorded evidence and reason remain available in the workbench.' : 'Follow the investigation here. When this stage finishes, Earth opens with a numbered pin for each location and its saved results.'}</Guide>
       <ol className="mc-progress" data-testid="progress-steps" data-state={snapshot.state}>{PROGRESS_STEPS.map((step, index) => { const state = stopped ? 'next' : current >= 0 && index < current ? 'done' : index === current ? 'current' : 'next'; return <li key={step.label} data-state={state}><span className="mc-progress-mark" aria-hidden="true">{state === 'done' ? <Check size={12} strokeWidth={2.5}/> : state === 'current' ? <Loader size={12} className="mc-spin"/> : null}</span>{step.label}</li>; })}</ol>
       <RunActivity run={snapshot}/>
     </Panel>;
@@ -91,12 +99,11 @@ export function TourView() {
     await run.action({ action_type: 'PROVE_IT', expected_revision: confirmed.revision, payload: { candidate_id: site.candidate.id } });
   };
   const working = PROVING_LABEL[snapshot.state] ?? PROGRESS_STEPS.find(step => (step.states as readonly string[]).includes(snapshot.state))?.label;
-  const researching = !TERMINAL.includes(snapshot.state) && !['COMPLETED', 'AWAITING_REVIEW'].includes(snapshot.state);
   const technical = !researching && search.get('detail') === 'technical';
   const changePresentation = (next: boolean) => setSearch(current => { if (next) current.set('detail', 'technical'); else current.delete('detail'); return current; }, { replace: true });
-  if (overview) return <Panel testid="tour" step={`${sites.length} Earth locations · mission rehearsal plan`} title="Your Earth test locations" lead={contract.name} notice={TERMINAL.includes(snapshot.state) ? <RunTerminalNotice run={snapshot}/> : undefined} footer={<><span className="helper">Choose a location to see its map, benchmarks, and field plan.</span><EvidenceBriefDownload run={snapshot} candidateId={sites[0]!.candidate.id} allLocations/></>}>
-    {badges}{researching && <p className="mc-research-status" role="status">{working ?? 'Research is still running'}. These locations are provisional while evidence is checked.</p>}
-    <LocationOverview sites={sites} coverage={coverage} hasRover={!!snapshot.rover_revision_id} onSelect={selectSite}/>
+  if (overview) return <Panel testid="tour" step={`${sites.length} Earth locations · mission rehearsal plan`} title={dashboard ? 'Your location test plan' : 'Your Earth test locations'} lead={contract.name} notice={TERMINAL.includes(snapshot.state) ? <RunTerminalNotice run={snapshot}/> : undefined} footer={dashboard ? <><Button variant="secondary" onClick={showOverview}><Globe2 size={16} aria-hidden="true"/>Back to Earth</Button><EvidenceBriefDownload run={snapshot} candidateId={sites[0]!.candidate.id} allLocations/></> : <Button variant="primary" data-testid="btn-results-dashboard" onClick={() => setView('dashboard')}><LayoutDashboard size={16} aria-hidden="true"/>Open results dashboard</Button>}>
+    {badges}
+    {dashboard ? <LocationOverview sites={sites} coverage={coverage} hasRover={!!snapshot.rover_revision_id} onSelect={selectSite}/> : <section className="mc-earth-directory" aria-label="Earth location directory"><p>Choose a numbered pin or a location below. Open its satellite map, test procedure, benchmarks, and PDF.</p><p className="helper">Each pin connects to an exact site coordinate. Nearby pin labels spread apart so every location remains selectable.</p><ol>{sites.map(site => <li key={site.candidate.id}><button type="button" aria-label={`Inspect location ${site.index}`} onClick={() => selectSite(site.candidate.id)}><span className="mc-directory-number">{site.index}</span><span><strong>{siteName(site)}</strong><span className="helper">{siteStatusSummary(site)}</span></span><ChevronRight size={16} aria-hidden="true"/></button></li>)}</ol><p className="helper">These are candidate rehearsal sites from the screened search area. Real imagery does not make synthetic measurements real; the data mode remains shown above.</p></section>}
     <details className="mc-activity-disclosure"><summary>Investigation work log</summary><RunActivity run={snapshot}/></details>
   </Panel>;
   return <>{regional && selected && <RegionalInspector runId={snapshot.run_id} site={selected} run={snapshot}/ >}{targetDetail && <TargetInspector runId={snapshot.run_id} profileId={snapshot.target_profile_id} target={contract.target} run={snapshot}/>}<Panel testid="tour" step={`Location ${position + 1} of ${sites.length}`} title={selected ? siteName(selected) : 'Earth locations'} lead={contract.name} notice={TERMINAL.includes(snapshot.state) ? <RunTerminalNotice run={snapshot}/> : undefined}
@@ -106,12 +113,13 @@ export function TourView() {
     {!researching && <ResultPresentation technical={technical} onChange={changePresentation}/>}
     {assurance.error && <ErrorPanel error={assurance.error}/>}
     <div className="mc-view-switch" role="group" aria-label="Evidence view"><Button variant="secondary" aria-pressed={!regional && !targetDetail} onClick={() => setView('globe')}>Globe</Button><Button variant="secondary" aria-label="Inspect location" aria-pressed={regional} onClick={() => setView('regional')}>Site detail</Button><Button variant="secondary" aria-label="Target evidence" aria-pressed={targetDetail} onClick={() => setView('target')}>Target</Button></div>
-    {!regional && !targetDetail && groups.some(items => items.length > 1) && <p className="helper">Nearby globe markers are grouped for readability. Choose an individual location from the site list or use Previous / Next; each has its own map, benchmarks and report.</p>}
+    <Button variant="secondary" onClick={showDashboard}><LayoutDashboard size={16} aria-hidden="true"/>Results dashboard</Button>
     {researching && <div className="mc-research-status" role="status"><p className="mc-working-line"><Loader size={14} className="mc-spin" aria-hidden="true"/>{working ?? 'Research is still running'}</p><p>Candidate locations are provisional while the remaining evidence is checked. Follow the work log for each recorded operation.</p></div>}
     <details className="mc-activity-disclosure" open={researching || technical || undefined}><summary>Investigation work log</summary><RunActivity run={snapshot}/></details>
     {selected && <p className="sr-only" role="status" aria-live="polite" aria-atomic="true" data-testid="site-selection-announcement">Site {selected.index} of {sites.length}: {selected.candidate.name}. {STATUS_WORD[selected.status]}.</p>}
     {selected && <article ref={siteCard} className="mc-site-card" data-testid="site-card" data-status={selected.status} aria-label={`Site ${selected.index}`}>
       <header><p className="mono">{formatPlace(selected.lat, selected.lng)} · {ORIGIN[selected.candidate.origin] ?? selected.candidate.origin}</p><span className="mc-site-status" data-status={selected.status}>{siteStatusSummary(selected)}</span></header>
+      <div className="mc-site-actions mc-location-exports"><EvidenceBriefDownload key={selected.candidate.id} run={snapshot} candidateId={selected.candidate.id}/><a className="button" data-variant="secondary" data-testid="link-report" href={`/runs/${snapshot.run_id}/report?site=${selected.candidate.id}`} target="_blank" rel="noreferrer">Location report<ExternalLink size={14} aria-hidden="true"/></a></div>
       <SiteTestPurpose site={selected}/>
       <div className="mc-site-actions mc-primary-test-action">{snapshot.rover_revision_id ? <><Button variant="primary" data-testid="link-prove" disabled={run.pending || snapshot.state !== 'AWAITING_REVIEW' || !canProve} onClick={() => { setSelectionError(null); void prove(selected).catch(setSelectionError); }}>{researching ? 'Rover model running…' : 'Run rover test here'}</Button><p className="helper">{canProve ? 'Design and independently verify this location’s route. Stay here to follow progress; this is a model, not a physical rover trial.' : snapshot.state === 'COMPLETED' ? 'The run is complete. Its recorded route and results remain below; start a new investigation for another test.' : 'The next test becomes available after its required evidence review.'}</p></> : <p className="helper">No rover supplied: this investigation compares site evidence only.</p>}</div>
       {!researching && <details className="mc-benchmark-details" open={technical || undefined}><summary>Start, checkpoints, and field procedure</summary><SiteFieldPlan runId={snapshot.run_id} candidateId={selected.candidate.id} revision={snapshot.revision}/></details>}
@@ -120,10 +128,8 @@ export function TourView() {
       {selected.candidate.limitations.length > 0 && <details className="mc-benchmark-details" key={`limits-${selected.candidate.id}`} open={technical || undefined}><summary>Source and model limits ({selected.candidate.limitations.length})</summary><ul className="mc-limits">{selected.candidate.limitations.map(item => <li key={item}>{item}</li>)}</ul></details>}
       {run.results.length > 0 && <details className="mc-benchmark-details" open={technical || undefined}><summary>Run-level rover test attempts ({run.results.length})</summary><p className="helper">These attempts belong to the run; they are not attributed to the currently viewed site.</p><ol className="mc-attempts" data-testid="attempts">{run.results.map((result, index) => <li key={result.id}><span className="mono">Attempt {index + 1}</span><ResultBadge outcome={result.outcome}/>{result.failure_category && <span className="helper">{sentenceCase(result.failure_category)} problem</span>}</li>)}</ol></details>}
       <div className="mc-site-actions">
-        <a className="button" data-variant="primary" data-testid="link-report" href={`/runs/${snapshot.run_id}/report?site=${selected.candidate.id}`} target="_blank" rel="noreferrer">Location report<ExternalLink size={14} aria-hidden="true"/></a>
         <Link className="button" data-variant="ghost" to={`/runs/${snapshot.run_id}/qualification?candidate=${selected.candidate.id}`}>Evidence workbench</Link>
       </div>
-      <EvidenceBriefDownload key={selected.candidate.id} run={snapshot} candidateId={selected.candidate.id}/>
       {(run.actionError ?? selectionError) != null && <ErrorPanel error={run.actionError ?? selectionError}/>}
     </article>}
     <details className="mc-coverage-strip" data-testid="coverage-strip" aria-label="Which site tests each requirement"><summary>Requirement coverage · {coverage.filter(row => row.state === 'COVERED').length} of {coverage.length} supported</summary><ul>{coverage.map(row => <li key={row.requirement.id} data-state={row.state}><span>{row.requirement.label}</span><strong>{row.state === 'COVERED' ? row.sites.map(site => `Site ${site.index}`).join(', ') : row.state === 'GAP' ? 'Not testable on Earth' : 'No site yet'}</strong></li>)}</ul></details>
