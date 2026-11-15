@@ -26,6 +26,7 @@ export function PlaceStep() {
   const sites = NAMED_SITES.filter(site => site.body === plan.body); const asset = GLOBE_ASSETS[plan.body];
   return <Panel testid="place-step" step="Step 1 of 4" title="Where is the mission?" lead="Choose the body, then set the place: pick a known site, type coordinates, or click the globe."
     footer={<><p className="helper" role="status" data-testid="place-summary">{hasPoint && validBox ? `${asset.label} · ${formatPlace(plan.lat!, plan.lng!)} · ${plan.sizeKm} km area` : 'No place selected yet.'}</p><Button variant="primary" data-testid="btn-confirm-place" disabled={!validBox} disabledReason="Set a valid place first." onClick={() => { update({ confirmed: true }); navigate('/start/mission'); }}>Confirm location<ArrowRight size={16} aria-hidden="true"/></Button></>}>
+    <p className="helper">Setup stays here while you navigate. Reloading starts a new setup; preparing requirements saves a mission draft.</p>
     <Guide>{hasPoint ? `Pin set on ${asset.label}. Adjust the area if needed, then confirm.` : `Start by choosing where on ${asset.label} the rover will operate.`}</Guide>
     <div className="mc-field"><span className="mc-field-label" id="body-label">Target body</span>
       <Choice<TargetBody> testid="choice-body" label="Target body" value={plan.body} options={[{ value: 'MARS', label: 'Mars' }, { value: 'MOON', label: 'Moon' }]} onChange={body => update({ body, lat: null, lng: null, latText: '', lngText: '', siteId: null, confirmed: false })}/></div>

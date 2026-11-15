@@ -12,7 +12,7 @@ export function validLatitude(lat: number): boolean { return Number.isFinite(lat
 export type BoxResult = { ok: true; bbox: [number, number, number, number] } | { ok: false; reason: 'POLE' | 'ANTIMERIDIAN' | 'INVALID' };
 /** A square area of the given edge length centred on a point, as west, south, east, north in degrees. */
 export function areaBox(body: GlobeBody, lat: number, lng: number, edgeKm: number): BoxResult {
-  if (!validLatitude(lat) || !Number.isFinite(lng) || !(edgeKm > 0)) return { ok: false, reason: 'INVALID' };
+  if (!validLatitude(lat) || !Number.isFinite(lng) || (!Number.isFinite(edgeKm) || !(edgeKm > 0))) return { ok: false, reason: 'INVALID' };
   const halfLat = (edgeKm / 2 / GLOBE_ASSETS[body].radiusKm) * (180 / Math.PI);
   const south = lat - halfLat, north = lat + halfLat;
   if (south <= -90 || north >= 90) return { ok: false, reason: 'POLE' };

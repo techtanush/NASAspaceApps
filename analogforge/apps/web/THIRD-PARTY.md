@@ -59,3 +59,13 @@ Runtime assets are installed locally and bundled. The application loads no font,
 The offline graticule is original display geometry. Practice fixtures are supplied by the repository. No NASA insignia or third-party imagery is included.
 
 The generated MSW development worker has a documented local lifecycle patch: CLIENT_CLOSED removes the closed client but retains the inactive registration. The existing zero-client fetch bypass remains unchanged. This prevents unregister/update races during document replacement; it changes no request handlers or scientific fixtures, and the worker remains excluded from production.
+
+## Mission Control globe
+
+- globe.gl 2.46.2: MIT; copyright Vasco Asturiano.
+- three 0.187.0: MIT; copyright three.js authors.
+- Earth Blue Marble and starfield assets were inherited from three-globe; Earth texture credited to NASA Blue Marble. Mars/Moon textures remain generated placeholders until a validated visual catalog replaces them.
+- Aleph, MMGIS, Terria and Kepler were studied as interaction references. No code or imagery from them was copied into this change.
+
+### Embedded reference identifiers
+The production audit classifies only the exact inert MapLibre URL-parser sentinel and WebGL help link, Three.js issue/shader/font attribution references, and Polished error-documentation URL emitted by the locked libraries. This does not allow external script, font, map, image or data requests; the Mission Control browser journey asserts zero external HTTP origins. Audit thresholds remain unchanged.

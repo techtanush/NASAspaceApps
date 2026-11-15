@@ -28,6 +28,6 @@ test('candidate metadata fits the 40/60 split and four loading rows remain compl
   if(width>=1280)expect(dimensions.ratio).toBeCloseTo(.4,2);expect(dimensions.scroll).toBeLessThanOrEqual(dimensions.width+1);for(const value of dimensions.values){expect(value.left).toBeGreaterThanOrEqual(dimensions.list[0]-1);expect(value.right).toBeLessThanOrEqual(dimensions.list[1]+1);}
  }
  const first=page.getByTestId('candidate-row').first();await first.getByTestId('btn-select-candidate').click();await expect(first).toHaveAttribute('data-selected','true');await first.locator('summary').click();await expect(first.getByText('WGS84 · bounds',{exact:true})).toBeVisible();
- await page.goto('/');await page.setViewportSize({width:390,height:900});await expect(page.getByTestId('run-row').first()).toBeVisible();await expect(page.getByTestId('run-list').locator('.table-overflow-hint')).toBeVisible();
+ await page.goto('/workbench');await page.setViewportSize({width:390,height:900});await expect(page.getByTestId('run-row').first()).toBeVisible();await expect(page.getByTestId('run-list').locator('.table-overflow-hint')).toBeVisible();
  const findings=finishAudit();expect(findings,JSON.stringify(findings.slice(0,12))).toEqual([]);
 });

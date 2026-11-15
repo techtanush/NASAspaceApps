@@ -144,5 +144,7 @@ export const thirdParty=[
     "name": "react-router-dom",
     "version": "7.18.5",
     "licence": "MIT"
-  }
+  },
+  {"name":"globe.gl","version":"2.46.2","licence":"MIT"},
+  {"name":"three","version":"0.187.0","licence":"MIT"},
 ] as const;

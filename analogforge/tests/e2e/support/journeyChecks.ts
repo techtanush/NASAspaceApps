@@ -85,7 +85,7 @@ export async function keyboardMission(page: Page) {
   // Enable native file-chooser interception before any keyboard activation; it is switched on lazily by the first
   // listener, and a late switch lets the real dialog open and block the page (observed ~50% at 200 % zoom).
   page.on('filechooser', () => undefined);
-  await page.goto('/');
+  await page.goto('/workbench');
   await pressControl(page, page.getByTestId('btn-new-mission'));
   await tabTo(page, page.getByTestId('input-mission-name'));
   await page.keyboard.type('Keyboard mobility investigation');

@@ -311,6 +311,17 @@ export function auditProduction(){
   ['AJV embedded schema identifier',/^https:\/\/raw\.githubusercontent\.com\/ajv-validator\/ajv\/master\/lib\/refs\/data\.json#/],
   ['library documentation',/^https:\/\/(?:react\.dev\/errors\/|reactrouter\.com\/en\/main\/routers\/|radix-ui\.com\/primitives\/docs\/|maplibre\.org\/|github\.com\/mapbox\/mapbox-gl-js\/issues\/|github\.com\/ungap\/url-search-params)/],
  ];
+ // Exact inert library identifiers, documentation and license references observed in the locked bundles.
+ // This classification does not authorize a runtime external resource; resources above are still rejected.
+ for (const [category,url] of [
+  ['MapLibre URL-parser sentinel','https://maplibre.invalid/'],
+  ['MapLibre WebGL help','https://wiki.openstreetmap.org/wiki/This_map_requires_WebGL'],
+  ['Three.js issue reference','https://github.com/mrdoob/three.js/issues/32012'],
+  ['Three.js shader attribution','https://www.shadertoy.com/view/WtyXRy'],
+  ['Three.js font attribution','http://www.magenta.gr/'],
+  ['Three.js font license','http://www.ellak.gr/fonts/MgOpen/license.html'],
+  ['Polished error documentation','https://github.com/styled-components/polished/blob/main/src/internalHelpers/errors.md#']
+ ]) permitted.push([category,{test:value=>value===url}]);
  const classified=[];
  for(const filename of files){
   if(!/\.(?:js|css|html)$/.test(filename))continue;const content=readFileSync(filename,'utf8');

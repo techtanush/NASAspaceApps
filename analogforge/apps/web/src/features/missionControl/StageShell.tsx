@@ -2,7 +2,7 @@ import { useEffect, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { GlobeStage, type GlobeScene } from '../../maps/GlobeStage';
-import { MissionControlProvider, STEPS, useMissionControl, type StepId } from './state';
+import { STEPS, useMissionControl, type StepId } from './state';
 
 function stepFor(pathname: string): StepId | null {
   if (pathname.startsWith('/start/')) return (pathname.split('/')[2] as StepId) ?? null;
@@ -24,11 +24,11 @@ function Stage() {
     <GlobeStage scene={scene} onPick={handlers.onPick} onMarkerSelect={handlers.onMarkerSelect}/>
     <header className="mc-header"><Link to="/" className="wordmark"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" fill="none"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>AnalogForge</Link>
       <nav className="mc-header-links" aria-label="Other views"><Link to="/workbench">Evidence workbench</Link><Link to="/rovers">Rovers</Link><Link to="/about">About</Link></nav></header>
-    <div className="mc-content"><Outlet/></div>
+    <div className="mc-content" data-regional={/view=(regional|target)/.test(location.search) ? 'true' : 'false'}><Outlet/></div>
     {step && <StepRail current={step}/>}
   </div>;
 }
-export function StageShell() { return <MissionControlProvider><Stage/></MissionControlProvider>; }
+export function StageShell() { return <Stage/>; }
 /** Each screen declares what the globe should show while it is mounted. */
 export function useScene(scene: GlobeScene, handlers: { onPick?: (lat: number, lng: number) => void; onMarkerSelect?: (id: string) => void } = {}) {
   const { setScene, setHandlers } = useMissionControl(); const key = JSON.stringify(scene);

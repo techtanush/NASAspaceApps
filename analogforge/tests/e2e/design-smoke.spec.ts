@@ -8,9 +8,9 @@ test('design rules reject visual regressions on the shell and full component kit
  await page.route(url=>/^https?:$/.test(url.protocol)&&url.origin!==(process.env.E2E_BASE_URL||'http://127.0.0.1:5176'),route=>route.fulfill({status:200,contentType:'text/css',body:''}));
  page.on('request',request=>{if(/^https?:/.test(request.url())&&new URL(request.url()).origin!==(process.env.E2E_BASE_URL||'http://127.0.0.1:5176'))external.push(request.url());});
  page.on('pageerror',error=>browserErrors.push(error.message));
- for(const path of ['/','/__styleguide']){
+ for(const path of ['/workbench','/__styleguide']){
   await page.goto(path);await expect(page.locator('main h1')).toBeVisible();
-  for(const theme of ['dark','light'])for(const width of [1920,1440,390]){const findings=await auditPage(page,path==='/'?'S01-smoke':'styleguide-smoke',{theme,width,height:900,focus:true});expect(findings,JSON.stringify(findings.slice(0,12))).toEqual([]);}
+  for(const theme of ['dark','light'])for(const width of [1920,1440,390]){const findings=await auditPage(page,path==='/workbench'?'S01-smoke':'styleguide-smoke',{theme,width,height:900,focus:true});expect(findings,JSON.stringify(findings.slice(0,12))).toEqual([]);}
   if(path==='/__styleguide'){
    await auditGlyphs(page);
    for(const theme of ['dark','light'])for(const density of ['compact','default','comfortable']){

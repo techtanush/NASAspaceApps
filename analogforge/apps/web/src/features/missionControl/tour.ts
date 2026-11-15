@@ -22,7 +22,7 @@ export interface SiteRow { requirement: Requirement; qualification: Qualificatio
 export interface Site { candidate: Candidate; index: number; lat: number; lng: number; rows: SiteRow[]; status: Status; covers: string[] }
 /** Overall site status is the most severe mandatory row; natural gaps do not by themselves fail a site. */
 export function buildSites(candidates: Candidate[], requirements: Requirement[], qualifications: Qualification[]): Site[] {
-  const sites = candidates.filter(candidate => candidate.aoi.bbox.length === 4).map(candidate => {
+  const sites = candidates.filter(candidate => candidate.aoi.body === 'EARTH' && candidate.aoi.bbox.length === 4 && candidate.aoi.bbox.every(Number.isFinite) && candidate.aoi.bbox[0]! < candidate.aoi.bbox[2]! && candidate.aoi.bbox[1]! < candidate.aoi.bbox[3]!).map(candidate => {
     const rows = requirements.map<SiteRow>(requirement => {
       const qualification = qualifications.find(row => row.candidate_id === candidate.id && row.requirement_id === requirement.id) ?? null;
       return { requirement, qualification, status: qualification?.status ?? 'UNKNOWN' };
@@ -32,8 +32,7 @@ export function buildSites(candidates: Candidate[], requirements: Requirement[],
     const [west, south, east, north] = candidate.aoi.bbox as [number, number, number, number];
     return { candidate, index: 0, lat: (south + north) / 2, lng: (west + east) / 2, rows, status, covers: rows.filter(row => row.status === 'PASS').map(row => row.requirement.id) };
   });
-  const rank = (site: Site) => SEVERITY.length - SEVERITY.indexOf(site.status);
-  return sites.map((site, order) => ({ site, order })).sort((a, b) => rank(a.site) - rank(b.site) || b.site.covers.length - a.site.covers.length || a.order - b.order).map(({ site }, position) => ({ ...site, index: position + 1 }));
+  return sites.map((site, position) => ({ ...site, index: position + 1 }));
 }
 export interface CoverageRow { requirement: Requirement; sites: Site[]; state: 'COVERED' | 'GAP' | 'UNCOVERED' }
 export function buildCoverage(requirements: Requirement[], sites: Site[]): CoverageRow[] {
