@@ -8,6 +8,8 @@
 .mc-landing-hero .mc-globe-canvas canvas{touch-action:pan-y!important}
 .mc-landing-copy{position:relative;z-index:4;max-width:570px;display:flex;flex-direction:column;gap:24px;pointer-events:none}
 .mc-landing-copy a{pointer-events:auto}
+.mc-landing-copy .mc-case-link{background:var(--canvas);color:var(--text-primary);border-color:var(--border-strong);text-decoration:none}
+.mc-landing-copy .mc-case-link:hover{background:var(--surface-2)}
 .mc-landing-copy h1{font-size:clamp(40px,4.2vw,68px);line-height:1.04;letter-spacing:-.045em;margin:0;font-weight:500;outline:none}
 .mc-landing-copy h1 span{color:var(--text-secondary)}
 .mc-landing-copy .mc-hero-lead{font-size:clamp(15px,1.2vw,18px);line-height:1.65;max-width:43ch}

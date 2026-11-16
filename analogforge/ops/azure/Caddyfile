@@ -37,6 +37,11 @@
         header Cache-Control "public, max-age=31536000, immutable"
         file_server
     }
+    handle /case-studies/* {
+        root * /srv
+        header Cache-Control "no-cache"
+        file_server
+    }
     handle {
         root * /srv
         try_files {path} /index.html

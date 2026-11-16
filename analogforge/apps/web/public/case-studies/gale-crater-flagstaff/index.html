@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A real NASA-data terrain comparison between Gale Crater on Mars and four candidate areas near Flagstaff, Arizona.">
+  <link rel="icon" href="/icons/analogforge.svg">
+  <link rel="stylesheet" href="/case-studies/gale-crater-flagstaff/case-study.css">
+  <title>Gale Crater and Flagstaff terrain comparison · AnalogForge</title>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to case study</a>
+  <header class="shell topbar">
+    <a class="brand" href="/"><img src="/icons/analogforge.svg" width="30" height="30" alt="">AnalogForge</a>
+    <a class="try" href="/start/place">Try a mission <span aria-hidden="true">↗</span></a>
+  </header>
+  <main id="main" class="shell">
+    <section class="intro" aria-labelledby="title">
+      <p class="eyebrow">NASA Space Apps case study <span>·</span> <time datetime="2026-11-14">14 Nov 2026</time></p>
+      <h1 id="title">Gale Crater <span>and</span> Flagstaff</h1>
+      <p class="lede">Which areas near Flagstaff have terrain most like our Gale Crater target? We screened four candidate areas using NASA elevation data and found two worth a closer look.</p>
+    </section>
+
+    <section class="results" aria-labelledby="results-title">
+      <div class="comparison">
+        <h2 id="results-title">Two of four areas met the terrain threshold</h2>
+        <p>We compared how common different slopes were across the Mars target and each Earth area. A smaller difference means a closer match on this measure.</p>
+        <table class="scores">
+          <caption>Slope distribution difference (0–7° scale)</caption>
+          <thead><tr><th scope="col">Area</th><th scope="col">Difference</th><th scope="col">Result</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><span class="badge met">A</span><span class="sr-only"> Southwest</span></th><td><div class="distance"><span class="bar met" style="--score:41.5222%" aria-hidden="true"></span><strong>2.91°</strong></div></td><td>Met</td></tr>
+            <tr><th scope="row"><span class="badge met">B</span><span class="sr-only"> Southeast</span></th><td><div class="distance"><span class="bar met" style="--score:52.6045%" aria-hidden="true"></span><strong>3.68°</strong></div></td><td>Met</td></tr>
+            <tr><th scope="row"><span class="badge missed">C</span><span class="sr-only"> Northwest</span></th><td><div class="distance"><span class="bar missed" style="--score:81.7477%" aria-hidden="true"></span><strong>5.72°</strong></div></td><td>Missed</td></tr>
+            <tr><th scope="row"><span class="badge missed">D</span><span class="sr-only"> Northeast</span></th><td><div class="distance"><span class="bar missed" style="--score:93.4065%" aria-hidden="true"></span><strong>6.54°</strong></div></td><td>Missed</td></tr>
+          </tbody>
+        </table>
+        <p class="threshold"><span aria-hidden="true"></span> Team-defined threshold of 5° on a shared 500 m comparison scale.</p>
+      </div>
+      <figure class="map">
+        <img src="/case-studies/gale-crater-flagstaff/flagstaff-terrain.webp" width="900" height="720" alt="Shaded relief map north of Flagstaff, Arizona. A and B form the southern row of the four screened areas. C and D are directly north of them.">
+        <figcaption>Candidate boundaries from the completed run over NASADEM shaded relief. North is up.</figcaption>
+      </figure>
+    </section>
+
+    <section class="details" aria-labelledby="method-title">
+      <div>
+        <h2 id="method-title">How we used NASA data</h2>
+        <p><a href="https://pds-geosciences.wustl.edu/missions/mgs/mola.html">Mars Orbiter Laser Altimeter (MOLA)</a> provided elevations for the Gale Crater target. <a href="https://www.earthdata.nasa.gov/data/catalog/lpcloud-nasadem-hgt-001">NASADEM</a> provided Earth elevations for the four candidate areas. We derived slope distributions at the same comparison scale and used Wasserstein-1 distance to score the difference.</p>
+        <a href="https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/">View the NASA Space Apps Earth-analog challenge</a>
+      </div>
+      <div>
+        <h2>What the result supports</h2>
+        <p>Areas A and B are candidates for further scouting. This regional run assessed terrain only. It did not assess rover performance, access, or field safety.</p>
+        <p>The public app offers a separate, labeled practice run where you can plan rover tests and open a modeled field brief.</p>
+        <a href="/start/place">Try the practice mission <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+  <footer class="shell footer"><a href="/">AnalogForge</a><p>Built by Space Bros for NASA Space Apps. NASA does not endorse this project.</p></footer>
+</body>
+</html>
