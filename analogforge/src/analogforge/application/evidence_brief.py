@@ -259,21 +259,24 @@ def render_pdf(snapshot: dict[str, Any]) -> bytes:
         # The renderer receives only this authorized snapshot, no credentials, DB sockets, paths or URLs to fetch.
         script = Path(__file__).resolve().parents[1] / "rendering/evidence_brief.py"
         environment = {"PATH": os.defpath, "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1"}
-        with tempfile.TemporaryDirectory(prefix="analogforge-evidence-pdf-") as directory:
+        with (tempfile.TemporaryDirectory(prefix="analogforge-evidence-pdf-") as directory,
+              tempfile.TemporaryFile(dir=directory) as source):
+            # A timed communicate() retry must not strand an unfinished write
+            # to the child's stdin pipe. The bounded snapshot is ready before launch.
+            source.write(content)
+            source.seek(0)
             process = subprocess.Popen(  # noqa: S603 - fixed local interpreter/script; input is data, never code.
-                [sys.executable, "-I", str(script)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                [sys.executable, "-I", str(script)], stdin=source, stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL, env=environment, cwd=directory,
             )
             packet = snapshot.get("schema_version") == "mission-test-brief.v1"
-            deadline = time.monotonic() + (45 if packet else 15)
-            pending: bytes | None = content
+            deadline = time.monotonic() + (30 if packet else 15)
             try:
                 while True:
                     try:
-                        output, _ = process.communicate(pending, timeout=0.1)
+                        output, _ = process.communicate(timeout=0.1)
                         break
                     except subprocess.TimeoutExpired:
-                        pending = None
                         if time.monotonic() >= deadline:
                             raise ApiError("TOOL_TIMEOUT", "The evidence PDF exceeded its rendering deadline.", 422) \
                                 from None

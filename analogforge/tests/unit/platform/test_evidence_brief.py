@@ -104,6 +104,20 @@ def test_combined_brief_has_each_site_its_coordinates_and_bookmarks(projection, 
             key: value for key, value in location.items() if key != "snapshot_sha256"})
 
 
+def test_waiting_for_renderer_preserves_large_snapshot(monkeypatch):
+    snapshot = {"schema_version": "mission-test-brief.v1", "value": "x" * (256 * 1024)}
+    launch = brief.subprocess.Popen
+
+    def slow_reader(argv, **kwargs):
+        return launch([argv[0], "-I", "-c",
+                       "import sys,time; time.sleep(.3); data=sys.stdin.buffer.read(); "
+                       "sys.stdout.buffer.write(b'%PDF-' + str(len(data)).encode())"], **kwargs)
+
+    monkeypatch.setattr(brief.subprocess, "Popen", slow_reader)
+    result = brief.render_pdf(snapshot)
+    assert result == b"%PDF-" + str(len(brief.json.dumps(snapshot).encode())).encode()
+
+
 def test_registered_analysis_histogram_requires_exact_operation_and_ancestry(projection):
     add_analysis(projection)
     document = snapshot(projection)
