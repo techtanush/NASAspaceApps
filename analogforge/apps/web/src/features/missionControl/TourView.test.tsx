@@ -41,6 +41,14 @@ it('starts on Earth with an individual location directory and a separate results
   expect(screen.queryByRole('region', {name:'Regional map'})).not.toBeInTheDocument();
   expect(state.run.action).not.toHaveBeenCalled();
 });
+it('explains unsupported returned coordinates instead of inventing a map position or reporting no results', () => {
+  state.run.snapshot = {...state.run.snapshot!,state:'COMPLETED'} as S['RunSnapshot'];
+  state.run.candidates = state.run.candidates.map(candidate => ({...candidate,aoi:{...candidate.aoi,crs_wkt:'EPSG:32612',bbox:[400000,3900000,401000,3901000]}}));
+  render(tour());
+  expect(screen.getByRole('heading',{name:'Earth coordinates need review'})).toBeVisible();
+  expect(screen.getByRole('status')).toHaveTextContent('unsupported Earth coordinates');
+  expect(screen.queryByRole('button',{name:'Inspect location 1'})).toBeNull();
+});
 it('runs the selected rover test in the tour after confirming the exact current selection and revision', async () => {
   state.run.snapshot = {...state.run.snapshot!, state:'AWAITING_REVIEW', workspace_id:'workspace', revision:7,
     rover_revision_id:'rover', selected_candidate_id:null, pending_review:{allowed_actions:['SELECT_CANDIDATE','PROVE_IT']}} as S['RunSnapshot'];

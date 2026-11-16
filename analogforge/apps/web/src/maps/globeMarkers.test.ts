@@ -27,6 +27,8 @@ it('opens each exact location without aggregating mixed scientific outcomes', ()
     const button = element.querySelector('button')!;
     expect(button.textContent).toBe(String(index + 1));
     expect(button.dataset.status).toBe(sites[index]!.status);
+    expect(Number(button.dataset.latitude)).toBe(sites[index]!.lat);
+    expect(Number(button.dataset.longitude)).toBe(sites[index]!.lng);
     expect(button.dataset.group).toBe('false');
     expect(button.getAttribute('aria-label')).toContain(sites[index]!.label);
     button.click();

@@ -61,3 +61,9 @@ The owner approved default loading of USGS/EOX tiles after being told that the p
 Native Comet receipts: `earth-pins-comet.png` (six independent numbered pins), `satellite-default-comet.png` (real aerial landscape), and `results-dashboard-comet.png` (full plan with no globe). Receipts are ignored under `out/demo-review/`.
 
 The final mobile accessibility scan caught focusable location pins inside a static-image role. The globe is now an interactive region. Its corrected real-backend mobile, keyboard and reduced-motion journey passed with no serious or critical Axe violations. The other four real-backend journeys passed in the same review batch.
+
+## Geographic accuracy follow-up
+
+Every globe pin comes from the center of the returned candidate’s geographic Earth bounds. The numbered badges may move in screen space to avoid overlap; their leader lines remain anchored to the original location. They are region centers, not independently surveyed route starts. Rotation and zoom remain enabled; clicking a pin opens the corresponding candidate ID. Pins on the far side of Earth are occluded as the globe rotates; the complete location directory remains available.
+
+Regression fixtures cover returned sites in South America, Australia, northern Europe and both sides of the date line, changing input bounds, retained unknown verdicts, and rejection of projected or out-of-range coordinates. The current regional practice search is explicitly labeled; a global display is not a claim that the algorithm searched beyond acquired terrain coverage.

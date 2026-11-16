@@ -59,7 +59,7 @@ export function GlobeStage({ scene, onPick, onMarkerSelect, onSurfaceDetail }: {
         .pathsData([]).pathPoints((path: object) => path as number[][]).pathPointLat((point: number[]) => point[0]!).pathPointLng((point: number[]) => point[1]!)
         .pathPointAlt(0.006).pathColor(() => GLOBE_INK.accent).pathStroke(1.4).pathDashLength(1).pathDashGap(0).pathTransitionDuration(0)
         .onGlobeClick(({ lat, lng }: { lat: number; lng: number }) => pick.current?.(lat, lng));
-      const controls = instance.controls(); controls.enablePan = false; controls.minDistance = 165; controls.maxDistance = 520; controls.autoRotateSpeed = 0.35;
+      const controls = instance.controls(); controls.enableRotate = true; controls.enableZoom = true; controls.enablePan = false; controls.minDistance = 165; controls.maxDistance = 520; controls.autoRotateSpeed = 0.35;
       // The overview texture has fixed resolution. Hand a deliberate close zoom to the
       // selected site's tiled map rather than magnifying it down to surface pixels.
       const openDetail = () => { if (instance.pointOfView().altitude <= 0.72) detail.current?.(); };

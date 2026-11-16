@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import seed from '../../mock/fixtures/seed.json';
 import { benchmarkText, buildSites, siteName, siteStatusSummary, type Candidate, type Requirement, type Qualification } from './tour';
+import { markerOverlays } from '../../maps/globeMarkers';
 
 describe('committed candidate presentation', () => {
   const candidates = seed.candidates as unknown as Candidate[];
@@ -19,6 +20,33 @@ describe('committed candidate presentation', () => {
     expect(sites).toHaveLength(input.length);
     expect(sites.every(site => site.status === 'UNKNOWN')).toBe(true);
     expect(sites.every(site => site.covers.length === 0)).toBe(true);
+  });
+  it('places returned regions across hemispheres and the date line without moving them or inventing matches', () => {
+    const boxes = [[-50.1,-10.1,-49.9,-9.9],[132.9,-25.1,133.1,-24.9],[14.9,67.9,15.1,68.1],[179.8,10,179.9,10.2],[-179.9,10,-179.8,10.2]];
+    const returned = boxes.map((bbox,index) => ({...candidates[0]!,id:`global-check-${index}`,aoi:{...candidates[0]!.aoi,bbox}}));
+    const original = JSON.stringify(returned);
+    const sites = buildSites(returned, requirements, []);
+    const overlays = markerOverlays(sites.map(site => ({id:site.candidate.id,lat:site.lat,lng:site.lng,label:siteName(site)})));
+    expect(overlays).toHaveLength(boxes.length);
+    returned.forEach((candidate,index) => {
+      const pin = overlays.find(item => item.marker.id === candidate.id)!;
+      expect(pin.lat).toBeCloseTo((boxes[index]![1]!+boxes[index]![3]!)/2,10);
+      expect(pin.lng).toBeCloseTo((boxes[index]![0]!+boxes[index]![2]!)/2,10);
+    });
+    expect(sites.every(site => site.status === 'UNKNOWN' && site.covers.length === 0)).toBe(true);
+    expect(JSON.stringify(returned)).toBe(original);
+    const changed = buildSites([{...returned[0]!,aoi:{...returned[0]!.aoi,bbox:[40,20,42,22]}}],requirements,[]);
+    expect([changed[0]!.lat,changed[0]!.lng]).toEqual([21,41]);
+  });
+  it('refuses invalid geographic frames instead of plotting projected metres or out-of-range degrees', () => {
+    const candidate = candidates[0]!;
+    const invalid = [
+      {bbox:[400000,3900000,401000,3901000],crs_wkt:'EPSG:32612'},
+      {bbox:[181,10,182,11]}, {bbox:[10,91,11,92]}, {latitude_type:'PLANETOCENTRIC'},
+      {longitude_convention:'ZERO_360'}, {crs_wkt:'UNKNOWN'},
+    ].map(patch => ({...candidate,aoi:{...candidate.aoi,...patch}} as Candidate));
+    expect(buildSites(invalid,requirements,[])).toEqual([]);
+    expect(buildSites([candidate],requirements,[])).toHaveLength(1);
   });
 });
 
