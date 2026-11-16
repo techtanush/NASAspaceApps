@@ -81,12 +81,16 @@ def test_actual_pdf_retains_failure_exact_value_missing_work_and_scope(projectio
     assert reader.trailer["/Root"].get("/OpenAction") is None
 
 
-def test_combined_brief_has_each_site_its_coordinates_and_bookmarks(projection):
+def test_combined_brief_has_each_site_its_coordinates_and_bookmarks(projection, monkeypatch):
     uow, _blobs, run, _mission, candidate = projection
     snapshot(projection)
     second = uow.seed("candidates", **{**deepcopy(candidate), "id": str(uuid4()), "name": "Second distinct place",
                                        "aoi": {**candidate["aoi"], "bbox": [-110, 34, -109, 35]}})
     run["candidate_ids"].append(second["id"])
+    def unexpected_raster_lookup(*_args, **_kwargs):
+        pytest.fail("Combined brief must not load raster appendices it never displays")
+
+    monkeypatch.setattr(brief, "site_detail", unexpected_raster_lookup)
     packet = brief.build_packet(uow, projection[1], run["id"])
     before = deepcopy(uow.rows)
     reader = PdfReader(io.BytesIO(brief.render_pdf(packet)))
@@ -98,6 +102,20 @@ def test_combined_brief_has_each_site_its_coordinates_and_bookmarks(projection):
     for location in packet["locations"]:
         assert location["snapshot_sha256"] == canonical_sha256({
             key: value for key, value in location.items() if key != "snapshot_sha256"})
+
+
+def test_waiting_for_renderer_preserves_large_snapshot(monkeypatch):
+    snapshot = {"schema_version": "mission-test-brief.v1", "value": "x" * (256 * 1024)}
+    launch = brief.subprocess.Popen
+
+    def slow_reader(argv, **kwargs):
+        return launch([argv[0], "-I", "-c",
+                       "import sys,time; time.sleep(.3); data=sys.stdin.buffer.read(); "
+                       "sys.stdout.buffer.write(b'%PDF-' + str(len(data)).encode())"], **kwargs)
+
+    monkeypatch.setattr(brief.subprocess, "Popen", slow_reader)
+    result = brief.render_pdf(snapshot)
+    assert result == b"%PDF-" + str(len(brief.json.dumps(snapshot).encode())).encode()
 
 
 def test_registered_analysis_histogram_requires_exact_operation_and_ancestry(projection):

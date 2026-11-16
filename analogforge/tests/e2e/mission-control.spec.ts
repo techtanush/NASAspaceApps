@@ -136,6 +136,11 @@ test('globe, exact-site inspection, stable selection and printable report',async
   const downloaded=await downloading;
   expect(downloaded.suggestedFilename()).toBe(`analogforge-evidence-brief-${runId.slice(0,8)}-${candidateId.slice(0,8)}.pdf`);
   expect(readFileSync((await downloaded.path())!).subarray(0,5).toString()).toBe('%PDF-');
+  const packetDownload=page.waitForEvent('download',{timeout:95000});
+  await page.getByRole('button',{name:'Download all-location test brief',exact:true}).click();
+  const packet=await packetDownload;
+  expect(packet.suggestedFilename()).toBe(`analogforge-mission-test-brief-${runId.slice(0,8)}.pdf`);
+  expect(readFileSync((await packet.path())!).subarray(0,5).toString()).toBe('%PDF-');
  }
  await page.emulateMedia({media:'print'});
  await expect(page.getByRole('navigation',{name:'Report actions'})).toBeHidden();

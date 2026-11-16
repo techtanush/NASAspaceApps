@@ -112,7 +112,9 @@ def _analysis(
     return unavailable
 
 
-def build_snapshot(uow: Any, blobs: Any, run_id: str, candidate_id: str) -> dict[str, Any]:
+def build_snapshot(
+    uow: Any, blobs: Any, run_id: str, candidate_id: str, *, include_rasters: bool = True
+) -> dict[str, Any]:
     """Only current pinned records; a foreign candidate cannot turn into a report about its neighbour."""
     run, mission, candidate, aoi = authorized_subject(uow, run_id, candidate_id)
     if candidate is None:
@@ -199,30 +201,33 @@ def build_snapshot(uow: Any, blobs: Any, run_id: str, candidate_id: str) -> dict
                 "id", "test_id", "outcome", "failure_category", "verified_route_sha256", "limitations",
                 "evidence_ids", "metrics")})
     snapshot["test_plan"] = field_plan(uow, blobs, run, mission, candidate, rover, own_tests, operations)
-    image_bytes = 0
-    for selected, label in ((None, "Planetary target"), (candidate_id, "Earth location")):
-        detail = site_detail(uow, blobs, run_id, selected)
-        snapshot["display_notes"].append(f"{label}: {detail['availability']}. {detail['reason']}")
-        if len(detail["display_layer_manifest_ids"]) > 2:
-            snapshot["display_notes"].append(f"{label}: additional registered views omitted by the two-view limit.")
-        for identifier in detail["display_layer_manifest_ids"][:2]:
-            layer = scoped_record(uow, "display_layers", identifier, run)
-            try:
-                content = blobs.read_limited(layer["image_artifact_sha256"], 3 * 1024 * 1024)
-            except (PersistenceError, OSError):
-                snapshot["display_notes"].append(
-                    f"{label}: display {identifier} exceeds inline bounds or is unavailable."
-                )
-                continue
-            if image_bytes + len(content) > 3 * 1024 * 1024:
-                snapshot["display_notes"].append(f"{label}: display {identifier} omitted: combined inline byte bound.")
-                continue
-            image_bytes += len(content)
-            snapshot["images"].append({"subject": label, "manifest_id": identifier,
-                "kind": layer["layer_kind"], "unit": layer["unit"], "support_scale_m": layer["support_scale_m"],
-                "source_evidence_ids": layer["source_evidence_ids"], "attribution": layer["attribution"],
-                "limitations": layer["limitations"], "legend": layer["legend"],
-                "sha256": layer["image_artifact_sha256"], "png": base64.b64encode(content).decode("ascii")})
+    if include_rasters:
+        image_bytes = 0
+        for selected, label in ((None, "Planetary target"), (candidate_id, "Earth location")):
+            detail = site_detail(uow, blobs, run_id, selected)
+            snapshot["display_notes"].append(f"{label}: {detail['availability']}. {detail['reason']}")
+            if len(detail["display_layer_manifest_ids"]) > 2:
+                snapshot["display_notes"].append(f"{label}: additional registered views omitted by the two-view limit.")
+            for identifier in detail["display_layer_manifest_ids"][:2]:
+                layer = scoped_record(uow, "display_layers", identifier, run)
+                try:
+                    content = blobs.read_limited(layer["image_artifact_sha256"], 3 * 1024 * 1024)
+                except (PersistenceError, OSError):
+                    snapshot["display_notes"].append(
+                        f"{label}: display {identifier} exceeds inline bounds or is unavailable."
+                    )
+                    continue
+                if image_bytes + len(content) > 3 * 1024 * 1024:
+                    snapshot["display_notes"].append(
+                        f"{label}: display {identifier} omitted: combined inline byte bound."
+                    )
+                    continue
+                image_bytes += len(content)
+                snapshot["images"].append({"subject": label, "manifest_id": identifier,
+                    "kind": layer["layer_kind"], "unit": layer["unit"], "support_scale_m": layer["support_scale_m"],
+                    "source_evidence_ids": layer["source_evidence_ids"], "attribution": layer["attribution"],
+                    "limitations": layer["limitations"], "legend": layer["legend"],
+                    "sha256": layer["image_artifact_sha256"], "png": base64.b64encode(content).decode("ascii")})
     # Digest describes the exact private snapshot, rather than any published passport manifest.
     snapshot["snapshot_sha256"] = canonical_sha256(snapshot)
     if len(json.dumps(snapshot, ensure_ascii=False, allow_nan=False).encode()) > MAX_INPUT:
@@ -237,12 +242,8 @@ def build_packet(uow: Any, blobs: Any, run_id: str) -> dict[str, Any]:
     if not identifiers or len(identifiers) > 8:
         raise ApiError("RESOURCE_LIMIT", "The combined brief supports one to eight locations; "
                        "use individual PDFs.", 422)
-    locations = [build_snapshot(uow, blobs, run_id, identifier) for identifier in identifiers]
-    # Concise dossier contains charts and route vectors; registered raster images remain in individual appendices.
-    for location in locations:
-        location["images"] = []
-        location.pop("snapshot_sha256")
-        location["snapshot_sha256"] = canonical_sha256(location)
+    # The concise dossier never renders raster appendices. Avoid loading and validating them per site.
+    locations = [build_snapshot(uow, blobs, run_id, identifier, include_rasters=False) for identifier in identifiers]
     packet = {"schema_version": "mission-test-brief.v1", "locations": locations, "run": locations[0]["run"]}
     packet["snapshot_sha256"] = canonical_sha256(packet)
     return packet
@@ -258,20 +259,24 @@ def render_pdf(snapshot: dict[str, Any]) -> bytes:
         # The renderer receives only this authorized snapshot, no credentials, DB sockets, paths or URLs to fetch.
         script = Path(__file__).resolve().parents[1] / "rendering/evidence_brief.py"
         environment = {"PATH": os.defpath, "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1"}
-        with tempfile.TemporaryDirectory(prefix="analogforge-evidence-pdf-") as directory:
+        with (tempfile.TemporaryDirectory(prefix="analogforge-evidence-pdf-") as directory,
+              tempfile.TemporaryFile(dir=directory) as source):
+            # A timed communicate() retry must not strand an unfinished write
+            # to the child's stdin pipe. The bounded snapshot is ready before launch.
+            source.write(content)
+            source.seek(0)
             process = subprocess.Popen(  # noqa: S603 - fixed local interpreter/script; input is data, never code.
-                [sys.executable, "-I", str(script)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                [sys.executable, "-I", str(script)], stdin=source, stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL, env=environment, cwd=directory,
             )
-            deadline = time.monotonic() + 15
-            pending: bytes | None = content
+            packet = snapshot.get("schema_version") == "mission-test-brief.v1"
+            deadline = time.monotonic() + (30 if packet else 15)
             try:
                 while True:
                     try:
-                        output, _ = process.communicate(pending, timeout=0.1)
+                        output, _ = process.communicate(timeout=0.1)
                         break
                     except subprocess.TimeoutExpired:
-                        pending = None
                         if time.monotonic() >= deadline:
                             raise ApiError("TOOL_TIMEOUT", "The evidence PDF exceeded its rendering deadline.", 422) \
                                 from None

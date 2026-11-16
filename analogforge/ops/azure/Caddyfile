@@ -11,6 +11,16 @@
         Referrer-Policy strict-origin-when-cross-origin
         -Server
     }
+    @combinedBrief path /api/v1/runs/*/test-brief.pdf
+    handle @combinedBrief {
+        reverse_proxy api:8000 {
+            transport http {
+                dial_timeout 5s
+                # A packet reads several sites before the bounded PDF render.
+                response_header_timeout 60s
+            }
+        }
+    }
     @backend path /api/* /auth/* /artifacts/*
     handle @backend {
         reverse_proxy api:8000 {
