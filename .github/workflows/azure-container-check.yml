@@ -1,0 +1,59 @@
+name: Azure container checks
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/azure-container-check.yml'
+      - 'analogforge/ops/azure/**'
+      - 'analogforge/.dockerignore'
+      - 'analogforge/pyproject.toml'
+      - 'analogforge/uv.lock'
+      - 'analogforge/package.json'
+      - 'analogforge/pnpm-lock.yaml'
+      - 'analogforge/pnpm-workspace.yaml'
+      - 'analogforge/apps/web/**'
+      - 'analogforge/scripts/ui/**'
+      - 'analogforge/contracts/**'
+      - 'analogforge/config/**'
+      - 'analogforge/src/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: azure-container-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux-production-stack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: analogforge
+        shell: bash
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Validate package safety and production topology
+        run: python3 ops/azure/check-package.py
+      - name: Build locked Python runtime on Linux
+        run: docker build --target runtime --tag "analogforge-runtime:${GITHUB_SHA}" --file ops/azure/Dockerfile .
+      - name: Build production frontend and proxy on Linux
+        run: docker build --target proxy --tag "analogforge-proxy:${GITHUB_SHA}" --file ops/azure/Dockerfile .
+      - name: Verify native science and PDF libraries as non-root
+        run: |
+          docker run --rm --network none --read-only --entrypoint python "analogforge-runtime:${GITHUB_SHA}" -c \
+            "import os; import h5py, numpy, pyproj, rasterio, reportlab, scipy, shapely; import analogforge.rendering.evidence_brief; assert os.geteuid() == 10001; print('Native science and PDF imports: PASS')"
+      - name: Validate HTTPS proxy and built frontend assets
+        run: |
+          docker run --rm --network none --entrypoint caddy \
+            -e APP_HOST=af-ci.invalid -e APP_HOSTS=af-ci.invalid \
+            "analogforge-proxy:${GITHUB_SHA}" validate --config /etc/caddy/Caddyfile --adapter caddyfile
+          docker run --rm --network none --entrypoint sh "analogforge-proxy:${GITHUB_SHA}" -c \
+            'test -s /srv/index.html && test ! -e /srv/mockServiceWorker.js'
+      - name: Smoke production DB, migrations, anonymous API and worker
+        run: ops/azure/ci-smoke.sh

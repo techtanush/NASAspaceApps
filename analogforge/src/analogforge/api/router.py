@@ -260,6 +260,29 @@ async def dispatch(request: Request, principal: Principal, operation: dict[str, 
             )
             if previous is not None:
                 return JSONResponse(previous[1], status_code=previous[0])
+            if rt.settings.auth_mode == "public":
+                # Serialize visitor resource creation so concurrent clicks cannot bypass the quota.
+                import sqlalchemy as sa
+
+                bounded = {
+                    "createRun": ("runs", rt.settings.public_runs_per_workspace),
+                    "createMission": ("missions", 16),
+                    "createRover": ("rovers", 16),
+                    "prepareMissionFingerprint": ("preparation_jobs", 16),
+                }
+                if operation_id in bounded:
+                    kind, maximum = bounded[operation_id]
+                    uow.connection.execute(
+                        sa.text("SELECT pg_advisory_xact_lock(hashtext(:workspace))"),
+                        {"workspace": principal.workspace_id},
+                    )
+                    if len(uow.list(kind, limit=maximum)) >= maximum:
+                        raise ApiError(
+                            "PUBLIC_USAGE_LIMIT",
+                            "This visitor workspace has reached its investigation limit. "
+                            "Existing results remain available.",
+                            429,
+                        )
             status, result = mutate(uow, operation_id, request.path_params.get("id"), body, principal, rt)
             uow.idempotency_complete(principal.subject_id, request.method, request.url.path, key, status, result)
         return JSONResponse(result, status_code=status)

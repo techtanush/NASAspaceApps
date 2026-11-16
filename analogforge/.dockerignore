@@ -1,0 +1,26 @@
+# Only tracked source/build inputs enter the production build context.
+.git
+**/.git
+**/.env
+**/.env.*
+**/*.env
+**/*.pem
+**/*.key
+**/.azure
+.env.example
+**/node_modules
+**/dist
+.venv
+.runtime
+.cache
+.cocoindex_code
+out
+data
+tests
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+playwright-report
+test-results

@@ -1,0 +1,31 @@
+#cloud-config
+# Ubuntu 24.04 LTS. No credentials or app data in cloud-init/user-data.
+package_update: true
+packages: [ca-certificates, curl, git, python3, jq, fail2ban]
+write_files:
+  - path: /opt/analogforge-install-docker.sh
+    owner: root:root
+    permissions: '0700'
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      install -m 0755 -d /etc/apt/keyrings
+      curl --fail --silent --show-error --location https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+      chmod a+r /etc/apt/keyrings/docker.asc
+      . /etc/os-release
+      arch="$(dpkg --print-architecture)"
+      printf 'Types: deb\nURIs: https://download.docker.com/linux/ubuntu\nSuites: %s\nComponents: stable\nArchitectures: %s\nSigned-By: /etc/apt/keyrings/docker.asc\n' "$VERSION_CODENAME" "$arch" > /etc/apt/sources.list.d/docker.sources
+      apt-get update
+      apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+      systemctl enable --now docker
+      install -m 0700 -d /etc/analogforge /srv/analogforge /srv/analogforge/backups /var/lib/analogforge/releases
+      # Build-time safety margin on the 8 GiB VM; persistent data remains on its disk.
+      if ! swapon --show=NAME --noheadings | grep -q .; then
+        fallocate -l 2G /swapfile
+        chmod 600 /swapfile
+        mkswap /swapfile
+        swapon /swapfile
+        printf '/swapfile none swap sw 0 0\n' >> /etc/fstab
+      fi
+runcmd:
+  - [bash, /opt/analogforge-install-docker.sh]

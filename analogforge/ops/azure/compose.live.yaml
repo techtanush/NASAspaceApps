@@ -1,0 +1,17 @@
+# Explicit operator override after real products/locks/config have been transferred.
+# AF_OPERATOR_CONFIG_DIR is a root-controlled absolute path in the private runtime env.
+services:
+  api:
+    volumes:
+      - type: bind
+        source: ${AF_OPERATOR_CONFIG_DIR:?Set the private operator config directory}
+        target: /app/config
+        read_only: true
+        bind: {create_host_path: false}
+  worker:
+    volumes:
+      - type: bind
+        source: ${AF_OPERATOR_CONFIG_DIR:?Set the private operator config directory}
+        target: /app/config
+        read_only: true
+        bind: {create_host_path: false}

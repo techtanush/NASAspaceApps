@@ -13,6 +13,7 @@ from analogforge.adapters.identity.local import IdentityService
 from analogforge.adapters.identity.oidc import OIDCClient
 from analogforge.api.dependencies import LOCAL_USER_ID, LOCAL_WORKSPACE_ID
 from analogforge.api.errors import ApiError
+from analogforge.db.store import PersistenceError
 
 router = APIRouter(prefix="/auth", include_in_schema=False)
 
@@ -99,8 +100,43 @@ def callback(request: Request, state: str, code: str) -> RedirectResponse:
 
 
 @router.get("/session")
-def session(request: Request) -> JSONResponse:
-    if request.app.state.settings.auth_mode == "local":
+def session(request: Request, create: bool = True) -> JSONResponse:
+    settings = request.app.state.settings
+    visitor_token = None
+    if settings.auth_mode == "public":
+        if request.headers.get("sec-fetch-site") == "cross-site" or (
+            request.headers.get("origin") is not None and request.headers["origin"] not in settings.allowed_origins
+        ):
+            raise ApiError("FORBIDDEN", "Open this workspace from the AnalogForge website.", 403)
+        try:
+            principal = verified_session(request)
+        except (ApiError, PersistenceError) as error:
+            code = error.code
+            if code not in {"UNAUTHENTICATED", "AUTHENTICATION_REQUIRED"}:
+                raise
+            if not create:
+                return JSONResponse(
+                    {"authenticated": False, "auth_mode": "public"}, headers={"Cache-Control": "no-store"}
+                )
+            try:
+                visitor_token, principal = service(request).create_visitor_session(settings.public_max_workspaces)
+            except PersistenceError as capacity:
+                if capacity.code != "PUBLIC_CAPACITY_REACHED":
+                    raise
+                raise ApiError(
+                    "PUBLIC_CAPACITY_REACHED",
+                    "New visitor workspaces are temporarily full. Your existing browser workspace remains available; "
+                    "please try that browser or contact the team.",
+                    503,
+                ) from capacity
+        document = {
+            "authenticated": True,
+            "user_id": principal.user_id,
+            "workspace_id": principal.workspace_id,
+            "role": principal.role,
+            "csrf_token": principal.csrf_token,
+        }
+    elif settings.auth_mode == "local":
         document = {
             "authenticated": True,
             "user_id": LOCAL_USER_ID,
@@ -118,7 +154,14 @@ def session(request: Request) -> JSONResponse:
             "csrf_token": principal.csrf_token,
         }
     document["auth_mode"] = request.app.state.settings.auth_mode
-    return JSONResponse(document, headers={"Cache-Control": "no-store"})
+    response = JSONResponse(document, headers={"Cache-Control": "no-store"})
+    if visitor_token is not None:
+        secure = settings.public_base_url.startswith("https://")
+        response.set_cookie("af_session", visitor_token, secure=secure, httponly=True, samesite="lax", max_age=28800)
+        response.set_cookie(
+            "af_workspace", principal.workspace_id, secure=secure, httponly=True, samesite="lax", max_age=28800
+        )
+    return response
 
 
 @router.post("/logout")
@@ -128,7 +171,7 @@ def logout(request: Request) -> Response:
         if request.headers.get(
             "origin"
         ) not in request.app.state.settings.allowed_origins or not secrets.compare_digest(
-            request.headers.get("X-CSRF-Token", ""), principal.csrf_token
+            request.headers.get("X-CSRF-Token", "").encode(), principal.csrf_token.encode()
         ):
             raise ApiError("FORBIDDEN", "A matching origin and CSRF token are required.", 403)
         service(request).revoke(request.cookies["af_session"], principal.workspace_id)

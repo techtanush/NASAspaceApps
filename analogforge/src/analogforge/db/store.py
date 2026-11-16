@@ -401,6 +401,27 @@ class Store:
                 insert(TABLES["workspaces"]).values(id=str(workspace_id), name=name).on_conflict_do_nothing()
             )
 
+    @contextmanager
+    def visitor_workspace(self, maximum: int) -> Iterator[UnitOfWork]:
+        """Create one isolated visitor workspace, atomically bounded across API processes.
+
+        This is a lifetime storage cap, including expired eight-hour visitor sessions:
+        session expiry never silently deletes scientific records or frees stored evidence.
+        Operators must explicitly manage retention before increasing public capacity.
+        """
+        with self.engine.begin() as connection:
+            connection.execute(sa.text("SELECT pg_advisory_xact_lock(hashtext('analogforge-public-workspaces'))"))
+            table = TABLES["workspaces"]
+            count = connection.execute(
+                sa.select(sa.func.count()).select_from(table).where(table.c.name == "Visitor investigation")
+            ).scalar_one()
+            if count >= maximum:
+                raise PersistenceError("PUBLIC_CAPACITY_REACHED", "Visitor workspace capacity reached")
+            workspace = str(uuid4())
+            connection.execute(insert(table).values(id=workspace, name="Visitor investigation"))
+            configure_workspace(connection, workspace)
+            yield UnitOfWork(connection, workspace)
+
     def record_worker_heartbeat(self, worker_name: str) -> None:
         """Privileged queue service records presence separately in every known workspace."""
         with self.engine.connect() as connection:

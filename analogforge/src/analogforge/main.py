@@ -138,6 +138,7 @@ def create_app(
             "SOURCE_UNAVAILABLE": 503,
             "IDENTITY_PROVIDER_UNAVAILABLE": 503,
             "OIDC_CONFIGURATION_INVALID": 503,
+            "PUBLIC_CAPACITY_REACHED": 503,
         }
         status = statuses.get(code, 422)
         safe = ApiError(code, "The operation could not be applied to this workspace record.", status)

@@ -7,6 +7,19 @@ import { handlers } from '../mock/handlers';
 import { workspaceId } from '../mock/state';
 const otherWorkspace='12345678-abcd-4123-8123-123456789abc';
 afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();setSessionCsrf(undefined);});
+it('probes an existing session without allocating a public visitor workspace',async()=>{
+ const fetch=vi.fn(async()=>Response.json({authenticated:true,workspace_id:otherWorkspace,role:'EDITOR',auth_mode:'public',csrf_token:'existing-public-csrf'}));
+ vi.stubGlobal('fetch',fetch);
+ expect(await loadSession(false)).toMatchObject({workspaceId:otherWorkspace,role:'EDITOR',authMode:'public'});
+ expect(fetch).toHaveBeenCalledWith('/auth/session?create=false',expect.objectContaining({method:'GET',credentials:'same-origin'}));
+});
+it('leaves an anonymous probe unauthenticated without a second allocating request',async()=>{
+ const fetch=vi.fn(async()=>Response.json({authenticated:false,auth_mode:'public'}));
+ vi.stubGlobal('fetch',fetch);
+ await expect(loadSession(false)).rejects.toMatchObject({code:'AUTH_REQUIRED'});
+ expect(fetch).toHaveBeenCalledOnce();
+ expect(fetch).toHaveBeenCalledWith('/auth/session?create=false',expect.anything());
+});
 it('bounds a stalled session request, clears the old token and never invents an authenticated workspace',async()=>{
  vi.useFakeTimers();setSessionCsrf('old-workspace-token');
  vi.stubGlobal('fetch',vi.fn((_url,init)=>new Promise((_resolve,reject)=>{
