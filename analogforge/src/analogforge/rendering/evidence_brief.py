@@ -702,11 +702,13 @@ def render_packet(document: dict[str, Any]) -> bytes:
 def main() -> None:
     if sys.platform != "darwin":
         resource.setrlimit(resource.RLIMIT_AS, (512 * 1024 * 1024, 512 * 1024 * 1024))
-    resource.setrlimit(resource.RLIMIT_CPU, (10, 10))
     source = sys.stdin.buffer.read(8 * 1024 * 1024 + 1)
     if len(source) > 8 * 1024 * 1024:
         raise ValueError("PDF input byte bound exceeded")
-    sys.stdout.buffer.write(render(json.loads(source)))
+    document = json.loads(source)
+    cpu_seconds = 30 if document.get("schema_version") == "mission-test-brief.v1" else 10
+    resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, cpu_seconds))
+    sys.stdout.buffer.write(render(document))
 
 
 if __name__ == "__main__":

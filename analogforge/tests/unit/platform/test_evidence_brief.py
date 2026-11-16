@@ -81,12 +81,16 @@ def test_actual_pdf_retains_failure_exact_value_missing_work_and_scope(projectio
     assert reader.trailer["/Root"].get("/OpenAction") is None
 
 
-def test_combined_brief_has_each_site_its_coordinates_and_bookmarks(projection):
+def test_combined_brief_has_each_site_its_coordinates_and_bookmarks(projection, monkeypatch):
     uow, _blobs, run, _mission, candidate = projection
     snapshot(projection)
     second = uow.seed("candidates", **{**deepcopy(candidate), "id": str(uuid4()), "name": "Second distinct place",
                                        "aoi": {**candidate["aoi"], "bbox": [-110, 34, -109, 35]}})
     run["candidate_ids"].append(second["id"])
+    def unexpected_raster_lookup(*_args, **_kwargs):
+        pytest.fail("Combined brief must not load raster appendices it never displays")
+
+    monkeypatch.setattr(brief, "site_detail", unexpected_raster_lookup)
     packet = brief.build_packet(uow, projection[1], run["id"])
     before = deepcopy(uow.rows)
     reader = PdfReader(io.BytesIO(brief.render_pdf(packet)))
