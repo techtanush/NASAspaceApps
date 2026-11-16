@@ -44,6 +44,7 @@ export function markerElement(datum: MarkerOverlay, select: (id: string) => void
   button.setAttribute('aria-label', `Open location ${marker.index ?? ''}: ${marker.label}`);
   button.title = `${marker.label} · ${marker.lat.toFixed(5)}, ${marker.lng.toFixed(5)}`;
   button.dataset.markerId = marker.id;
+  button.dataset.latitude = String(marker.lat); button.dataset.longitude = String(marker.lng);
   button.dataset.selected = String(datum.selected);
   button.dataset.group = 'false';
   const badge = document.createElement('span'); badge.className = 'mc-ticker-index'; badge.textContent = String(marker.index ?? '');

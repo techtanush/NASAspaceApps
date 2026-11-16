@@ -28,6 +28,14 @@ const SEVERITY: Status[] = ['FAIL', 'UNKNOWN', 'PARTIAL', 'GAP', 'PASS'];
 export interface SiteRow { requirement: Requirement; qualification: Qualification | null; status: Status }
 export interface Site { candidate: Candidate; index: number; lat: number; lng: number; rows: SiteRow[]; status: Status; covers: string[] }
 const ROUTE_OBSERVABLES = new Set(['unique_slope_exposure_m', 'completed_task_count', 'final_battery_reserve_pct']);
+/** Only canonical geographic Earth geometry can be placed on the globe. Never treat projected metres as degrees. */
+function geographicEarthCandidate(candidate: Candidate): boolean {
+  const { body, crs_wkt, latitude_type, longitude_convention, bbox } = candidate.aoi;
+  if (body !== 'EARTH' || latitude_type !== 'GEODETIC' || longitude_convention !== 'NEG180_180'
+    || (crs_wkt !== null && crs_wkt !== 'EPSG:4326') || bbox.length !== 4 || !bbox.every(Number.isFinite)) return false;
+  const [west, south, east, north] = bbox as [number, number, number, number];
+  return west >= -180 && east <= 180 && south >= -90 && north <= 90 && west < east && south < north;
+}
 export function siteName(site: Pick<Site, 'candidate' | 'lat' | 'lng'>): string {
   return /^(?:Practice|Terrain) grid-r\d+c\d+$/i.test(site.candidate.name)
     ? `Earth site · ${Math.abs(site.lat).toFixed(3)}° ${site.lat < 0 ? 'S' : 'N'}, ${Math.abs(site.lng).toFixed(3)}° ${site.lng < 0 ? 'W' : 'E'}`
@@ -41,7 +49,7 @@ export function siteStatusSummary(site: Site): string {
 }
 /** Overall site status is the most severe mandatory row; natural gaps do not by themselves fail a site. */
 export function buildSites(candidates: Candidate[], requirements: Requirement[], qualifications: Qualification[]): Site[] {
-  const sites = candidates.filter(candidate => candidate.aoi.body === 'EARTH' && candidate.aoi.bbox.length === 4 && candidate.aoi.bbox.every(Number.isFinite) && candidate.aoi.bbox[0]! < candidate.aoi.bbox[2]! && candidate.aoi.bbox[1]! < candidate.aoi.bbox[3]!).map(candidate => {
+  const sites = candidates.filter(geographicEarthCandidate).map(candidate => {
     const rows = requirements.map<SiteRow>(requirement => {
       const qualification = qualifications.find(row => row.candidate_id === candidate.id && row.requirement_id === requirement.id) ?? null;
       return { requirement, qualification, status: qualification?.status ?? 'UNKNOWN' };
