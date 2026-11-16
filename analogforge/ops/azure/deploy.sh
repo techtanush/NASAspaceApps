@@ -32,6 +32,12 @@ elif docker volume inspect analogforge_postgres >/dev/null 2>&1; then
   if [[ -f /srv/analogforge/staged-commit ]]; then
     active_commit=$(cat /srv/analogforge/staged-commit)
     RELEASE_ID="$active_commit" "$release/analogforge/ops/azure/backup.sh"
+  elif docker run --rm --network none --read-only --user 0:0 \
+      --mount type=volume,src=analogforge_postgres,dst=/database,readonly,volume-nocopy \
+      --entrypoint python "analogforge-runtime:$commit" \
+      -c 'from pathlib import Path; raise SystemExit(int(any(Path("/database").iterdir())))'; then
+    # Compose can create an empty volume even for a no-dependencies validation run.
+    echo "First deployment: database volume exists but is empty."
   else
     echo "Existing database has no release record; inspect it and take a backup before retrying." >&2
     exit 1
