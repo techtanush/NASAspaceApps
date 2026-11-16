@@ -18,15 +18,25 @@
     <section class="intro" aria-labelledby="title">
       <p class="eyebrow">NASA Space Apps case study <span>·</span> <time datetime="2026-11-14">14 Nov 2026</time></p>
       <h1 id="title">Gale Crater <span>and</span> Flagstaff</h1>
-      <p class="lede">Which areas near Flagstaff have terrain most like our Gale Crater target? We screened four candidate areas using NASA elevation data and found two worth a closer look.</p>
+      <p class="lede">Where on Earth could a rover team rehearse driving on terrain like the area we studied on Mars? We used NASA elevation data to compare four areas in Arizona with our Mars target.</p>
+      <dl class="places">
+        <div>
+          <dt>Gale Crater, Mars</dt>
+          <dd>A large impact crater where NASA’s Curiosity rover landed in 2012. We used a region within the crater as the terrain reference. <a href="https://science.nasa.gov/resource/a-guide-to-gale-crater/">NASA’s guide to Gale Crater</a></dd>
+        </div>
+        <div>
+          <dt>Flagstaff, Arizona, Earth</dt>
+          <dd>A city in northern Arizona, USA. The four boxes on the map are areas north of the city that we screened as possible places to scout for rover tests.</dd>
+        </div>
+      </dl>
     </section>
 
     <section class="results" aria-labelledby="results-title">
       <div class="comparison">
         <h2 id="results-title">Two of four areas met the terrain threshold</h2>
-        <p>We compared how common different slopes were across the Mars target and each Earth area. A smaller difference means a closer match on this measure.</p>
+        <p>We compared the mix of flat ground, gentle slopes, and steep hills in each area. A smaller score means the overall mix is closer to the Mars target.</p>
         <table class="scores">
-          <caption>Slope distribution difference (0–7° scale)</caption>
+          <caption>Difference in the mix of slopes (0–7° chart scale)</caption>
           <thead><tr><th scope="col">Area</th><th scope="col">Difference</th><th scope="col">Result</th></tr></thead>
           <tbody>
             <tr><th scope="row"><span class="badge met">A</span><span class="sr-only"> Southwest</span></th><td><div class="distance"><span class="bar met" style="--score:41.5222%" aria-hidden="true"></span><strong>2.91°</strong></div></td><td>Met</td></tr>
@@ -35,7 +45,7 @@
             <tr><th scope="row"><span class="badge missed">D</span><span class="sr-only"> Northeast</span></th><td><div class="distance"><span class="bar missed" style="--score:93.4065%" aria-hidden="true"></span><strong>6.54°</strong></div></td><td>Missed</td></tr>
           </tbody>
         </table>
-        <p class="threshold"><span aria-hidden="true"></span> Team-defined threshold of 5° on a shared 500 m comparison scale.</p>
+        <p class="threshold"><span aria-hidden="true"></span> Our cutoff was a difference of 5° or less. The score describes the whole area. Individual hills can be much steeper. Both elevation maps were compared at the same 500 m scale.</p>
       </div>
       <figure class="map">
         <img src="/case-studies/gale-crater-flagstaff/flagstaff-terrain.webp" width="900" height="720" alt="Shaded relief map north of Flagstaff, Arizona. A and B form the southern row of the four screened areas. C and D are directly north of them.">
