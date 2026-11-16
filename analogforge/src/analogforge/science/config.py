@@ -12,12 +12,13 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 from threading import Lock
-from typing import Any, Literal
+from typing import Any, Literal, overload
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from analogforge.ports import catalog
+from analogforge.ports.common import RuntimeMode
 from analogforge.ports.hashing import canonical_sha256
 from analogforge.science.errors import ConfigError
 
@@ -188,6 +189,21 @@ class AlgorithmsConfig(_Strict):
     design_defaults: DesignDefaults
     thresholds: Thresholds
     fixtures: FixturesConfig
+    live_terrain_support_m: float | None = Field(default=None, gt=0)
+
+    @overload
+    def requested_terrain_support(self, mode: RuntimeMode, default_m: float) -> float: ...
+
+    @overload
+    def requested_terrain_support(self, mode: RuntimeMode, default_m: float | None) -> float | None: ...
+
+    def requested_terrain_support(self, mode: RuntimeMode, default_m: float | None) -> float | None:
+        """Apply a support floor in live mode; raster preparation still respects native resolution."""
+        if mode != "live" or self.live_terrain_support_m is None:
+            return default_m
+        if default_m is None:
+            return self.live_terrain_support_m
+        return max(default_m, self.live_terrain_support_m)
 
     @model_validator(mode="after")
     def _complete(self) -> AlgorithmsConfig:

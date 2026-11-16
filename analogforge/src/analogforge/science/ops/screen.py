@@ -169,7 +169,7 @@ def run_screen(env: OpEnv) -> OpOutcome:
     # establish that real terrain is a known analog or a synthetic control.
     known = {e.window_id for e in ref_set.entries if not e.synthetic or src.manifest.is_synthetic
              and rs_cfg.kind == "FIXED_GRID"}
-    cell = float(cfg.algorithms.grid.cell_size_m)
+    cell = cfg.algorithms.requested_terrain_support(env.request.mode, cfg.algorithms.grid.cell_size_m)
     prep = prepare(src.raster, cell, th.flat_gradient_tolerance)
     cell = prep.support_m
     specs = region_windows(rs_cfg, prep.grid)

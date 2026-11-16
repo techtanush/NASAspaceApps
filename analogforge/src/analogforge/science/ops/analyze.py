@@ -34,7 +34,7 @@ def run_analyze(env: OpEnv) -> OpOutcome:
     cfg = env.cfg
     spec = cfg.measurement_spec(inp.measurement_spec_id)
     src = resolve_source(env, inp.source, roles=("EARTH_TERRAIN",))
-    cell = float(cfg.algorithms.grid.cell_size_m)
+    cell = cfg.algorithms.requested_terrain_support(env.request.mode, cfg.algorithms.grid.cell_size_m)
     prep = prepare(src.raster, cell, cfg.algorithms.thresholds.flat_gradient_tolerance)
     win = find_window(cfg, inp.candidate.window_id, prep.grid, inp.candidate.aoi,
                       allow_custom_aoi=inp.candidate.origin == "USER_SUPPLIED")
