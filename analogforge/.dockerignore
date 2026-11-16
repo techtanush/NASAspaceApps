@@ -17,6 +17,8 @@
 out
 data
 tests
+!tests/fixtures/kit/**/*.json
+!tests/unit/passport_renderer/fixtures/bundles/positive.json
 **/__pycache__
 **/*.pyc
 **/.pytest_cache

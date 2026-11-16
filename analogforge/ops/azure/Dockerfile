@@ -33,6 +33,9 @@ COPY apps/web/package.json ./apps/web/package.json
 COPY scripts/ui ./scripts/ui
 RUN pnpm install --frozen-lockfile
 COPY contracts ./contracts
+COPY config/presets/rovers/ares-1.json ./config/presets/rovers/ares-1.json
+COPY tests/fixtures/kit ./tests/fixtures/kit
+COPY tests/unit/passport_renderer/fixtures/bundles/positive.json ./tests/unit/passport_renderer/fixtures/bundles/positive.json
 COPY apps/web ./apps/web
 RUN pnpm --filter @analogforge/web run typecheck && pnpm --filter @analogforge/web run build
 
