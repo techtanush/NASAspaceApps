@@ -39,7 +39,7 @@ export function Welcome() {
     <div className="mc-hero-kicker"><BrandSymbol size={42}/><p className="mc-eyebrow">Planetary mission. Earth rehearsal.</p></div>
     <h1 id="welcome-title" tabIndex={-1}>A world away.<br/><span>Tested closer to home.</span></h1>
     <p className="mc-hero-lead">Find where on Earth to rehearse a mission to Mars or the Moon. Set the target, describe the objective and bring a rover. Follow the evidence to the right site for each benchmark.</p>
-    <div className="mc-hero-actions"><Link className="button mc-cta" data-variant="primary" to="/start/place" reloadDocument={!session} data-testid="btn-begin" onClick={reset}>Enter AnalogForge<ArrowRight size={16} aria-hidden="true"/></Link></div>
+    <div className="mc-hero-actions"><Link className="button mc-cta" data-variant="primary" to="/start/place" reloadDocument={!session} data-testid="btn-begin" onClick={reset}>Enter AnalogForge<ArrowRight size={16} aria-hidden="true"/></Link><a className="button mc-case-link" href="/case-studies/gale-crater-flagstaff/">See the NASA terrain case study</a></div>
     <p className="mc-landing-access">Open exploration. No account required.</p>
     <p className="mc-hero-principle"><span aria-hidden="true"/>What Earth cannot reproduce stays visible.</p>
     <a className="mc-landing-scroll" href="#how-it-works">Explore the mission<ArrowDown size={16} aria-hidden="true"/></a>

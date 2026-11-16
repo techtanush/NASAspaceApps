@@ -1,0 +1,63 @@
+:root {
+  color-scheme: dark;
+  color: #f0f5fc;
+  background: #0c1421;
+  font: 16px/1.6 system-ui, sans-serif;
+  --muted: #b3c1d2;
+  --line: #2e4056;
+  --blue: #93d2ff;
+  --met: #83dfc6;
+  --missed: #ffb686;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+a { color: var(--blue); text-underline-offset: .22em; }
+a:hover { color: #eef8ff; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 5px; }
+h1, h2, p, figure { margin: 0; }
+.shell { width: min(1160px, calc(100% - clamp(36px, 8vw, 112px))); margin-inline: auto; }
+.topbar, .footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.topbar { min-height: 70px; border-bottom: 1px solid var(--line); }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: inherit; font-weight: 650; text-decoration: none; }
+.brand img { flex: none; }
+.try { font-size: .9rem; }
+.intro { padding: clamp(36px, 7vw, 78px) 0 clamp(28px, 5vw, 52px); }
+.eyebrow { font-size: .86rem; font-weight: 650; color: var(--blue); }
+.eyebrow span { padding-inline: .3rem; }
+.intro h1 { font-size: clamp(2.35rem, 6.4vw, 5.15rem); letter-spacing: -.048em; line-height: 1.06; margin: 8px 0 18px; }
+.intro h1 span { color: var(--muted); font-weight: 550; }
+.lede { max-width: 62ch; font-size: clamp(1rem, 1.7vw, 1.22rem); color: var(--muted); }
+.results { display: grid; grid-template-columns: 1fr minmax(0, .97fr); border: 1px solid var(--line); border-radius: 24px; overflow: hidden; background: #111e30; }
+.comparison { padding: clamp(22px, 4vw, 44px); min-width: 0; }
+h2 { font-size: clamp(1.24rem, 2.6vw, 2rem); line-height: 1.18; letter-spacing: -.025em; }
+.comparison > p:first-of-type, .details p { color: var(--muted); margin-top: 12px; }
+.scores { width: 100%; border-collapse: collapse; margin: 22px 0 12px; text-align: left; font-variant-numeric: tabular-nums; }
+.scores caption { text-align: left; color: var(--muted); font-weight: 600; font-size: .9rem; padding-bottom: 8px; }
+.scores thead { color: var(--muted); font-size: .76rem; }
+.scores th, .scores td { padding: 7px 8px 7px 0; border-bottom: 1px solid var(--line); }
+.scores td:nth-child(2) { width: 72%; }
+.badge { display: inline-grid; place-items: center; width: 1.65rem; height: 1.65rem; border-radius: 50%; border: 1px solid currentColor; }
+.badge.met, .bar.met { color: var(--met); }
+.badge.missed, .bar.missed { color: var(--missed); }
+.distance { display: grid; grid-template-columns: minmax(0, 1fr) 3.6rem; gap: 8px; align-items: center; }
+.distance strong { text-align: right; }
+.bar { position: relative; border-radius: 3px; height: 8px; background: #26374b; }
+.bar::before { content: ''; display: block; border-radius: inherit; background: currentColor; width: var(--score); height: 100%; }
+.bar::after { content: ''; position: absolute; left: 71.4286%; top: -3px; bottom: -3px; border-left: 1px solid #f0f5fc; }
+.threshold { font-size: .85rem; color: var(--muted); }
+.threshold span { display: inline-block; height: 12px; border-left: 1px solid #f0f5fc; margin-right: 6px; vertical-align: -1px; }
+.map { min-width: 0; align-self: stretch; padding: 16px; background: #0b1523; display: grid; align-content: center; gap: 10px; }
+.map img { display: block; width: 100%; height: auto; border-radius: 12px; }
+.map figcaption { font-size: .84rem; color: var(--muted); padding-inline: 4px; }
+.details { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 6vw, 72px); margin: clamp(32px, 6vw, 66px) 0; }
+.details > div { border-top: 1px solid var(--line); padding-top: 18px; }
+.details > div > a { display: inline-block; margin-top: 14px; }
+.footer { border-top: 1px solid var(--line); color: var(--muted); padding-block: 20px; font-size: .85rem; }
+.sr-only, .skip:not(:focus) { position: absolute; height: 1px; width: 1px; clip-path: inset(50%); overflow: hidden; white-space: nowrap; }
+.skip:focus { position: fixed; z-index: 1; top: 8px; left: 8px; background: #0c1421; padding: 5px 10px; }
+
+@media (max-width: 760px) {
+  .results, .details { grid-template-columns: 1fr; }
+  .map { padding: 12px; }
+}
