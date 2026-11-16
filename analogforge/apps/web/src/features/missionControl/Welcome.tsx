@@ -6,6 +6,7 @@ import { useApi } from '../../api/hooks/useApi';
 import { useWorkspace, useWorkspaceSession } from '../../app/WorkspaceContext';
 import type { components } from '../../generated/schema';
 import { ModeBadge } from '../../components/ui';
+import { BrandSymbol } from '../../components/ui/BrandSymbol';
 import { useScene } from './StageShell';
 import { GlobeStage, type GlobeScene } from '../../maps/GlobeStage';
 
@@ -35,7 +36,7 @@ export function Welcome() {
   const reveal = { initial: reduced ? false as const : { opacity: 0, y: 24 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: .15 }, transition: { duration: reduced ? 0 : .5 } };
   return <div className="mc-landing" data-testid="welcome" tabIndex={0} role="region" aria-label="Explore AnalogForge">
     <section className="mc-landing-hero" aria-labelledby="welcome-title"><GlobeStage scene={LANDING_SCENE}/><div className="mc-landing-copy">
-    <div className="mc-hero-kicker"><span className="mc-orbit-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="10"/><ellipse cx="24" cy="24" rx="23" ry="8" transform="rotate(-35 24 24)"/><path d="M24 4v7M24 37v7M4 24h7M37 24h7"/></svg></span><p className="mc-eyebrow">Planetary mission. Earth rehearsal.</p></div>
+    <div className="mc-hero-kicker"><BrandSymbol size={42}/><p className="mc-eyebrow">Planetary mission. Earth rehearsal.</p></div>
     <h1 id="welcome-title" tabIndex={-1}>A world away.<br/><span>Tested closer to home.</span></h1>
     <p className="mc-hero-lead">Find where on Earth to rehearse a mission to Mars or the Moon. Set the target, describe the objective and bring a rover. Follow the evidence to the right site for each benchmark.</p>
     <div className="mc-hero-actions"><Link className="button mc-cta" data-variant="primary" to="/start/place" reloadDocument={!session} data-testid="btn-begin" onClick={reset}>Enter AnalogForge<ArrowRight size={16} aria-hidden="true"/></Link></div>
@@ -69,7 +70,7 @@ export function Welcome() {
 
     {recent.length > 0 && <section className="mc-landing-section mc-recent" data-testid="recent-investigations"><h2>Continue an investigation</h2><ul>{recent.map(run => <RecentInvestigation key={run.id} run={run} workspace={workspace}/>)}</ul></section>}
     <section className="mc-landing-section mc-landing-final" aria-labelledby="landing-start"><p className="mc-eyebrow">Ready for the next world</p><h2 id="landing-start">Start with a place.<br/>Leave with a test plan.</h2><Link className="button mc-cta" data-variant="primary" to="/start/place" reloadDocument={!session} onClick={reset}>Start your investigation<ArrowRight size={16} aria-hidden="true"/></Link><Link className="mc-secondary-entry" to="/workbench" reloadDocument={!session}>Open mission library</Link></section>
-    <footer className="mc-landing-footer"><strong>AnalogForge</strong><p>Mission-conditioned qualification of Earth analogs for Mars and the Moon.</p><p>Not a NASA product; no endorsement implied. Modeled terrain evidence is not field validation.</p></footer>
+    <footer className="mc-landing-footer"><strong><BrandSymbol size={24}/>AnalogForge</strong><p>Mission-conditioned qualification of Earth analogs for Mars and the Moon.</p><p>Not a NASA product; no endorsement implied. Modeled terrain evidence is not field validation.</p></footer>
     </div>
   </div>;
 }
