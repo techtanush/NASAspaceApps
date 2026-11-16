@@ -84,8 +84,10 @@ def run_characterize(env: OpEnv) -> OpOutcome:
             detail_code="BODY_MISMATCH",
         )
     frame = frame_from_crs_wkt(src.body, src.raster.grid.crs_wkt)
-    prep = prepare(src.raster, spec.comparison_support.default_requested_m,
-                   cfg.algorithms.thresholds.flat_gradient_tolerance)
+    requested = cfg.algorithms.requested_terrain_support(
+        env.request.mode, spec.comparison_support.default_requested_m
+    )
+    prep = prepare(src.raster, requested, cfg.algorithms.thresholds.flat_gradient_tolerance)
     env.check()
     aoi = inp.target
     xmin, ymin, xmax, ymax = bbox_to_projected_bounds(frame, tuple(aoi.bbox), aoi.longitude_convention)  # type: ignore[arg-type]
