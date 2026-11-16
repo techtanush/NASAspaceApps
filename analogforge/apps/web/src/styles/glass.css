@@ -103,8 +103,9 @@ h3 {
   letter-spacing: -0.01em;
 }
 
-.wordmark > svg {
-  color: var(--accent);
+.brand-symbol {
+  display: block;
+  flex: none;
 }
 
 .context-label {
