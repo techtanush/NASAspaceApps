@@ -20,6 +20,9 @@ class Principal:
 
 
 def get_principal(request: Request) -> Principal:
+    if request.method == "GET" and request.url.path in {"/api/v1/health/live", "/api/v1/health/ready"}:
+        # Infrastructure probes never read a workspace or allocate a visitor session.
+        return Principal("00000000-0000-0000-0000-000000000000", "health-probe", "VIEWER")
     provider = request.app.state.identity_provider
     if provider is not None:
         return cast(Principal, provider(request))

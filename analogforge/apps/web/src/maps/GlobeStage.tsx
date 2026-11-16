@@ -12,7 +12,7 @@ export interface GlobeScene {
   markers?: GlobeMarker[];
   selectedMarker?: string | null;
   autoRotate?: boolean;
-  layout?: 'hero' | 'panel' | 'center' | 'dashboard';
+  layout?: 'hero' | 'landing' | 'panel' | 'center' | 'dashboard';
   scanning?: boolean;
 }
 type OverlayDatum = MarkerOverlay | { kind: 'pin'; lat: number; lng: number };
@@ -59,7 +59,7 @@ export function GlobeStage({ scene, onPick, onMarkerSelect, onSurfaceDetail }: {
         .pathsData([]).pathPoints((path: object) => path as number[][]).pathPointLat((point: number[]) => point[0]!).pathPointLng((point: number[]) => point[1]!)
         .pathPointAlt(0.006).pathColor(() => GLOBE_INK.accent).pathStroke(1.4).pathDashLength(1).pathDashGap(0).pathTransitionDuration(0)
         .onGlobeClick(({ lat, lng }: { lat: number; lng: number }) => pick.current?.(lat, lng));
-      const controls = instance.controls(); controls.enableRotate = true; controls.enableZoom = true; controls.enablePan = false; controls.minDistance = 165; controls.maxDistance = 520; controls.autoRotateSpeed = 0.35;
+      const controls = instance.controls(); controls.enableRotate = true; controls.enableZoom = layout.current !== 'landing'; controls.enablePan = false; controls.minDistance = 165; controls.maxDistance = 520; controls.autoRotateSpeed = 0.35;
       // The overview texture has fixed resolution. Hand a deliberate close zoom to the
       // selected site's tiled map rather than magnifying it down to surface pixels.
       const openDetail = () => { if (instance.pointOfView().altitude <= 0.72) detail.current?.(); };
@@ -70,7 +70,7 @@ export function GlobeStage({ scene, onPick, onMarkerSelect, onSurfaceDetail }: {
       };
       applyOffset.current = () => {
         const width = element.clientWidth, height = element.clientHeight; const mobile = width < 768;
-        const offset: [number, number] = layout.current === 'center' ? [0, 0] : mobile ? [0, -Math.round(height * 0.2)] : layout.current === 'panel' ? [-Math.round(Math.min(440, width * 0.34) / 2), 0] : [Math.round(width * 0.2), 0];
+        const offset: [number, number] = layout.current === 'center' || (mobile && layout.current === 'landing') ? [0, 0] : mobile ? [0, -Math.round(height * 0.2)] : layout.current === 'panel' ? [-Math.round(Math.min(440, width * 0.34) / 2), 0] : [Math.round(width * 0.2), 0];
         instance.globeOffset(offset);
       };
       const contextLost = (event: Event) => { event.preventDefault(); setState('unavailable'); };
@@ -86,7 +86,13 @@ export function GlobeStage({ scene, onPick, onMarkerSelect, onSurfaceDetail }: {
     instance.globeImageUrl(asset.surface).bumpImageUrl(asset.relief ?? '').showAtmosphere(asset.atmosphere !== null);
     if (asset.atmosphere) instance.atmosphereColor(asset.atmosphere.color).atmosphereAltitude(asset.atmosphere.altitude);
   }, [ready, scene.body, assets]);
-  useEffect(() => { if (ready) applyOffset.current(); }, [ready, scene.layout]);
+  useEffect(() => {
+    if (!ready || !globe.current) return;
+    applyOffset.current();
+    // On the public introduction, a wheel gesture scrolls the page. Scientific
+    // scenes retain their normal globe zoom and tiled-surface hand-off.
+    globe.current.controls().enableZoom = scene.layout !== 'landing';
+  }, [ready, scene.layout]);
   useEffect(() => {
     const instance = globe.current; if (!ready || !instance) return;
     const controls = instance.controls(); controls.autoRotate = false;

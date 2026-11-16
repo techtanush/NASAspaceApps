@@ -43,6 +43,25 @@ class IdentityService:
             )
         return token, Principal(user_id, workspace_id, role, csrf)
 
+    def create_visitor_session(self, maximum: int) -> tuple[str, Principal]:
+        """No account or password: an opaque cookie owns a private, bounded workspace."""
+        token, csrf, user = secrets.token_urlsafe(32), secrets.token_urlsafe(32), str(uuid4())
+        with self.store.visitor_workspace(maximum) as unit:
+            unit.create("users", {"id": user, "issuer": "public-visitor", "subject": user})
+            unit.create("workspace_memberships", {"user_id": user, "role": "EDITOR"})
+            unit.create(
+                "sessions",
+                {
+                    "token_hash": hashlib.sha256(token.encode()).hexdigest(),
+                    "user_id": user,
+                    "role": "EDITOR",
+                    "csrf_token": csrf,
+                    "expires_at": datetime.now(UTC) + timedelta(seconds=self.session_seconds),
+                },
+            )
+            workspace = unit.workspace_id
+        return token, Principal(user, workspace, "EDITOR", csrf)
+
     def authenticate(self, token: str, workspace_id: str) -> Principal:
         with self.store.transaction(workspace_id) as unit:
             sessions = unit.list("sessions", {"token_hash": hashlib.sha256(token.encode()).hexdigest()})
@@ -69,7 +88,11 @@ class IdentityService:
     def protect_mutation(self, principal: Principal, csrf: str | None, origin: str | None) -> None:
         if principal.role == "VIEWER":
             raise PersistenceError("AUTHORIZATION_FAILED", "Viewer cannot change workspace data")
-        if origin not in self.allowed_origins or csrf is None or not secrets.compare_digest(csrf, principal.csrf_token):
+        if (
+            origin not in self.allowed_origins
+            or csrf is None
+            or not secrets.compare_digest(csrf.encode(), principal.csrf_token.encode())
+        ):
             raise PersistenceError("CSRF_INVALID", "Origin and CSRF token must match the active session")
 
     def local_principal(self, workspace_id: str, user_id: str) -> Principal:

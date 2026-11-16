@@ -1,0 +1,154 @@
+name: analogforge
+x-app: &app
+  image: analogforge-runtime:${RELEASE_ID:?Set exact source commit in RELEASE_ID}
+  build:
+    context: ../..
+    dockerfile: ops/azure/Dockerfile
+    target: runtime
+  env_file:
+    - ${AF_ENV_FILE:-/etc/analogforge/runtime.env}
+  environment: &app-environment
+    AUTH_MODE: public
+    API_HOST: 0.0.0.0
+    API_PORT: "8000"
+    DATA_ROOT: /data
+    OMP_NUM_THREADS: "1"
+    OPENBLAS_NUM_THREADS: "1"
+    MKL_NUM_THREADS: "1"
+    NUMEXPR_NUM_THREADS: "1"
+  volumes:
+    - evidence:/data
+  restart: unless-stopped
+  init: true
+  read_only: true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=536870912
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  pids_limit: 256
+  logging:
+    driver: json-file
+    options: {max-size: 10m, max-file: "3"}
+
+services:
+  db:
+    image: postgis/postgis:16-3.4@sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5
+    environment:
+      POSTGRES_DB: analogforge
+      POSTGRES_USER: af_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Generate a private runtime env file}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    # Deliberately no host port: only API and worker can reach PostgreSQL.
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    shm_size: 128mb
+    mem_limit: 1g
+    cpus: 0.7
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: "3"}
+  initialize-volume:
+    <<: *app
+    user: "0:0"
+    entrypoint: [python, -c]
+    command: ["import os; os.chown('/data',10001,10001)"]
+    restart: "no"
+    cap_add: [CHOWN]
+    profiles: [bootstrap]
+    mem_limit: 128m
+    cpus: 0.2
+  migrate:
+    <<: *app
+    command: [migrate]
+    environment:
+      <<: *app-environment
+      DATABASE_URL: ${DATABASE_ADMIN_URL:?Generate a separate private database env file}
+    restart: "no"
+    profiles: [bootstrap]
+    mem_limit: 512m
+    cpus: 0.5
+  provision-runtime-role:
+    <<: *app
+    entrypoint: [python, /app/provision-db.py]
+    command: []
+    environment:
+      <<: *app-environment
+      DATABASE_ADMIN_URL: ${DATABASE_ADMIN_URL:?Generate a separate private database env file}
+    restart: "no"
+    profiles: [bootstrap]
+    mem_limit: 256m
+    cpus: 0.5
+  seed:
+    <<: *app
+    command: [seed-synthetic]
+    restart: "no"
+    profiles: [bootstrap]
+    mem_limit: 512m
+    cpus: 0.5
+  api:
+    <<: *app
+    command: [serve]
+    depends_on:
+      db: {condition: service_healthy}
+    mem_limit: 1536m
+    cpus: 0.8
+    stop_grace_period: 30s
+    healthcheck:
+      test: [CMD, python, /app/probe.py, api]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+  worker:
+    <<: *app
+    command: [worker]
+    depends_on:
+      db: {condition: service_healthy}
+    mem_limit: 4g
+    cpus: 2
+    stop_grace_period: 950s
+    healthcheck:
+      test: [CMD, python, /app/probe.py, worker]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+  proxy:
+    image: analogforge-proxy:${RELEASE_ID:?Set exact source commit in RELEASE_ID}
+    build:
+      context: ../..
+      dockerfile: ops/azure/Dockerfile
+      target: proxy
+    environment:
+      APP_HOST: ${APP_HOST:?Set the verified Azure DNS hostname}
+      APP_HOSTS: ${APP_HOSTS:-${APP_HOST}}
+    ports: ["80:80", "443:443", "443:443/udp"]
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=67108864
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    cpus: 0.3
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: "3"}
+
+volumes:
+  postgres:
+  evidence:
+  caddy_data:
+  caddy_config:

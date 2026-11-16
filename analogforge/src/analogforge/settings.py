@@ -37,7 +37,9 @@ class Settings(BaseSettings):
     data_root: Path = APP_ROOT / "data"
     config_dir: Path = APP_ROOT / "config"
     analogforge_mode: Literal["synthetic", "replay", "live"] = "synthetic"
-    auth_mode: Literal["local", "oidc"] = "local"
+    auth_mode: Literal["local", "oidc", "public"] = "local"
+    public_max_workspaces: int = Field(default=100, ge=1, le=10000)
+    public_runs_per_workspace: int = Field(default=4, ge=1, le=100)
     api_host: str = "127.0.0.1"
     api_port: int = Field(default=8000, ge=1, le=65535)
     web_port: int = Field(default=5173, ge=1, le=65535)
@@ -149,6 +151,21 @@ class Settings(BaseSettings):
             raise ValueError("DATABASE_URL must use postgresql+psycopg")
         if self.auth_mode == "local" and self.api_host not in {"127.0.0.1", "::1", "localhost"}:
             raise ValueError("AUTH_MODE=local requires a loopback API_HOST")
+        if self.auth_mode == "public":
+            public = urlsplit(self.public_base_url)
+            loopback = public.hostname in {"127.0.0.1", "::1", "localhost"}
+            if (
+                public.scheme != "https"
+                and not (loopback and public.scheme == "http")
+                or not public.netloc
+                or public.username
+                or public.password
+                or public.path not in {"", "/"}
+                or public.query
+                or public.fragment
+                or self.public_base_url.rstrip("/") not in self.allowed_origins
+            ):
+                raise ValueError("Public access requires HTTPS (or loopback) and its exact origin in ALLOWED_ORIGINS")
         if self.job_heartbeat_seconds * 3 >= self.job_lease_seconds:
             raise ValueError("JOB_HEARTBEAT_SECONDS must be less than one third of JOB_LEASE_SECONDS")
         for origin in self.allowed_origins:

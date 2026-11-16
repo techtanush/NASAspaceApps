@@ -12,6 +12,14 @@ Ship the same API/worker/database topology locally and in a hosted container env
 
 Initial developer machine budget: 4 CPU cores, 8 GiB RAM and 20 GiB disk for small scenarios. Hosted worker starts with 2 CPU/4 GiB memory and 20 GiB persistent storage; these are planning assumptions validated with real raster workloads. API remains separately limited so worker pressure cannot kill all request handling. Workers gracefully stop claiming jobs on SIGTERM and either finish within grace period or release/requeue by lease expiry.
 
+## Public judging access
+
+The judging deployment uses `AUTH_MODE=public`: a visitor deliberately entering the investigation receives an isolated workspace through an opaque HttpOnly, SameSite cookie. No signup, password, login or logout screen is needed. The public landing renders before the session service and uses only a non-allocating `/auth/session?create=false` probe to recover an existing browser workspace. Unavailable session services must not hide the landing page. Health probes never create sessions. The shared local Owner mode remains loopback-only and must never be exposed as public access.
+
+Visitor mutations retain exact-origin and CSRF checks, workspace scoping, idempotency and bounded resource creation. Defaults are 100 retained visitor workspaces and four investigations per workspace; `PUBLIC_MAX_WORKSPACES` and `PUBLIC_RUNS_PER_WORKSPACE` are explicit operator limits. Eight-hour session expiry does not delete scientific records or silently free storage capacity. Saved investigations are browser-session specific; there is no promise of cross-device recovery without a separate identity flow. Existing OIDC infrastructure remains optional and is not required for judging.
+
+The production package is `analogforge/ops/azure/`: locked runtime and static frontend builds, separate migration/runtime database credentials, persistent PostGIS/evidence, HTTPS/SSE proxy, repeatable source-commit deployment and backup checks. Its README records the actual verification boundary. The GitHub container-check workflow verifies a disposable Linux stack; it does not automatically deploy to Azure or change billing. Only record a hosted release as complete after its real HTTPS journey passes.
+
 ## Release sequence
 
 1. Build immutable images and frontend assets from dependency locks and source commit.
