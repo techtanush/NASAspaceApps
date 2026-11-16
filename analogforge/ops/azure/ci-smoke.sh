@@ -25,9 +25,9 @@ cleanup() {
 trap cleanup EXIT
 "${compose[@]}" config --quiet
 "${compose[@]}" up -d --wait --wait-timeout 180 db
-"${compose[@]}" run --rm --no-deps --no-build initialize-volume
-"${compose[@]}" run --rm --no-deps --no-build migrate
-"${compose[@]}" run --rm --no-deps --no-build provision-runtime-role
-"${compose[@]}" run --rm --no-deps --no-build seed
+"${compose[@]}" run --rm --no-deps --pull never initialize-volume
+"${compose[@]}" run --rm --no-deps --pull never migrate
+"${compose[@]}" run --rm --no-deps --pull never provision-runtime-role
+"${compose[@]}" run --rm --no-deps --pull never seed
 "${compose[@]}" up -d --no-build --wait --wait-timeout 240 api worker
 "${compose[@]}" exec -T api python - < ops/azure/ci-probe.py

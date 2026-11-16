@@ -4,6 +4,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -20,15 +21,25 @@ origin = urlsplit(public["PUBLIC_BASE_URL"])
 if (origin.scheme != "https" or not origin.hostname or origin.username or origin.password
         or origin.path not in {"", "/"} or origin.query or origin.fragment):
     raise SystemExit("A valid HTTPS public origin is required")
-connection = http.client.HTTPSConnection(origin.hostname, origin.port or 443, timeout=20)
-try:
-    connection.request("GET", "/api/v1/health/ready")
-    response = connection.getresponse()
-    if response.status != 200 or response.getheader("Set-Cookie"):
-        raise SystemExit("Session-free public readiness probe failed")
-    response.read()
-finally:
-    connection.close()
+# Compose startup can finish before the proxy has obtained its first certificate.
+deadline = time.monotonic() + 90
+while True:
+    connection = http.client.HTTPSConnection(origin.hostname, origin.port or 443, timeout=8)
+    try:
+        connection.request("GET", "/api/v1/health/ready")
+        response = connection.getresponse()
+        if response.getheader("Set-Cookie"):
+            raise SystemExit("Public readiness must not create a session")
+        if response.status == 200:
+            response.read()
+            break
+    except (OSError, http.client.HTTPException):
+        pass
+    finally:
+        connection.close()
+    if time.monotonic() >= deadline:
+        raise SystemExit("Public HTTPS readiness did not pass within 90 seconds")
+    time.sleep(3)
 images = {}
 for name in ("runtime", "proxy"):
     # Validated immutable commit and two fixed image names; no shell or user command.
